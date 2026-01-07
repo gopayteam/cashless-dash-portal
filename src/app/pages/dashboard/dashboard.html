@@ -1,0 +1,146 @@
+<!-- pages/dashboard/dashboard.component.html -->
+<div class="dashboard-container">
+  <!-- ================= GLOBAL LOADING OVERLAY ================= -->
+  <div class="dashboard-loader" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div>
+
+  <!-- ================= HEADER ================= -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Dashboard Overview</h1>
+      <p class="text-muted">Welcome back! Here's what's happening with your fleet today.</p>
+    </div>
+
+    <div class="header-actions">
+      <mat-form-field appearance="fill">
+        <mat-label>Select Date Range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
+      </mat-form-field>
+
+      <button
+        pButton
+        label="Export"
+        icon="pi pi-download"
+        class="p-button-outlined p-button-primary"
+        (click)="exportData()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" [styleClass]="'stat-card'">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">{{ card.value }}</h2>
+          <span class="stat-change positive" *ngIf="card.change">
+            <i class="pi pi-arrow-up"></i> {{ card.change }}
+          </span>
+        </div>
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= CHARTS SECTION ================= -->
+  <div class="charts-grid">
+    <!-- Line Chart -->
+    <p-card header="Organizations Performance" styleClass="chart-card">
+      <div class="chart-container">
+        <p-chart
+          *ngIf="chartData"
+          type="line"
+          [data]="chartData"
+          [options]="chartOptions"
+          height="300px"
+        ></p-chart>
+      </div>
+    </p-card>
+
+    <!-- Pie Chart -->
+    <p-card header="Total Amount Per Category" styleClass="chart-card">
+      <div class="chart-container">
+        <p-chart
+          *ngIf="pieChartData"
+          type="pie"
+          [data]="pieChartData"
+          [options]="pieChartOptions"
+          height="300px"
+        ></p-chart>
+      </div>
+
+      <!-- Dynamic Legend -->
+      <div class="category-legend" *ngIf="pieChartData">
+        <div class="legend-item" *ngFor="let label of pieChartData.labels; let i = index">
+          <span
+            class="legend-dot"
+            [style.background]="pieChartData.datasets[0].backgroundColor[i]"
+          ></span>
+          <span class="legend-label">{{ label }}</span>
+          <span class="legend-value">
+            Ksh {{ pieChartData.datasets[0].data[i] | number : '1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= RECENT TRANSACTIONS ================= -->
+  <p-card header="Recent Transactions" styleClass="transactions-card">
+    <p-table [value]="recentTransactions" [rows]="5" [paginator]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Transaction ID</th>
+          <th>Date</th>
+          <th>Vehicle</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-transaction>
+        <tr>
+          <td>{{ transaction.id }}</td>
+          <td>{{ transaction.date }}</td>
+          <td>
+            <span class="vehicle-badge">
+              <i class="pi pi-car"></i>
+              {{ transaction.vehicle }}
+            </span>
+          </td>
+          <td class="amount-cell">Ksh {{ transaction.amount | number : '1.2-2' }}</td>
+          <td>
+            <span [class]="'type-badge type-' + transaction.type.toLowerCase()">
+              {{ transaction.type }}
+            </span>
+          </td>
+          <td>
+            <span [class]="'status-badge status-' + transaction.status.toLowerCase()">
+              {{ transaction.status }}
+            </span>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

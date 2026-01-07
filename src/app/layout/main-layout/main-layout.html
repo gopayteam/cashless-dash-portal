@@ -1,0 +1,323 @@
+<div class="layout-container">
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed">
+    <!-- Logo Header -->
+    <div class="sidebar__header">
+      <div class="sidebar__logo">
+        <i class="pi pi-car" style="color: black"></i>
+        <span class="sidebar__logo-text">GOPAY</span>
+      </div>
+    </div>
+
+    <!-- Sidebar Body -->
+    <div class="sidebar__body">
+      <!-- User Profile Card -->
+      <div class="sidebar__profile">
+        <div class="sidebar__avatar">{{ userInfo.initials }}</div>
+        <div class="sidebar__user-info" *ngIf="!sidebarCollapsed">
+          <div class="sidebar__user-name">{{ userInfo.name }}</div>
+          <div class="sidebar__user-email">{{ userInfo.email }}</div>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="sidebar__nav">
+        <ul class="sidebar-menu">
+          <!-- Main Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Main</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/dashboard')"
+                  (click)="navigate('/dashboard/home')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-home menu-icon" style="color: black"></i>
+                    <span class="menu-text">Dashboard</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Transactions Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Transactions</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/transactions')"
+                  (click)="navigate('/transactions/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-list menu-icon"></i>
+                    <span class="menu-text"> All Transactions</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/deposits')"
+                  (click)="navigate('/deposits/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-arrow-down menu-icon"></i>
+                    <span class="menu-text"> Deposits (Debit)</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/withdrawals')"
+                  (click)="navigate('/withdrawals/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-arrow-up menu-icon"></i>
+                    <span class="menu-text"> Withdrawals (Credit)</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/transfer-payment')"
+                  (click)="navigate('/transfer-payment/1')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-send menu-icon"></i>
+                    <span class="menu-text"> Initiate Transfer</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Parcels Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Parcels</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/parcels')"
+                  (click)="navigate('/parcels/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-box menu-icon" style="color: black"></i>
+                    <span class="menu-text">All Parcels</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/parcel-managers')"
+                  (click)="navigate('/parcel-managers')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-users menu-icon" style="color: black"></i>
+                    <span class="menu-text">Parcel managers</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/parcel-Offices')"
+                  (click)="navigate('/parcel-Offices')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-building menu-icon" style="color: black"></i>
+                    <span class="menu-text">Parcel Offices</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Vehicles and Operations Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Vehicles and Operations</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/vehicles')"
+                  (click)="navigate('/vehicles/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-car menu-icon"></i>
+                    <span class="menu-text">Vehicles</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/drivers')"
+                  (click)="navigate('/drivers')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-user menu-icon"></i>
+                    <span class="menu-text">Drivers</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/driver-assignments')"
+                  (click)="navigate('/driver-assignments')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-map menu-icon"></i>
+                    <span class="menu-text">Driver Assignment</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <li class="menu-item">
+            <button
+              class="menu-link"
+              [class.menu-link--active]="isRouteActive('/locations')"
+              (click)="navigate('/locations/all')"
+            >
+              <span class="menu-link-content">
+                <i class="pi pi-map-marker menu-icon" style="color: black"></i>
+                <span class="menu-text">Locations</span>
+              </span>
+            </button>
+          </li>
+
+          <!-- Finance Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Finance</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/organization-wallet')"
+                  (click)="navigate('/organization-wallet')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-wallet menu-icon" style="color: black"></i>
+                    <span class="menu-text">Organization Wallets</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/management-statements')"
+                  (click)="navigate('/management-statements')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-file menu-icon" style="color: black"></i>
+                    <span class="menu-text">Withdrawal Statements</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/obligations')"
+                  (click)="navigate('/obligations')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-briefcase menu-icon" style="color: black"></i>
+                    <span class="menu-text">Obligations</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- User Management Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">User Management</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/users')"
+                  (click)="navigate('/users/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-users menu-icon" style="color: black"></i>
+                    <span class="menu-text">Users</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar__footer">
+      <button class="sidebar__logout-btn" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span *ngIf="!sidebarCollapsed">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <button class="topbar__toggle" (click)="toggleSidebar()">
+          <i class="pi pi-bars"></i>
+        </button>
+      </div>
+
+      <div class="topbar__right">
+        <button class="topbar__icon-btn">
+          <i class="pi pi-bell"></i>
+          <span class="topbar__badge">3</span>
+        </button>
+        <button class="topbar__icon-btn">
+          <i class="pi pi-cog"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
+    <nav class="tab-nav" *ngIf="showTabs">
+      <div class="tab-nav__group">
+        <button
+          *ngFor="let tab of currentTabs; let i = index"
+          class="tab-nav__item"
+          [class.tab-nav__item--active]="activeTabIndex === i"
+          (click)="onTabChange(i)"
+        >
+          <i [class]="tab.icon" class="tab-nav__icon"></i>
+          <span class="tab-nav__label">{{ tab.label }}</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Page Content Area -->
+    <section class="content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

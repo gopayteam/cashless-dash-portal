@@ -1,0 +1,532 @@
+/* ==================== LAYOUT WRAPPER ==================== */
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+/* ==================== SIDEBAR STYLES ==================== */
+.sidebar {
+  width: 280px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  z-index: 1000;
+}
+
+/* Collapsed State */
+.sidebar.collapsed {
+  width: 80px;
+}
+
+/* Hide text elements when collapsed */
+.sidebar.collapsed .logo-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+}
+
+.sidebar.collapsed .user-info {
+  display: none;
+}
+
+.sidebar.collapsed ::ng-deep .p-menuitem-text {
+  opacity: 0;
+  visibility: hidden;
+  width: 0;
+  margin: 0;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding: 1.2rem 0.5rem;
+}
+
+.sidebar.collapsed ::ng-deep .p-submenu-header {
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  font-size: 0;
+  overflow: hidden;
+}
+
+.sidebar.collapsed ::ng-deep .p-submenu-header::before {
+  content: '•';
+  font-size: 1.2rem;
+  color: #dc3545;
+}
+
+.sidebar.collapsed ::ng-deep .p-menuitem-link {
+  justify-content: center;
+  padding: 0.75rem;
+  margin: 0.25rem 0.5rem;
+}
+
+.sidebar.collapsed ::ng-deep .p-menuitem-icon {
+  margin-right: 0 !important;
+  font-size: 1.3rem;
+}
+
+.sidebar.collapsed .logout-button span {
+  display: none;
+}
+
+.sidebar.collapsed .logout-button {
+  justify-content: center;
+}
+
+/* ===== SIDEBAR HEADER ===== */
+.sidebar-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  min-height: 70px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.logo-text {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #dc3545;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+/* ===== SIDEBAR CONTENT ===== */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0;
+}
+
+/* ===== USER PROFILE ===== */
+.user-profile {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.25);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.user-profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.35);
+}
+
+.user-info {
+  margin-left: 1rem;
+  overflow: hidden;
+  flex: 1;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  opacity: 0.85;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+/* ==================== MENU STYLES ==================== */
+
+/* Sidebar Menu Wrapper */
+.sidebar .sidebar-menu {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.5rem 0;
+}
+
+/* Category Headers (Main, Analytics, Management) */
+.sidebar .p-submenu-header {
+  padding: 1rem 1.5rem 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #6c757d;
+  background: transparent;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.sidebar .p-submenu-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 2px;
+  background: linear-gradient(90deg, #dc3545 0%, transparent 70%);
+  opacity: 0.3;
+}
+
+.sidebar .p-submenu-header:first-child {
+  margin-top: 0;
+}
+
+/* Menu Items */
+.sidebar .p-menuitem {
+  margin: 0.2rem 0;
+}
+
+.sidebar .p-menuitem-link {
+  padding: 0.85rem 1.5rem;
+  margin: 0 0.75rem;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Left border accent on hover and active */
+.sidebar .p-menuitem-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #dc3545;
+  transform: scaleY(0);
+  transition: transform 0.25s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+.sidebar .p-menuitem-link:hover::before {
+  transform: scaleY(0.7);
+}
+
+/* Hover effect */
+.sidebar .p-menuitem-link:hover {
+  background: linear-gradient(90deg, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.03) 100%);
+  transform: translateX(3px);
+}
+
+/* Icons */
+.sidebar .p-menuitem-icon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+  color: #6c757d;
+  transition: all 0.25s ease;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar .p-menuitem-link:hover .p-menuitem-icon {
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+/* Menu Text */
+.sidebar .p-menuitem-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.sidebar .p-menuitem-link:hover .p-menuitem-text {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Active Menu Item */
+.sidebar .p-menuitem-link-active {
+  background: linear-gradient(
+    90deg,
+    rgba(220, 53, 69, 0.12) 0%,
+    rgba(220, 53, 69, 0.06) 100%
+  ) !important;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
+}
+
+.sidebar .p-menuitem-link-active::before {
+  transform: scaleY(1) !important;
+}
+
+.sidebar .p-menuitem-link-active .p-menuitem-icon {
+  color: #dc3545 !important;
+}
+
+.sidebar .p-menuitem-link-active .p-menuitem-text {
+  color: #dc3545 !important;
+  font-weight: 700;
+}
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 2px solid #e9ecef;
+  background: #ffffff;
+}
+
+.logout-button {
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem !important;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout-button:hover {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+/* ==================== MAIN CONTENT STYLES ==================== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  background: #ffffff;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  min-height: 70px;
+}
+
+.toggle-button {
+  transition: all 0.25s ease;
+}
+
+.toggle-button:hover {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  color: #dc3545 !important;
+}
+
+.topbar-right {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.topbar-right ::ng-deep .p-button {
+  color: #6c757d;
+  transition: all 0.25s ease;
+}
+
+.topbar-right ::ng-deep .p-button:hover {
+  color: #dc3545 !important;
+  background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* ==================== HORIZONTAL TAB MENU ==================== */
+.tab-menu-container {
+  background: #ffffff;
+  border-bottom: 2px solid #e9ecef;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  position: relative;
+  z-index: 50;
+}
+
+/* Material Tabs Customization */
+::ng-deep .horizontal-tabs {
+  height: auto;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab-labels {
+  padding: 0 1.5rem;
+  background: #ffffff;
+  gap: 0.5rem;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab {
+  min-width: 120px;
+  padding: 0 1.5rem;
+  height: 56px;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab:hover {
+  opacity: 1;
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab.mdc-tab--active {
+  opacity: 1;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab .mdc-tab__text-label {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+::ng-deep .horizontal-tabs .tab-icon {
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab:hover .tab-icon {
+  transform: scale(1.1);
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab-header {
+  border-bottom: none;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab-header-pagination {
+  display: none;
+}
+
+/* Tab Indicator (underline) */
+::ng-deep .horizontal-tabs .mdc-tab-indicator {
+  height: 3px;
+}
+
+::ng-deep .horizontal-tabs .mdc-tab-indicator__content--underline {
+  border-top-width: 3px;
+  border-color: #dc3545;
+  border-radius: 3px 3px 0 0;
+}
+
+::ng-deep .horizontal-tabs .mat-mdc-tab-body-wrapper {
+  display: none;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #f8f9fa;
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #cbd5e0 0%, #a0aec0 100%);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #a0aec0 0%, #718096 100%);
+}
+
+/* ==================== RESPONSIVE STYLES ==================== */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+  }
+
+  .sidebar.collapsed {
+    left: -280px;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-menu-container ::ng-deep .horizontal-tabs .mat-mdc-tab {
+    min-width: 100px;
+    padding: 0 1rem;
+  }
+
+  .tab-menu-container ::ng-deep .horizontal-tabs .mat-mdc-tab .mdc-tab__text-label {
+    font-size: 0.875rem;
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .tab-menu-container ::ng-deep .horizontal-tabs .mat-mdc-tab-labels {
+    padding: 0 0.75rem;
+  }
+
+  .tab-menu-container ::ng-deep .horizontal-tabs .mat-mdc-tab {
+    min-width: 80px;
+    padding: 0 0.75rem;
+  }
+
+  .tab-menu-container ::ng-deep .horizontal-tabs .tab-label {
+    display: none;
+  }
+
+  .tab-menu-container ::ng-deep .horizontal-tabs .tab-icon {
+    margin: 0;
+  }
+
+  .page-content {
+    padding: 0.75rem;
+  }
+}
