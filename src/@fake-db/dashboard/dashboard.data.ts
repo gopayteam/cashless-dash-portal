@@ -1,14 +1,14 @@
-import { LineChartData } from './dashboard.linechart.data';
-import { DashboardDataModel } from './dashboard.models';
-import { PieChartData } from './dashboard.piechart.data';
-import { StatisticsData } from './dashboard.statistics.data';
-import { TransactionsData } from './dashboard.transaction.data';
+import { TransactionStatsData } from './dashboard.transactionStats.data';
+import { TransactionStatsStatsByPeriodData } from './dashboard.transactionStatsByPeriod.data';
+import { TransactionStatsStatsByCategoryData } from './dashboard.transactionStatsPerCategory.data';
+import { PaymentRecordsData } from './dashboard.paymentRecord.data';
+import { DashboardData } from '../../@core/models/dashboard/dashboard.models';
 
 export class DashboardFakeData {
-  public static data: DashboardDataModel = {
-    stats: StatisticsData.data,
-    lineChart: LineChartData.data,
-    pieChart: PieChartData.data,
-    recentTransactions: TransactionsData.data,
+  public static data: DashboardData = {
+    summary: TransactionStatsData.data,
+    daily: TransactionStatsStatsByPeriodData.data,
+    categories: TransactionStatsStatsByCategoryData.data,
+    recentTransactions: PaymentRecordsData.response,
   };
 }

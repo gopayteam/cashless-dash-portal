@@ -263,6 +263,79 @@
   color: #58151c;
 }
 
+/* ================= PRIME NG PAGINATOR FIX ================= */
+
+.dashboard-container .transactions-card .p-paginator {
+  border: none;
+  background: transparent;
+  padding: 1rem 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Page report text */
+.dashboard-container .transactions-card .p-paginator-current {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Page buttons */
+.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  border: none;
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page:hover {
+  background: #e9ecef;
+}
+
+.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #dc3545;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Prev / Next buttons */
+.dashboard-container .transactions-card .p-paginator-prev,
+.dashboard-container .transactions-card .p-paginator-next {
+  border-radius: 8px;
+  min-width: 36px;
+  height: 36px;
+  background: #f8f9fa;
+  border: none;
+}
+
+.dashboard-container .transactions-card .p-paginator-prev:hover,
+.dashboard-container .transactions-card .p-paginator-next:hover {
+  background: #e9ecef;
+}
+
+/* Rows-per-page dropdown */
+.dashboard-container .transactions-card .p-paginator-rpp-options {
+  height: 36px;
+  border-radius: 8px;
+}
+
+.dashboard-container .transactions-card .p-dropdown {
+  border-radius: 8px;
+  min-height: 36px;
+}
+
+/* Icons alignment */
+.dashboard-container .transactions-card .p-paginator-icon {
+  font-size: 0.875rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-container .dashboard-header {
@@ -285,5 +358,16 @@
 
   .dashboard-container .charts-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container .transactions-card .p-paginator {
+    justify-content: center;
+  }
+
+  .dashboard-container .transactions-card .p-paginator-current {
+    width: 100%;
+    text-align: center;
   }
 }

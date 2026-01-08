@@ -13,20 +13,36 @@ export class DataService {
     private cache: CacheService
   ) {}
 
-  // get<T>(endpoint: string): Observable<T> {
-  //   const request$ = environment.useMockApi
-  //     ? this.mockApi.get(endpoint)
-  //     : this.api.get<T>(endpoint);
-
-  //   return this.cache.get(endpoint, request$);
-  // }
-
-  get<T>(endpoint: string, context?: string): Observable<T> {
-    const key = `${endpoint}:${context ?? 'default'}`;
+  /**
+   * GET with optional params + cache
+   */
+  get<T>(
+    endpoint: string,
+    params?: Record<string, any>,
+    context?: string
+  ): Observable<T> {
+    const key = `${endpoint}:GET:${JSON.stringify(params)}:${context ?? 'default'}`;
 
     const request$ = environment.useMockApi
       ? this.mockApi.get(endpoint)
-      : this.api.get<T>(endpoint);
+      : this.api.get<T>(endpoint, params);
+
+    return this.cache.get(key, request$);
+  }
+
+  /**
+   * POST with payload + cache
+   */
+  post<T>(
+    endpoint: string,
+    payload: any,
+    context?: string
+  ): Observable<T> {
+    const key = `${endpoint}:POST:${JSON.stringify(payload)}:${context ?? 'default'}`;
+
+    const request$ = environment.useMockApi
+      ? this.mockApi.post(endpoint, payload)
+      : this.api.post<T>(endpoint, payload);
 
     return this.cache.get(key, request$);
   }

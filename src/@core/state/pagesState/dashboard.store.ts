@@ -15,7 +15,7 @@ export class DashboardStore {
 
   loadStats() {
     this.loading.set(true);
-    this.data.get(API_ENDPOINTS.DASHBOARD).subscribe((data) => {
+    this.data.get(API_ENDPOINTS.TRANSACTION_STATS).subscribe((data) => {
       this.stats.set(data);
       this.loading.set(false);
     });

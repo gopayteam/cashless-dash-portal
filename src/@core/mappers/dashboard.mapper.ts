@@ -1,13 +1,14 @@
-// @core/mappers/dashboard.mapper.ts
 import {
-  DashboardStatsModel,
-  DashboardLineChartModel,
-  DashboardPieChartModel,
-} from '../../@fake-db/dashboard/dashboard.models';
+  TransactionStats,
+  TransactionStatsByPeriod,
+  TransactionStatsPerCategory,
+} from '../models/dashboard/dashboard.models';
 
 export interface StatsCard {
   title: string;
-  value: string;
+  amount?: number;
+  count?: number;
+  currency?: string;
   icon: string;
   color: string;
   change?: string;
@@ -16,44 +17,34 @@ export interface StatsCard {
 /**
  * Maps API stats to UI card format
  */
-export function mapStatsToCards(stats: DashboardStatsModel): StatsCard[] {
+export function mapStatsToCards(stats: TransactionStats): StatsCard[] {
   return [
     {
       title: 'Total Amount Collected',
-      value: `Ksh ${stats.totalAmountCollected.toLocaleString('en-KE', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
+      amount: stats.totalAmountCredited,
+      currency: 'Ksh',
       icon: 'pi-wallet',
       color: '#0d6efd',
-      change: stats.changes.totalAmountCollected,
     },
     {
       title: 'Total Booking Amount',
-      value: `Ksh ${stats.totalBookingAmount.toLocaleString('en-KE', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
+      amount: stats.totalBookingAmount,
+      currency: 'Ksh',
       icon: 'pi-calendar',
       color: '#198754',
-      change: stats.changes.totalBookingAmount,
     },
     {
-      title: 'Total Direct Payment',
-      value: `Ksh ${stats.totalDirectPayment.toLocaleString('en-KE', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
+      title: 'Total Direct Payments',
+      amount: stats.totalDirectPaymentAmount,
+      currency: 'Ksh',
       icon: 'pi-money-bill',
       color: '#ffc107',
-      change: stats.changes.totalDirectPayment,
     },
     {
       title: 'Total Transactions',
-      value: stats.totalTransactions.toLocaleString('en-KE'),
+      count: stats.totalTransactions,
       icon: 'pi-chart-line',
       color: '#dc3545',
-      change: stats.changes.totalTransactions,
     },
   ];
 }
@@ -61,23 +52,17 @@ export function mapStatsToCards(stats: DashboardStatsModel): StatsCard[] {
 /**
  * Builds line chart data from API response
  */
-export function buildLineChart(lineChart: DashboardLineChartModel): any {
+export function buildLineChart(data: TransactionStatsByPeriod[]) {
   return {
-    labels: lineChart.labels,
+    labels: data.map((d) => d.period),
     datasets: [
       {
-        label: 'Amount (Ksh)',
-        data: lineChart.data,
-        // fill: false,
-        // borderColor: '#0d6efd',
-        // backgroundColor: '#0d6efd',
+        label: 'Daily Amount (Ksh)',
+        data: data.map((d) => d.totalAmountCredited),
         fill: true,
         borderColor: '#dc3545',
-        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+        backgroundColor: 'rgba(220,53,69,0.1)',
         tension: 0.4,
-        borderWidth: 3,
-        pointRadius: 4,
-        pointHoverRadius: 6,
       },
     ],
   };
@@ -122,14 +107,15 @@ export function buildLineChartOptions(): any {
 /**
  * Builds pie chart data from API response
  */
-export function buildPieChart(pieChart: DashboardPieChartModel): any {
+export function buildPieChart(data: TransactionStatsPerCategory[]) {
+  const filtered = data.filter((d) => d.category);
+
   return {
-    labels: pieChart.labels,
+    labels: filtered.map((d) => d.category),
     datasets: [
       {
-        data: pieChart.data,
-        backgroundColor: ['#0d6efd', '#dc3545', '#ffc107', '#198754'],
-        hoverBackgroundColor: ['#0b5ed7', '#bb2d3b', '#ffca2c', '#157347'],
+        data: filtered.map((d) => d.totalAmount),
+        backgroundColor: ['#0d6efd', '#dc3545', '#ffc107', '#198754', '#6f42c1'],
       },
     ],
   };

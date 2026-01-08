@@ -20,4 +20,21 @@ export class MockApiService {
         return of(null);
     }
   }
+
+  post(endpoint: string, payload: any): Observable<any> {
+    switch (endpoint) {
+      case '/users':
+        return of(MOCK_DB.users).pipe(delay(500));
+
+      case '/transactions':
+        return of(MOCK_DB.transactions).pipe(delay(500));
+
+      case '/dashboard':
+        return of(MOCK_DB.dashboard).pipe(delay(500));
+
+      default:
+        console.warn(`MockApiService: Unknown endpoint ${endpoint}`);
+        return of(null);
+    }
+  }
 }

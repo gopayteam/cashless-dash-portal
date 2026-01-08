@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout';
-import { DashboardComponent } from './pages/dashboard/dashboard';
+import { DashboardComponent } from './pages/dashboard/home/dashboard';
 import { StatsComponent } from './pages/dashboard/stats/stats';
 import { ReportsComponent } from './pages/dashboard/reports/reports';
 import { DailyAnalysisComponent } from './pages/vehicle-analysis/daily/daily';

@@ -39,7 +39,21 @@
       <div class="stat-content">
         <div class="stat-info">
           <span class="stat-title">{{ card.title }}</span>
-          <h2 class="stat-value">{{ card.value }}</h2>
+          <h2 class="stat-value">
+            <ng-container *ngIf="card.amount !== undefined; else countValue">
+              <span class="currency">{{ card.currency }}</span>
+              <span class="amount">
+                {{ card.amount | number : '1.0-2' }}
+              </span>
+            </ng-container>
+
+            <ng-template #countValue>
+              <span class="amount">
+                {{ card.count | number }}
+              </span>
+            </ng-template>
+          </h2>
+
           <span class="stat-change positive" *ngIf="card.change">
             <i class="pi pi-arrow-up"></i> {{ card.change }}
           </span>
@@ -96,7 +110,20 @@
 
   <!-- ================= RECENT TRANSACTIONS ================= -->
   <p-card header="Recent Transactions" styleClass="transactions-card">
-    <p-table [value]="recentTransactions" [rows]="5" [paginator]="true">
+    <p-table
+      [value]="recentTransactions"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[5, 10, 20, 30]"
+      paginatorPosition="bottom"
+      paginatorStyleClass="custom-paginator"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      (onLazyLoad)="loadTransactions($event)"
+    >
       <ng-template pTemplate="header">
         <tr>
           <th>Transaction ID</th>
@@ -111,23 +138,23 @@
 
       <ng-template pTemplate="body" let-transaction>
         <tr>
-          <td>{{ transaction.id }}</td>
-          <td>{{ transaction.date }}</td>
+          <td>{{ transaction.mpesaReceiptNumber }}</td>
+          <td>{{ transaction.createdAt }}</td>
           <td>
             <span class="vehicle-badge">
               <i class="pi pi-car"></i>
-              {{ transaction.vehicle }}
+              {{ transaction.fleetNumber }}
             </span>
           </td>
-          <td class="amount-cell">Ksh {{ transaction.amount | number : '1.2-2' }}</td>
+          <td class="amount-cell">Ksh {{ transaction.assignedAmount | number : '1.2-2' }}</td>
           <td>
-            <span [class]="'type-badge type-' + transaction.type.toLowerCase()">
-              {{ transaction.type }}
+            <span [class]="'type-badge type-' + transaction.transactionType.toLowerCase()">
+              {{ transaction.transactionType }}
             </span>
           </td>
           <td>
-            <span [class]="'status-badge status-' + transaction.status.toLowerCase()">
-              {{ transaction.status }}
+            <span [class]="'status-badge status-' + transaction.paymentStatus.toLowerCase()">
+              {{ transaction.paymentStatus }}
             </span>
           </td>
           <td>

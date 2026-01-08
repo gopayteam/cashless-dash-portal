@@ -4,9 +4,9 @@
 
 export const environment = {
   hmr: false,
-  useMockApi: true,
+  useMockApi: false,
   production: false,
-  apiBaseUrl: 'http://localhost:4200',
+  apiBaseUrl: 'https://api.gopay.ke', //'http://localhost:4200',
 };
 
 /*
