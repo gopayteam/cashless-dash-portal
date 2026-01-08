@@ -32,9 +32,9 @@ export class MainLayoutComponent implements OnInit {
 
   // User Info
   userInfo = {
-    name: 'SuperMetro Admin',
-    email: 'super.metro@gmail.com',
-    initials: 'SA',
+    name: 'Gopay Admin',
+    email: 'admin@gopay.ke',
+    initials: 'GA',
   };
 
   // Navigation Configuration - Maps routes to their tab menus

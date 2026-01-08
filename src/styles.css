@@ -6,14 +6,21 @@
 
 /* Color Variables */
 :root {
-  --primary-color: #dc3545;
-  --primary-color-dark: #c82333;
-  --secondary-color: #0d6efd;
-  --secondary-color-dark: #0b5ed7;
+  /* Primary – Blue 900 */
+  --primary-color: #0e2c5a;
+  --primary-color-dark: #093170;
+
+  /* Secondary – Red 900 */
+  --secondary-color: #c82333;
+  --secondary-color-dark: #7f0000;
+
+  /* Status colors */
   --success-color: #198754;
   --warning-color: #ffc107;
-  --danger-color: #dc3545;
+  --danger-color: #b71c1c;
   --info-color: #0dcaf0;
+
+  /* Neutrals */
   --light-bg: #f8f9fa;
   --white: #ffffff;
   --dark-text: #212529;
@@ -21,6 +28,7 @@
   --light-text: #6c757d;
   --border-color: #e9ecef;
 }
+
 
 /* Reset and Base Styles */
 * {
