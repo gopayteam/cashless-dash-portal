@@ -15,3 +15,10 @@ export interface PaymentRecord {
   assignedAmount: number;
   updatedAt: string;
 }
+
+
+
+export interface PaymentRecordVM extends PaymentRecord {
+  createdAtFormatted: string;
+  updatedAtFormatted: string;
+}

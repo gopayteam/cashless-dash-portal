@@ -139,7 +139,7 @@
       <ng-template pTemplate="body" let-transaction>
         <tr>
           <td>{{ transaction.mpesaReceiptNumber }}</td>
-          <td>{{ transaction.createdAt }}</td>
+          <td>{{ transaction.createdAt | date : 'dd MMM yyyy, hh:mm a' }}</td>
           <td>
             <span class="vehicle-badge">
               <i class="pi pi-car"></i>

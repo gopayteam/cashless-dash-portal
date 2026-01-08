@@ -33,9 +33,12 @@ import {
   TransactionStatsPerCategory,
 } from '../../../../@core/models/dashboard/dashboard.models';
 import { forkJoin } from 'rxjs';
-import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
+import {
+  PaymentRecord,
+  PaymentRecordVM,
+} from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
-
+import { formatDateTime, formatRelativeTime } from '../../../../@core/utils/date-time.util';
 
 @Component({
   imports: [
@@ -101,7 +104,7 @@ export class DashboardComponent implements OnInit {
       page,
       size: event.rows,
       paymentStatus: 'PAID',
-      transactionType: 'DEBIT',
+      transactionType: 'CREDIT',
       sort: 'createdAt,DESC',
     };
 
@@ -135,7 +138,7 @@ export class DashboardComponent implements OnInit {
       page: 0,
       size: this.rows, // 👈 DEFAULT 5
       paymentStatus: 'PAID',
-      transactionType: 'DEBIT',
+      transactionType: 'CREDIT',
       sort: 'createdAt,DESC', // 👈 LATEST FIRST
     };
 
