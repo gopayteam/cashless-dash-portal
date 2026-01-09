@@ -1,1 +1,299 @@
-<p>pending works!</p>
+<!-- pages/transactions/all-transactions.component.html -->
+<div class="transactions-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="transactions-loader" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER WITH DATE FILTER ================= -->
+  <div class="transactions-header">
+    <div class="header-content">
+      <h1>All pending transactions</h1>
+      <p class="text-muted">View and manage all your payment transactions</p>
+    </div>
+    <div class="filter-item">
+      <label class="filter-label">Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- ================= TRANSACTIONS TABLE ================= -->
+  <p-card styleClass="table-card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Transactions List</h3>
+        <span class="record-count">{{ totalRecords }} total records</span>
+      </div>
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search transactions..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          />
+        </span>
+        <button
+          *ngIf="searchTerm"
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()"
+          pTooltip="Clear search"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="transactions"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="apiTotalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
+      styleClass="transactions-table"
+      (onLazyLoad)="loadTransactions($event)"
+      [tableStyle]="{ 'min-width': '60rem',  }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Receipt Number</th>
+          <th>Transaction Date</th>
+          <th>Customer Name</th>
+          <th>Fleet Number</th>
+          <th>Amount</th>
+          <th>Transaction Type</th>
+          <th>Payment Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-transaction>
+        <tr class="clickable-row" (click)="viewTransactionDetails(transaction)">
+          <td>
+            <span class="receipt-number">{{ transaction.mpesaReceiptNumber }}</span>
+          </td>
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ transaction.createdAt | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ transaction.createdAt | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="customer-cell">
+              <i class="pi pi-user"></i>
+              <span>{{ transaction.customerName || 'N/A' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              {{ transaction.fleetNumber }}
+            </span>
+          </td>
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ transaction.assignedAmount | number : '1.2-2' }}</span>
+          </td>
+          <td>
+            <span [class]="'type-badge type-' + transaction.transactionType.toLowerCase()">
+              <i
+                [class]="
+                  transaction.transactionType === 'CREDIT' ? 'pi pi-arrow-down' : 'pi pi-arrow-up'
+                "
+              ></i>
+              {{ transaction.transactionType }}
+            </span>
+          </td>
+          <td>
+            <span [class]="'status-badge status-' + transaction.paymentStatus.toLowerCase()">
+              <i
+                [class]="
+                  transaction.paymentStatus === 'PAID'
+                    ? 'pi pi-check-circle'
+                    : transaction.paymentStatus === 'PENDING'
+                      ? 'pi pi-clock'
+                      : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ transaction.paymentStatus }}
+            </span>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm action-button"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewTransactionDetails(transaction); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No Transactions Found</h3>
+              <p>Try adjusting your date range</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= TRANSACTION DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="transaction-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Transaction Details</h2>
+        <span class="receipt-number-large">{{ selectedTransaction?.mpesaReceiptNumber }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedTransaction">
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Receipt Number</label>
+            <span class="value">{{ selectedTransaction.mpesaReceiptNumber || 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Transaction Date</label>
+            <span class="value">
+              {{ selectedTransaction.createdAt | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Customer Name</label>
+            <span class="value">{{ selectedTransaction.customerName || 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Customer Phone</label>
+            <span class="value">{{ 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Fleet Number</label>
+            <span class="value fleet-highlight">
+              <i class="pi pi-car"></i>
+              {{ selectedTransaction.fleetNumber }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Amount</label>
+            <span class="value amount-highlight">
+              Ksh {{ selectedTransaction.assignedAmount | number : '1.2-2' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Transaction Type</label>
+            <span [class]="'value type-badge type-' + selectedTransaction.transactionType.toLowerCase()">
+              <i
+                [class]="
+                  selectedTransaction.transactionType === 'CREDIT'
+                    ? 'pi pi-arrow-down'
+                    : 'pi pi-arrow-up'
+                "
+              ></i>
+              {{ selectedTransaction.transactionType }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Payment Status</label>
+            <span [class]="'value status-badge status-' + selectedTransaction.paymentStatus.toLowerCase()">
+              <i
+                [class]="
+                  selectedTransaction.paymentStatus === 'PAID'
+                    ? 'pi pi-check-circle'
+                    : selectedTransaction.paymentStatus === 'PENDING'
+                      ? 'pi pi-clock'
+                      : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ selectedTransaction.paymentStatus }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Transaction ID</label>
+            <span class="value code-value">{{  'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Entity ID</label>
+            <span class="value code-value">{{  'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Payment Method</label>
+            <span class="value">{{  'M-Pesa' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Reference Number</label>
+            <span class="value code-value">{{  'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Description</label>
+            <span class="value">{{  'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Last Updated</label>
+            <span class="value">
+              {{ selectedTransaction.updatedAt | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

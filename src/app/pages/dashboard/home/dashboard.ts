@@ -66,6 +66,7 @@ export class DashboardComponent implements OnInit {
   pieChartOptions: any;
   dateRange: Date[] = [];
   recentTransactions: PaymentRecord[] = [];
+
   // pagination state
   rows: number = 5;
   first: number = 0;
@@ -93,6 +94,9 @@ export class DashboardComponent implements OnInit {
 
     const page = event.first / event.rows;
 
+    this.rows = event.rows;
+    this.first = event.first;
+
     const payload = {
       entityId: 'GS000002',
       startDate: start.toISOString().split('T')[0],
@@ -114,7 +118,7 @@ export class DashboardComponent implements OnInit {
           this.first = event.first;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Transaction load failed', err),
+        error: (err) => console.error('Recent Transaction load failed', err),
       });
   }
 

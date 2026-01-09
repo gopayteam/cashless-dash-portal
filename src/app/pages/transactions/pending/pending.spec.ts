@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Pending } from './pending';
+import { PendingTransactionsComponent as Pending } from './pending';
 
 describe('Pending', () => {
   let component: Pending;

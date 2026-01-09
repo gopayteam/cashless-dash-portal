@@ -39,14 +39,14 @@ export class MainLayoutComponent implements OnInit {
 
   // Navigation Configuration - Maps routes to their tab menus
   private navigationConfig: NavConfig[] = [
-    {
-      route: '/dashboard',
-      tabs: [
-        { label: 'Overview', icon: 'pi pi-th-large', path: '/dashboard/home' },
-        { label: 'Statistics', icon: 'pi pi-chart-pie', path: '/dashboard/stats' },
-        { label: 'Reports', icon: 'pi pi-file', path: '/dashboard/reports' },
-      ],
-    },
+    // {
+    //   route: '/dashboard',
+    //   tabs: [
+    //     { label: 'Overview', icon: 'pi pi-th-large', path: '/dashboard/home' },
+    //     { label: 'Statistics', icon: 'pi pi-chart-pie', path: '/dashboard/stats' },
+    //     { label: 'Reports', icon: 'pi pi-file', path: '/dashboard/reports' },
+    //   ],
+    // },
 
     {
       route: '/transactions',

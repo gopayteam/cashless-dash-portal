@@ -1,0 +1,702 @@
+/* pages/transactions/all-transactions.component.css */
+
+.transactions-container {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ================= LOADING OVERLAY ================= */
+.transactions-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* ================= HEADER WITH DATE FILTER ================= */
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.header-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 350px;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+.date-range-field {
+  width: 100%;
+}
+
+/* ================= TABLE CARD ================= */
+.table-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.table-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.record-count {
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  width: 300px;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  outline: none;
+}
+
+.p-input-icon-left {
+  position: relative;
+  display: inline-block;
+}
+
+.p-input-icon-left > i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  z-index: 1;
+}
+
+.clear-button {
+  color: #6c757d !important;
+}
+
+.clear-button:hover {
+  color: #495057 !important;
+}
+
+/* ================= TABLE STYLING ================= */
+.transactions-table {
+  font-size: 0.9rem;
+}
+
+.transactions-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.transactions-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.transactions-table tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background-color: #e7f3ff !important;
+}
+
+/* ================= CELL CONTENT STYLING ================= */
+.receipt-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #495057;
+  background-color: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.date-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-cell .date {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.date-cell .time {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer-cell i {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.fleet-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.fleet-badge i {
+  font-size: 0.9rem;
+}
+
+.amount-cell {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.amount {
+  font-size: 1rem;
+}
+
+/* ================= BADGES ================= */
+.type-badge,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Transaction Type Badges */
+.type-credit {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.type-debit {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Payment Status Badges */
+.status-paid {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-failed {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* ================= ACTION BUTTON ================= */
+.action-button {
+  color: #667eea !important;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #667eea !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #dee2e6;
+}
+
+.empty-state h3 {
+  margin: 0;
+  color: #495057;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: 1rem;
+  }
+
+  .transactions-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .filter-item {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-header-left {
+    width: 100%;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .transactions-table {
+    font-size: 0.8rem;
+  }
+
+  .transactions-table th,
+  .transactions-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .fleet-badge,
+  .type-badge,
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .amount {
+    font-size: 0.9rem;
+  }
+}
+
+/* ================= PRIMENG OVERRIDES ================= */
+::ng-deep .p-card .p-card-body {
+  padding: 1.5rem;
+}
+
+::ng-deep .p-card .p-card-content {
+  padding: 0;
+}
+
+::ng-deep .p-paginator {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+::ng-deep .p-paginator .p-paginator-current {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.95rem;
+  order: 2;
+  margin-left: auto;
+}
+
+::ng-deep .p-paginator .p-paginator-left-content {
+  order: 1;
+}
+
+::ng-deep .p-paginator .p-paginator-right-content {
+  order: 3;
+}
+
+/* Rows per page dropdown */
+::ng-deep .p-paginator .p-dropdown {
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+  height: 40px;
+}
+
+::ng-deep .p-paginator .p-dropdown:hover {
+  border-color: #5568d3;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+::ng-deep .p-paginator .p-dropdown .p-dropdown-label {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+::ng-deep .p-paginator .p-dropdown .p-dropdown-trigger {
+  color: #667eea;
+  width: 2.5rem;
+}
+
+/* Page navigation buttons */
+::ng-deep .p-paginator .p-paginator-pages {
+  display: flex;
+  gap: 0.5rem;
+}
+
+::ng-deep .p-paginator .p-paginator-page,
+::ng-deep .p-paginator .p-paginator-first,
+::ng-deep .p-paginator .p-paginator-prev,
+::ng-deep .p-paginator .p-paginator-next,
+::ng-deep .p-paginator .p-paginator-last {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  background: white;
+  color: #495057;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .p-paginator .p-paginator-page:hover,
+::ng-deep .p-paginator .p-paginator-first:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-prev:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-next:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* ================= ACTIVE PAGE (PERSISTENT) ================= */
+::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: #667eea !important;
+  border-color: #667eea !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.35);
+}
+
+/* Prevent hover from overriding active page */
+::ng-deep .p-paginator .p-paginator-page.p-highlight:hover {
+  background: #667eea !important;
+  border-color: #667eea !important;
+  color: #ffffff !important;
+  transform: none;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.45);
+}
+
+::ng-deep .p-paginator .p-paginator-first.p-disabled,
+::ng-deep .p-paginator .p-paginator-prev.p-disabled,
+::ng-deep .p-paginator .p-paginator-next.p-disabled,
+::ng-deep .p-paginator .p-paginator-last.p-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #e9ecef;
+}
+
+/* Paginator icons */
+::ng-deep .p-paginator .p-paginator-icon {
+  font-size: 1rem;
+}
+
+/* Items per page text */
+::ng-deep .p-paginator .p-dropdown-label::before {
+  content: 'Items per page: ';
+  color: #6c757d;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+/* Responsive paginator */
+@media (max-width: 768px) {
+  ::ng-deep .p-paginator {
+    justify-content: center;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-current {
+    order: 4;
+    width: 100%;
+    text-align: center;
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-pages {
+    gap: 0.25rem;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-page,
+  ::ng-deep .p-paginator .p-paginator-first,
+  ::ng-deep .p-paginator .p-paginator-prev,
+  ::ng-deep .p-paginator .p-paginator-next,
+  ::ng-deep .p-paginator .p-paginator-last {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+}
+
+/* ================= MATERIAL DATE PICKER OVERRIDES ================= */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+::ng-deep .mat-date-range-input-container {
+  width: 100%;
+}
+
+/* ================= TRANSACTION DETAIL DIALOG ================= */
+.transaction-detail-dialog .dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.transaction-detail-dialog .dialog-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.receipt-number-large {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+  background-color: #f0f3ff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.detail-content {
+  padding: 1rem 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detail-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item .value {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.detail-item .code-value {
+  font-family: 'Courier New', monospace;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.fleet-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea !important;
+  font-weight: 600 !important;
+}
+
+.fleet-highlight i {
+  font-size: 1.1rem;
+}
+
+.amount-highlight {
+  color: #28a745 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+/* Responsive dialog */
+@media (max-width: 768px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 6px 6px 0 0;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-title {
+  color: white;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-footer {
+  padding: 1rem 2rem;
+  border-top: 1px solid #e9ecef;
+}
+::ng-deep .transaction-detail-dialog .p-button.p-button-primary {
+  background: #667eea;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}

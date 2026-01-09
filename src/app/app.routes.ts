@@ -13,7 +13,7 @@ import { LongTermPredictionComponent } from './pages/prediction/long-term/long-t
 import { CompletedTransactionsComponent } from './pages/transactions/completed/completed';
 import { FailedTransactionsComponent } from './pages/transactions/failed/failed';
 import { PendingTransactionsComponent } from './pages/transactions/pending/pending';
-import { TransactionsComponent } from './pages/transactions/all/all';
+import { AllTransactionsComponent } from './pages/transactions/all/all';
 import { RevenueComponent } from './pages/revenue/all/all';
 import { RevenueByVehicleComponent } from './pages/revenue/by-vehicle/by-vehicle';
 import { RevenueByLocationComponent } from './pages/revenue/by-location/by-location';
@@ -51,7 +51,7 @@ export const routes: Routes = [
       { path: 'dashboard/stats', component: StatsComponent },
       { path: 'dashboard/reports', component: ReportsComponent },
 
-      { path: 'transactions/all', component: TransactionsComponent },
+      { path: 'transactions/all', component: AllTransactionsComponent },
       { path: 'transactions/completed', component: CompletedTransactionsComponent },
       { path: 'transactions/failed', component: FailedTransactionsComponent },
       { path: 'transactions/pending', component: PendingTransactionsComponent },

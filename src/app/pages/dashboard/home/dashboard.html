@@ -13,7 +13,7 @@
     </div>
 
     <div class="header-actions">
-      <mat-form-field appearance="fill">
+      <mat-form-field appearance="fill" class="white-bg">
         <mat-label>Select Date Range</mat-label>
         <mat-date-range-input [rangePicker]="picker">
           <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
@@ -22,15 +22,8 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
       </mat-form-field>
-
-      <button
-        pButton
-        label="Export"
-        icon="pi pi-download"
-        class="p-button-outlined p-button-primary"
-        (click)="exportData()"
-      ></button>
     </div>
+
   </div>
 
   <!-- ================= STATS CARDS ================= -->
@@ -116,10 +109,9 @@
       [paginator]="true"
       [rows]="rows"
       [first]="first"
+      [loading]="loading()"
       [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[5, 10, 20, 30]"
-      paginatorPosition="bottom"
-      paginatorStyleClass="custom-paginator"
+      [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
       (onLazyLoad)="loadTransactions($event)"

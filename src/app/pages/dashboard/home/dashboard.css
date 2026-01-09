@@ -108,6 +108,11 @@
   font-size: 2rem;
 }
 
+.white-bg .mat-mdc-text-field-wrapper {
+  background-color: #ffffff !important;
+}
+
+
 /* Charts Grid */
 .dashboard-container .charts-grid {
   display: grid;
@@ -263,111 +268,159 @@
   color: #58151c;
 }
 
-/* ================= PRIME NG PAGINATOR FIX ================= */
 
-.dashboard-container .transactions-card .p-paginator {
-  border: none;
-  background: transparent;
-  padding: 1rem 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+/* ================= PRIMENG OVERRIDES ================= */
+::ng-deep .p-card .p-card-body {
+  padding: 1.5rem;
 }
 
-/* Page report text */
-.dashboard-container .transactions-card .p-paginator-current {
-  font-size: 0.875rem;
-  color: #6c757d;
+::ng-deep .p-card .p-card-content {
+  padding: 0;
 }
 
-/* Page buttons */
-.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page {
-  min-width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  margin: 0 0.25rem;
-  border: none;
+::ng-deep .p-paginator {
+  padding: 1.5rem;
   background: #f8f9fa;
+  border-top: 2px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+::ng-deep .p-paginator .p-paginator-current {
+  color: #495057;
+  font-weight: 500;
+  font-size: 0.95rem;
+  order: 2;
+  margin-left: auto;
+}
+
+::ng-deep .p-paginator .p-paginator-left-content {
+  order: 1;
+}
+
+::ng-deep .p-paginator .p-paginator-right-content {
+  order: 3;
+}
+
+/* Rows per page dropdown */
+::ng-deep .p-paginator .p-dropdown {
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+  height: 40px;
+}
+
+::ng-deep .p-paginator .p-dropdown:hover {
+  border-color: #5568d3;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+::ng-deep .p-paginator .p-dropdown .p-dropdown-label {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+::ng-deep .p-paginator .p-dropdown .p-dropdown-trigger {
+  color: #667eea;
+  width: 2.5rem;
+}
+
+/* Page navigation buttons */
+::ng-deep .p-paginator .p-paginator-pages {
+  display: flex;
+  gap: 0.5rem;
+}
+
+::ng-deep .p-paginator .p-paginator-page,
+::ng-deep .p-paginator .p-paginator-first,
+::ng-deep .p-paginator .p-paginator-prev,
+::ng-deep .p-paginator .p-paginator-next,
+::ng-deep .p-paginator .p-paginator-last {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  background: white;
   color: #495057;
   font-weight: 500;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page:hover {
-  background: #e9ecef;
+::ng-deep .p-paginator .p-paginator-page:hover,
+::ng-deep .p-paginator .p-paginator-first:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-prev:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-next:not(.p-disabled):hover,
+::ng-deep .p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.dashboard-container .transactions-card .p-paginator-pages .p-paginator-page.p-highlight {
-  background: #dc3545;
-  color: #fff;
+::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
   font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
-/* Prev / Next buttons */
-.dashboard-container .transactions-card .p-paginator-prev,
-.dashboard-container .transactions-card .p-paginator-next {
-  border-radius: 8px;
-  min-width: 36px;
-  height: 36px;
-  background: #f8f9fa;
-  border: none;
+::ng-deep .p-paginator .p-paginator-first.p-disabled,
+::ng-deep .p-paginator .p-paginator-prev.p-disabled,
+::ng-deep .p-paginator .p-paginator-next.p-disabled,
+::ng-deep .p-paginator .p-paginator-last.p-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #e9ecef;
 }
 
-.dashboard-container .transactions-card .p-paginator-prev:hover,
-.dashboard-container .transactions-card .p-paginator-next:hover {
-  background: #e9ecef;
+/* Paginator icons */
+::ng-deep .p-paginator .p-paginator-icon {
+  font-size: 1rem;
 }
 
-/* Rows-per-page dropdown */
-.dashboard-container .transactions-card .p-paginator-rpp-options {
-  height: 36px;
-  border-radius: 8px;
+/* Items per page text */
+::ng-deep .p-paginator .p-dropdown-label::before {
+  content: 'Items per page: ';
+  color: #6c757d;
+  font-weight: 500;
+  margin-right: 0.5rem;
 }
 
-.dashboard-container .transactions-card .p-dropdown {
-  border-radius: 8px;
-  min-height: 36px;
-}
-
-/* Icons alignment */
-.dashboard-container .transactions-card .p-paginator-icon {
-  font-size: 0.875rem;
-}
-
-/* Responsive Design */
+/* Responsive paginator */
 @media (max-width: 768px) {
-  .dashboard-container .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .dashboard-container .dashboard-header .header-actions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .dashboard-container .dashboard-header .header-actions > * {
-    width: 100%;
-  }
-
-  .dashboard-container .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-container .charts-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-container .transactions-card .p-paginator {
+  ::ng-deep .p-paginator {
     justify-content: center;
   }
 
-  .dashboard-container .transactions-card .p-paginator-current {
+  ::ng-deep .p-paginator .p-paginator-current {
+    order: 4;
     width: 100%;
     text-align: center;
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-pages {
+    gap: 0.25rem;
+  }
+
+  ::ng-deep .p-paginator .p-paginator-page,
+  ::ng-deep .p-paginator .p-paginator-first,
+  ::ng-deep .p-paginator .p-paginator-prev,
+  ::ng-deep .p-paginator .p-paginator-next,
+  ::ng-deep .p-paginator .p-paginator-last {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
   }
 }
