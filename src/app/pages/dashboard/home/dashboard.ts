@@ -33,12 +33,8 @@ import {
   TransactionStatsPerCategory,
 } from '../../../../@core/models/dashboard/dashboard.models';
 import { forkJoin } from 'rxjs';
-import {
-  PaymentRecord,
-  PaymentRecordVM,
-} from '../../../../@core/models/transactions/transactions.models';
+import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
-import { formatDateTime, formatRelativeTime } from '../../../../@core/utils/date-time.util';
 
 @Component({
   imports: [
@@ -136,24 +132,24 @@ export class DashboardComponent implements OnInit {
     const transactionsPayload = {
       ...baseParams,
       page: 0,
-      size: this.rows, // 👈 DEFAULT 5
+      size: this.rows,
       paymentStatus: 'PAID',
       transactionType: 'CREDIT',
-      sort: 'createdAt,DESC', // 👈 LATEST FIRST
+      sort: 'createdAt,DESC',
     };
 
     forkJoin({
-      summary: this.dataService.get<TransactionStats>(
+      transaction_stats: this.dataService.get<TransactionStats>(
         API_ENDPOINTS.TRANSACTION_STATS,
         baseParams,
         'stats'
       ),
-      daily: this.dataService.get<TransactionStatsByPeriod[]>(
+      transaction_stats_by_period: this.dataService.get<TransactionStatsByPeriod[]>(
         API_ENDPOINTS.STATS_BY_PERIOD,
         { ...baseParams, periodType: 'DAILY' },
         'daily'
       ),
-      categories: this.dataService.get<TransactionStatsPerCategory[]>(
+      transaction_stats_per_category: this.dataService.get<TransactionStatsPerCategory[]>(
         API_ENDPOINTS.STATS_PER_CATEGORY,
         baseParams,
         'categories'
@@ -167,14 +163,14 @@ export class DashboardComponent implements OnInit {
     }).subscribe({
       next: (data: DashboardData) => {
         // Cards
-        this.statsCards = mapStatsToCards(data.summary);
+        this.statsCards = mapStatsToCards(data.transaction_stats);
 
         // Line chart
-        this.chartData = buildLineChart(data.daily);
+        this.chartData = buildLineChart(data.transaction_stats_by_period);
         this.chartOptions = buildLineChartOptions();
 
         // Pie chart
-        this.pieChartData = buildPieChart(data.categories);
+        this.pieChartData = buildPieChart(data.transaction_stats_per_category);
         this.pieChartOptions = buildPieChartOptions();
 
         // Set transactions

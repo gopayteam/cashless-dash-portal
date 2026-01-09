@@ -6,9 +6,9 @@ import { DashboardData } from '../../@core/models/dashboard/dashboard.models';
 
 export class DashboardFakeData {
   public static data: DashboardData = {
-    summary: TransactionStatsData.data,
-    daily: TransactionStatsStatsByPeriodData.data,
-    categories: TransactionStatsStatsByCategoryData.data,
+    transaction_stats: TransactionStatsData.data,
+    transaction_stats_by_period: TransactionStatsStatsByPeriodData.data,
+    transaction_stats_per_category: TransactionStatsStatsByCategoryData.data,
     recentTransactions: PaymentRecordsData.response,
   };
 }

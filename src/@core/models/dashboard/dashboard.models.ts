@@ -19,8 +19,8 @@ export interface TransactionStatsPerCategory {
 }
 
 export interface DashboardData {
-  summary: TransactionStats;
-  daily: TransactionStatsByPeriod[];
-  categories: TransactionStatsPerCategory[];
+  transaction_stats: TransactionStats;
+  transaction_stats_by_period: TransactionStatsByPeriod[];
+  transaction_stats_per_category: TransactionStatsPerCategory[];
   recentTransactions: PaymentsApiResponse;
 }

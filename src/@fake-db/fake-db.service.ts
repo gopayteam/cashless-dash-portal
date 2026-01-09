@@ -5,12 +5,13 @@ export class FakeDbService implements InMemoryDbService {
   createDb() {
     return {
       // Dashboard
-      'dashboard': DashboardFakeData.data,
+      dashboard: DashboardFakeData.data,
 
-      // Future extensions
-      // 'dashboard-transactions': DashboardFakeData.data.recentTransactions,
-      // 'dashboard-line-chart': DashboardFakeData.data.lineChart,
-      // 'dashboard-pie-chart': DashboardFakeData.data.pieChart,
+      recent_transactions: DashboardFakeData.data.recentTransactions,
+      transaction_stats: DashboardFakeData.data.transaction_stats,
+      transaction_stats_by_period: DashboardFakeData.data.transaction_stats_by_period,
+      transaction_stats_per_category: DashboardFakeData.data.transaction_stats_per_category,
+
     };
   }
 }

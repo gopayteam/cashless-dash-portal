@@ -16,8 +16,6 @@ export interface PaymentRecord {
   updatedAt: string;
 }
 
-
-
 export interface PaymentRecordVM extends PaymentRecord {
   createdAtFormatted: string;
   updatedAtFormatted: string;
