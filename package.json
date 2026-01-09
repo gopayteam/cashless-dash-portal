@@ -17,7 +17,10 @@
         "options": {
           "parser": "angular"
         }
-      }
+      },
+        {
+    "vite": "5.4.11"
+  }
     ]
   },
   "private": true,
