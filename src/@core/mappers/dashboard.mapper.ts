@@ -3,6 +3,7 @@ import {
   TransactionStatsByPeriod,
   TransactionStatsPerCategory,
 } from '../models/dashboard/dashboard.models';
+import { ParcelsAPiResponse } from '../models/parcels/parcel_response.model';
 
 export interface StatsCard {
   title: string;
@@ -48,6 +49,59 @@ export function mapStatsToCards(stats: TransactionStats): StatsCard[] {
     },
   ];
 }
+export function mapParcelStatsToCards(
+  stats: ParcelsAPiResponse
+): StatsCard[] {
+  return [
+    {
+      title: 'Total Parcels',
+      count: stats.totalItems,
+      icon: 'pi pi-box',
+      color: '#0d6efd', // Primary / Info
+    },
+
+    {
+      title: 'Total Amount',
+      amount: stats.totalAmount,
+      currency: 'KSh',
+      icon: 'pi pi-wallet',
+      color: '#198754', // Success
+    },
+
+    {
+      title: 'Cash Payments',
+      amount: stats.totalCash,
+      currency: 'KSh',
+      icon: 'pi pi-money-bill',
+      color: '#20c997', // Teal (Cash)
+    },
+
+    {
+      title: 'Cashless Payments',
+      amount: stats.totalCashLess,
+      currency: 'KSh',
+      icon: 'pi pi-credit-card',
+      color: '#0dcaf0', // Cyan (Digital)
+    },
+
+    {
+      title: 'Total Expenses',
+      amount: stats.totalExpenses,
+      currency: 'KSh',
+      icon: 'pi pi-receipt',
+      color: '#dc3545', // Danger
+    },
+
+    {
+      title: 'Net Amount',
+      amount: stats.netAmount,
+      currency: 'KSh',
+      icon: 'pi pi-chart-line',
+      color: stats.netAmount >= 0 ? '#198754' : '#dc3545',
+    },
+  ];
+}
+
 
 /**
  * Builds line chart data from API response

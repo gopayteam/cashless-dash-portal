@@ -1,1 +1,493 @@
-<p>parcels works!</p>
+<!-- pages/parcels/parcels.component.html -->
+<div class="parcels-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="parcels-header">
+    <div class="header-content">
+      <h1>Parcel Management</h1>
+      <p class="text-muted">Track and manage all parcel shipments</p>
+    </div>
+  </div>
+
+  <!-- ================= FILTER SECTION ================= -->
+  <p-card styleClass="stat-card card filter-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label class="filter-label">Parcel Number</label>
+        <input
+          pInputText
+          placeholder="Search by parcel number..."
+          [(ngModel)]="filters.parcelNumber"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Source</label>
+        <input
+          pInputText
+          placeholder="Source location..."
+          [(ngModel)]="filters.sourceName"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Destination</label>
+        <input
+          pInputText
+          placeholder="Destination location..."
+          [(ngModel)]="filters.destinationName"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Payment Method</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-select [(ngModel)]="filters.paymentMethod">
+            <mat-option [value]="null">All Methods</mat-option>
+            <mat-option *ngFor="let method of paymentMethods" [value]="method">
+              {{ method }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Parcel Status</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-select [(ngModel)]="filters.parcelStatus">
+            <mat-option [value]="null">All Statuses</mat-option>
+            <mat-option *ngFor="let status of parcelStatuses" [value]="status">
+              {{ status.replace('_', ' ') }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button pButton label="Apply Filters" icon="pi pi-filter" (click)="applyFilters()"></button>
+        <button
+          pButton
+          label="Reset"
+          icon="pi pi-refresh"
+          class="p-button-outlined"
+          (click)="resetFilters()"
+        ></button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <ng-container *ngIf="card.amount !== undefined; else countValue">
+              <span class="currency">{{ card.currency }}</span>
+              <span class="amount">{{ card.amount | number : '1.0-2' }}</span>
+            </ng-container>
+
+            <ng-template #countValue>
+              <span class="amount">{{ card.count | number }}</span>
+            </ng-template>
+          </h2>
+
+          <span class="stat-change positive" *ngIf="card.change">
+            <i class="pi pi-arrow-up"></i> {{ card.change }}
+          </span>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= PARCELS TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Parcels List</h3>
+        <span class="record-count">{{ totalRecords }} total parcels</span>
+      </div>
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search parcels..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          />
+        </span>
+        <button
+          *ngIf="searchTerm"
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()"
+          pTooltip="Clear search"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="parcels"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels"
+      styleClass="data-table"
+      (onLazyLoad)="loadParcels($event)"
+      [tableStyle]="{ 'min-width': '80rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Parcel Number</th>
+          <th>Created Date</th>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Route</th>
+          <th>Fleet No</th>
+          <th>Amount</th>
+          <th>Payment Method</th>
+          <th>Payment Status</th>
+          <th>Parcel Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-parcel>
+        <tr class="clickable-row" (click)="viewParcelDetails(parcel)">
+          <td>
+            <span class="receipt-number">{{ parcel.parcelNumber }}</span>
+          </td>
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ parcel.createdAt | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ parcel.createdAt | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="customer-cell">
+              <i class="pi pi-user"></i>
+              <div class="customer-info">
+                <span class="customer-name">{{ parcel.senderName }}</span>
+                <span class="customer-phone">{{ parcel.senderPhoneNumber }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="customer-cell">
+              <i class="pi pi-user"></i>
+              <div class="customer-info">
+                <span class="customer-name">{{ parcel.receiverName }}</span>
+                <span class="customer-phone">{{ parcel.receiverPhoneNumber }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="route-cell">
+              <span class="route-point">
+                <i class="pi pi-map-marker"></i>
+                {{ parcel.sourceName }}
+              </span>
+              <i class="pi pi-arrow-right route-arrow"></i>
+              <span class="route-point">
+                <i class="pi pi-map-marker"></i>
+                {{ parcel.destinationName }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              - {{ parcel.fleetNo ?? 'N/A' }}
+            </span>
+          </td>
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ parcel.amount | number : '1.2-2' }}</span>
+          </td>
+          <td>
+            <span [class]="'badge ' + getPaymentMethodClass(parcel.paymentMethod)">
+              <i [class]="parcel.paymentMethod === 'CASH' ? 'pi pi-money-bill' : 'pi pi-credit-card'"></i>
+              {{ parcel.paymentMethod }}
+            </span>
+          </td>
+          <td>
+            <span [class]="'badge ' + getPaymentStatusClass(parcel.paymentStatus)">
+              <i
+                [class]="
+                  parcel.paymentStatus === 'PAID'
+                    ? 'pi pi-check-circle'
+                    : parcel.paymentStatus === 'PENDING'
+                      ? 'pi pi-clock'
+                      : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ parcel.paymentStatus }}
+            </span>
+          </td>
+          <td>
+            <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
+              <i
+                [class]="
+                  parcel.parcelStatus === 'COLLECTED'
+                    ? 'pi pi-check-circle'
+                    : parcel.parcelStatus === 'IN_TRANSIT'
+                      ? 'pi pi-truck'
+                      : parcel.parcelStatus === 'ARRIVED'
+                        ? 'pi pi-inbox'
+                        : parcel.parcelStatus === 'CANCELLED'
+                          ? 'pi pi-times-circle'
+                          : 'pi pi-box'
+                "
+              ></i>
+              {{ parcel.parcelStatus.replace('_', ' ') }}
+            </span>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewParcelDetails(parcel); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="11" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No Parcels Found</h3>
+              <p>Try adjusting your filters or date range</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= PARCEL DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="parcel-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Parcel Details</h2>
+        <span class="receipt-number-large">{{ selectedParcel?.parcelNumber }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedParcel">
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Parcel Information</h4>
+
+            <div class="detail-item">
+              <label>Parcel Number</label>
+              <span class="value">{{ selectedParcel.parcelNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created Date</label>
+              <span class="value">
+                {{ selectedParcel.createdAt | date : 'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Description</label>
+              <span class="value">{{ selectedParcel.description || 'N/A' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Parcel Value</label>
+              <span class="value">Ksh {{ selectedParcel.value | number : '1.2-2' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Service Charge</label>
+              <span class="value">Ksh {{ selectedParcel.serviceCharge | number : '1.2-2' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Total Amount</label>
+              <span class="value amount-highlight">
+                Ksh {{ selectedParcel.amount | number : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4 class="section-title">Sender Information</h4>
+
+            <div class="detail-item">
+              <label>Sender Name</label>
+              <span class="value">{{ selectedParcel.senderName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Sender Phone</label>
+              <span class="value">{{ selectedParcel.senderPhoneNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Source Location</label>
+              <span class="value fleet-highlight">
+                <i class="pi pi-map-marker"></i>
+                {{ selectedParcel.sourceName }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Delivery Information</h4>
+
+            <div class="detail-item">
+              <label>Receiver Name</label>
+              <span class="value">{{ selectedParcel.receiverName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Receiver Phone</label>
+              <span class="value">{{ selectedParcel.receiverPhoneNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Destination</label>
+              <span class="value fleet-highlight">
+                <i class="pi pi-map-marker"></i>
+                {{ selectedParcel.destinationName }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Last Mile</label>
+              <span class="value">{{ selectedParcel.lastMile || 'N/A' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Fleet Number</label>
+              <span class="value fleet-highlight">
+                <i class="pi pi-car"></i>
+                {{ selectedParcel.fleetNo }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4 class="section-title">Status & Payment</h4>
+
+            <div class="detail-item">
+              <label>Parcel Status</label>
+              <span [class]="'value badge ' + getStatusClass(selectedParcel.parcelStatus)">
+                {{ selectedParcel.parcelStatus.replace('_', ' ') }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Payment Status</label>
+              <span [class]="'value badge ' + getPaymentStatusClass(selectedParcel.paymentStatus)">
+                {{ selectedParcel.paymentStatus }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Payment Method</label>
+              <span [class]="'value badge ' + getPaymentMethodClass(selectedParcel.paymentMethod)">
+                {{ selectedParcel.paymentMethod }}
+              </span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedParcel.mpesaReceiptNumber">
+              <label>M-Pesa Receipt</label>
+              <span class="value code-value">{{ selectedParcel.mpesaReceiptNumber }}</span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedParcel.dispatchedAt">
+              <label>Dispatched At</label>
+              <span class="value">
+                {{ selectedParcel.dispatchedAt | date : 'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedParcel.arrivedAt">
+              <label>Arrived At</label>
+              <span class="value">
+                {{ selectedParcel.arrivedAt | date : 'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedParcel.pickedAt">
+              <label>Picked At</label>
+              <span class="value">
+                {{ selectedParcel.pickedAt | date : 'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedParcel.pickedBy">
+              <label>Picked By</label>
+              <span class="value">{{ selectedParcel.pickedBy }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

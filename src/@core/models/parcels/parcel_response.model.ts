@@ -1,7 +1,7 @@
 import { Parcel } from "./parcel.model";
 
 
-export interface ParcelsResponse {
+export interface ParcelsAPiResponse {
   parcels: Parcel[];
   aggregates: Record<string, unknown> | null;
   currentPage: number;

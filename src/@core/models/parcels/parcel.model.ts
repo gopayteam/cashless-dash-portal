@@ -9,12 +9,12 @@ export interface Parcel {
   receiverPhoneNumber: string;
   sourceName: string;
   destinationName: string;
-  parcelStatus: "IN_TRANSIT" | "ARRIVED" | "CANCELLED"; // extend as needed
-  paymentStatus: "PAID" | "UNPAID" | "PENDING"; // extend as needed
-  paymentMethod: "CASH" | "CASHLESS" | "MPESA"; // extend as needed
+  parcelStatus:"REGISTERED" |  "IN_TRANSIT" | "ARRIVED" | "COLLECTED" | "CANCELLED" ;
+  paymentStatus: "PAID" | "UNPAID" | "PENDING";
+  paymentMethod: "CASH" | "CASHLESS";
   fleetNo: string;
   amount: number;
-  dispatchedAt: string | null; // ISO date string
+  dispatchedAt: string | null;
   arrivedAt: string | null;
   receivedBy: string | null;
   pickedAt: string | null;
@@ -22,7 +22,7 @@ export interface Parcel {
   createdAt: string;
   updatedAt: string | null;
   description: string;
-  value: string; // could be number if always numeric
+  value: string;
   lastMile: string;
   expense: number | null;
   expenseDescription: string | null;

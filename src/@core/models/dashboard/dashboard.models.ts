@@ -1,5 +1,5 @@
+import { ParcelsAPiResponse } from '../parcels/parcel_response.model';
 import { PaymentsApiResponse } from '../transactions/payment_reponse.model';
-import { PaymentRecord } from '../transactions/transactions.models';
 
 export interface TransactionStats {
   totalTransactions: number;
@@ -23,4 +23,8 @@ export interface DashboardData {
   transaction_stats_by_period: TransactionStatsByPeriod[];
   transaction_stats_per_category: TransactionStatsPerCategory[];
   recentTransactions: PaymentsApiResponse;
+}
+
+export interface ParcelDashboardData {
+  data: ParcelsAPiResponse;
 }
