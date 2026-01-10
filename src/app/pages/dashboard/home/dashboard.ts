@@ -33,8 +33,9 @@ import {
   TransactionStatsPerCategory,
 } from '../../../../@core/models/dashboard/dashboard.models';
 import { forkJoin } from 'rxjs';
-import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
+import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
+import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
 
 @Component({
   imports: [
@@ -65,7 +66,7 @@ export class DashboardComponent implements OnInit {
   pieChartData: any;
   pieChartOptions: any;
   dateRange: Date[] = [];
-  recentTransactions: PaymentRecord[] = [];
+  recentTransactions: PaymentRecord[] | PaymentRecordVM[] = [];
 
   // pagination state
   rows: number = 5;
@@ -112,7 +113,8 @@ export class DashboardComponent implements OnInit {
       .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
       .subscribe({
         next: (response) => {
-          this.recentTransactions = response.data.manifest;
+          const records = response.data.manifest;
+          this.recentTransactions = this.mapPaymentRecords(response.data.manifest);
           this.totalRecords = response.data.totalRecords;
           this.rows = event.rows;
           this.first = event.first;
@@ -121,6 +123,14 @@ export class DashboardComponent implements OnInit {
         error: (err) => console.error('Recent Transaction load failed', err),
       });
   }
+
+  mapPaymentRecords(records: PaymentRecord[]): PaymentRecordVM[] {
+  return records.map((r) => ({
+    ...r,
+    createdAtFormatted: formatRelativeTime(r.createdAt),
+    updatedAtFormatted: formatRelativeTime(r.updatedAt),
+  }));
+}
 
   loadDashboardData(): void {
     this.loadingStore.start();

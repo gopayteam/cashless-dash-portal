@@ -1,0 +1,115 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+
+/* PrimeIcons */
+@import 'primeicons/primeicons.css';
+
+
+/* Import CSS modules */
+@import './modules/_badges.css';
+@import './modules/_buttons.css';
+@import './modules/_tables.css';
+@import './modules/_forms.css';
+@import './modules/_cards.css';
+@import './modules/_loading.css';
+@import './modules/_utility.css';
+@import './modules/_animations.css';
+@import './modules/_grid_layout.css';
+@import './modules/_scrollbar.css';
+@import './modules/_primeng.css';
+@import './modules/_empty_state.css';
+
+/* Import layout styles */
+@import './layout/_topbar.css';
+@import './layout/_sidebar.css';
+@import './layout/_content.css';
+
+/* ============================================================
+   COLOR VARIABLES
+   ============================================================ */
+:root {
+  /* Primary – Blue 900 */
+  --primary-color: #0e2c5a;
+  --primary-color-dark: #093170;
+  --primary-hover: #c82333;
+
+  /* Secondary – Red 900 */
+  --secondary-color: #c82333;
+  --secondary-color-dark: #7f0000;
+
+  /* Status colors */
+  --success-color: #198754;
+  --warning-color: #ffc107;
+  --danger-color: #b71c1c;
+  --info-color: #0dcaf0;
+
+  /* Neutrals */
+  --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --dark-text: #212529;
+  --medium-text: #495057;
+  --light-text: #6c757d;
+  --border-color: #e9ecef;
+
+  /* Layout dimensions */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --topbar-height: 70px;
+
+  /* Effects */
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================
+   RESET AND BASE STYLES
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+}
+
+/* ============================================================
+   RESPONSIVE UTILITIES
+   ============================================================ */
+@media (max-width: 768px) {
+  .p-paginator {
+    justify-content: center;
+  }
+
+  .p-paginator .p-paginator-current {
+    order: 4;
+    width: 100%;
+    text-align: center;
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .p-paginator .p-paginator-pages {
+    gap: 0.25rem;
+  }
+
+  .p-paginator .p-paginator-page,
+  .p-paginator .p-paginator-first,
+  .p-paginator .p-paginator-prev,
+  .p-paginator .p-paginator-next,
+  .p-paginator .p-paginator-last {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+  }
+}
