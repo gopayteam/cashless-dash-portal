@@ -21,7 +21,7 @@ import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
-import { DriversComponent } from './pages/users/drivers/drivers';
+import { ActiveDriversComponent } from './pages/users/drivers/active/drivers';
 import { CustomersComponent } from './pages/users/customers/customers';
 import { AdminUserComponent } from './pages/users/admin/admin';
 import { LocationsComponent } from './pages/locations/locations';
@@ -42,6 +42,8 @@ import { InvestorsComponent } from './pages/users/investors/investors';
 import { MarshalsComponent } from './pages/users/marshals/marshals';
 import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
+import { DriversComponent } from './pages/users/drivers/all/drivers';
+import { InactiveDriversComponent } from './pages/users/drivers/inactive/drivers';
 
 export const routes: Routes = [
   {
@@ -63,11 +65,14 @@ export const routes: Routes = [
       { path: 'transfer-payment/1', component: CreditDriverComponent },
       { path: 'transfer-payment/2', component: FundReassignmentComponent },
 
-      { path: 'drivers', component: DriversComponent },
       { path: 'parcels/all', component: ParcelsComponent },
       { path: 'parcel-managers', component: ParcelManagersComponent },
       { path: 'parcel-offices/parcel-source', component: ParcelSourceComponent },
       { path: 'parcel-offices/parcel-destination', component: ParcelDestinationComponent },
+
+      { path: 'drivers/all', component: DriversComponent },
+      { path: 'drivers/active', component: ActiveDriversComponent },
+      { path: 'drivers/inactive', component: InactiveDriversComponent },
 
       { path: 'driver-assignments', component: DriverAssignmentComponent },
 

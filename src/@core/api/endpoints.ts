@@ -10,4 +10,7 @@ export const API_ENDPOINTS = {
   ALL_PARCEL_MANAGERS: '/api/parcels/filter/user/aggregates',
   ALL_PARCEL_SOURCES: '/api/parcels/report/summary/source',
   ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
+
+  // #####################  Driver SUB-ENDPOINTS   #######################
+  ALL_DRIVERS: '/api/v1/org/view-activated-fleets',
 };

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Drivers } from './drivers';
+import { DriversComponent as Drivers } from './drivers';
 
 describe('Drivers', () => {
   let component: Drivers;

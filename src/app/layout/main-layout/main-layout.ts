@@ -103,6 +103,15 @@ export class MainLayoutComponent implements OnInit {
     },
 
     {
+      route: '/drivers',
+      tabs: [
+        { label: 'All Drivers', icon: 'pi pi-user', path: '/drivers/all' },
+        { label: 'Active Drivers', icon: 'pi pi-check', path: '/drivers/active' },
+        { label: 'Inactive Drivers', icon: 'pi pi-ban', path: '/drivers/inactive' },
+      ],
+    },
+
+    {
       route: '/users',
       tabs: [
         { label: 'All Users', icon: 'pi pi-avatar', path: '/users/all' },
