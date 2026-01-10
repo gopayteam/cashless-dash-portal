@@ -5,5 +5,9 @@ export const API_ENDPOINTS = {
   STATS_BY_PERIOD: '/api/payment/transactions/stats-by-period',
   STATS_PER_CATEGORY: '/api/payment/transactions/stats-per-category',
 
-  // #####################  DASHBOARD SUB-ENDPOINTS   #######################
+  // #####################  PARCELS SUB-ENDPOINTS   #######################
+  ALL_PARCELS: '/api/parcels/filter/user/sales',
+  ALL_PARCEL_MANAGERS: 'api/parcels/filter/user/aggregates',
+  ALL_PERCEL_SOURVES: '/api/parcels/report/summary/source',
+  ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
 };

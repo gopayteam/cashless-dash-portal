@@ -66,7 +66,7 @@
                   (click)="navigate('/deposits/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> Deposits (Debit)</span>
                   </span>
                 </button>
@@ -79,7 +79,7 @@
                   (click)="navigate('/withdrawals/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> Withdrawals (Credit)</span>
                   </span>
                 </button>
@@ -133,8 +133,8 @@
               <li class="menu-item">
                 <button
                   class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-Offices')"
-                  (click)="navigate('/parcel-Offices')"
+                  [class.menu-link--active]="isRouteActive('/parcel-offices')"
+                  (click)="navigate('/parcel-offices/parcel-source')"
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-building menu-icon" style="color: rgb(134, 5, 5)"></i>

@@ -31,7 +31,6 @@ import { CreditDriverComponent } from './pages/payments/credit-driver/create-pay
 import { FundReassignmentComponent } from './pages/payments/fund-reassignment/fund-reassignment';
 import { ParcelsComponent } from './pages/parcels/all/parcels';
 import { ParcelManagersComponent } from './pages/parcels/parcel-managers/parcel-managers';
-import { ParcelOfficesComponent } from './pages/parcels/parcel-offices/parcel-offices';
 import { DriverAssignmentComponent } from './pages/driver-assignment/driver-assignment';
 import { OrganizationWalletComponent } from './pages/finance/organization-wallet/organization-wallet';
 import { WithdrawalStatementsComponent } from './pages/finance/statements/statements';
@@ -41,6 +40,8 @@ import { ConductorsComponent } from './pages/users/conductors/conductors';
 import { DeactivatedUsersComponent } from './pages/users/deactivated/deactivated';
 import { InvestorsComponent } from './pages/users/investors/investors';
 import { MarshalsComponent } from './pages/users/marshals/marshals';
+import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
+import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
 
 export const routes: Routes = [
   {
@@ -65,7 +66,8 @@ export const routes: Routes = [
       { path: 'drivers', component: DriversComponent },
       { path: 'parcels/all', component: ParcelsComponent },
       { path: 'parcel-managers', component: ParcelManagersComponent },
-      { path: 'parcel-Offices', component: ParcelOfficesComponent },
+      { path: 'parcel-offices/parcel-source', component: ParcelSourceComponent },
+      { path: 'parcel-offices/parcel-destination', component: ParcelDestinationComponent },
 
       { path: 'driver-assignments', component: DriverAssignmentComponent },
 

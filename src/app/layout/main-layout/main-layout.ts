@@ -119,6 +119,15 @@ export class MainLayoutComponent implements OnInit {
       route: '/locations',
       tabs: [{ label: 'Locations', icon: 'pi pi-location', path: '/locations' }],
     },
+
+    {
+      route: '/parcel-offices',
+      tabs: [
+        { label: 'Parcel Source', icon: 'pi pi-location', path: '/parcel-offices/parcel-source' },
+        { label: 'Parcel Destination', icon: 'pi pi-location', path: '/parcel-offices/parcel-destination' },
+      ],
+
+    },
   ];
 
   // Current tabs to display

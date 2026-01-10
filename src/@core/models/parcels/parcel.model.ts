@@ -9,7 +9,7 @@ export interface Parcel {
   receiverPhoneNumber: string;
   sourceName: string;
   destinationName: string;
-  parcelStatus: "IN_TRANSIT" | "DELIVERED" | "PENDING" | "CANCELLED"; // extend as needed
+  parcelStatus: "IN_TRANSIT" | "ARRIVED" | "CANCELLED"; // extend as needed
   paymentStatus: "PAID" | "UNPAID" | "PENDING"; // extend as needed
   paymentMethod: "CASH" | "CASHLESS" | "MPESA"; // extend as needed
   fleetNo: string;
