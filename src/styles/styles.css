@@ -21,6 +21,7 @@
 @import './modules/_transactions.css';
 @import './modules/_parcels.css';
 @import './modules/_drivers.css';
+@import './modules/_date_picker.css';
 
 /* Import layout styles */
 @import './layout/_topbar.css';

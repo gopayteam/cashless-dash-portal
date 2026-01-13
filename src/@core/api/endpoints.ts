@@ -17,4 +17,7 @@ export const API_ENDPOINTS = {
   // #####################  LOCATION SUB-ENDPOINTS   #######################
   ALL_STAGES: '/api/route/view/stages',
   ALL_ROUTES: '/api/route/list/routes',
+
+  // #####################  NOTIFICATION SUB-ENDPOINTS   #######################
+  ALL_NOTIFICATIONS: '/api/notifications',
 };

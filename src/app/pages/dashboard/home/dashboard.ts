@@ -57,7 +57,10 @@ import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
   standalone: true,
   selector: 'app-dashboard',
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.css'],
+  styleUrls: [
+    './dashboard.css',
+    '../../../../styles/modules/_date_picker.css',
+  ],
 })
 export class DashboardComponent implements OnInit {
   statsCards: StatsCard[] = [];

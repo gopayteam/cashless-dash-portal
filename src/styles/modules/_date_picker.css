@@ -1,0 +1,345 @@
+/* ===== FILTER ITEM DATE PICKER STYLES ===== */
+
+/* Filter Item Container */
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 280px;
+}
+
+/* Filter Label */
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* ===== MODERN DATE RANGE FIELD ===== */
+
+/* Main Form Field */
+::ng-deep .date-range-field.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Outline Container */
+::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+  background: #ffffff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+::ng-deep .date-range-field .mdc-notched-outline {
+  border-color: #dee2e6;
+  border-width: 2px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Hover State */
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: #adb5bd;
+}
+
+/* Focus State */
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: #dc3545 !important;
+  border-width: 2px !important;
+}
+
+/* Remove default outline colors */
+::ng-deep .date-range-field .mdc-notched-outline__leading,
+::ng-deep .date-range-field .mdc-notched-outline__notch,
+::ng-deep .date-range-field .mdc-notched-outline__trailing {
+  border-color: #dee2e6;
+  transition: border-color 0.3s ease;
+}
+
+/* Input Container */
+::ng-deep .date-range-field .mat-mdc-form-field-infix {
+  padding: 0.875rem 0;
+  min-height: auto;
+}
+
+/* Input Fields */
+::ng-deep .date-range-field .mat-mdc-input-element {
+  color: #2c3e50;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+}
+
+::ng-deep .date-range-field .mat-mdc-input-element::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+/* Date Range Separator (dash between dates) */
+::ng-deep .date-range-field .mat-date-range-input-separator {
+  color: #6c757d;
+  margin: 0 0.25rem;
+  font-weight: 500;
+}
+
+/* Datepicker Toggle Icon */
+::ng-deep .date-range-field .mat-datepicker-toggle {
+  color: #dc3545;
+  margin-right: 0.5rem;
+}
+
+::ng-deep .date-range-field .mat-datepicker-toggle-default-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+::ng-deep .date-range-field .mat-mdc-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+::ng-deep .date-range-field .mat-mdc-icon-button:hover {
+  background: rgba(220, 53, 69, 0.08);
+  border-radius: 8px;
+}
+
+/* Remove label floating animation since we have external label */
+::ng-deep .date-range-field .mdc-floating-label {
+  display: none;
+}
+
+/* Subscript wrapper (error messages) */
+::ng-deep .date-range-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+/* ===== COMPACT VARIANT ===== */
+::ng-deep .date-picker-compact.date-range-field {
+  max-width: 320px;
+}
+
+::ng-deep .date-picker-compact.date-range-field .mat-mdc-input-element {
+  font-size: 0.85rem;
+  padding: 0.375rem 0.5rem;
+}
+
+::ng-deep .date-picker-compact.date-range-field .mat-mdc-form-field-infix {
+  padding: 0.75rem 0;
+}
+
+/* ===== FILLED VARIANT (Alternative Style) ===== */
+.filter-item-filled ::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 10px;
+}
+
+.filter-item-filled ::ng-deep .date-range-field .mdc-notched-outline {
+  display: none;
+}
+
+.filter-item-filled ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper {
+  background: #e9ecef;
+  border-color: #dee2e6;
+}
+
+.filter-item-filled ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper {
+  background: #ffffff;
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* ===== MODERN GRADIENT VARIANT ===== */
+.filter-item-gradient ::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-item-gradient ::ng-deep .date-range-field .mdc-notched-outline {
+  display: none;
+}
+
+.filter-item-gradient ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper {
+  border-color: #dc3545;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+  transform: translateY(-1px);
+}
+
+.filter-item-gradient ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: #dc3545;
+  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.15);
+  transform: translateY(-2px);
+}
+
+/* ===== ICON STYLE VARIANT ===== */
+.filter-item-icon {
+  position: relative;
+}
+
+.filter-item-icon::before {
+  content: "📅";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.25rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.filter-item-icon ::ng-deep .date-range-field .mat-mdc-form-field-infix {
+  padding-left: 2.5rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .filter-item {
+    min-width: 100%;
+  }
+
+  ::ng-deep .date-range-field.mat-mdc-form-field {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ===== CALENDAR POPUP STYLES (MATCHING) ===== */
+
+/* Calendar Container */
+::ng-deep .mat-datepicker-content {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+::ng-deep .mat-calendar {
+  font-family: inherit;
+  background: #ffffff;
+}
+
+/* Calendar Header */
+::ng-deep .mat-calendar-header {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 16px 16px 0 0;
+}
+
+::ng-deep .mat-calendar-controls {
+  margin: 0;
+}
+
+::ng-deep .mat-calendar-period-button {
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+::ng-deep .mat-calendar-arrow {
+  fill: white;
+}
+
+::ng-deep .mat-calendar-previous-button,
+::ng-deep .mat-calendar-next-button {
+  color: white;
+}
+
+::ng-deep .mat-calendar-previous-button:hover,
+::ng-deep .mat-calendar-next-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Calendar Body */
+::ng-deep .mat-calendar-body {
+  padding: 0.5rem;
+}
+
+/* Day Names */
+::ng-deep .mat-calendar-table-header th {
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 0.5rem 0;
+}
+
+/* Date Cells */
+::ng-deep .mat-calendar-body-cell {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .mat-calendar-body-cell-content {
+  border-radius: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Hover State */
+::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.3);
+  transform: scale(1.05);
+}
+
+/* Selected Date */
+::ng-deep .mat-calendar-body-selected {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  font-weight: 600;
+}
+
+/* Date Range */
+::ng-deep .mat-calendar-body-range-start,
+::ng-deep .mat-calendar-body-range-end {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+::ng-deep .mat-calendar-body-in-range::before {
+  background: rgba(220, 53, 69, 0.15);
+  border-radius: 0;
+}
+
+/* Today's Date */
+::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) .mat-calendar-body-cell-content {
+  color: #dc3545;
+  font-weight: 600;
+  border-color: #dc3545;
+}
+
+/* Disabled Dates */
+::ng-deep .mat-calendar-body-disabled {
+  opacity: 0.3;
+}
+
+/* Animation */
+::ng-deep .mat-datepicker-content {
+  animation: slideUpFadeIn 0.3s ease-out;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -38,7 +38,9 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
     MatNativeDateModule,
   ],
   templateUrl: './debit-transactions.html',
-  styleUrls: ['./debit-transactions.css'],
+  styleUrls: ['./debit-transactions.css',
+    '../../../../styles/modules/_date_picker.css',  
+  ],
 })
 export class DebitTransactionsComponent implements OnInit {
   transactions: PaymentRecord[] = [];

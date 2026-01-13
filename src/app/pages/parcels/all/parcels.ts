@@ -27,7 +27,7 @@ import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mappe
   standalone: true,
   selector: 'app-parcels',
   templateUrl: './parcels.html',
-  styleUrls: ['./parcels.css'],
+  styleUrls: ['./parcels.css', '../../../../styles/modules/_date_picker.css',],
   imports: [
     CommonModule,
     FormsModule,
