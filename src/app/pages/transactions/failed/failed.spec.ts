@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Failed } from './failed';
+import { FailedTransactionsComponent as Failed } from './failed';
 
 describe('Failed', () => {
   let component: Failed;

@@ -47,6 +47,7 @@ import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mappe
 })
 export class ParcelsComponent implements OnInit {
   parcels: Parcel[] = [];
+  dateRange: Date[] = [];
 
   // Pagination
   totalRecords = 0;
@@ -97,12 +98,20 @@ export class ParcelsComponent implements OnInit {
     this.loadParcels({ first: 0, rows: this.rows });
   }
 
+  setDefaultDateRange(): void {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    this.dateRange = [lastWeek, today];
+  }
+
   loadParcels($event: any): void {
     this.loadingStore.start();
     const event = $event;
 
     const page = event.first / event.rows;
     const [start, end] = this.filters.dateRange || [];
+    // const [start, end] = this.dateRange;
 
     const payload = {
       entityId: 'GS000002',
