@@ -1,0 +1,242 @@
+<!-- pages/routes-stages/routes-stages.component.html -->
+<div class="routes-stages-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="routes-stages-header">
+    <div class="header-content">
+      <h1>Routes Management</h1>
+      <p class="text-muted">Manage route configurations </p>
+    </div>
+  </div>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ card.count | number }}</span>
+          </h2>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= ROUTES TABLE ================= -->
+  <div>
+    <p-card styleClass="stat-card card">
+      <div class="table-header">
+        <div class="table-header-left">
+          <h3>Routes List</h3>
+          <span class="record-count">{{ routesTotalRecords }} total routes</span>
+        </div>
+        <div class="search-container">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search routes..."
+              [(ngModel)]="routesSearchTerm"
+              (input)="onRoutesSearchChange()"
+              class="search-input"
+            />
+          </span>
+          <button
+            *ngIf="routesSearchTerm"
+            pButton
+            icon="pi pi-times"
+            class="p-button-text p-button-sm clear-button"
+            (click)="clearRoutesSearch()"
+            pTooltip="Clear search"
+          ></button>
+        </div>
+      </div>
+
+      <p-table
+        [value]="routes"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="routesRows"
+        [first]="routesFirst"
+        [loading]="loading()"
+        [totalRecords]="routesTotalRecords"
+        [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} routes"
+        styleClass="data-table"
+        (onLazyLoad)="loadRoutes($event)"
+        [tableStyle]="{ 'min-width': '60rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Route ID</th>
+            <th>Start Location</th>
+            <th>End Location</th>
+            <th>Direction</th>
+            <th>Start ID</th>
+            <th>End ID</th>
+            <th>Fleet Numbers</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-route>
+          <tr class="clickable-row" (click)="viewRouteDetails(route)">
+            <td>
+              <span class="receipt-number">{{ route.routeId }}</span>
+            </td>
+            <td>
+              <div class="location-cell">
+                <i class="pi pi-map-marker start-marker"></i>
+                <span>{{ route.startLocation }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="location-cell">
+                <i class="pi pi-map-marker end-marker"></i>
+                <span>{{ route.endLocation }}</span>
+              </div>
+            </td>
+            <td>
+              <span [class]="'badge ' + getDirectionClass(route.direction)">
+                <i [class]="route.direction === 'FORWARD' ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"></i>
+                {{ route.direction }}
+              </span>
+            </td>
+            <td>
+              <span class="code-badge">{{ route.startId }}</span>
+            </td>
+            <td>
+              <span class="code-badge">{{ route.endId }}</span>
+            </td>
+            <td>
+              <span class="fleet-count" *ngIf="route.fleetNumbers">
+                <i class="pi pi-car"></i>
+                {{ route.fleetNumbers ? 'Assigned' : 'None' }}
+              </span>
+              <span class="text-muted" *ngIf="!route.fleetNumbers">N/A</span>
+            </td>
+            <td>
+              <button
+                pButton
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-text p-button-sm"
+                pTooltip="View Details"
+                tooltipPosition="top"
+                (click)="viewRouteDetails(route); $event.stopPropagation()"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="empty-message">
+              <div class="empty-state">
+                <i class="pi pi-map"></i>
+                <h3>No Routes Found</h3>
+                <p>Try adjusting your search term</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- ================= ROUTE DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayRouteDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="transaction-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '700px', backgroundColor: '#f9f9f9' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Route Details</h2>
+        <span class="receipt-number-large">Route ID: {{ selectedRoute?.routeId }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedRoute">
+      <div class="detail-grid">
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Route ID</label>
+            <span class="value">{{ selectedRoute.routeId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Start Location</label>
+            <span class="value fleet-highlight">
+              <i class="pi pi-map-marker"></i>
+              {{ selectedRoute.startLocation }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>End Location</label>
+            <span class="value fleet-highlight">
+              <i class="pi pi-map-marker"></i>
+              {{ selectedRoute.endLocation }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Direction</label>
+            <span [class]="'value badge ' + getDirectionClass(selectedRoute.direction)">
+              <i [class]="selectedRoute.direction === 'FORWARD' ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"></i>
+              {{ selectedRoute.direction }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Start Stage ID</label>
+            <span class="value code-value">{{ selectedRoute.startId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>End Stage ID</label>
+            <span class="value code-value">{{ selectedRoute.endId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Fleet Numbers</label>
+            <span class="value">{{ selectedRoute.fleetNumbers || 'Not assigned' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Points Data</label>
+            <span class="value">{{ selectedRoute.points || 'No points data' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeRouteDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

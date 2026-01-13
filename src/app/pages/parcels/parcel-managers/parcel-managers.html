@@ -1,1 +1,191 @@
-<p>parcel-managers works!</p>
+<div class="parcels-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="parcels-header">
+    <div class="header-content">
+      <h1>Parcel Managers</h1>
+      <p class="text-muted">Performance summary per parcel manager</p>
+    </div>
+  </div>
+
+  <!-- ================= FILTERS ================= -->
+  <p-card styleClass="stat-card card filter-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button pButton label="Apply" icon="pi pi-filter" (click)="applyFilters()"></button>
+        <button
+          pButton
+          label="Reset"
+          icon="pi pi-refresh"
+          class="p-button-outlined"
+          (click)="resetFilters()"
+        ></button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- ================= TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Parcel Managers</h3>
+        <span class="record-count">{{ totalRecords }} managers</span>
+      </div>
+    </div>
+
+    <p-table
+      [value]="parcelManagers"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [totalRecords]="totalRecords"
+      [loading]="loading()"
+      [rowsPerPageOptions]="[10, 20, 30, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} managers"
+      (onLazyLoad)="loadParcelManagers($event)"
+      styleClass="data-table"
+      [tableStyle]="{ 'min-width': '80rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Manager</th>
+          <th>Phone</th>
+          <th>Parcels</th>
+          <th>Cash</th>
+          <th>Cashless</th>
+          <th>Total Amount</th>
+          <th>Expenses</th>
+          <th>Net Amount</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-manager>
+        <tr (click)="openManagerDialog(manager)">
+          <td>
+            <div class="customer-cell">
+              <i class="pi pi-user"></i>
+              <span class="customer-name">{{ manager.userName }}</span>
+            </div>
+          </td>
+          <td>{{ manager.userPhone }}</td>
+          <td>
+            <span class="badge badge-info">{{ manager.parcels }}</span>
+          </td>
+          <td>Ksh {{ manager.cash | number: '1.2-2' }}</td>
+          <td>Ksh {{ manager.cashless | number: '1.2-2' }}</td>
+          <td class="amount-highlight">
+            Ksh {{ manager.totalAmount | number: '1.2-2' }}
+          </td>
+          <td>Ksh {{ manager.expense | number: '1.2-2' }}</td>
+          <td class="amount-cell">
+            <strong>Ksh {{ manager.netAmount | number: '1.2-2' }}</strong>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <h3>No Parcel Managers Found</h3>
+              <p>Try adjusting the date range</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+
+  <p-dialog
+  header="Parcel Manager Details"
+  [(visible)]="showManagerDialog"
+  [modal]="true"
+  [style]="{ width: '720px', backgroundColor: '#f9f9f9' }"
+  [closable]="true"
+  styleClass="parcel-detail-dialog"
+>
+  <div class="detail-content" *ngIf="selectedManager">
+    <div class="detail-grid">
+      <!-- LEFT COLUMN -->
+      <div class="detail-column">
+        <div class="detail-section">
+          <h4 class="section-title">Manager Info</h4>
+
+          <div class="detail-item">
+            <label>Name</label>
+            <span class="value">{{ selectedManager.userName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Phone</label>
+            <span class="value">{{ selectedManager.userPhone }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">Parcels</h4>
+
+          <div class="detail-item">
+            <label>Total Parcels</label>
+            <span class="value">{{ selectedManager.parcels }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="detail-column">
+        <div class="detail-section">
+          <h4 class="section-title">Financial Summary</h4>
+
+          <div class="detail-item">
+            <label>Cash</label>
+            <span class="value">Ksh {{ selectedManager.cash | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Cashless</label>
+            <span class="value">Ksh {{ selectedManager.cashless | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Expenses</label>
+            <span class="value">Ksh {{ selectedManager.expense | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Net Amount</label>
+            <span class="amount-highlight">
+              Ksh {{ selectedManager.netAmount | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Close" icon="pi pi-times" (click)="showManagerDialog = false"></button>
+  </ng-template>
+</p-dialog>
+
+</div>

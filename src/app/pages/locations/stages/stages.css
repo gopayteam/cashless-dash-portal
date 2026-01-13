@@ -1,0 +1,413 @@
+/* ================= ROUTES & STAGES SPECIFIC STYLES ================= */
+/* Only styles unique to the routes-stages component */
+
+/* Routes & Stages Container */
+.routes-stages-container {
+  padding: 1rem;
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ================= HEADER ================= */
+.routes-stages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.routes-stages-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+/* ================= STATS GRID ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ================= TAB MENU ================= */
+::ng-deep .p-tabmenu {
+  margin-bottom: 1.5rem;
+}
+
+::ng-deep .p-tabmenu .p-tabmenu-nav {
+  background: var(--white);
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem {
+  margin-right: 0.5rem;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-link {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 1rem 1.5rem;
+  color: var(--medium-text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-link:hover {
+  background: rgba(102, 126, 234, 0.05);
+  color: var(--primary-color);
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem.p-highlight .p-menuitem-link {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: transparent;
+  font-weight: 600;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-icon {
+  margin-right: 0.5rem;
+}
+
+/* ================= TABLE HEADER ================= */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.table-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.record-count {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ================= SEARCH CONTAINER ================= */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  width: 300px;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  outline: none;
+}
+
+.p-input-icon-left {
+  position: relative;
+  display: inline-block;
+}
+
+.p-input-icon-left > i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text);
+  z-index: 1;
+}
+
+.clear-button {
+  color: var(--light-text) !important;
+}
+
+.clear-button:hover {
+  color: var(--medium-text) !important;
+}
+
+/* ================= CELL CONTENT STYLING ================= */
+.receipt-number {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--medium-text);
+  background-color: var(--border-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.code-badge {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--medium-text);
+  background-color: var(--border-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Location Cell */
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.location-cell i {
+  font-size: 0.9rem;
+}
+
+.start-marker {
+  color: #28a745;
+}
+
+.end-marker {
+  color: #dc3545;
+}
+
+/* Fleet Count */
+.fleet-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--medium-text);
+  font-weight: 500;
+}
+
+.fleet-count i {
+  color: #667eea;
+}
+
+/* Stage Name Cell */
+.stage-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-name-cell i {
+  color: #ffc107;
+  font-size: 1rem;
+}
+
+.stage-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Coordinates Cell */
+.coordinates-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.coordinate-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.coordinate-label {
+  font-weight: 600;
+  color: var(--light-text);
+  min-width: 30px;
+}
+
+.coordinate-value {
+  font-family: 'Courier New', monospace;
+  color: var(--medium-text);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* ================= DETAIL DIALOG ================= */
+.receipt-number-large {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+  background-color: #f0f3ff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.detail-content {
+  padding: 1rem 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detail-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--light-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item .value {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.detail-item .code-value {
+  font-family: 'Courier New', monospace;
+  background-color: var(--light-bg);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.fleet-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea !important;
+  font-weight: 600 !important;
+}
+
+.fleet-highlight i {
+  font-size: 1.1rem;
+}
+
+/* Map Action Button */
+.map-action {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+}
+
+.map-action button {
+  width: 100%;
+  max-width: 300px;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 768px) {
+  .routes-stages-container {
+    padding: 1rem;
+  }
+
+  .routes-stages-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .routes-stages-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-header-left {
+    width: 100%;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .coordinates-cell {
+    font-size: 0.8rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+/* ================= DIALOG STYLING ================= */
+::ng-deep .transaction-detail-dialog .p-dialog-header {
+  background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--secondary-color-dark) 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 6px 6px 0 0;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-title {
+  color: white;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+::ng-deep .transaction-detail-dialog .p-dialog-footer {
+  padding: 1rem 2rem;
+  border-top: 1px solid var(--border-color);
+}

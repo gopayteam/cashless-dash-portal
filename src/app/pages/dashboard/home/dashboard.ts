@@ -33,8 +33,9 @@ import {
   TransactionStatsPerCategory,
 } from '../../../../@core/models/dashboard/dashboard.models';
 import { forkJoin } from 'rxjs';
-import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
+import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
+import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
 
 @Component({
   imports: [
@@ -56,7 +57,10 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
   standalone: true,
   selector: 'app-dashboard',
   templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.css'],
+  styleUrls: [
+    './dashboard.css',
+    '../../../../styles/modules/_date_picker.css',
+  ],
 })
 export class DashboardComponent implements OnInit {
   statsCards: StatsCard[] = [];
@@ -65,7 +69,8 @@ export class DashboardComponent implements OnInit {
   pieChartData: any;
   pieChartOptions: any;
   dateRange: Date[] = [];
-  recentTransactions: PaymentRecord[] = [];
+  recentTransactions: PaymentRecord[] | PaymentRecordVM[] = [];
+
   // pagination state
   rows: number = 5;
   first: number = 0;
@@ -93,6 +98,9 @@ export class DashboardComponent implements OnInit {
 
     const page = event.first / event.rows;
 
+    this.rows = event.rows;
+    this.first = event.first;
+
     const payload = {
       entityId: 'GS000002',
       startDate: start.toISOString().split('T')[0],
@@ -108,15 +116,24 @@ export class DashboardComponent implements OnInit {
       .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
       .subscribe({
         next: (response) => {
-          this.recentTransactions = response.data.manifest;
+          const records = response.data.manifest;
+          this.recentTransactions = this.mapPaymentRecords(response.data.manifest);
           this.totalRecords = response.data.totalRecords;
           this.rows = event.rows;
           this.first = event.first;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Transaction load failed', err),
+        error: (err) => console.error('Recent Transaction load failed', err),
       });
   }
+
+  mapPaymentRecords(records: PaymentRecord[]): PaymentRecordVM[] {
+  return records.map((r) => ({
+    ...r,
+    createdAtFormatted: formatRelativeTime(r.createdAt),
+    updatedAtFormatted: formatRelativeTime(r.updatedAt),
+  }));
+}
 
   loadDashboardData(): void {
     this.loadingStore.start();

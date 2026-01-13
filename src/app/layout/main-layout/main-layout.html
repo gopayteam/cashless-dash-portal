@@ -1,13 +1,21 @@
 <div class="layout-container">
   <!-- ========== SIDEBAR ========== -->
   <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed">
+
+    <!-- Mobile Backdrop -->
+    <!-- <div
+      class="sidebar-backdrop"
+      *ngIf="sidebarCollapsed"
+      (click)="toggleSidebar()"
+    ></div> -->
+
     <!-- Logo Header -->
-    <div class="sidebar__header">
+     <div class="sidebar__header">
       <div class="sidebar__logo">
-        <i class="pi pi-car" style="color: black"></i>
-        <span class="sidebar__logo-text">GOPAY</span>
+        <img src="/logo.png" alt="Gopay Logo" class="sidebar__logo-img" />
       </div>
     </div>
+
 
     <!-- Sidebar Body -->
     <div class="sidebar__body">
@@ -34,7 +42,7 @@
                   (click)="navigate('/dashboard/home')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-home menu-icon" style="color: black"></i>
+                    <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
                     <span class="menu-text">Dashboard</span>
                   </span>
                 </button>
@@ -53,7 +61,7 @@
                   (click)="navigate('/transactions/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-list menu-icon"></i>
+                    <i class="pi pi-list menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> All Transactions</span>
                   </span>
                 </button>
@@ -66,7 +74,7 @@
                   (click)="navigate('/deposits/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-arrow-down menu-icon"></i>
+                    <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> Deposits (Debit)</span>
                   </span>
                 </button>
@@ -79,7 +87,7 @@
                   (click)="navigate('/withdrawals/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-arrow-up menu-icon"></i>
+                    <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> Withdrawals (Credit)</span>
                   </span>
                 </button>
@@ -92,7 +100,7 @@
                   (click)="navigate('/transfer-payment/1')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-send menu-icon"></i>
+                    <i class="pi pi-send menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text"> Initiate Transfer</span>
                   </span>
                 </button>
@@ -111,7 +119,7 @@
                   (click)="navigate('/parcels/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-box menu-icon" style="color: black"></i>
+                    <i class="pi pi-box menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">All Parcels</span>
                   </span>
                 </button>
@@ -124,7 +132,7 @@
                   (click)="navigate('/parcel-managers')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-users menu-icon" style="color: black"></i>
+                    <i class="pi pi-users menu-icon" style="color: rgb(116, 4, 4)"></i>
                     <span class="menu-text">Parcel managers</span>
                   </span>
                 </button>
@@ -133,11 +141,11 @@
               <li class="menu-item">
                 <button
                   class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-Offices')"
-                  (click)="navigate('/parcel-Offices')"
+                  [class.menu-link--active]="isRouteActive('/parcel-offices')"
+                  (click)="navigate('/parcel-offices/parcel-source')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-building menu-icon" style="color: black"></i>
+                    <i class="pi pi-building menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Parcel Offices</span>
                   </span>
                 </button>
@@ -156,7 +164,7 @@
                   (click)="navigate('/vehicles/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-car menu-icon"></i>
+                    <i class="pi pi-car menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Vehicles</span>
                   </span>
                 </button>
@@ -166,10 +174,10 @@
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/drivers')"
-                  (click)="navigate('/drivers')"
+                  (click)="navigate('/drivers/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-user menu-icon"></i>
+                    <i class="pi pi-user menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Drivers</span>
                   </span>
                 </button>
@@ -182,7 +190,7 @@
                   (click)="navigate('/driver-assignments')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-map menu-icon"></i>
+                    <i class="pi pi-map menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Driver Assignment</span>
                   </span>
                 </button>
@@ -194,10 +202,10 @@
             <button
               class="menu-link"
               [class.menu-link--active]="isRouteActive('/locations')"
-              (click)="navigate('/locations/all')"
+              (click)="navigate('/locations/stages')"
             >
               <span class="menu-link-content">
-                <i class="pi pi-map-marker menu-icon" style="color: black"></i>
+                <i class="pi pi-map-marker menu-icon" style="color: rgb(134, 5, 5)"></i>
                 <span class="menu-text">Locations</span>
               </span>
             </button>
@@ -214,7 +222,7 @@
                   (click)="navigate('/organization-wallet')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-wallet menu-icon" style="color: black"></i>
+                    <i class="pi pi-wallet menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Organization Wallets</span>
                   </span>
                 </button>
@@ -227,7 +235,7 @@
                   (click)="navigate('/management-statements')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-file menu-icon" style="color: black"></i>
+                    <i class="pi pi-file menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Withdrawal Statements</span>
                   </span>
                 </button>
@@ -240,7 +248,7 @@
                   (click)="navigate('/obligations')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-briefcase menu-icon" style="color: black"></i>
+                    <i class="pi pi-briefcase menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Obligations</span>
                   </span>
                 </button>
@@ -259,7 +267,7 @@
                   (click)="navigate('/users/all')"
                 >
                   <span class="menu-link-content">
-                    <i class="pi pi-users menu-icon" style="color: black"></i>
+                    <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Users</span>
                   </span>
                 </button>
@@ -273,32 +281,114 @@
     <!-- Sidebar Footer -->
     <div class="sidebar__footer">
       <button class="sidebar__logout-btn" (click)="logout()">
-        <i class="pi pi-sign-out"></i>
+        <i class="pi pi-sign-out" style="color: rgb(125, 3, 3)"></i>
         <span *ngIf="!sidebarCollapsed">Logout</span>
       </button>
     </div>
   </aside>
 
   <!-- ========== MAIN CONTENT ========== -->
-  <main class="main-content">
-    <!-- Top Navigation Bar -->
-    <header class="topbar">
-      <div class="topbar__left">
-        <button class="topbar__toggle" (click)="toggleSidebar()">
-          <i class="pi pi-bars"></i>
-        </button>
-      </div>
+  <!-- ========== MAIN CONTENT ========== -->
+<main class="main-content">
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <button class="topbar__toggle" (click)="toggleSidebar()">
+        <i class="pi pi-bars"></i>
+      </button>
+    </div>
 
-      <div class="topbar__right">
-        <button class="topbar__icon-btn">
-          <i class="pi pi-bell"></i>
-          <span class="topbar__badge">3</span>
-        </button>
-        <button class="topbar__icon-btn">
-          <i class="pi pi-cog"></i>
-        </button>
+    <div class="topbar__right">
+      <!-- 🔔 Notifications -->
+      <button
+        class="topbar__icon-btn"
+        (click)="showNotifications()"
+      >
+        <i class="pi pi-bell"></i>
+        <span class="topbar__badge">{{ unreadCount }}</span>
+      </button>
+
+      <!-- Notifications Dialog -->
+      <p-dialog
+        header="Notifications"
+        [(visible)]="notificationDialogVisible"
+        [style]="{ width: '400px', backgroundColor: '#fff' }"
+        [modal]="true"
+        [closable]="true"
+        [dismissableMask]="true"
+        [styleClass]="'notification-dialog'"
+        [baseZIndex]="10000"
+        (onHide)="hideNotifications()"
+      >
+        <div class="notification-panel">
+          <div
+            class="notification-item"
+            *ngFor="let n of notifications"
+            [class.unread]="!n.read"
+          >
+            <div class="notification-title">{{ n.title }}</div>
+            <div class="notification-message">{{ n.message }}</div>
+            <div class="notification-time">{{ n.time }}</div>
+          </div>
+
+          <div class="notification-footer">
+            <button
+              pButton
+              label="View All"
+              class="p-button-text"
+            ></button>
+          </div>
+        </div>
+      </p-dialog>
+
+
+
+      <!-- ⚙️ Settings -->
+      <button
+        class="topbar__icon-btn"
+        (click)="showSettings()"
+      >
+        <i class="pi pi-cog"></i>
+      </button>
+
+     <!-- Settings Dialog -->
+    <p-dialog
+      header="Settings"
+      [(visible)]="settingsDialogVisible"
+      [style]="{ width: '320px', backgroundColor: '#fff' }"
+      [modal]="true"
+      [closable]="true"
+      [dismissableMask]="true"
+      [styleClass]="'settings-dialog'"
+      [baseZIndex]="10000"
+    >
+      <div class="settings-panel">
+        <div class="settings-item">
+          <span>Dark Mode</span>
+          <p-toggleSwitch [(ngModel)]="darkModeEnabled"></p-toggleSwitch>
+        </div>
+
+        <div class="settings-item">
+          <span>Email Notifications</span>
+          <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"></p-toggleSwitch>
+        </div>
+
+        <div class="settings-item">
+          <span>Auto Logout</span>
+          <p-toggleSwitch [(ngModel)]="autoLogoutEnabled"></p-toggleSwitch>
+        </div>
+
+        <button
+          pButton
+          label="Account Settings"
+          icon="pi pi-user"
+          class="p-button-text"
+        ></button>
       </div>
-    </header>
+    </p-dialog>
+    </div>
+  </header>
+
 
     <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
     <nav class="tab-nav" *ngIf="showTabs">

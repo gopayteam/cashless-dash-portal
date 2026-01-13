@@ -1,0 +1,189 @@
+<div class="parcels-container">
+  <!-- ================= LOADING ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="parcels-header">
+    <div class="header-content">
+      <h1>Parcel Destination Stages</h1>
+      <p class="text-muted">Daily parcel summary by destination stage</p>
+    </div>
+  </div>
+
+  <!-- ================= FILTER ================= -->
+  <p-card styleClass="stat-card card filter-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button pButton label="Apply" icon="pi pi-filter" (click)="applyFilters()"></button>
+        <button
+          pButton
+          label="Reset"
+          icon="pi pi-refresh"
+          class="p-button-outlined"
+          (click)="resetFilters()"
+        ></button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- ================= TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Source Stages</h3>
+        <span class="record-count">{{ totalRecords }} records</span>
+      </div>
+    </div>
+
+    <p-table
+      [value]="stages"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [totalRecords]="totalRecords"
+      [loading]="loading()"
+      [rowsPerPageOptions]="[10, 20, 30, 50]"
+      (onLazyLoad)="loadStages($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} destinations"
+      styleClass="data-table"
+      [tableStyle]="{ 'min-width': '70rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date</th>
+          <th>Stage</th>
+          <th>Parcels</th>
+          <th>Cash</th>
+          <th>Cashless</th>
+          <th>Total Cost</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-stage>
+        <tr (click)="openStageDialog(stage)" style="cursor: pointer">
+          <td>{{ stage.parcelDate | date: 'dd MMM yyyy' }}</td>
+          <td>
+            <span class="badge badge-info">
+              <i class="pi pi-map-marker"></i>
+              {{ stage.stage }}
+            </span>
+          </td>
+          <td>{{ stage.parcels }}</td>
+          <td>Ksh {{ stage.cash | number: '1.2-2' }}</td>
+          <td>Ksh {{ stage.cashless | number: '1.2-2' }}</td>
+          <td class="amount-highlight">
+            Ksh {{ stage.totalCost | number: '1.2-2' }}
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-map-marker"></i>
+              <h3>No Data Found</h3>
+              <p>Try adjusting the date range</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <p-dialog
+    header="Parcel Stage Details"
+    [(visible)]="showStageDialog"
+    [modal]="true"
+    [style]="{ width: '650px', background: '#f9f9f9' }"
+    [contentStyle]="{ overflow: 'visible' }"
+    styleClass="parcel-detail-dialog"
+    [dismissableMask]="true"
+  >
+    <ng-container *ngIf="selectedStage">
+      <div class="detail-content">
+        <div class="detail-grid">
+          <!-- LEFT COLUMN -->
+          <div class="detail-column">
+            <div class="section-title">Stage Information</div>
+
+            <div class="detail-item">
+              <label>Date</label>
+              <span class="value">
+                {{ selectedStage.parcelDate | date: 'dd MMM yyyy' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Stage</label>
+              <span class="value">
+                <i class="pi pi-map-marker"></i>
+                {{ selectedStage.stage }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Total Parcels</label>
+              <span class="value">
+                {{ selectedStage.parcels }}
+              </span>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="detail-column">
+            <div class="section-title">Financial Breakdown</div>
+
+            <div class="detail-item">
+              <label>Cash</label>
+              <span class="value">
+                Ksh {{ selectedStage.cash | number: '1.2-2' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Cashless</label>
+              <span class="value">
+                Ksh {{ selectedStage.cashless | number: '1.2-2' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Total Cost</label>
+              <span class="value amount-highlight">
+                Ksh {{ selectedStage.totalCost | number: '1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showStageDialog = false"
+      ></button>
+    </ng-template>
+  </p-dialog>
+
+</div>

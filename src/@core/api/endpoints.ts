@@ -5,5 +5,19 @@ export const API_ENDPOINTS = {
   STATS_BY_PERIOD: '/api/payment/transactions/stats-by-period',
   STATS_PER_CATEGORY: '/api/payment/transactions/stats-per-category',
 
-  // #####################  DASHBOARD SUB-ENDPOINTS   #######################
+  // #####################  PARCELS SUB-ENDPOINTS   #######################
+  ALL_PARCELS: '/api/parcels/filter/user/sales',
+  ALL_PARCEL_MANAGERS: '/api/parcels/filter/user/aggregates',
+  ALL_PARCEL_SOURCES: '/api/parcels/report/summary/source',
+  ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
+
+  // #####################  Driver SUB-ENDPOINTS   #######################
+  ALL_DRIVERS: '/api/v1/org/view-activated-fleets',
+
+  // #####################  LOCATION SUB-ENDPOINTS   #######################
+  ALL_STAGES: '/api/route/view/stages',
+  ALL_ROUTES: '/api/route/list/routes',
+
+  // #####################  NOTIFICATION SUB-ENDPOINTS   #######################
+  ALL_NOTIFICATIONS: '/api/notifications',
 };

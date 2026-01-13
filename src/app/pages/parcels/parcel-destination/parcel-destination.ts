@@ -1,0 +1,127 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { TableModule } from 'primeng/table';
+import { CardModule } from 'primeng/card';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ButtonModule } from 'primeng/button';
+
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+
+import { DataService } from '../../../../@core/api/data.service';
+import { LoadingStore } from '../../../../@core/state/loading.store';
+
+import { ParcelStage } from '../../../../@core/models/parcels/parcel_stage.model';
+import { ParcelStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
+import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
+import { DialogModule } from 'primeng/dialog';
+
+@Component({
+  standalone: true,
+  selector: 'app-parcel-destination-stages',
+  templateUrl: './parcel-destination.html',
+  styleUrls: ['./parcel-destination.css'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TableModule,
+    CardModule,
+    DialogModule,
+    ProgressSpinnerModule,
+    ButtonModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+  ],
+})
+export class ParcelDestinationComponent implements OnInit {
+  stages: ParcelStage[] = [];
+
+  // Pagination
+  rows = 10;
+  first = 0;
+  totalRecords = 0;
+
+  // Date filter
+  dateRange: Date[] = [];
+
+  private readonly ENTITY_ID = 'GS000002';
+
+  constructor(
+    private dataService: DataService,
+    public loadingStore: LoadingStore,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  get loading() {
+    return this.loadingStore.loading;
+  }
+
+  ngOnInit(): void {
+    this.loadStages({ first: 0, rows: this.rows });
+  }
+
+  loadStages(event: any): void {
+    this.loadingStore.start();
+
+    const page = event.first / event.rows;
+    const [start, end] = this.dateRange || [];
+
+    const params = {
+      entityId: this.ENTITY_ID,
+      page,
+      size: event.rows,
+      startDate: start ? start.toISOString().split('T')[0] : null,
+      endDate: end ? end.toISOString().split('T')[0] : null,
+    };
+
+    this.dataService
+      .get<ParcelStageApiResponse>(
+        API_ENDPOINTS.ALL_PARCEL_DESTINATIONS,
+        params,
+        'parcel-destination-stages'
+      )
+      .subscribe({
+        next: (response) => {
+          this.stages = response.data;
+          this.totalRecords = response.totalRecords;
+
+          this.rows = event.rows;
+          this.first = event.first;
+
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load parcel source stages', err);
+        },
+        complete: () => this.loadingStore.stop(),
+      });
+  }
+
+  applyFilters(): void {
+    this.first = 0;
+    this.loadStages({ first: 0, rows: this.rows });
+  }
+
+  resetFilters(): void {
+    this.dateRange = [];
+    this.applyFilters();
+  }
+
+  showStageDialog = false;
+  selectedStage: ParcelStage | null = null;
+
+  openStageDialog(stage: ParcelStage): void {
+    this.selectedStage = stage;
+    this.showStageDialog = true;
+  }
+  closeStageDialog(): void {
+    this.showStageDialog = false;
+    this.selectedStage = null;
+  }
+}

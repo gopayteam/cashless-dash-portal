@@ -1,8 +1,15 @@
 // layout/main-layout/main-layout.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { DialogModule } from 'primeng/dialog';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
+import { DataService } from '../../../@core/api/data.service';
+import { LoadingStore } from '../../../@core/state/loading.store';
+import { API_ENDPOINTS } from '../../../@core/api/endpoints';
+import { ButtonModule } from 'primeng/button';
 
 interface NavConfig {
   route: string;
@@ -15,15 +22,42 @@ interface TabItem {
   path: string;
 }
 
+interface NotificationItem {
+  id: number;
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+}
+
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, DialogModule, ButtonModule, ToggleSwitchModule, FormsModule],
   selector: 'app-main-layout',
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.css'],
 })
 export class MainLayoutComponent implements OnInit {
   loading: any;
+
+  notifications: NotificationItem[] = [
+    {
+      id: 1,
+      title: 'New Parcel Received',
+      message: 'Parcel arrived at Westlands office',
+      time: '5 mins ago',
+      read: false,
+    },
+    {
+      id: 2,
+      title: 'Transfer Completed',
+      message: 'KES 25,000 sent to driver wallet',
+      time: '1 hour ago',
+      read: true,
+    },
+  ];
+
+  unreadCount = 2;
 
   // UI State
   sidebarCollapsed = false;
@@ -32,32 +66,21 @@ export class MainLayoutComponent implements OnInit {
 
   // User Info
   userInfo = {
-    name: 'SuperMetro Admin',
-    email: 'super.metro@gmail.com',
-    initials: 'SA',
+    name: 'Gopay Admin',
+    email: 'admin@gopay.ke',
+    initials: 'GA',
   };
 
   // Navigation Configuration - Maps routes to their tab menus
   private navigationConfig: NavConfig[] = [
     {
-      route: '/dashboard',
-      tabs: [
-        { label: 'Overview', icon: 'pi pi-th-large', path: '/dashboard/home' },
-        { label: 'Statistics', icon: 'pi pi-chart-pie', path: '/dashboard/stats' },
-        { label: 'Reports', icon: 'pi pi-file', path: '/dashboard/reports' },
-      ],
-    },
-
-    {
       route: '/transactions',
       tabs: [
         { label: 'All Transactions', icon: 'pi pi-list', path: '/transactions/all' },
         { label: 'Pending', icon: 'pi pi-clock', path: '/transactions/pending' },
-        { label: 'Completed', icon: 'pi pi-check-circle', path: '/transactions/completed' },
         { label: 'Failed', icon: 'pi pi-times-circle', path: '/transactions/failed' },
       ],
     },
-
     {
       route: '/transfer-payment',
       tabs: [
@@ -65,7 +88,6 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Funds Re-assignment', icon: 'pi pi-clock', path: '/transfer-payment/2' },
       ],
     },
-
     {
       route: '/vehicle-analysis',
       tabs: [
@@ -83,7 +105,6 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Trends', icon: 'pi pi-chart-bar', path: '/prediction/trends' },
       ],
     },
-
     {
       route: '/revenue',
       tabs: [
@@ -95,13 +116,20 @@ export class MainLayoutComponent implements OnInit {
     {
       route: '/vehicles',
       tabs: [
-        { label: 'All Vehicles', icon: 'pi pi-car', path: 'vehicles/all' },
+        { label: 'All Vehicles', icon: 'pi pi-car', path: '/vehicles/all' },
         { label: 'Active', icon: 'pi pi-check', path: '/vehicles/active' },
         { label: 'Inactive', icon: 'pi pi-ban', path: '/vehicles/inactive' },
         { label: 'Maintenance', icon: 'pi pi-wrench', path: '/vehicles/maintenance' },
       ],
     },
-
+    {
+      route: '/drivers',
+      tabs: [
+        { label: 'All Drivers', icon: 'pi pi-user', path: '/drivers/all' },
+        { label: 'Active Drivers', icon: 'pi pi-check', path: '/drivers/active' },
+        { label: 'Inactive Drivers', icon: 'pi pi-ban', path: '/drivers/inactive' },
+      ],
+    },
     {
       route: '/users',
       tabs: [
@@ -114,18 +142,39 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Deactivated Users', icon: 'pi pi-avatar', path: '/users/inactive' },
       ],
     },
-
     {
       route: '/locations',
-      tabs: [{ label: 'Locations', icon: 'pi pi-location', path: '/locations' }],
+      tabs: [
+        { label: 'Stages', icon: 'pi pi-location', path: '/locations/stages' },
+        { label: 'Routes', icon: 'pi pi-location', path: '/locations/routes' },
+      ],
+    },
+    {
+      route: '/parcel-offices',
+      tabs: [
+        { label: 'Parcel Source', icon: 'pi pi-location', path: '/parcel-offices/parcel-source' },
+        { label: 'Parcel Destination', icon: 'pi pi-location', path: '/parcel-offices/parcel-destination' },
+      ],
     },
   ];
 
   // Current tabs to display
   currentTabs: TabItem[] = [];
   showTabs = false;
+  notificationDialogVisible = false;
+  settingsDialogVisible = false;
 
-  constructor(private router: Router) {}
+  // Settings toggles
+  darkModeEnabled = false;
+  emailNotificationsEnabled = true;
+  autoLogoutEnabled = false;
+
+  constructor(
+    private router: Router,
+    private dataService: DataService,
+    public loadingStore: LoadingStore,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.setupRouteListener();
@@ -137,7 +186,7 @@ export class MainLayoutComponent implements OnInit {
 
     // Listen to route changes
     this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.handleRouteChange(event.urlAfterRedirects);
       });
@@ -168,6 +217,10 @@ export class MainLayoutComponent implements OnInit {
 
   navigate(route: string) {
     this.router.navigate([route]);
+
+    if (this.isMobile()) {
+      this.sidebarCollapsed = true;
+    }
   }
 
   onTabChange(index: number) {
@@ -176,6 +229,10 @@ export class MainLayoutComponent implements OnInit {
       this.activeTabIndex = index;
       this.router.navigate([selectedTab.path]);
     }
+  }
+
+  isMobile(): boolean {
+    return window.innerWidth <= 1024;
   }
 
   toggleSidebar() {
@@ -187,6 +244,29 @@ export class MainLayoutComponent implements OnInit {
       return this.currentRoute === route;
     }
     return this.currentRoute.startsWith(route);
+  }
+
+  loadNotifications() {
+    this.dataService.get<NotificationItem[]>(API_ENDPOINTS.ALL_NOTIFICATIONS).subscribe((data) => {
+      this.notifications = data;
+      this.unreadCount = data.filter((n) => !n.read).length;
+    });
+  }
+
+  showNotifications() {
+    this.notificationDialogVisible = true;
+  }
+
+  hideNotifications() {
+    this.notificationDialogVisible = false;
+  }
+
+  showSettings() {
+    this.settingsDialogVisible = true;
+  }
+
+  hideSettings() {
+    this.settingsDialogVisible = false;
   }
 
   logout() {

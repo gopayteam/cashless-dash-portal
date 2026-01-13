@@ -1,0 +1,240 @@
+<!-- pages/routes-stages/routes-stages.component.html -->
+<div class="routes-stages-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="routes-stages-header">
+    <div class="header-content">
+      <h1>Stages Management</h1>
+      <p class="text-muted">Manage stage locations</p>
+    </div>
+  </div>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ card.count | number }}</span>
+          </h2>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= STAGES TABLE ================= -->
+  <div>
+    <p-card styleClass="stat-card card">
+      <div class="table-header">
+        <div class="table-header-left">
+          <h3>Stages List</h3>
+          <span class="record-count">{{ stagesTotalRecords }} total stages</span>
+        </div>
+        <div class="search-container">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search stages..."
+              [(ngModel)]="stagesSearchTerm"
+              (input)="onStagesSearchChange()"
+              class="search-input"
+            />
+          </span>
+          <button
+            *ngIf="stagesSearchTerm"
+            pButton
+            icon="pi pi-times"
+            class="p-button-text p-button-sm clear-button"
+            (click)="clearStagesSearch()"
+            pTooltip="Clear search"
+          ></button>
+        </div>
+      </div>
+
+      <p-table
+        [value]="stages"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="stagesRows"
+        [first]="stagesFirst"
+        [loading]="loading()"
+        [totalRecords]="stagesTotalRecords"
+        [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} stages"
+        styleClass="data-table"
+        (onLazyLoad)="loadStages($event)"
+        [tableStyle]="{ 'min-width': '60rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Stage ID</th>
+            <th>Stage Name</th>
+            <th>Entity ID</th>
+            <th>Coordinates</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-stage>
+          <tr class="clickable-row" (click)="viewStageDetails(stage)">
+            <td>
+              <span class="receipt-number">{{ stage.id }}</span>
+            </td>
+            <td>
+              <div class="stage-name-cell">
+                <i class="pi pi-map-marker"></i>
+                <span class="stage-name">{{ stage.name }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="code-badge">{{ stage.entityId }}</span>
+            </td>
+            <td>
+              <div class="coordinates-cell">
+                <div class="coordinate-item">
+                  <span class="coordinate-label">Lat:</span>
+                  <span class="coordinate-value">{{ stage.latitude }}</span>
+                </div>
+                <div class="coordinate-item">
+                  <span class="coordinate-label">Lng:</span>
+                  <span class="coordinate-value">{{ stage.longitude }}</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span [class]="stage.softDelete ? 'badge badge-failed' : 'badge badge-paid'">
+                <i [class]="stage.softDelete ? 'pi pi-times-circle' : 'pi pi-check-circle'"></i>
+                {{ stage.softDelete ? 'DELETED' : 'ACTIVE' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="View Details"
+                  tooltipPosition="top"
+                  (click)="viewStageDetails(stage); $event.stopPropagation()"
+                ></button>
+                <button
+                  pButton
+                  icon="pi pi-map"
+                  class="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="View on Map"
+                  tooltipPosition="top"
+                  (click)="openInMaps(stage); $event.stopPropagation()"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-message">
+              <div class="empty-state">
+                <i class="pi pi-map-marker"></i>
+                <h3>No Stages Found</h3>
+                <p>Try adjusting your search term</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- ================= STAGE DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayStageDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="transaction-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '700px', backgroundColor: '#f9f9f9' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Stage Details</h2>
+        <span class="receipt-number-large">{{ selectedStage?.name }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedStage">
+      <div class="detail-grid">
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Stage ID</label>
+            <span class="value">{{ selectedStage.id }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Stage Name</label>
+            <span class="value">{{ selectedStage.name }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Entity ID</label>
+            <span class="value code-value">{{ selectedStage.entityId }}</span>
+          </div>
+        </div>
+
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Latitude</label>
+            <span class="value">{{ selectedStage.latitude }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Longitude</label>
+            <span class="value">{{ selectedStage.longitude }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Status</label>
+            <span [class]="selectedStage.softDelete ? 'value badge badge-failed' : 'value badge badge-paid'">
+              <i [class]="selectedStage.softDelete ? 'pi pi-times-circle' : 'pi pi-check-circle'"></i>
+              {{ selectedStage.softDelete ? 'DELETED' : 'ACTIVE' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-action">
+        <button
+          pButton
+          label="View on Google Maps"
+          icon="pi pi-map"
+          class="p-button-outlined"
+          (click)="openInMaps(selectedStage)"
+        ></button>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeStageDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

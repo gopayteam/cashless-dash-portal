@@ -1,9 +1,10 @@
 <!-- pages/dashboard/dashboard.component.html -->
 <div class="dashboard-container">
   <!-- ================= GLOBAL LOADING OVERLAY ================= -->
-  <div class="dashboard-loader" *ngIf="loading()">
+  <!-- Using global .loading-overlay class -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
     <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
-  </div>
+  </div> -->
 
   <!-- ================= HEADER ================= -->
   <div class="dashboard-header">
@@ -12,8 +13,8 @@
       <p class="text-muted">Welcome back! Here's what's happening with your fleet today.</p>
     </div>
 
-    <div class="header-actions">
-      <mat-form-field appearance="fill">
+    <div class="filter-item header-actions">
+      <mat-form-field appearance="fill" class="white-bg">
         <mat-label>Select Date Range</mat-label>
         <mat-date-range-input [rangePicker]="picker">
           <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
@@ -22,23 +23,20 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
       </mat-form-field>
-
-      <button
-        pButton
-        label="Export"
-        icon="pi pi-download"
-        class="p-button-outlined p-button-primary"
-        (click)="exportData()"
-      ></button>
     </div>
   </div>
 
   <!-- ================= STATS CARDS ================= -->
+  <!-- Using global .stat-card class with hover effect -->
   <div class="stats-grid">
-    <p-card *ngFor="let card of statsCards" [styleClass]="'stat-card'">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <!-- Using global .stat-content class -->
       <div class="stat-content">
         <div class="stat-info">
+          <!-- Using global .stat-title class -->
           <span class="stat-title">{{ card.title }}</span>
+
+          <!-- Using global .stat-value class -->
           <h2 class="stat-value">
             <ng-container *ngIf="card.amount !== undefined; else countValue">
               <span class="currency">{{ card.currency }}</span>
@@ -54,10 +52,13 @@
             </ng-template>
           </h2>
 
+          <!-- Using global .stat-change class -->
           <span class="stat-change positive" *ngIf="card.change">
             <i class="pi pi-arrow-up"></i> {{ card.change }}
           </span>
         </div>
+
+        <!-- Using global .stat-icon class -->
         <div class="stat-icon" [style.background-color]="card.color + '20'">
           <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
         </div>
@@ -68,7 +69,8 @@
   <!-- ================= CHARTS SECTION ================= -->
   <div class="charts-grid">
     <!-- Line Chart -->
-    <p-card header="Organizations Performance" styleClass="chart-card">
+    <!-- Using global .card class -->
+    <p-card header="Organizations Performance" styleClass="stat-card card">
       <div class="chart-container">
         <p-chart
           *ngIf="chartData"
@@ -81,7 +83,7 @@
     </p-card>
 
     <!-- Pie Chart -->
-    <p-card header="Total Amount Per Category" styleClass="chart-card">
+    <p-card header="Total Amount Per Category" styleClass="stat-card card">
       <div class="chart-container">
         <p-chart
           *ngIf="pieChartData"
@@ -109,25 +111,27 @@
   </div>
 
   <!-- ================= RECENT TRANSACTIONS ================= -->
-  <p-card header="Recent Transactions" styleClass="transactions-card">
+  <p-card header="Recent Transactions" styleClass="stat-card card">
+    <!-- Using global .data-table class -->
     <p-table
       [value]="recentTransactions"
       [lazy]="true"
       [paginator]="true"
       [rows]="rows"
       [first]="first"
+      [loading]="loading()"
       [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[5, 10, 20, 30]"
-      paginatorPosition="bottom"
-      paginatorStyleClass="custom-paginator"
+      [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
       (onLazyLoad)="loadTransactions($event)"
+      styleClass="data-table"
     >
       <ng-template pTemplate="header">
         <tr>
           <th>Transaction ID</th>
           <th>Date</th>
+          <th>Time</th>
           <th>Vehicle</th>
           <th>Amount</th>
           <th>Type</th>
@@ -140,7 +144,9 @@
         <tr>
           <td>{{ transaction.mpesaReceiptNumber }}</td>
           <td>{{ transaction.createdAt | date : 'dd MMM yyyy, hh:mm a' }}</td>
+          <td>{{ transaction.createdAtFormatted || "N/A" }}</td>
           <td>
+            <!-- Using component-specific .vehicle-badge -->
             <span class="vehicle-badge">
               <i class="pi pi-car"></i>
               {{ transaction.fleetNumber }}
@@ -148,12 +154,14 @@
           </td>
           <td class="amount-cell">Ksh {{ transaction.assignedAmount | number : '1.2-2' }}</td>
           <td>
-            <span [class]="'type-badge type-' + transaction.transactionType.toLowerCase()">
+            <!-- Using global .badge classes -->
+            <span [class]="'badge badge-' + transaction.transactionType.toLowerCase()">
               {{ transaction.transactionType }}
             </span>
           </td>
           <td>
-            <span [class]="'status-badge status-' + transaction.paymentStatus.toLowerCase()">
+            <!-- Using global .badge classes -->
+            <span [class]="'badge badge-' + transaction.paymentStatus.toLowerCase()">
               {{ transaction.paymentStatus }}
             </span>
           </td>
