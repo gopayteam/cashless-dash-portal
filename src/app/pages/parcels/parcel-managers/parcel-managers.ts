@@ -16,6 +16,7 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 
 import { ParcelManager } from '../../../../@core/models/parcels/parcel_manager.model';
 import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parcel_manager_response.model';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   standalone: true,
@@ -28,6 +29,7 @@ import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parc
     TableModule,
     CardModule,
     ButtonModule,
+    DialogModule,
     ProgressSpinnerModule,
     MatDatepickerModule,
     MatFormFieldModule,
@@ -107,5 +109,17 @@ export class ParcelManagersComponent implements OnInit {
   resetFilters(): void {
     this.dateRange = [];
     this.applyFilters();
+  }
+
+  showManagerDialog = false;
+  selectedManager: ParcelManager | null = null;
+
+  openManagerDialog(manager: ParcelManager): void {
+    this.selectedManager = manager;
+    this.showManagerDialog = true;
+  }
+  closeManagerDialog(): void {
+    this.showManagerDialog = false;
+    this.selectedManager = null;
   }
 }

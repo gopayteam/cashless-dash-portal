@@ -18,6 +18,7 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { ParcelStage } from '../../../../@core/models/parcels/parcel_stage.model';
 import { ParcelStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   standalone: true,
@@ -29,6 +30,7 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
     FormsModule,
     TableModule,
     CardModule,
+    DialogModule,
     ProgressSpinnerModule,
     ButtonModule,
     MatDatepickerModule,
@@ -109,5 +111,17 @@ export class ParcelSourceComponent implements OnInit {
   resetFilters(): void {
     this.dateRange = [];
     this.applyFilters();
+  }
+
+  showStageDialog = false;
+  selectedStage: ParcelStage | null = null;
+
+  openStageDialog(stage: ParcelStage): void {
+    this.selectedStage = stage;
+    this.showStageDialog = true;
+  }
+  closeStageDialog(): void {
+    this.showStageDialog = false;
+    this.selectedStage = null;
   }
 }

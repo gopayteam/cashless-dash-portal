@@ -13,4 +13,8 @@ export const API_ENDPOINTS = {
 
   // #####################  Driver SUB-ENDPOINTS   #######################
   ALL_DRIVERS: '/api/v1/org/view-activated-fleets',
+
+  // #####################  LOCATION SUB-ENDPOINTS   #######################
+  ALL_STAGES: '/api/route/view/stages',
+  ALL_ROUTES: '/api/route/list/routes',
 };

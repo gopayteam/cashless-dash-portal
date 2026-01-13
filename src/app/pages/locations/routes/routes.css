@@ -1,8 +1,8 @@
-/* ================= PARCELS SPECIFIC STYLES ================= */
-/* Only styles unique to the parcels component */
+/* ================= ROUTES & STAGES SPECIFIC STYLES ================= */
+/* Only styles unique to the routes-stages component */
 
-/* Parcels Container */
-.parcels-container {
+/* Routes & Stages Container */
+.routes-stages-container {
   padding: 1rem;
   background-color: var(--light-bg);
   min-height: 100vh;
@@ -10,7 +10,7 @@
 }
 
 /* ================= HEADER ================= */
-.parcels-header {
+.routes-stages-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -20,71 +20,61 @@
   gap: 1rem;
 }
 
-.parcels-header h1 {
+.routes-stages-header h1 {
   font-size: 2rem;
   font-weight: 700;
   color: #2c3e50;
   margin: 0 0 0.5rem 0;
 }
 
-/* ================= FILTER CARD ================= */
-.filter-card {
-  margin-bottom: 2rem;
-}
-
-.filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-  align-items: end;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-group input {
-  width: 100%;
-  border: 1px solid var(--border-color);
-  margin: auto;
-  padding: 1rem;
-}
-
-.filter-label {
-  font-weight: 600;
-  color: var(--medium-text);
-  font-size: 0.875rem;
-}
-
-.filter-field {
-  width: 100%;
-}
-
-.filter-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 /* ================= STATS GRID ================= */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-/* Currency Display in Stats */
-.stat-value .currency {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-right: 0.25rem;
+/* ================= TAB MENU ================= */
+::ng-deep .p-tabmenu {
+  margin-bottom: 1.5rem;
 }
 
-.stat-value .amount {
-  font-size: 1.75rem;
+::ng-deep .p-tabmenu .p-tabmenu-nav {
+  background: var(--white);
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem {
+  margin-right: 0.5rem;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-link {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 1rem 1.5rem;
+  color: var(--medium-text);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-link:hover {
+  background: rgba(102, 126, 234, 0.05);
+  color: var(--primary-color);
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem.p-highlight .p-menuitem-link {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: transparent;
+  font-weight: 600;
+}
+
+::ng-deep .p-tabmenu .p-tabmenuitem .p-menuitem-icon {
+  margin-right: 0.5rem;
 }
 
 /* ================= TABLE HEADER ================= */
@@ -173,103 +163,97 @@
   font-size: 0.85rem;
 }
 
-.date-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.date-cell .date {
+.code-badge {
+  font-family: 'Courier New', monospace;
   font-weight: 600;
-  color: #2c3e50;
-}
-
-.date-cell .time {
-  font-size: 0.8rem;
-  color: var(--light-text);
-}
-
-.customer-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.customer-cell i {
-  color: var(--light-text);
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.customer-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.customer-name {
-  font-weight: 600;
-  color: #2c3e50;
-}
-
-.customer-phone {
-  font-size: 0.8rem;
-  color: var(--light-text);
-}
-
-/* Route Cell */
-.route-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.route-point {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.route-point i {
-  color: var(--primary-color);
-  font-size: 0.75rem;
-}
-
-.route-arrow {
-  color: var(--light-text);
-  font-size: 0.75rem;
-}
-
-/* Fleet Badge - Parcels Specific */
-.parcels-container .fleet-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-weight: 600;
+  color: var(--medium-text);
+  background-color: var(--border-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
   font-size: 0.85rem;
 }
 
-.parcels-container .fleet-badge i {
+/* Location Cell */
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.location-cell i {
   font-size: 0.9rem;
 }
 
-/* Amount Cell */
-.amount-cell {
-  font-weight: 700;
-  color: #2c3e50;
+.start-marker {
+  color: #28a745;
 }
 
-.amount {
+.end-marker {
+  color: #dc3545;
+}
+
+/* Fleet Count */
+.fleet-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--medium-text);
+  font-weight: 500;
+}
+
+.fleet-count i {
+  color: #667eea;
+}
+
+/* Stage Name Cell */
+.stage-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-name-cell i {
+  color: #ffc107;
   font-size: 1rem;
 }
 
-/* ================= PARCEL DETAIL DIALOG ================= */
+.stage-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Coordinates Cell */
+.coordinates-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.coordinate-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.coordinate-label {
+  font-weight: 600;
+  color: var(--light-text);
+  min-width: 30px;
+}
+
+.coordinate-value {
+  font-family: 'Courier New', monospace;
+  color: var(--medium-text);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* ================= DETAIL DIALOG ================= */
 .receipt-number-large {
   font-family: 'Courier New', monospace;
   font-weight: 600;
@@ -294,22 +278,7 @@
 .detail-column {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-}
-
-.detail-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.section-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin: 0 0 0.5rem 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--border-color);
+  gap: 1.5rem;
 }
 
 .detail-item {
@@ -352,29 +321,33 @@
   font-size: 1.1rem;
 }
 
-.amount-highlight {
-  color: #28a745 !important;
-  font-weight: 700 !important;
-  font-size: 1.25rem !important;
+/* Map Action Button */
+.map-action {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+}
+
+.map-action button {
+  width: 100%;
+  max-width: 300px;
 }
 
 /* ================= RESPONSIVE DESIGN ================= */
 @media (max-width: 768px) {
-  .parcels-container {
+  .routes-stages-container {
     padding: 1rem;
   }
 
-  .parcels-header {
+  .routes-stages-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .parcels-header h1 {
+  .routes-stages-header h1 {
     font-size: 1.5rem;
-  }
-
-  .filters-grid {
-    grid-template-columns: 1fr;
   }
 
   .table-header {
@@ -399,60 +372,42 @@
     gap: 1.5rem;
   }
 
-  .filter-actions {
-    width: 100%;
-    flex-direction: column;
-  }
-
-  .filter-actions button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .amount {
-    font-size: 0.9rem;
-  }
-
   .stats-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ================= MATERIAL FORM FIELD OVERRIDES ================= */
-::ng-deep .mat-mdc-form-field {
-  width: 100%;
-}
+@media (max-width: 480px) {
+  .coordinates-cell {
+    font-size: 0.8rem;
+  }
 
-::ng-deep .mat-mdc-text-field-wrapper {
-  background-color: white;
-}
-
-::ng-deep .mat-date-range-input-container {
-  width: 100%;
+  .action-buttons {
+    flex-direction: column;
+  }
 }
 
 /* ================= DIALOG STYLING ================= */
-::ng-deep .parcel-detail-dialog .p-dialog-header {
+::ng-deep .transaction-detail-dialog .p-dialog-header {
   background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--secondary-color-dark) 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;
 }
 
-::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-title {
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-title {
   color: white;
 }
 
-::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-header-icon {
+::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-header-icon {
   color: white;
 }
 
-::ng-deep .parcel-detail-dialog .p-dialog-content {
+::ng-deep .transaction-detail-dialog .p-dialog-content {
   padding: 2rem;
 }
 
-::ng-deep .parcel-detail-dialog .p-dialog-footer {
+::ng-deep .transaction-detail-dialog .p-dialog-footer {
   padding: 1rem 2rem;
   border-top: 1px solid var(--border-color);
 }

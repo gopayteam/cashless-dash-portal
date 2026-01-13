@@ -76,7 +76,7 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-stage>
-        <tr>
+        <tr (click)="openStageDialog(stage)" style="cursor: pointer">
           <td>{{ stage.parcelDate | date: 'dd MMM yyyy' }}</td>
           <td>
             <span class="badge badge-info">
@@ -106,4 +106,83 @@
       </ng-template>
     </p-table>
   </p-card>
+
+  <p-dialog
+    header="Parcel Stage Details"
+    [(visible)]="showStageDialog"
+    [modal]="true"
+    [style]="{ width: '650px', background: '#f9f9f9' }"
+    [contentStyle]="{ overflow: 'visible' }"
+    styleClass="parcel-detail-dialog"
+    [dismissableMask]="true"
+  >
+    <ng-container *ngIf="selectedStage">
+      <div class="detail-content">
+        <div class="detail-grid">
+          <!-- LEFT COLUMN -->
+          <div class="detail-column">
+            <div class="section-title">Stage Information</div>
+
+            <div class="detail-item">
+              <label>Date</label>
+              <span class="value">
+                {{ selectedStage.parcelDate | date: 'dd MMM yyyy' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Stage</label>
+              <span class="value">
+                <i class="pi pi-map-marker"></i>
+                {{ selectedStage.stage }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Total Parcels</label>
+              <span class="value">
+                {{ selectedStage.parcels }}
+              </span>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="detail-column">
+            <div class="section-title">Financial Breakdown</div>
+
+            <div class="detail-item">
+              <label>Cash</label>
+              <span class="value">
+                Ksh {{ selectedStage.cash | number: '1.2-2' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Cashless</label>
+              <span class="value">
+                Ksh {{ selectedStage.cashless | number: '1.2-2' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Total Cost</label>
+              <span class="value amount-highlight">
+                Ksh {{ selectedStage.totalCost | number: '1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showStageDialog = false"
+      ></button>
+    </ng-template>
+  </p-dialog>
 </div>

@@ -78,7 +78,7 @@
       </ng-template>
 
       <ng-template pTemplate="body" let-manager>
-        <tr>
+        <tr (click)="openManagerDialog(manager)">
           <td>
             <div class="customer-cell">
               <i class="pi pi-user"></i>
@@ -114,4 +114,78 @@
       </ng-template>
     </p-table>
   </p-card>
+
+
+  <p-dialog
+  header="Parcel Manager Details"
+  [(visible)]="showManagerDialog"
+  [modal]="true"
+  [style]="{ width: '720px', backgroundColor: '#f9f9f9' }"
+  [closable]="true"
+  styleClass="parcel-detail-dialog"
+>
+  <div class="detail-content" *ngIf="selectedManager">
+    <div class="detail-grid">
+      <!-- LEFT COLUMN -->
+      <div class="detail-column">
+        <div class="detail-section">
+          <h4 class="section-title">Manager Info</h4>
+
+          <div class="detail-item">
+            <label>Name</label>
+            <span class="value">{{ selectedManager.userName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Phone</label>
+            <span class="value">{{ selectedManager.userPhone }}</span>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">Parcels</h4>
+
+          <div class="detail-item">
+            <label>Total Parcels</label>
+            <span class="value">{{ selectedManager.parcels }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="detail-column">
+        <div class="detail-section">
+          <h4 class="section-title">Financial Summary</h4>
+
+          <div class="detail-item">
+            <label>Cash</label>
+            <span class="value">Ksh {{ selectedManager.cash | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Cashless</label>
+            <span class="value">Ksh {{ selectedManager.cashless | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Expenses</label>
+            <span class="value">Ksh {{ selectedManager.expense | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Net Amount</label>
+            <span class="amount-highlight">
+              Ksh {{ selectedManager.netAmount | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Close" icon="pi pi-times" (click)="showManagerDialog = false"></button>
+  </ng-template>
+</p-dialog>
+
 </div>

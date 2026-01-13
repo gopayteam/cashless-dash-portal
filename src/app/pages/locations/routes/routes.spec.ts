@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Locations } from './locations';
+import { LocationRoutesComponent as Locations } from './routes';
 
 describe('Locations', () => {
   let component: Locations;

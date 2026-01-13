@@ -24,7 +24,6 @@ import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maint
 import { ActiveDriversComponent } from './pages/users/drivers/active/drivers';
 import { CustomersComponent } from './pages/users/customers/customers';
 import { AdminUserComponent } from './pages/users/admin/admin';
-import { LocationsComponent } from './pages/locations/locations';
 import { DebitTransactionsComponent } from './pages/payments/debit-transactions/debit-transactions';
 import { CreditTransactionsComponent } from './pages/payments/credit-transactions/credit-transactions';
 import { CreditDriverComponent } from './pages/payments/credit-driver/create-payment';
@@ -44,6 +43,8 @@ import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-sour
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
 import { DriversComponent } from './pages/users/drivers/all/drivers';
 import { InactiveDriversComponent } from './pages/users/drivers/inactive/drivers';
+import { LocationStagesComponent } from './pages/locations/stages/stages';
+import { LocationRoutesComponent } from './pages/locations/routes/routes';
 
 export const routes: Routes = [
   {
@@ -76,7 +77,8 @@ export const routes: Routes = [
 
       { path: 'driver-assignments', component: DriverAssignmentComponent },
 
-      { path: 'locations/all', component: LocationsComponent },
+      { path: 'locations/stages', component: LocationStagesComponent },
+      { path: 'locations/routes', component: LocationRoutesComponent },
 
       { path: 'vehicles/all', component: AllVehiclesComponent },
       { path: 'vehicles/active', component: ActiveVehiclesComponent },

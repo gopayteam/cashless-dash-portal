@@ -113,21 +113,6 @@
   backdrop-filter: blur(4px);
 }
 
-/* Vehicle Badge in Dashboard Table */
-.vehicle-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  background: var(--light-bg);
-  border-radius: 6px;
-  font-weight: 500;
-}
-
-.vehicle-badge i {
-  color: var(--secondary-color);
-}
-
 /* Amount Cell Styling */
 .amount-cell {
   font-weight: 600;
@@ -155,3 +140,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+

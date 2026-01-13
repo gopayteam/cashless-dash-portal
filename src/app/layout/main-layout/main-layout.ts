@@ -53,7 +53,6 @@ export class MainLayoutComponent implements OnInit {
       tabs: [
         { label: 'All Transactions', icon: 'pi pi-list', path: '/transactions/all' },
         { label: 'Pending', icon: 'pi pi-clock', path: '/transactions/pending' },
-        { label: 'Completed', icon: 'pi pi-check-circle', path: '/transactions/completed' },
         { label: 'Failed', icon: 'pi pi-times-circle', path: '/transactions/failed' },
       ],
     },
@@ -126,7 +125,10 @@ export class MainLayoutComponent implements OnInit {
 
     {
       route: '/locations',
-      tabs: [{ label: 'Locations', icon: 'pi pi-location', path: '/locations' }],
+      tabs: [
+        { label: 'Stages', icon: 'pi pi-location', path: '/locations/stages' },
+        { label: 'Routes', icon: 'pi pi-location', path: '/locations/routes' },
+      ],
     },
 
     {

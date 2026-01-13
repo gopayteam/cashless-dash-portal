@@ -1,8 +1,8 @@
-/* ================= DRIVERS SPECIFIC STYLES ================= */
-/* Only styles unique to the drivers component */
+/* ================= PARCELS SPECIFIC STYLES ================= */
+/* Only styles unique to the parcels component */
 
-/* Drivers Container */
-.drivers-container {
+/* Parcels Container */
+.parcels-container {
   padding: 1rem;
   background-color: var(--light-bg);
   min-height: 100vh;
@@ -10,7 +10,7 @@
 }
 
 /* ================= HEADER ================= */
-.drivers-header {
+.parcels-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -20,7 +20,7 @@
   gap: 1rem;
 }
 
-.drivers-header h1 {
+.parcels-header h1 {
   font-size: 2rem;
   font-weight: 700;
   color: #2c3e50;
@@ -34,7 +34,7 @@
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
   align-items: end;
 }
@@ -43,6 +43,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.filter-group input {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  margin: auto;
+  padding: 1rem;
 }
 
 .filter-label {
@@ -64,9 +71,20 @@
 /* ================= STATS GRID ================= */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+/* Currency Display in Stats */
+.stat-value .currency {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+
+.stat-value .amount {
+  font-size: 1.75rem;
 }
 
 /* ================= TABLE HEADER ================= */
@@ -145,84 +163,7 @@
 }
 
 /* ================= CELL CONTENT STYLING ================= */
-
-/* Driver Cell with Avatar */
-.driver-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.driver-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.driver-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.driver-name {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
-
-.driver-meta {
-  font-size: 0.75rem;
-  color: var(--light-text);
-}
-
-/* Username Cell */
-.username-cell {
-  font-family: 'Courier New', monospace;
-  font-weight: 500;
-  color: var(--medium-text);
-  font-size: 0.9rem;
-}
-
-/* Phone Cell */
-.phone-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.phone-cell i {
-  color: var(--light-text);
-  font-size: 0.85rem;
-}
-
-/* Fleet Badge */
-.drivers-container .fleet-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-.drivers-container .fleet-badge i {
-  font-size: 0.9rem;
-}
-
-/* Code Badge */
-.code-badge {
+.receipt-number {
   font-family: 'Courier New', monospace;
   font-weight: 600;
   color: var(--medium-text);
@@ -232,55 +173,93 @@
   font-size: 0.85rem;
 }
 
-/* Date Range Cell */
-.date-range-cell {
+.date-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-cell .date {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.date-cell .time {
+  font-size: 0.8rem;
+  color: var(--light-text);
+}
+
+.customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer-cell i {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.customer-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.customer-phone {
+  font-size: 0.8rem;
+  color: var(--light-text);
+}
+
+/* Route Cell */
+.route-cell {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.date-item {
-  display: flex;
+.route-point {
+  display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
 }
 
-.date-item i {
+.route-point i {
   color: var(--primary-color);
   font-size: 0.75rem;
 }
 
-.date-arrow {
+.route-arrow {
   color: var(--light-text);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
 }
 
-/* Days Remaining Cell */
-.days-remaining-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--success-color);
-  font-weight: 600;
+/* Amount Cell */
+.amount-cell {
+  font-weight: 700;
+  color: #2c3e50;
 }
 
-.days-remaining-cell.warning {
-  color: #ffc107;
-}
-
-.days-remaining-cell i {
+.amount {
   font-size: 1rem;
 }
 
-/* ================= DRIVER DETAIL DIALOG ================= */
-.driver-name-large {
-  font-weight: 700;
-  color: white;
-  font-size: 1.2rem;
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1rem;
+/* ================= PARCEL DETAIL DIALOG ================= */
+.receipt-number-large {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+  background-color: #f0f3ff;
+  padding: 0.35rem 0.7rem;
   border-radius: 6px;
   display: inline-block;
 }
@@ -334,9 +313,6 @@
   font-size: 1rem;
   color: #2c3e50;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .detail-item .code-value {
@@ -359,28 +335,24 @@
   font-size: 1.1rem;
 }
 
-.warning-text {
-  color: #ffc107 !important;
-  font-weight: 600 !important;
-}
-
-.success-text {
+.amount-highlight {
   color: #28a745 !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
 }
 
 /* ================= RESPONSIVE DESIGN ================= */
 @media (max-width: 768px) {
-  .drivers-container {
+  .parcels-container {
     padding: 1rem;
   }
 
-  .drivers-header {
+  .parcels-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .drivers-header h1 {
+  .parcels-header h1 {
     font-size: 1.5rem;
   }
 
@@ -418,22 +390,15 @@
   .filter-actions button {
     width: 100%;
   }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
-  .driver-avatar {
-    width: 35px;
-    height: 35px;
-    font-size: 0.8rem;
+  .amount {
+    font-size: 0.9rem;
   }
 
-  .date-range-cell {
-    flex-direction: column;
-    align-items: flex-start;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -446,27 +411,31 @@
   background-color: white;
 }
 
+::ng-deep .mat-date-range-input-container {
+  width: 100%;
+}
+
 /* ================= DIALOG STYLING ================= */
-::ng-deep .driver-detail-dialog .p-dialog-header {
-  background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--secondary-color-dark) 100%);
+::ng-deep .parcel-detail-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;
 }
 
-::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-title {
+::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-title {
   color: white;
 }
 
-::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-header-icon {
+::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-header-icon {
   color: white;
 }
 
-::ng-deep .driver-detail-dialog .p-dialog-content {
+::ng-deep .parcel-detail-dialog .p-dialog-content {
   padding: 2rem;
 }
 
-::ng-deep .driver-detail-dialog .p-dialog-footer {
+::ng-deep .parcel-detail-dialog .p-dialog-footer {
   padding: 1rem 2rem;
   border-top: 1px solid var(--border-color);
 }
