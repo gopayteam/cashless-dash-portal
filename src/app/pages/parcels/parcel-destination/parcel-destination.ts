@@ -24,7 +24,9 @@ import { DialogModule } from 'primeng/dialog';
   standalone: true,
   selector: 'app-parcel-destination-stages',
   templateUrl: './parcel-destination.html',
-  styleUrls: ['./parcel-destination.css'],
+  styleUrls: ['./parcel-destination.css', '../../../../styles/modules/_date_picker.css',
+    '../../../../styles/modules/_filter_actions.css',
+  ],
   imports: [
     CommonModule,
     FormsModule,

@@ -22,7 +22,9 @@ import { DialogModule } from 'primeng/dialog';
   standalone: true,
   selector: 'app-parcel-managers',
   templateUrl: './parcel-managers.html',
-  styleUrls: ['./parcel-managers.css'],
+  styleUrls: ['./parcel-managers.css', '../../../../styles/modules/_date_picker.css',
+    '../../../../styles/modules/_filter_actions.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,

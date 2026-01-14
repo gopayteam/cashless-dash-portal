@@ -10,7 +10,6 @@ import { YearlyAnalysisComponent } from './pages/vehicle-analysis/yearly/yearly'
 import { ShortTermPredictionComponent } from './pages/prediction/short-term/short-term';
 import { PredictionTrendsComponent } from './pages/prediction/trends/trends';
 import { LongTermPredictionComponent } from './pages/prediction/long-term/long-term';
-import { CompletedTransactionsComponent } from './pages/transactions/completed/completed';
 import { FailedTransactionsComponent } from './pages/transactions/failed/failed';
 import { PendingTransactionsComponent } from './pages/transactions/pending/pending';
 import { AllTransactionsComponent } from './pages/transactions/all/all';
@@ -56,7 +55,6 @@ export const routes: Routes = [
       { path: 'dashboard/reports', component: ReportsComponent },
 
       { path: 'transactions/all', component: AllTransactionsComponent },
-      { path: 'transactions/completed', component: CompletedTransactionsComponent },
       { path: 'transactions/failed', component: FailedTransactionsComponent },
       { path: 'transactions/pending', component: PendingTransactionsComponent },
 

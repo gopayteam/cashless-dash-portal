@@ -1,5 +1,5 @@
 // pages/transactions/all-transactions.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -38,7 +38,9 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
     MatNativeDateModule,
   ],
   templateUrl: './failed.html',
-  styleUrls: ['./failed.css'],
+  styleUrls: ['./failed.css',
+    '../../../../styles/modules/_date_picker.css',
+  ],
 })
 export class FailedTransactionsComponent implements OnInit {
   transactions: PaymentRecord[] = [];
@@ -60,7 +62,8 @@ export class FailedTransactionsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
-    private cdr: ChangeDetectorRef
+    // private cdr: ChangeDetectorRef
+    @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {

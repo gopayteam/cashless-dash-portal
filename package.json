@@ -18,9 +18,9 @@
           "parser": "angular"
         }
       },
-        {
-    "vite": "5.4.11"
-  }
+      {
+        "vite": "5.4.11"
+      }
     ]
   },
   "private": true,
@@ -49,6 +49,8 @@
     "@angular/compiler-cli": "~21.0.3",
     "angular-in-memory-web-api": "^0.21.0",
     "autoprefixer": "^10.4.22",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "jsdom": "^27.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",

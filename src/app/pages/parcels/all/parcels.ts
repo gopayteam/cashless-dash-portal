@@ -1,5 +1,5 @@
 // pages/parcels/parcels.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -27,7 +27,9 @@ import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mappe
   standalone: true,
   selector: 'app-parcels',
   templateUrl: './parcels.html',
-  styleUrls: ['./parcels.css', '../../../../styles/modules/_date_picker.css',],
+  styleUrls: ['./parcels.css', '../../../../styles/modules/_date_picker.css',
+    '../../../../styles/modules/_filter_actions.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -87,7 +89,7 @@ export class ParcelsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
-    private cdr: ChangeDetectorRef
+    @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {
@@ -95,6 +97,7 @@ export class ParcelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setDefaultDateRange();
     this.loadParcels({ first: 0, rows: this.rows });
   }
 
@@ -102,21 +105,28 @@ export class ParcelsComponent implements OnInit {
     const today = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
-    this.dateRange = [lastWeek, today];
+    this.filters.dateRange = [lastWeek, today];
   }
 
   loadParcels($event: any): void {
-    this.loadingStore.start();
+    const [start, end] = this.filters.dateRange;
     const event = $event;
 
-    const page = event.first / event.rows;
-    const [start, end] = this.filters.dateRange || [];
-    // const [start, end] = this.dateRange;
+    if (!start || !end) {
+      console.warn('Date range not set, skipping load');
+      return;
+    }
+
+    const page = event?.first ? event.first / event.rows : 0;
+    const size = event?.rows ?? this.rows;
+
+    this.first = event?.first ?? 0;
+    this.rows = size;
 
     const payload = {
       entityId: 'GS000002',
-      page,
-      size: event.rows,
+      page: page,
+      size: size,
       // transactionType: 'DEBIT',
       paymentStatus: 'PAID',
 
@@ -131,6 +141,8 @@ export class ParcelsComponent implements OnInit {
 
       sort: 'createdAt,DESC',
     };
+
+    this.loadingStore.start();
 
     this.dataService
       .post<ParcelsAPiResponse>(API_ENDPOINTS.ALL_PARCELS, payload, 'parcels')
@@ -169,7 +181,7 @@ export class ParcelsComponent implements OnInit {
       parcelStatus: null,
       dateRange: [],
     };
-
+    this.setDefaultDateRange();
     this.searchTerm = '';
     this.applyFilters();
   }

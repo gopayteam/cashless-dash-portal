@@ -13,6 +13,35 @@
     </div>
   </div>
 
+   <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <ng-container *ngIf="card.amount !== undefined; else countValue">
+              <span class="currency">{{ card.currency }}</span>
+              <span class="amount">{{ card.amount | number : '1.0-2' }}</span>
+            </ng-container>
+
+            <ng-template #countValue>
+              <span class="amount">{{ card.count | number }}</span>
+            </ng-template>
+          </h2>
+
+          <span class="stat-change positive" *ngIf="card.change">
+            <i class="pi pi-arrow-up"></i> {{ card.change }}
+          </span>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
   <!-- ================= FILTER SECTION ================= -->
   <p-card styleClass="stat-card card filter-card">
     <div class="filters-grid">
@@ -46,10 +75,10 @@
         />
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item filter-item-filled">
         <label class="filter-label">Payment Method</label>
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-select [(ngModel)]="filters.paymentMethod">
+          <mat-select placeholder="Select Payment Method" [(ngModel)]="filters.paymentMethod">
             <mat-option [value]="null">All Methods</mat-option>
             <mat-option *ngFor="let method of paymentMethods" [value]="method">
               {{ method }}
@@ -58,10 +87,10 @@
         </mat-form-field>
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item filter-item-filled">
         <label class="filter-label">Parcel Status</label>
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-select [(ngModel)]="filters.parcelStatus">
+          <mat-select placeholder="Select Parcel Status" [(ngModel)]="filters.parcelStatus">
             <mat-option [value]="null">All Statuses</mat-option>
             <mat-option *ngFor="let status of parcelStatuses" [value]="status">
               {{ status.replace('_', ' ') }}
@@ -70,59 +99,39 @@
         </mat-form-field>
       </div>
 
-      <div class="filter-group">
-        <label class="filter-label filter-item">Date Range</label>
-        <mat-form-field appearance="outline" class="filter-field">
+      <div class="filter-item filter-item-filled">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="date-range-field">
           <mat-date-range-input [rangePicker]="picker">
             <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
             <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker></mat-date-range-picker>
+          <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
         </mat-form-field>
       </div>
 
+
       <div class="filter-actions">
-        <button pButton label="Apply Filters" icon="pi pi-filter" (click)="applyFilters()"></button>
         <button
           pButton
-          label="Reset"
+          icon="pi pi-filter"
+          label="Apply"
+          class="filter-btn filter-btn--apply"
+          (click)="applyFilters()">
+        </button>
+
+        <button
+          pButton
           icon="pi pi-refresh"
-          class="p-button-outlined"
-          (click)="resetFilters()"
-        ></button>
+          label="Reset"
+          class="filter-btn filter-btn--reset"
+          (click)="resetFilters()">
+        </button>
       </div>
     </div>
   </p-card>
 
-  <!-- ================= STATS CARDS ================= -->
-  <div class="stats-grid">
-    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
-      <div class="stat-content">
-        <div class="stat-info">
-          <span class="stat-title">{{ card.title }}</span>
-          <h2 class="stat-value">
-            <ng-container *ngIf="card.amount !== undefined; else countValue">
-              <span class="currency">{{ card.currency }}</span>
-              <span class="amount">{{ card.amount | number : '1.0-2' }}</span>
-            </ng-container>
-
-            <ng-template #countValue>
-              <span class="amount">{{ card.count | number }}</span>
-            </ng-template>
-          </h2>
-
-          <span class="stat-change positive" *ngIf="card.change">
-            <i class="pi pi-arrow-up"></i> {{ card.change }}
-          </span>
-        </div>
-
-        <div class="stat-icon" [style.background-color]="card.color + '20'">
-          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
-        </div>
-      </div>
-    </p-card>
-  </div>
 
   <!-- ================= PARCELS TABLE ================= -->
   <p-card styleClass="stat-card card">

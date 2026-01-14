@@ -6,6 +6,8 @@
     <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
   </div> -->
 
+
+
   <!-- ================= HEADER ================= -->
   <div class="dashboard-header">
     <div class="header-content">
@@ -13,9 +15,9 @@
       <p class="text-muted">Welcome back! Here's what's happening with your fleet today.</p>
     </div>
 
-    <div class="filter-item header-actions">
-      <mat-form-field appearance="fill" class="white-bg">
-        <mat-label>Select Date Range</mat-label>
+    <div class="filter-item-gradient filter-item">
+      <label class="filter-label">Select Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
         <mat-date-range-input [rangePicker]="picker">
           <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
           <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />

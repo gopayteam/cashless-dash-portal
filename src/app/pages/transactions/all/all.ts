@@ -1,5 +1,5 @@
 // pages/transactions/all-transactions.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -64,7 +64,8 @@ export class AllTransactionsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
-    private cdr: ChangeDetectorRef
+    // private cdr: ChangeDetectorRef
+    @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {
