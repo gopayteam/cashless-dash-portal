@@ -122,6 +122,16 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Maintenance', icon: 'pi pi-wrench', path: '/vehicles/maintenance' },
       ],
     },
+     {
+      route: '/driver-assignments',
+      tabs: [
+        { label: 'Overview', icon: 'pi pi-list', path: '/driver-assignments/all' },
+        { label: 'Active', icon: 'pi pi-check', path: '/driver-assignments/active' },
+        { label: 'Inactive', icon: 'pi pi-wrench', path: '/driver-assignments/inactive' },
+        { label: 'Rejected', icon: 'pi pi-ban', path: '/driver-assignments/rejected' },
+        { label: 'Pending', icon: 'pi pi-clock', path: '/driver-assignments/pending' },
+      ],
+    },
     {
       route: '/drivers',
       tabs: [
@@ -147,6 +157,14 @@ export class MainLayoutComponent implements OnInit {
       tabs: [
         { label: 'Stages', icon: 'pi pi-location', path: '/locations/stages' },
         { label: 'Routes', icon: 'pi pi-location', path: '/locations/routes' },
+      ],
+    },
+
+    {
+      route: '/wallet',
+      tabs: [
+        { label: 'Organization Wallet', icon: 'pi pi-wallet', path: '/wallet/organization' },
+        { label: 'User Wallet', icon: 'pi pi-wallet', path: '/wallet/user' },
       ],
     },
     {
@@ -237,6 +255,10 @@ export class MainLayoutComponent implements OnInit {
 
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  toggleSidebarMobile() {
+    this.sidebarCollapsed = true;
   }
 
   isRouteActive(route: string, exact: boolean = false): boolean {

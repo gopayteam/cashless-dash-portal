@@ -1,0 +1,307 @@
+/* pages/vehicles/all-vehicles.component.css */
+
+/* Import the reusable dialog module */
+@import '../../../../styles/modules/_dialog_module.css';
+
+.vehicles-container {
+  padding: 1.5rem;
+  min-height: 100vh;
+}
+
+/* ================= HEADER ================= */
+.vehicles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.text-muted {
+  color: #718096;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.header-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ================= SEARCH & FILTERS ================= */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  min-width: 300px;
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.clear-button {
+  color: #718096 !important;
+}
+
+.clear-button:hover {
+  color: #2d3748 !important;
+}
+
+::ng-deep .status-dropdown {
+  min-width: 180px;
+}
+
+/* ================= SUMMARY STATS ================= */
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon i {
+  font-size: 1.75rem;
+  color: white;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+/* ================= TABLE HEADER ================= */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.table-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.table-header-left h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.record-count {
+  padding: 0.25rem 0.75rem;
+  background: #edf2f7;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* ================= TABLE CELLS ================= */
+.fleet-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fleet-cell i {
+  color: #4299e1;
+  font-size: 1rem;
+}
+
+.fleet-number {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+.registration-number {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+  background: #f7fafc;
+  padding: 0.375rem 0.625rem;
+  border-radius: 4px;
+}
+
+.stage-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-cell i {
+  color: #f59e0b;
+  font-size: 0.875rem;
+}
+
+.capacity-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.capacity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.capacity-item i {
+  color: #10b981;
+}
+
+.capacity-breakdown {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.capacity-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.capacity-detail i {
+  font-size: 0.75rem;
+}
+
+.contact-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.contact-cell i {
+  color: #718096;
+  font-size: 0.75rem;
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state p {
+  color: #718096;
+  margin: 0;
+}
+
+/* ================= DIALOG ================= */
+/* Dialog styles are now imported from _dialog_module.css */
+/* Component-specific dialog overrides can be added here if needed */
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .vehicles-container {
+    padding: 1rem;
+  }
+
+  .vehicles-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .header-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    min-width: 100%;
+  }
+
+  ::ng-deep .status-dropdown {
+    min-width: 100%;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+}

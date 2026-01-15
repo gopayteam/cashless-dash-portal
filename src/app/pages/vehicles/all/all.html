@@ -1,1 +1,378 @@
-<p>all works!</p>
+<!-- pages/vehicles/all-vehicles.component.html -->
+<div class="vehicles-container">
+  <!-- ================= HEADER ================= -->
+  <div class="vehicles-header">
+    <div class="header-content">
+      <h1>Fleet Management</h1>
+      <p class="text-muted">View and manage all registered vehicles</p>
+    </div>
+
+    <div class="header-filters">
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search vehicles..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          />
+        </span>
+        <button
+          *ngIf="searchTerm"
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()"
+          pTooltip="Clear search"
+        ></button>
+      </div>
+
+      <!-- <p-dropdown
+        [options]="statusOptionsList"
+        [(ngModel)]="selectedStatus"
+        (onChange)="onStatusChange()"
+        placeholder="Filter by Status"
+        styleClass="status-dropdown"
+      ></p-dropdown> -->
+
+      <button
+        *ngIf="searchTerm || selectedStatus"
+        pButton
+        label="Clear Filters"
+        icon="pi pi-filter-slash"
+        class="p-button-outlined p-button-sm"
+        (click)="clearFilters()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- ================= SUMMARY STATS ================= -->
+  <div class="summary-stats">
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-car"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Vehicles</span>
+        <span class="stat-value">{{ totalRecords }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Active Vehicles</span>
+        <span class="stat-value">{{ activeVehicles }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Capacity</span>
+        <span class="stat-value">{{ totalCapacity }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+        <i class="pi pi-map-marker"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Stages</span>
+        <span class="stat-value">{{ totalStages }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VEHICLES TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Vehicles List</h3>
+        <span class="record-count">{{ filteredVehicles.length }} of {{ totalRecords }} vehicles</span>
+      </div>
+    </div>
+
+    <p-table
+      [value]="vehicles"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} vehicles"
+      styleClass="data-table"
+      (onLazyLoad)="loadVehicles($event)"
+      [tableStyle]="{ 'min-width': '70rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Fleet Number</th>
+          <th>Registration</th>
+          <th>Stage</th>
+          <th>Capacity</th>
+          <th>Status</th>
+          <th>Investor</th>
+          <th>Marshal</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-vehicle>
+        <tr class="clickable-row" (click)="viewVehicleDetails(vehicle)">
+          <td>
+            <div class="fleet-cell">
+              <i class="pi pi-car"></i>
+              <span class="fleet-number">{{ vehicle.fleetNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="registration-number">{{ vehicle.registrationNumber }}</span>
+          </td>
+          <td>
+            <div class="stage-cell">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ vehicle.stageName }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="capacity-cell">
+              <div class="capacity-item">
+                <i class="pi pi-users"></i>
+                <span>{{ vehicle.capacity }}</span>
+              </div>
+              <div class="capacity-breakdown">
+                <span class="capacity-detail">
+                  <i class="pi pi-user"></i>{{ vehicle.seatedCapacity }}
+                </span>
+                <span class="capacity-detail">
+                  <i class="pi pi-users"></i>{{ vehicle.standingCapacity }}
+                </span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + getStatusClass(vehicle.status)">
+              <i [class]="'pi ' + getStatusIcon(vehicle.status)"></i>
+              {{ vehicle.status }}
+            </span>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <i class="pi pi-phone"></i>
+              <span>{{ vehicle.investorNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="contact-cell">
+              <i class="pi pi-phone"></i>
+              <span>{{ vehicle.marshalNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewVehicleDetails(vehicle); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-car"></i>
+              <h3>No Vehicles Found</h3>
+              <p *ngIf="searchTerm || selectedStatus">Try adjusting your filters</p>
+              <p *ngIf="!searchTerm && !selectedStatus">No vehicles registered yet</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= VEHICLE DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '900px' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon">
+            <i class="pi pi-car"></i>
+          </div>
+          <div>
+            <h2>{{ selectedVehicle?.fleetNumber }}</h2>
+            <span class="registration-large">{{ selectedVehicle?.registrationNumber }}</span>
+          </div>
+          <span
+            *ngIf="selectedVehicle"
+            [class]="'badge badge-' + getStatusClass(selectedVehicle.status)"
+          >
+            <i [class]="'pi ' + getStatusIcon(selectedVehicle.status)"></i>
+            {{ selectedVehicle.status }}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedVehicle">
+      <!-- Capacity Section -->
+      <div class="detail-section">
+        <h4 class="section-title">Capacity Information</h4>
+        <div class="capacity-grid">
+          <div class="capacity-card">
+            <i class="pi pi-users"></i>
+            <span class="capacity-label">Total</span>
+            <span class="capacity-value">{{ selectedVehicle.capacity }}</span>
+          </div>
+          <div class="capacity-card">
+            <i class="pi pi-user"></i>
+            <span class="capacity-label">Seated</span>
+            <span class="capacity-value">{{ selectedVehicle.seatedCapacity }}</span>
+          </div>
+          <div class="capacity-card">
+            <i class="pi pi-users"></i>
+            <span class="capacity-label">Standing</span>
+            <span class="capacity-value">{{ selectedVehicle.standingCapacity }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Fleet Number</label>
+            <span class="value fleet-highlight">
+              <i class="pi pi-car"></i>
+              {{ selectedVehicle.fleetNumber }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Fleet Code</label>
+            <span class="value code-value">{{ selectedVehicle.fleetCode }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Registration Number</label>
+            <span class="value">{{ selectedVehicle.registrationNumber }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Store Number</label>
+            <span class="value">{{ selectedVehicle.storeNumber || 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Till Number</label>
+            <span class="value">{{ selectedVehicle.tillNumber || 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Stage</label>
+            <span class="value stage-highlight">
+              <i class="pi pi-map-marker"></i>
+              {{ selectedVehicle.stageName }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Stage ID</label>
+            <span class="value">{{ selectedVehicle.stageId }}</span>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Entity ID</label>
+            <span class="value code-value">{{ selectedVehicle.entityId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Entity Name</label>
+            <span class="value">{{ selectedVehicle.entityName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Investor Number</label>
+            <span class="value contact-value">
+              <i class="pi pi-phone"></i>
+              {{ selectedVehicle.investorNumber }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Marshal Number</label>
+            <span class="value contact-value">
+              <i class="pi pi-phone"></i>
+              {{ selectedVehicle.marshalNumber }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>OTP Approver</label>
+            <span class="value">{{ selectedVehicle.otpApproverNumber || 'N/A' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Org Fees Maintained</label>
+            <span [class]="'value badge badge-' + (selectedVehicle.organizationFeesMaintained ? 'active' : 'inactive')">
+              <i [class]="selectedVehicle.organizationFeesMaintained ? 'pi pi-check' : 'pi pi-times'"></i>
+              {{ selectedVehicle.organizationFeesMaintained ? 'Yes' : 'No' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Created On</label>
+            <span class="value">
+              {{ selectedVehicle.createdOn | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Created By</label>
+            <span class="value">{{ selectedVehicle.createBy }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

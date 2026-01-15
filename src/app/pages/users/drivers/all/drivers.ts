@@ -22,7 +22,11 @@ import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
   standalone: true,
   selector: 'app-drivers',
   templateUrl: './drivers.html',
-  styleUrls: ['./drivers.css'],
+  styleUrls: [
+    './drivers.css',
+    '../../../../../styles/modules/_date_picker.css',
+    '../../../../../styles/modules/_filter_actions.css',
+  ],
   imports: [
     CommonModule,
     FormsModule,

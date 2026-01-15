@@ -24,7 +24,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles/styles.css", "src/styles/modules/_date_picker.css"]
+            "styles": ["src/styles/styles.css"]
           },
           "configurations": {
             "production": {

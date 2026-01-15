@@ -20,4 +20,19 @@ export const API_ENDPOINTS = {
 
   // #####################  NOTIFICATION SUB-ENDPOINTS   #######################
   ALL_NOTIFICATIONS: '/api/notifications',
+
+  // #####################  WALLET SUB-ENDPOINTS   #######################
+  ALL_WALLETS: '/api/payment/wallets/all',
+  ALL_ORGANIZATION_WALLETS: '/api/payment/wallets/accounts',
+
+  // #####################  VEHICLE SUB-ENDPOINTS   #######################
+  ALL_VEHICLES: '/api/v1/org/vehicles/view-all',
+
+  // #####################  DRIVER-ASSIGNMENTS SUB-ENDPOINTS   #######################
+  ALL_DRIVER_ASSIGNMENTS: '/api/v1/org/view-activated-fleets',
+  ALL_ACTIVE_DRIVERS: '/api/v1/org/view-activated-fleets',
+  ALL_PENDING_REQUESTS: '/api/v1/org/driver/fleets/view',
+
+  // #####################  STATEMENTS SUB-ENDPOINTS   #######################
+  WITHDRAWAL_STATEMENTS: '/api/statements/retrieve'
 };

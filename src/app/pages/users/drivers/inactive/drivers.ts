@@ -20,7 +20,7 @@ import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
 
 @Component({
   standalone: true,
-  selector: 'app-drivers',
+  selector: 'app-inactive-drivers',
   templateUrl: './drivers.html',
   styleUrls: ['./drivers.css'],
   imports: [

@@ -29,7 +29,6 @@ import { CreditDriverComponent } from './pages/payments/credit-driver/create-pay
 import { FundReassignmentComponent } from './pages/payments/fund-reassignment/fund-reassignment';
 import { ParcelsComponent } from './pages/parcels/all/parcels';
 import { ParcelManagersComponent } from './pages/parcels/parcel-managers/parcel-managers';
-import { DriverAssignmentComponent } from './pages/driver-assignment/driver-assignment';
 import { OrganizationWalletComponent } from './pages/finance/organization-wallet/organization-wallet';
 import { WithdrawalStatementsComponent } from './pages/finance/statements/statements';
 import { ObligationsComponent } from './pages/finance/obligations/obligations';
@@ -44,6 +43,12 @@ import { DriversComponent } from './pages/users/drivers/all/drivers';
 import { InactiveDriversComponent } from './pages/users/drivers/inactive/drivers';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
 import { LocationRoutesComponent } from './pages/locations/routes/routes';
+import { AllDriverAssignmentsComponent } from './pages/driver-assignment/all/all';
+import { AllActiveDriverAssignmentsComponent } from './pages/driver-assignment/active/active';
+import { AllRejectedDriverAssignmentsComponent } from './pages/driver-assignment/rejected/rejected';
+import { AllPendingDriverAssignmentsComponent } from './pages/driver-assignment/pending/pending';
+import { UserWallet } from './pages/finance/user-wallet/user-wallet';
+import { AllInactiveDriverAssignmentsComponent } from './pages/driver-assignment/inactive/inactive';
 
 export const routes: Routes = [
   {
@@ -73,7 +78,11 @@ export const routes: Routes = [
       { path: 'drivers/active', component: ActiveDriversComponent },
       { path: 'drivers/inactive', component: InactiveDriversComponent },
 
-      { path: 'driver-assignments', component: DriverAssignmentComponent },
+      { path: 'driver-assignments/all', component: AllDriverAssignmentsComponent },
+      { path: 'driver-assignments/active', component: AllActiveDriverAssignmentsComponent },
+      { path: 'driver-assignments/inactive', component: AllInactiveDriverAssignmentsComponent },
+      { path: 'driver-assignments/rejected', component: AllRejectedDriverAssignmentsComponent },
+      { path: 'driver-assignments/pending', component: AllPendingDriverAssignmentsComponent },
 
       { path: 'locations/stages', component: LocationStagesComponent },
       { path: 'locations/routes', component: LocationRoutesComponent },
@@ -83,7 +92,8 @@ export const routes: Routes = [
       { path: 'vehicles/inactive', component: InactiveVehiclesComponent },
       { path: 'vehicles/maintenance', component: MaintenanceVehiclesComponent },
 
-      { path: 'organization-wallet', component: OrganizationWalletComponent },
+      { path: 'wallet/organization', component: OrganizationWalletComponent },
+      { path: 'wallet/user', component: UserWallet },
       { path: 'management-statements', component: WithdrawalStatementsComponent },
       { path: 'obligations', component: ObligationsComponent },
 

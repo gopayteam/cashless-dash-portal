@@ -5,8 +5,8 @@
     <!-- Mobile Backdrop -->
     <!-- <div
       class="sidebar-backdrop"
-      *ngIf="sidebarCollapsed"
-      (click)="toggleSidebar()"
+      *ngIf="isMobile"
+      (click)="toggleSidebarMobile()"
     ></div> -->
 
     <!-- Logo Header -->
@@ -187,7 +187,7 @@
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/driver-assignments')"
-                  (click)="navigate('/driver-assignments')"
+                  (click)="navigate('/driver-assignments/all')"
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-map menu-icon" style="color: rgb(125, 3, 3)"></i>
@@ -218,12 +218,12 @@
               <li class="menu-item">
                 <button
                   class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/organization-wallet')"
-                  (click)="navigate('/organization-wallet')"
+                  [class.menu-link--active]="isRouteActive('/wallet')"
+                  (click)="navigate('/wallet/organization')"
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-wallet menu-icon" style="color: rgb(134, 5, 5)"></i>
-                    <span class="menu-text">Organization Wallets</span>
+                    <span class="menu-text">Wallets</span>
                   </span>
                 </button>
               </li>

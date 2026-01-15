@@ -26,7 +26,7 @@
         />
       </div>
 
-      <div class="filter-group">
+      <div class="filter-item filter-item-filled">
         <label class="filter-label">Driver Status</label>
         <mat-form-field appearance="outline" class="filter-field">
           <mat-select [(ngModel)]="filters.status">
@@ -39,14 +39,21 @@
       </div>
 
       <div class="filter-actions">
-        <button pButton label="Apply Filters" icon="pi pi-filter" (click)="applyFilters()"></button>
         <button
           pButton
-          label="Reset"
+          icon="pi pi-filter"
+          label="Apply"
+          class="filter-btn filter-btn--apply"
+          (click)="applyFilters()">
+        </button>
+
+        <button
+          pButton
           icon="pi pi-refresh"
-          class="p-button-outlined"
-          (click)="resetFilters()"
-        ></button>
+          label="Reset"
+          class="filter-btn filter-btn--reset"
+          (click)="resetFilters()">
+        </button>
       </div>
     </div>
   </p-card>

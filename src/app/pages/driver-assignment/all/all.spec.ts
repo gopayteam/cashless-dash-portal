@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DriverAssignment } from './driver-assignment';
+import { AllDriverAssignmentsComponent as All } from './all';
 
-describe('DriverAssignment', () => {
-  let component: DriverAssignment;
-  let fixture: ComponentFixture<DriverAssignment>;
+describe('All', () => {
+  let component: All;
+  let fixture: ComponentFixture<All>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DriverAssignment]
+      imports: [All]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DriverAssignment);
+    fixture = TestBed.createComponent(All);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
