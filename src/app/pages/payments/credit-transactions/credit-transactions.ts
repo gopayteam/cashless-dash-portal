@@ -109,7 +109,7 @@ export class CreditTransactionsComponent implements OnInit {
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,
-      transactionType: 'CREDIT',
+      transactionType: 'DEBIT',
       size: pageSize,
       sort: 'createdAt,DESC',
     };

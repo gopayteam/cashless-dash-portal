@@ -39,7 +39,7 @@ import { InvestorsComponent } from './pages/users/investors/investors';
 import { MarshalsComponent } from './pages/users/marshals/marshals';
 import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
-import { DriversComponent } from './pages/users/drivers/all/drivers';
+import { AllDriversComponent } from './pages/users/drivers/all/drivers';
 import { InactiveDriversComponent } from './pages/users/drivers/inactive/drivers';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
 import { LocationRoutesComponent } from './pages/locations/routes/routes';
@@ -49,6 +49,7 @@ import { AllRejectedDriverAssignmentsComponent } from './pages/driver-assignment
 import { AllPendingDriverAssignmentsComponent } from './pages/driver-assignment/pending/pending';
 import { UserWallet } from './pages/finance/user-wallet/user-wallet';
 import { AllInactiveDriverAssignmentsComponent } from './pages/driver-assignment/inactive/inactive';
+import { DriverUserComponent } from './pages/users/driver/driver';
 
 export const routes: Routes = [
   {
@@ -74,7 +75,7 @@ export const routes: Routes = [
       { path: 'parcel-offices/parcel-source', component: ParcelSourceComponent },
       { path: 'parcel-offices/parcel-destination', component: ParcelDestinationComponent },
 
-      { path: 'drivers/all', component: DriversComponent },
+      { path: 'drivers/all', component: AllDriversComponent },
       { path: 'drivers/active', component: ActiveDriversComponent },
       { path: 'drivers/inactive', component: InactiveDriversComponent },
 
@@ -113,7 +114,7 @@ export const routes: Routes = [
       { path: 'users/all', component: GeneralUserComponent },
       { path: 'users/admins', component: AdminUserComponent },
       { path: 'users/conductors', component: ConductorsComponent },
-      { path: 'users/drivers', component: DriversComponent },
+      { path: 'users/drivers', component: DriverUserComponent },
       { path: 'users/customers', component: CustomersComponent },
       { path: 'users/deactivated', component: DeactivatedUsersComponent },
       { path: 'users/inactive', component: DeactivatedUsersComponent },

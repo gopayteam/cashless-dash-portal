@@ -66,7 +66,7 @@
       </div>
       <div class="stat-content">
         <span class="stat-label">Total Drivers</span>
-        <span class="stat-value">{{ totalDrivers }}</span>
+        <span class="stat-value">{{ totalRecords }}</span>
       </div>
     </div>
 
@@ -141,6 +141,7 @@
 
       <ng-template pTemplate="body" let-assignment>
         <tr class="clickable-row" (click)="viewAssignmentDetails(assignment)">
+
           <td>
             <div class="driver-cell">
               <i class="pi pi-user"></i>
@@ -150,45 +151,53 @@
               </div>
             </div>
           </td>
+
           <td>
             <div class="contact-cell">
               <i class="pi pi-phone"></i>
               <span>{{ assignment.phoneNumber }}</span>
             </div>
           </td>
+
           <td>
             <div class="fleet-cell">
               <i class="pi pi-car"></i>
               <span class="fleet-number">{{ assignment.fleetNumber }}</span>
             </div>
           </td>
+
           <td>
             <span class="registration-number">{{ assignment.registrationNumber }}</span>
           </td>
+
           <td>
-            <span [class]="'badge badge-' + getApprovalStatusClass(assignment.approvalStatus)">
-              <i [class]="'pi ' + getApprovalStatusIcon(assignment.approvalStatus)"></i>
-              {{ assignment.approvalStatus }}
+            <span [class]="'badge badge-' + getApprovalStatusClass(assignment.approvalStatus ?? assignment.status )">
+              <i [class]="'pi ' + getApprovalStatusIcon(assignment.approvalStatus ?? assignment.status )"></i>
+              {{ assignment.approvalStatus ?? assignment.status }}
             </span>
           </td>
+
           <td>
             <span [class]="'badge badge-' + (assignment.approved ? 'active' : 'inactive')">
               <i [class]="assignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
-              {{ assignment.approved ? 'Yes' : 'No' }}
+              {{ assignment.approved ? 'Yes' : 'No'  }}
             </span>
           </td>
+
           <td>
             <div class="approval-count">
               <i class="pi pi-thumbs-up"></i>
               <span>{{ assignment.approvalCount }}</span>
             </div>
           </td>
+
           <td>
             <div class="days-cell">
               <i class="pi pi-calendar"></i>
               <span>{{ assignment.allowedActiveDays }} days</span>
             </div>
           </td>
+
           <td>
             <button
               pButton
@@ -240,21 +249,25 @@
           </div>
           <div class="dialog-title-section">
             <h2>{{ getFullName(selectedAssignment!) }}</h2>
+
             <div class="dialog-badges">
-              <span
+
+              <!-- <span
                 *ngIf="selectedAssignment"
-                [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus)"
+                [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus || selectedAssignment.status)"
               >
                 <i [class]="'pi ' + getApprovalStatusIcon(selectedAssignment.approvalStatus)"></i>
                 {{ selectedAssignment.approvalStatus }}
               </span>
+
               <span
                 *ngIf="selectedAssignment"
                 [class]="'badge badge-' + (selectedAssignment.approved ? 'active' : 'inactive')"
               >
                 <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
                 {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
-              </span>
+              </span> -->
+
             </div>
           </div>
         </div>
@@ -264,11 +277,11 @@
     <div class="detail-content" *ngIf="selectedAssignment">
       <!-- Status Cards -->
       <div class="status-cards">
-        <div class="status-card">
+        <!-- <div class="status-card">
           <i class="pi pi-thumbs-up"></i>
-          <span class="status-label">Approval Count</span>
-          <span class="status-value">{{ selectedAssignment.approvalCount }}</span>
-        </div>
+           <span class="status-label">Approval Count</span>
+           <span class="status-value">{{ selectedAssignment.approvalCount }}</span>
+        </div> -->
         <div class="status-card">
           <i class="pi pi-calendar"></i>
           <span class="status-label">Active Days</span>

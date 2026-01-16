@@ -12,8 +12,8 @@ import { SelectModule } from 'primeng/select';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { DriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
-import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { PendingDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
+import { DriverAssignmentApiResponse, PendingDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 
 
 interface ApprovalStatusOption {
@@ -45,9 +45,9 @@ interface ApprovalFilterOption {
   styleUrls: ['./pending.css', '../../../../styles/modules/_dialog_module.css'],
 })
 export class AllPendingDriverAssignmentsComponent implements OnInit {
-  assignments: DriverAssignment[] = [];
-  allAssignments: DriverAssignment[] = [];
-  filteredAssignments: DriverAssignment[] = [];
+  assignments: PendingDriverAssignment[] = [];
+  allAssignments: PendingDriverAssignment[] = [];
+  filteredAssignments: PendingDriverAssignment[] = [];
 
   // Pagination state
   rows: number = 10;
@@ -60,7 +60,7 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
 
   // Dialog state
   displayDetailDialog: boolean = false;
-  selectedAssignment: DriverAssignment | null = null;
+  selectedAssignment: PendingDriverAssignment | null = null;
 
   // Summary stats
   totalDrivers: number = 0;
@@ -120,7 +120,7 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<DriverAssignmentApiResponse>(
+      .post<PendingDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_PENDING_REQUESTS,
         payload,
         'driver-assignments'
@@ -217,7 +217,7 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     this.applyClientSideFilter();
   }
 
-  viewAssignmentDetails(assignment: DriverAssignment): void {
+  viewAssignmentDetails(assignment: PendingDriverAssignment): void {
     this.selectedAssignment = assignment;
     this.displayDetailDialog = true;
   }
@@ -245,7 +245,7 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     return iconMap[status] || 'pi-circle';
   }
 
-  getFullName(assignment: DriverAssignment): string {
+  getFullName(assignment: PendingDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 }

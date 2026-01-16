@@ -66,7 +66,7 @@
       </div>
       <div class="stat-content">
         <span class="stat-label">Total Drivers</span>
-        <span class="stat-value">{{ totalDrivers }}</span>
+        <span class="stat-value">{{ totalRecords }}</span>
       </div>
     </div>
 
@@ -240,7 +240,7 @@
           </div>
           <div class="dialog-title-section">
             <h2>{{ getFullName(selectedAssignment!) }}</h2>
-            <div class="dialog-badges">
+            <!-- <div class="dialog-badges">
               <span
                 *ngIf="selectedAssignment"
                 [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus)"
@@ -255,7 +255,7 @@
                 <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
                 {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
               </span>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -264,11 +264,11 @@
     <div class="detail-content" *ngIf="selectedAssignment">
       <!-- Status Cards -->
       <div class="status-cards">
-        <div class="status-card">
+        <!-- <div class="status-card">
           <i class="pi pi-thumbs-up"></i>
           <span class="status-label">Approval Count</span>
           <span class="status-value">{{ selectedAssignment.approvalCount }}</span>
-        </div>
+        </div> -->
         <div class="status-card">
           <i class="pi pi-calendar"></i>
           <span class="status-label">Active Days</span>

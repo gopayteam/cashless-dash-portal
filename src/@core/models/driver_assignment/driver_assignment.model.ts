@@ -1,23 +1,67 @@
-export interface DriverAssignment {
-  id: number;                   // Unique numeric ID
-  createdOn: string;            // Timestamp when created
-  createBy: string;             // Creator identifier (phone/email)
-  lastModifiedDate: string | null; // Last modification timestamp (nullable)
-  modifiedBy: string | null;    // Modifier identifier (nullable)
-  softDelete: boolean;          // Soft delete flag
-  created: boolean;             // Indicates if entity was created
-  entityId: string;             // Organization/entity ID
-  username: string;             // Username (often phone number)
-  phoneNumber: string;          // Driver’s phone number
-  firstName: string;            // First name
-  lastName: string;             // Last name
-  fleetNumber: string;          // Fleet number
-  investorNumber: string;       // Investor phone number
-  marshalNumber: string;        // Marshal phone number
-  approved: boolean;            // Approval flag
-  approvalCount: number;        // Number of approvals
-  allowedActiveDays: number;    // Allowed active days
-  registrationNumber: string;   // Vehicle registration number
-  approvalStatus: string;       // Approval status (e.g., PENDING)
-  stageId: number;              // Stage ID
+export type DriverAssignment = PendingDriverAssignment | ActiveDriverAssignment | InactiveDriverAssignment | DormantDriverAssignment | GeneralDriverAssignment;
+
+
+
+export interface BaseDriverAssignment {
+  id: number;
+  createdOn: string;
+  createBy: string;
+  lastModifiedDate?: string | null;
+  modifiedBy?: string | null;
+  softDelete: boolean;
+  created: boolean;
+  entityId: string;
+  username: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  fleetNumber: string;
+  investorNumber: string;
+  marshalNumber: string;
+  registrationNumber: string;
+  allowedActiveDays: number;
+  stageId?: number | null;
 }
+
+// Fetch all driver assignments that are pending approval
+export interface PendingDriverAssignment extends BaseDriverAssignment {
+  approved: boolean;
+  approvalCount: number;
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+}
+
+// Fetch all driver assignments that are active
+export interface ActiveDriverAssignment extends BaseDriverAssignment {
+  status: "ACTIVE";
+  approved: boolean;
+  startDate: string;
+  endDate: string;
+}
+
+// Fetch all driver assignments that are inactive
+export interface InactiveDriverAssignment extends BaseDriverAssignment {
+  status: "INACTIVE";
+  approved: boolean;
+  endDate: string;
+}
+
+// Fetch all driver assignments that are rejected
+export interface RejectedDriverAssignment extends BaseDriverAssignment {
+  status: "REJECTED";
+  approved: boolean;
+  endDate: string;
+}
+
+// Fetch all driver assignments that are neither active nor inactive
+export interface DormantDriverAssignment extends BaseDriverAssignment {
+  status: "DORMANT";
+  endDate?: string;
+}
+
+// Fetch all driver assignments
+export interface GeneralDriverAssignment extends BaseDriverAssignment {
+  status: "ACTIVE" | "INACTIVE" | "PENDING";
+  startDate?: string;
+  endDate?: string;
+}
+

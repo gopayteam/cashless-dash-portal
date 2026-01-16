@@ -12,8 +12,8 @@ import { SelectModule } from 'primeng/select';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { DriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
-import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { ActiveDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
+import { ActiveDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 
 
 interface ApprovalStatusOption {
@@ -45,9 +45,9 @@ interface ApprovalFilterOption {
   styleUrls: ['./active.css', '../../../../styles/modules/_dialog_module.css'],
 })
 export class AllActiveDriverAssignmentsComponent implements OnInit {
-  assignments: DriverAssignment[] = [];
-  allAssignments: DriverAssignment[] = [];
-  filteredAssignments: DriverAssignment[] = [];
+  assignments: ActiveDriverAssignment[] = [];
+  allAssignments: ActiveDriverAssignment[] = [];
+  filteredAssignments: ActiveDriverAssignment[] = [];
 
   // Pagination state
   rows: number = 10;
@@ -60,7 +60,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
 
   // Dialog state
   displayDetailDialog: boolean = false;
-  selectedAssignment: DriverAssignment | null = null;
+  selectedAssignment: ActiveDriverAssignment | null = null;
 
   // Summary stats
   totalDrivers: number = 0;
@@ -120,7 +120,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<DriverAssignmentApiResponse>(
+      .post<ActiveDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_ACTIVE_DRIVERS,
         payload,
         'driver-assignments'
@@ -143,11 +143,6 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalDrivers = this.allAssignments.length;
-    this.approvedDrivers = this.allAssignments.filter(a => a.approved).length;
-    this.pendingApprovals = this.allAssignments.filter(
-      a => a.approvalStatus === 'PENDING'
-    ).length;
-
     // Count unique fleets
     const uniqueFleets = new Set(this.allAssignments.map(a => a.fleetNumber));
     this.totalFleets = uniqueFleets.size;
@@ -171,22 +166,6 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
           assignment.username?.toLowerCase().includes(searchLower)
         );
       });
-    }
-
-    // Apply approval status filter
-    if (this.selectedApprovalStatus && this.selectedApprovalStatus !== '') {
-      filtered = filtered.filter(
-        assignment => assignment.approvalStatus === this.selectedApprovalStatus
-      );
-    }
-
-    // Apply approved/not approved filter
-    if (this.selectedApprovalFilter && this.selectedApprovalFilter !== '') {
-      if (this.selectedApprovalFilter === 'approved') {
-        filtered = filtered.filter(assignment => assignment.approved);
-      } else if (this.selectedApprovalFilter === 'not-approved') {
-        filtered = filtered.filter(assignment => !assignment.approved);
-      }
     }
 
     this.filteredAssignments = filtered;
@@ -217,7 +196,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
     this.applyClientSideFilter();
   }
 
-  viewAssignmentDetails(assignment: DriverAssignment): void {
+  viewAssignmentDetails(assignment: ActiveDriverAssignment): void {
     this.selectedAssignment = assignment;
     this.displayDetailDialog = true;
   }
@@ -245,7 +224,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
     return iconMap[status] || 'pi-circle';
   }
 
-  getFullName(assignment: DriverAssignment): string {
+  getFullName(assignment: ActiveDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 }

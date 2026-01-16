@@ -34,5 +34,9 @@ export const API_ENDPOINTS = {
   ALL_PENDING_REQUESTS: '/api/v1/org/driver/fleets/view',
 
   // #####################  STATEMENTS SUB-ENDPOINTS   #######################
-  WITHDRAWAL_STATEMENTS: '/api/statements/retrieve'
+  WITHDRAWAL_STATEMENTS: '/api/statements/retrieve',
+
+  // #####################  USER SUB-ENDPOINTS   #######################
+  ALL_USERS: '/api/v1/org/users/view',
+  ALL_DEACTIVATED_USERS: '/api/v1/org/users/view-deactivated',
 };

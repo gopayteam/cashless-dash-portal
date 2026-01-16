@@ -39,7 +39,7 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
   ],
   templateUrl: './debit-transactions.html',
   styleUrls: ['./debit-transactions.css',
-    '../../../../styles/modules/_date_picker.css',  
+    '../../../../styles/modules/_date_picker.css',
   ],
 })
 export class DebitTransactionsComponent implements OnInit {
@@ -108,7 +108,7 @@ export class DebitTransactionsComponent implements OnInit {
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,
-      transactionType: 'DEBIT',
+      transactionType: 'CREDIT',
       size: pageSize,
       sort: 'createdAt,DESC',
     };

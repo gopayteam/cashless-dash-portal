@@ -41,7 +41,7 @@ import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
     MatFormFieldModule,
   ],
 })
-export class DriversComponent implements OnInit {
+export class AllDriversComponent implements OnInit {
   drivers: Driver[] = [];
 
   // Pagination
@@ -158,7 +158,7 @@ export class DriversComponent implements OnInit {
     this.statsCards = [
       {
         title: 'Total Drivers',
-        count: totalDrivers,
+        count: this.totalRecords,
         icon: 'pi-users',
         color: '#667eea',
         change: null,

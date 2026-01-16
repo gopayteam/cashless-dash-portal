@@ -24,6 +24,7 @@
 @import './modules/_date_picker.css';
 @import './modules/_filter_actions.css';
 @import './modules/_dialog_module.css';
+@import './modules/_user_module.css';
 
 /* Import layout styles */
 @import './layout/_topbar.css';

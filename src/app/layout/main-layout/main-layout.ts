@@ -145,6 +145,7 @@ export class MainLayoutComponent implements OnInit {
       tabs: [
         { label: 'All Users', icon: 'pi pi-avatar', path: '/users/all' },
         { label: 'All Admins', icon: 'pi pi-avatar', path: '/users/admins' },
+        { label: 'All Investors', icon: 'pi pi-avatar', path: '/users/investors' },
         { label: 'All Marshalls', icon: 'pi pi-avatar', path: '/users/marshals' },
         { label: 'All Drivers', icon: 'pi pi-avatar', path: '/users/drivers' },
         { label: 'All Conductors', icon: 'pi pi-avatar', path: '/users/conductors' },

@@ -1,6 +1,6 @@
 import { Role } from './role.model';
 
-export class User {
+export class AuthUser {
   id!: number;
   email!: string;
   password!: string;

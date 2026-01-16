@@ -13,8 +13,8 @@ import { SelectModule } from 'primeng/select';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { DriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
-import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { RejectedDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
+import { DriverAssignmentApiResponse, RejectedDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 
 
 interface ApprovalStatusOption {
@@ -46,9 +46,9 @@ interface ApprovalFilterOption {
   styleUrls: ['./rejected.css', '../../../../styles/modules/_dialog_module.css'],
 })
 export class AllRejectedDriverAssignmentsComponent implements OnInit {
-  assignments: DriverAssignment[] = [];
-  allAssignments: DriverAssignment[] = [];
-  filteredAssignments: DriverAssignment[] = [];
+  assignments: RejectedDriverAssignment[] = [];
+  allAssignments: RejectedDriverAssignment[] = [];
+  filteredAssignments: RejectedDriverAssignment[] = [];
 
   // Pagination state
   rows: number = 10;
@@ -61,7 +61,7 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
 
   // Dialog state
   displayDetailDialog: boolean = false;
-  selectedAssignment: DriverAssignment | null = null;
+  selectedAssignment: RejectedDriverAssignment | null = null;
 
   // Summary stats
   totalDrivers: number = 0;
@@ -121,7 +121,7 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<DriverAssignmentApiResponse>(
+      .post<RejectedDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_DRIVER_ASSIGNMENTS,
         payload,
         'driver-assignments'
@@ -144,10 +144,6 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalDrivers = this.allAssignments.length;
-    this.approvedDrivers = this.allAssignments.filter(a => a.approved).length;
-    this.pendingApprovals = this.allAssignments.filter(
-      a => a.approvalStatus === 'PENDING'
-    ).length;
 
     // Count unique fleets
     const uniqueFleets = new Set(this.allAssignments.map(a => a.fleetNumber));
@@ -172,22 +168,6 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
           assignment.username?.toLowerCase().includes(searchLower)
         );
       });
-    }
-
-    // Apply approval status filter
-    if (this.selectedApprovalStatus && this.selectedApprovalStatus !== '') {
-      filtered = filtered.filter(
-        assignment => assignment.approvalStatus === this.selectedApprovalStatus
-      );
-    }
-
-    // Apply approved/not approved filter
-    if (this.selectedApprovalFilter && this.selectedApprovalFilter !== '') {
-      if (this.selectedApprovalFilter === 'approved') {
-        filtered = filtered.filter(assignment => assignment.approved);
-      } else if (this.selectedApprovalFilter === 'not-approved') {
-        filtered = filtered.filter(assignment => !assignment.approved);
-      }
     }
 
     this.filteredAssignments = filtered;
@@ -218,7 +198,7 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
     this.applyClientSideFilter();
   }
 
-  viewAssignmentDetails(assignment: DriverAssignment): void {
+  viewAssignmentDetails(assignment: RejectedDriverAssignment): void {
     this.selectedAssignment = assignment;
     this.displayDetailDialog = true;
   }
@@ -246,7 +226,7 @@ export class AllRejectedDriverAssignmentsComponent implements OnInit {
     return iconMap[status] || 'pi-circle';
   }
 
-  getFullName(assignment: DriverAssignment): string {
+  getFullName(assignment: RejectedDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 }

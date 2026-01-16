@@ -78,7 +78,7 @@
           <th>Receipt Number</th>
           <th>Transaction Date</th>
           <th>Customer Name</th>
-          <th>Fleet Number</th>
+          <th>Account</th>
           <th>Amount</th>
           <th>Transaction Type</th>
           <th>Payment Status</th>
@@ -107,7 +107,7 @@
           <td>
             <!-- Using component-specific fleet-badge -->
             <span class="fleet-badge">
-              <i class="pi pi-car"></i>
+              <i [class]="transaction.transactionType === 'CREDIT' ? 'pi pi-car' : 'pi pi-phone'"></i>
               {{ transaction.fleetNumber }}
             </span>
           </td>

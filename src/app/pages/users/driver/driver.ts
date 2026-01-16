@@ -32,7 +32,7 @@ interface StatusOption {
 }
 
 @Component({
-  selector: 'app-all-general-users',
+  selector: 'app-all-driver-users',
   standalone: true,
   imports: [
     CommonModule,
@@ -46,13 +46,14 @@ interface StatusOption {
     InputTextModule,
     SelectModule,
   ],
-  templateUrl: './general.html',
+  templateUrl: './driver.html',
   styleUrls: [
-    './general.css',
+    './driver.css',
     '../../../../styles/modules/_dialog_module.css',
+    '../../../../styles/modules/_user_module.css'
   ],
 })
-export class GeneralUserComponent implements OnInit {
+export class DriverUserComponent implements OnInit {
   users: User[] = [];
   allUsers: User[] = [];
   filteredUsers: User[] = [];
@@ -130,6 +131,7 @@ export class GeneralUserComponent implements OnInit {
 
     const payload = {
       entityId: 'GS000002',
+      agent: "DRIVER",
       page,
       size: pageSize,
     };
@@ -137,7 +139,7 @@ export class GeneralUserComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'general-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'driver-users')
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;

@@ -13,7 +13,7 @@ import { SelectModule } from 'primeng/select';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { DriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
+import { GeneralDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
 import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 
 
@@ -46,9 +46,9 @@ interface ApprovalFilterOption {
   styleUrls: ['./all.css', '../../../../styles/modules/_dialog_module.css'],
 })
 export class AllDriverAssignmentsComponent implements OnInit {
-  assignments: DriverAssignment[] = [];
-  allAssignments: DriverAssignment[] = [];
-  filteredAssignments: DriverAssignment[] = [];
+  assignments: GeneralDriverAssignment[] = [];
+  allAssignments: GeneralDriverAssignment[] = [];
+  filteredAssignments: GeneralDriverAssignment[] = [];
 
   // Pagination state
   rows: number = 10;
@@ -61,7 +61,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
 
   // Dialog state
   displayDetailDialog: boolean = false;
-  selectedAssignment: DriverAssignment | null = null;
+  selectedAssignment: GeneralDriverAssignment | null = null;
 
   // Summary stats
   totalDrivers: number = 0;
@@ -143,11 +143,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalDrivers = this.allAssignments.length;
-    this.approvedDrivers = this.allAssignments.filter(a => a.approved).length;
-    this.pendingApprovals = this.allAssignments.filter(
-      a => a.approvalStatus === 'PENDING'
-    ).length;
-
+    
     // Count unique fleets
     const uniqueFleets = new Set(this.allAssignments.map(a => a.fleetNumber));
     this.totalFleets = uniqueFleets.size;
@@ -171,22 +167,6 @@ export class AllDriverAssignmentsComponent implements OnInit {
           assignment.username?.toLowerCase().includes(searchLower)
         );
       });
-    }
-
-    // Apply approval status filter
-    if (this.selectedApprovalStatus && this.selectedApprovalStatus !== '') {
-      filtered = filtered.filter(
-        assignment => assignment.approvalStatus === this.selectedApprovalStatus
-      );
-    }
-
-    // Apply approved/not approved filter
-    if (this.selectedApprovalFilter && this.selectedApprovalFilter !== '') {
-      if (this.selectedApprovalFilter === 'approved') {
-        filtered = filtered.filter(assignment => assignment.approved);
-      } else if (this.selectedApprovalFilter === 'not-approved') {
-        filtered = filtered.filter(assignment => !assignment.approved);
-      }
     }
 
     this.filteredAssignments = filtered;
@@ -217,7 +197,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
     this.applyClientSideFilter();
   }
 
-  viewAssignmentDetails(assignment: DriverAssignment): void {
+  viewAssignmentDetails(assignment: GeneralDriverAssignment): void {
     this.selectedAssignment = assignment;
     this.displayDetailDialog = true;
   }
@@ -245,7 +225,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
     return iconMap[status] || 'pi-circle';
   }
 
-  getFullName(assignment: DriverAssignment): string {
+  getFullName(assignment: GeneralDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 }
