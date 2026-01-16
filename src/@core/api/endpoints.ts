@@ -39,4 +39,8 @@ export const API_ENDPOINTS = {
   // #####################  USER SUB-ENDPOINTS   #######################
   ALL_USERS: '/api/v1/org/users/view',
   ALL_DEACTIVATED_USERS: '/api/v1/org/users/view-deactivated',
+
+  // #####################  AUDIT SUB-ENDPOINTS   #######################
+  ALL_AUDIT_TRAILS: '/api/v1/org/view-audit-trails',
+
 };

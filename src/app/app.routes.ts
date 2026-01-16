@@ -50,6 +50,8 @@ import { AllPendingDriverAssignmentsComponent } from './pages/driver-assignment/
 import { UserWallet } from './pages/finance/user-wallet/user-wallet';
 import { AllInactiveDriverAssignmentsComponent } from './pages/driver-assignment/inactive/inactive';
 import { DriverUserComponent } from './pages/users/driver/driver';
+import { UserAudits } from './pages/audits/user-audits/user-audits';
+import { SystemAudits } from './pages/audits/system-audits/system-audits';
 
 export const routes: Routes = [
   {
@@ -120,6 +122,11 @@ export const routes: Routes = [
       { path: 'users/inactive', component: DeactivatedUsersComponent },
       { path: 'users/investors', component: InvestorsComponent },
       { path: 'users/marshals', component: MarshalsComponent },
+
+      { path: 'audits/all', component: SystemAudits },
+      { path: 'audits/user', component: UserAudits },
+
+
 
       { path: '', redirectTo: '/dashboard/home', pathMatch: 'full' },
     ],

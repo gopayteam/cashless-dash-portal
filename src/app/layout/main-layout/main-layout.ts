@@ -161,6 +161,14 @@ export class MainLayoutComponent implements OnInit {
       ],
     },
 
+     {
+      route: '/audits',
+      tabs: [
+        { label: 'System Audits', icon: 'pi pi-location', path: '/audits/all' },
+        { label: 'User Audits', icon: 'pi pi-location', path: '/audits/user' },
+      ],
+    },
+
     {
       route: '/wallet',
       tabs: [

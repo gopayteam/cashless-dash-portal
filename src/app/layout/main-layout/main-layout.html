@@ -274,6 +274,28 @@
               </li>
             </ul>
           </li>
+
+
+           <!-- Audits Category -->
+          <li>
+            <div class="menu-category" *ngIf="!sidebarCollapsed">Audits</div>
+            <ul class="menu-items">
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/audits')"
+                  (click)="navigate('/audits/all')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">All Audits</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+
         </ul>
       </nav>
     </div>
