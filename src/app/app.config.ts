@@ -1,12 +1,13 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 
 import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { FakeDbService } from '../@fake-db/fake-db.service';
+import { AuthInterceptor } from '../@core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +17,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptorsFromDi()
     ),
+
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
 
     // ✅ Mock API (optional)
     ...(environment.useMockApi
