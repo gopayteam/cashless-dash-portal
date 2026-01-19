@@ -1,0 +1,409 @@
+/* fund-reassignment.component.css - Component-specific styles */
+
+/* Container wrapper - centered layout */
+.age-container {
+  display: flex;
+  justify-content: center;   /* horizontal center */
+  align-items: center;       /* vertical center */
+  /* min-height: calc(100vh - var(--topbar-height)); */
+  padding: 2rem 1rem;
+  background: var(--light-bg);
+}
+
+
+/* Page header styling */
+.page-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.page-description {
+  color: var(--medium-text);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+}
+
+.loading-text {
+  color: var(--medium-text);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Material card styling - matching the design */
+::ng-deep p-card {
+  width: 100%;
+  max-width: 500px;
+}
+
+::ng-deep p-card .p-card {
+  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--white);
+  transition: box-shadow var(--transition);
+}
+
+::ng-deep p-card .p-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+::ng-deep p-card .p-card-body {
+  padding: 2rem;
+}
+
+/* Form container */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Form fields */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--dark-text);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.required-indicator {
+  color: var(--danger-color);
+  margin-left: 2px;
+}
+
+/* Input and dropdown styling */
+::ng-deep .p-inputtext,
+::ng-deep .p-dropdown {
+  width: 100%;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+::ng-deep .p-inputtext {
+  padding: 0.625rem 0.75rem;
+  color: var(--dark-text);
+}
+
+::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 0.625rem 0.75rem;
+  color: var(--medium-text);
+}
+
+::ng-deep .p-dropdown .p-dropdown-trigger {
+  width: 2.5rem;
+  color: var(--medium-text);
+}
+
+/* Focus states */
+::ng-deep .p-inputtext:enabled:focus,
+::ng-deep .p-dropdown:not(.p-disabled).p-focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+}
+
+::ng-deep .p-inputtext:enabled:hover,
+::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+/* InputNumber specific styles */
+::ng-deep .p-inputnumber {
+  width: 100%;
+}
+
+::ng-deep .p-inputnumber .p-inputtext {
+  width: 100%;
+}
+
+::ng-deep .p-inputnumber.invalid .p-inputtext {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-inputnumber.invalid .p-inputtext:enabled:hover {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-inputnumber.invalid .p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color);
+}
+
+/* Invalid state for all inputs */
+::ng-deep .p-dropdown.invalid,
+::ng-deep .p-inputtext.ng-invalid.ng-dirty,
+::ng-deep .p-inputtext.ng-invalid.ng-touched {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-dropdown.invalid:not(.p-disabled):hover {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-dropdown.invalid:not(.p-disabled).p-focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color);
+}
+
+/* Form messages */
+.form-error {
+  color: var(--danger-color);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: 0.875rem;
+}
+
+.form-hint {
+  color: var(--light-text);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Transfer Summary Styles */
+.transfer-summary {
+  background: linear-gradient(135deg, #e8eef5 0%, #d4e2f0 100%);
+  border: 1px solid #c5d7e8;
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin-top: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.summary-header i {
+  font-size: 1rem;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem;
+  background: var(--white);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.summary-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  margin: 0.25rem 0;
+}
+
+.summary-label {
+  color: var(--medium-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.summary-value {
+  color: var(--dark-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.summary-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--primary-color);
+  color: var(--white);
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.summary-amount .summary-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.8125rem;
+}
+
+.summary-amount .summary-value.amount {
+  color: var(--white);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* Dropdown template styles */
+::ng-deep .p-dropdown-item {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+::ng-deep .p-dropdown-item .flex {
+  gap: 0.5rem;
+}
+
+::ng-deep .p-dropdown-item i {
+  color: var(--primary-color);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  padding-top: 0;
+}
+
+/* Button styling - matching the design */
+::ng-deep .form-actions .p-button {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-width: 90px;
+}
+
+/* Submit button (primary) */
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+  box-shadow: var(--shadow-md);
+}
+
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:active {
+  background: #072040;
+  border-color: #072040;
+}
+
+/* Cancel/Reset button (outlined/secondary) */
+::ng-deep .form-actions .p-button.p-button-outlined,
+::ng-deep .form-actions .p-button.p-button-secondary {
+  background: var(--white);
+  border-color: var(--border-color);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+
+::ng-deep .form-actions .p-button.p-button-outlined:enabled:hover,
+::ng-deep .form-actions .p-button.p-button-secondary:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+  color: var(--dark-text);
+}
+
+::ng-deep .form-actions .p-button.p-button-outlined:enabled:active,
+::ng-deep .form-actions .p-button.p-button-secondary:enabled:active {
+  background: var(--border-color);
+}
+
+/* Disabled button state */
+::ng-deep .p-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .age-container {
+    padding: 1rem;
+  }
+
+  ::ng-deep p-card {
+    max-width: 100%;
+  }
+
+  ::ng-deep p-card .p-card-body {
+    padding: 1.5rem;
+  }
+
+  .transfer-summary {
+    padding: 1rem;
+  }
+
+  .summary-amount .summary-value.amount {
+    font-size: 1rem;
+  }
+
+  .loading-container {
+    padding: 2rem 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .p-button {
+    width: 100%;
+  }
+}
+
+/* Animation for summary appearance */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.transfer-summary {
+  animation: slideDown 0.3s ease-out;
+}

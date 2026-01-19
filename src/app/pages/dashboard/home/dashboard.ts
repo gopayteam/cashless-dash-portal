@@ -36,6 +36,7 @@ import { forkJoin } from 'rxjs';
 import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
+import { AuthService } from '../../../../@core/services/auth.service';
 
 @Component({
   imports: [
@@ -79,6 +80,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -90,6 +92,13 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.setDateRange();
     this.loadDashboardData();
+
+    const user = this.authService.currentUser();
+    if (user) {
+      console.log('Logged in as:', user.username);
+    } else {
+      console.log('No user logged in');
+    }
   }
 
   loadTransactions($event: any): void {
@@ -222,5 +231,10 @@ export class DashboardComponent implements OnInit {
   exportData() {
     // TODO: Implement export functionality
     console.log('Exporting data...');
+  }
+
+  // Sign out
+  signOut() {
+    this.authService.signOut(); // Auto redirects to signin
   }
 }

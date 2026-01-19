@@ -52,85 +52,127 @@ import { AllInactiveDriverAssignmentsComponent } from './pages/driver-assignment
 import { DriverUserComponent } from './pages/users/driver/driver';
 import { UserAudits } from './pages/audits/user-audits/user-audits';
 import { SystemAudits } from './pages/audits/system-audits/system-audits';
+import { DeletedParcels } from './pages/parcels/deleted-parcels/deleted-parcels';
+import { SignInComponent } from './pages/auth/signin/signin';
+import { SignUpComponent } from './pages/auth/signup/signup';
+import { AuthGuard } from '../@core/services/auth.guard';
+
+/* =====================================================
+   ROUTES
+===================================================== */
 
 export const routes: Routes = [
+
+  /* =======================
+     PUBLIC (NO AUTH)
+  ======================= */
+  {
+    path: 'auth',
+    children: [
+      { path: 'signin', component: SignInComponent },
+      { path: 'signup', component: SignUpComponent },
+      { path: '', redirectTo: 'signin', pathMatch: 'full' }
+    ]
+  },
+
+  /* =======================
+     PROTECTED (AUTH REQUIRED)
+  ======================= */
   {
     path: '',
     component: MainLayoutComponent,
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
+
+      /* Dashboard */
       { path: 'dashboard/home', component: DashboardComponent },
       { path: 'dashboard/stats', component: StatsComponent },
       { path: 'dashboard/reports', component: ReportsComponent },
 
+      /* Transactions */
       { path: 'transactions/all', component: AllTransactionsComponent },
       { path: 'transactions/failed', component: FailedTransactionsComponent },
       { path: 'transactions/pending', component: PendingTransactionsComponent },
 
+      /* Payments */
       { path: 'deposits/all', component: DebitTransactionsComponent },
-      { path: 'withdrawals/all', component: CreditTransactionsComponent },
       { path: 'withdrawals/all', component: CreditTransactionsComponent },
       { path: 'transfer-payment/1', component: CreditDriverComponent },
       { path: 'transfer-payment/2', component: FundReassignmentComponent },
 
+      /* Parcels */
       { path: 'parcels/all', component: ParcelsComponent },
       { path: 'parcel-managers', component: ParcelManagersComponent },
       { path: 'parcel-offices/parcel-source', component: ParcelSourceComponent },
       { path: 'parcel-offices/parcel-destination', component: ParcelDestinationComponent },
+      { path: 'deleted-parcels', component: DeletedParcels },
 
+      /* Drivers */
       { path: 'drivers/all', component: AllDriversComponent },
       { path: 'drivers/active', component: ActiveDriversComponent },
       { path: 'drivers/inactive', component: InactiveDriversComponent },
 
+      /* Driver assignments */
       { path: 'driver-assignments/all', component: AllDriverAssignmentsComponent },
       { path: 'driver-assignments/active', component: AllActiveDriverAssignmentsComponent },
       { path: 'driver-assignments/inactive', component: AllInactiveDriverAssignmentsComponent },
       { path: 'driver-assignments/rejected', component: AllRejectedDriverAssignmentsComponent },
       { path: 'driver-assignments/pending', component: AllPendingDriverAssignmentsComponent },
 
+      /* Locations */
       { path: 'locations/stages', component: LocationStagesComponent },
       { path: 'locations/routes', component: LocationRoutesComponent },
 
+      /* Vehicles */
       { path: 'vehicles/all', component: AllVehiclesComponent },
       { path: 'vehicles/active', component: ActiveVehiclesComponent },
       { path: 'vehicles/inactive', component: InactiveVehiclesComponent },
       { path: 'vehicles/maintenance', component: MaintenanceVehiclesComponent },
 
+      /* Finance */
       { path: 'wallet/organization', component: OrganizationWalletComponent },
       { path: 'wallet/user', component: UserWallet },
       { path: 'management-statements', component: WithdrawalStatementsComponent },
       { path: 'obligations', component: ObligationsComponent },
 
+      /* Analysis */
       { path: 'vehicle-analysis/daily', component: DailyAnalysisComponent },
       { path: 'vehicle-analysis/weekly', component: WeeklyAnalysisComponent },
       { path: 'vehicle-analysis/monthly', component: MonthlyAnalysisComponent },
       { path: 'vehicle-analysis/yearly', component: YearlyAnalysisComponent },
 
+      /* Prediction */
       { path: 'prediction/short-term', component: ShortTermPredictionComponent },
       { path: 'prediction/long-term', component: LongTermPredictionComponent },
       { path: 'prediction/trends', component: PredictionTrendsComponent },
 
+      /* Revenue */
       { path: 'revenue/all', component: RevenueComponent },
       { path: 'revenue/by-vehicle', component: RevenueByVehicleComponent },
       { path: 'revenue/by-location', component: RevenueByLocationComponent },
 
+      /* Users */
       { path: 'users/all', component: GeneralUserComponent },
       { path: 'users/admins', component: AdminUserComponent },
       { path: 'users/conductors', component: ConductorsComponent },
       { path: 'users/drivers', component: DriverUserComponent },
       { path: 'users/customers', component: CustomersComponent },
       { path: 'users/deactivated', component: DeactivatedUsersComponent },
-      { path: 'users/inactive', component: DeactivatedUsersComponent },
       { path: 'users/investors', component: InvestorsComponent },
       { path: 'users/marshals', component: MarshalsComponent },
 
+      /* Audits */
       { path: 'audits/all', component: SystemAudits },
       { path: 'audits/user', component: UserAudits },
 
-
-
-      { path: '', redirectTo: '/dashboard/home', pathMatch: 'full' },
-    ],
+      /* Default protected redirect */
+      { path: '', redirectTo: 'dashboard/home', pathMatch: 'full' }
+    ]
   },
 
-  { path: '**', redirectTo: '/dashboard/home' },
+  /* =======================
+     FALLBACK
+  ======================= */
+  { path: '**', redirectTo: 'auth/signin' }
 ];

@@ -1,0 +1,77 @@
+<div class="auth-container">
+  <div class="auth-wrapper">
+    <div class="auth-header">
+      <h1>Sign In</h1>
+      <p class="auth-description">Welcome back! Please sign in to your account</p>
+    </div>
+
+    <p-card>
+      <form [formGroup]="signInForm" (ngSubmit)="onSubmit()" class="form-container">
+
+        <!-- Error Message -->
+        <p-message
+          *ngIf="errorMessage"
+          severity="error"
+          [text]="errorMessage"
+          styleClass="w-full">
+        </p-message>
+
+        <!-- Username Field -->
+        <div class="form-field">
+          <label for="username" class="form-label">
+            Username <span class="required-indicator">*</span>
+          </label>
+          <input
+            pInputText
+            id="username"
+            formControlName="username"
+            placeholder="Enter your username"
+            class="w-full"
+            [class.ng-invalid]="isFieldInvalid('username')"
+            [class.ng-dirty]="signInForm.get('username')?.dirty"
+          />
+          <small class="form-error" *ngIf="isFieldInvalid('username')">
+            {{ getErrorMessage('username') }}
+          </small>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label for="password" class="form-label">
+            Password <span class="required-indicator">*</span>
+          </label>
+          <p-password
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [class.ng-invalid]="isFieldInvalid('password')"
+            [class.ng-dirty]="signInForm.get('password')?.dirty">
+          </p-password>
+          <small class="form-error" *ngIf="isFieldInvalid('password')">
+            {{ getErrorMessage('password') }}
+          </small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions-single">
+          <p-button
+            type="submit"
+            label="Sign In"
+            [loading]="loading()"
+            icon="pi pi-sign-in"
+            styleClass="w-full">
+          </p-button>
+        </div>
+
+        <!-- Sign Up Link -->
+        <div class="auth-footer">
+          <p>Don't have an account? <a routerLink="/auth/signup" class="auth-link">Sign Up</a></p>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

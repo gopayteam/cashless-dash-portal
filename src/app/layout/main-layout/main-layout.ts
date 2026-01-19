@@ -1,6 +1,6 @@
 // layout/main-layout/main-layout.component.ts
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, HostListener } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { DialogModule } from 'primeng/dialog';
@@ -10,6 +10,7 @@ import { DataService } from '../../../@core/api/data.service';
 import { LoadingStore } from '../../../@core/state/loading.store';
 import { API_ENDPOINTS } from '../../../@core/api/endpoints';
 import { ButtonModule } from 'primeng/button';
+import { AuthService } from '../../../@core/services/auth.service';
 
 interface NavConfig {
   route: string;
@@ -61,15 +62,18 @@ export class MainLayoutComponent implements OnInit {
 
   // UI State
   sidebarCollapsed = false;
+  sidebarVisible = false; // For mobile overlay
   currentRoute = '';
   activeTabIndex = 0;
 
   // User Info
+  // User Info
   userInfo = {
-    name: 'Gopay Admin',
-    email: 'admin@gopay.ke',
-    initials: 'GA',
+    name: '',
+    email: '',
+    initials: '',
   };
+
 
   // Navigation Configuration - Maps routes to their tab menus
   private navigationConfig: NavConfig[] = [
@@ -122,7 +126,7 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Maintenance', icon: 'pi pi-wrench', path: '/vehicles/maintenance' },
       ],
     },
-     {
+    {
       route: '/driver-assignments',
       tabs: [
         { label: 'Overview', icon: 'pi pi-list', path: '/driver-assignments/all' },
@@ -160,15 +164,13 @@ export class MainLayoutComponent implements OnInit {
         { label: 'Routes', icon: 'pi pi-location', path: '/locations/routes' },
       ],
     },
-
-     {
+    {
       route: '/audits',
       tabs: [
         { label: 'System Audits', icon: 'pi pi-location', path: '/audits/all' },
         { label: 'User Audits', icon: 'pi pi-location', path: '/audits/user' },
       ],
     },
-
     {
       route: '/wallet',
       tabs: [
@@ -200,11 +202,50 @@ export class MainLayoutComponent implements OnInit {
     private router: Router,
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    // Close mobile sidebar on resize to desktop
+    if (window.innerWidth > 1024 && this.sidebarVisible) {
+      this.sidebarVisible = false;
+    }
+    // Show desktop sidebar when resizing from mobile
+    if (window.innerWidth > 1024) {
+      this.sidebarCollapsed = false;
+    }
+  }
+
+  private getInitials(firstName: string, lastName: string): string {
+    const firstInitial = firstName?.charAt(0).toUpperCase() || '';
+    const lastInitial = lastName?.charAt(0).toUpperCase() || '';
+    return `${firstInitial}${lastInitial}`;
+  }
+
   ngOnInit() {
     this.setupRouteListener();
+    // Initialize sidebar state based on screen size
+    if (this.isMobile()) {
+      this.sidebarVisible = false;
+      this.sidebarCollapsed = true;
+    }
+
+    // Get current user from AuthService
+    const user = this.authService.currentUser();
+    if (user) {
+      console.log('Logged in as:', user.username);
+
+      // Set user info for UI
+      this.userInfo = {
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        initials: this.getInitials(user.firstName, user.lastName)
+      };
+    } else {
+      console.log('No user logged in');
+    }
   }
 
   private setupRouteListener() {
@@ -216,6 +257,10 @@ export class MainLayoutComponent implements OnInit {
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.handleRouteChange(event.urlAfterRedirects);
+        // Close mobile sidebar on navigation
+        if (this.isMobile()) {
+          this.sidebarVisible = false;
+        }
       });
   }
 
@@ -244,9 +289,9 @@ export class MainLayoutComponent implements OnInit {
 
   navigate(route: string) {
     this.router.navigate([route]);
-
+    // Close mobile sidebar after navigation
     if (this.isMobile()) {
-      this.sidebarCollapsed = true;
+      this.sidebarVisible = false;
     }
   }
 
@@ -263,11 +308,17 @@ export class MainLayoutComponent implements OnInit {
   }
 
   toggleSidebar() {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
+    if (this.isMobile()) {
+      // On mobile, toggle the overlay visibility
+      this.sidebarVisible = !this.sidebarVisible;
+    } else {
+      // On desktop, toggle collapsed state
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
   }
 
-  toggleSidebarMobile() {
-    this.sidebarCollapsed = true;
+  closeMobileSidebar() {
+    this.sidebarVisible = false;
   }
 
   isRouteActive(route: string, exact: boolean = false): boolean {
@@ -303,6 +354,7 @@ export class MainLayoutComponent implements OnInit {
   logout() {
     console.log('Logging out...');
     // Implement logout logic here
+    this.authService.signOut()
     this.router.navigate(['/login']);
   }
 }

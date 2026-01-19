@@ -1,0 +1,179 @@
+<div class="auth-container">
+  <div class="auth-wrapper">
+    <div class="auth-header">
+      <h1>Sign Up</h1>
+      <p class="auth-description">Create your account to get started</p>
+    </div>
+
+    <p-card>
+      <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" class="form-container">
+
+        <!-- Error Message -->
+        <p-message
+          *ngIf="errorMessage"
+          severity="error"
+          [text]="errorMessage"
+          styleClass="w-full">
+        </p-message>
+
+        <!-- Name Fields Row -->
+        <div class="form-row">
+          <!-- First Name -->
+          <div class="form-field">
+            <label for="firstName" class="form-label">
+              First Name <span class="required-indicator">*</span>
+            </label>
+            <input
+              pInputText
+              id="firstName"
+              formControlName="firstName"
+              placeholder="Enter first name"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('firstName')"
+              [class.ng-dirty]="signUpForm.get('firstName')?.dirty"
+            />
+            <small class="form-error" *ngIf="isFieldInvalid('firstName')">
+              {{ getErrorMessage('firstName') }}
+            </small>
+          </div>
+
+          <!-- Last Name -->
+          <div class="form-field">
+            <label for="lastName" class="form-label">
+              Last Name <span class="required-indicator">*</span>
+            </label>
+            <input
+              pInputText
+              id="lastName"
+              formControlName="lastName"
+              placeholder="Enter last name"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('lastName')"
+              [class.ng-dirty]="signUpForm.get('lastName')?.dirty"
+            />
+            <small class="form-error" *ngIf="isFieldInvalid('lastName')">
+              {{ getErrorMessage('lastName') }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Username Field -->
+        <div class="form-field">
+          <label for="username" class="form-label">
+            Username <span class="required-indicator">*</span>
+          </label>
+          <input
+            pInputText
+            id="username"
+            formControlName="username"
+            placeholder="Choose a username"
+            class="w-full"
+            [class.ng-invalid]="isFieldInvalid('username')"
+            [class.ng-dirty]="signUpForm.get('username')?.dirty"
+          />
+          <small class="form-error" *ngIf="isFieldInvalid('username')">
+            {{ getErrorMessage('username') }}
+          </small>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-field">
+          <label for="email" class="form-label">
+            Email <span class="required-indicator">*</span>
+          </label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            class="w-full"
+            [class.ng-invalid]="isFieldInvalid('email')"
+            [class.ng-dirty]="signUpForm.get('email')?.dirty"
+          />
+          <small class="form-error" *ngIf="isFieldInvalid('email')">
+            {{ getErrorMessage('email') }}
+          </small>
+        </div>
+
+        <!-- Phone Number Field -->
+        <div class="form-field">
+          <label for="phoneNumber" class="form-label">
+            Phone Number <span class="required-indicator">*</span>
+          </label>
+          <input
+            pInputText
+            id="phoneNumber"
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="e.g., 0712345678"
+            class="w-full"
+            [class.ng-invalid]="isFieldInvalid('phoneNumber')"
+            [class.ng-dirty]="signUpForm.get('phoneNumber')?.dirty"
+          />
+          <small class="form-error" *ngIf="isFieldInvalid('phoneNumber')">
+            {{ getErrorMessage('phoneNumber') }}
+          </small>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label for="password" class="form-label">
+            Password <span class="required-indicator">*</span>
+          </label>
+          <p-password
+            id="password"
+            formControlName="password"
+            placeholder="Create a password"
+            [toggleMask]="true"
+            [feedback]="true"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [class.ng-invalid]="isFieldInvalid('password')"
+            [class.ng-dirty]="signUpForm.get('password')?.dirty">
+          </p-password>
+          <small class="form-error" *ngIf="isFieldInvalid('password')">
+            {{ getErrorMessage('password') }}
+          </small>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-field">
+          <label for="confirmPassword" class="form-label">
+            Confirm Password <span class="required-indicator">*</span>
+          </label>
+          <p-password
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [class.ng-invalid]="isFieldInvalid('confirmPassword')"
+            [class.ng-dirty]="signUpForm.get('confirmPassword')?.dirty">
+          </p-password>
+          <small class="form-error" *ngIf="isFieldInvalid('confirmPassword')">
+            {{ getErrorMessage('confirmPassword') }}
+          </small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions-single">
+          <p-button
+            type="submit"
+            label="Sign Up"
+            [loading]="loading()"
+            icon="pi pi-user-plus"
+            styleClass="w-full">
+          </p-button>
+        </div>
+
+        <!-- Sign In Link -->
+        <div class="auth-footer">
+          <p>Already have an account? <a routerLink="/auth/signin" class="auth-link">Sign In</a></p>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

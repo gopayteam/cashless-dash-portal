@@ -1,4 +1,11 @@
 export const API_ENDPOINTS = {
+  // #####################  AUTHENTICATION SUB-ENDPOINTS   #######################
+  AUTH_LOGIN: '/api/v1/auth/login',
+  AUTH_LOGOUT: '/api/auth/logout',
+  AUTH_REFRESH: '/api/auth/refresh-token',
+  REFRESH_TOKEN: '',
+  REGISTER: '',
+
   // #####################  DASHBOARD SUB-ENDPOINTS   #######################
   ALL_PAYMENTS: '/api/payment/passenger/manifest',
   TRANSACTION_STATS: '/api/payment/transactions/stats',

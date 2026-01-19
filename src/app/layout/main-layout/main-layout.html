@@ -1,28 +1,38 @@
 <div class="layout-container">
+  <!-- ========== MOBILE BACKDROP ========== -->
+  <div
+    class="sidebar-backdrop"
+    *ngIf="sidebarVisible && isMobile()"
+    (click)="closeMobileSidebar()"
+  ></div>
+
   <!-- ========== SIDEBAR ========== -->
-  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed">
-
-    <!-- Mobile Backdrop -->
-    <!-- <div
-      class="sidebar-backdrop"
-      *ngIf="isMobile"
-      (click)="toggleSidebarMobile()"
-    ></div> -->
-
+  <aside
+    class="sidebar"
+    [class.sidebar--collapsed]="sidebarCollapsed"
+    [class.sidebar--mobile-visible]="sidebarVisible"
+  >
     <!-- Logo Header -->
-     <div class="sidebar__header">
+    <div class="sidebar__header">
       <div class="sidebar__logo">
-        <img src="/logo.png" alt="Gopay Logo" class="sidebar__logo-img" />
+        <img src="/logo_2.png" alt="Gopay Logo" class="sidebar__logo-img" />
       </div>
+      <!-- Close button for mobile -->
+      <button
+        class="sidebar__close-btn"
+        (click)="closeMobileSidebar()"
+        *ngIf="isMobile()"
+      >
+        <i class="pi pi-times"></i>
+      </button>
     </div>
-
 
     <!-- Sidebar Body -->
     <div class="sidebar__body">
       <!-- User Profile Card -->
       <div class="sidebar__profile">
         <div class="sidebar__avatar">{{ userInfo.initials }}</div>
-        <div class="sidebar__user-info" *ngIf="!sidebarCollapsed">
+        <div class="sidebar__user-info">
           <div class="sidebar__user-name">{{ userInfo.name }}</div>
           <div class="sidebar__user-email">{{ userInfo.email }}</div>
         </div>
@@ -33,7 +43,7 @@
         <ul class="sidebar-menu">
           <!-- Main Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Main</div>
+            <div class="menu-category">Main</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -52,7 +62,7 @@
 
           <!-- Transactions Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Transactions</div>
+            <div class="menu-category">Transactions</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -62,7 +72,7 @@
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-list menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> All Transactions</span>
+                    <span class="menu-text">All Transactions</span>
                   </span>
                 </button>
               </li>
@@ -75,7 +85,7 @@
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Deposits </span>
+                    <span class="menu-text">Deposits</span>
                   </span>
                 </button>
               </li>
@@ -88,7 +98,7 @@
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Withdrawals </span>
+                    <span class="menu-text">Withdrawals</span>
                   </span>
                 </button>
               </li>
@@ -101,7 +111,7 @@
                 >
                   <span class="menu-link-content">
                     <i class="pi pi-send menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Initiate Transfer</span>
+                    <span class="menu-text">Initiate Transfer</span>
                   </span>
                 </button>
               </li>
@@ -110,7 +120,7 @@
 
           <!-- Parcels Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Parcels</div>
+            <div class="menu-category">Parcels</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -150,12 +160,25 @@
                   </span>
                 </button>
               </li>
+
+              <li class="menu-item">
+                <button
+                  class="menu-link"
+                  [class.menu-link--active]="isRouteActive('/deleted-parcels')"
+                  (click)="navigate('/deleted-parcels')"
+                >
+                  <span class="menu-link-content">
+                    <i class="pi pi-trash menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Deleted Parcels</span>
+                  </span>
+                </button>
+              </li>
             </ul>
           </li>
 
           <!-- Vehicles and Operations Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Vehicles and Operations</div>
+            <div class="menu-category">Vehicles and Operations</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -213,7 +236,7 @@
 
           <!-- Finance Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Finance</div>
+            <div class="menu-category">Finance</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -258,7 +281,7 @@
 
           <!-- User Management Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">User Management</div>
+            <div class="menu-category">User Management</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -275,10 +298,9 @@
             </ul>
           </li>
 
-
-           <!-- Audits Category -->
+          <!-- Audits Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Audits</div>
+            <div class="menu-category">Audits</div>
             <ul class="menu-items">
               <li class="menu-item">
                 <button
@@ -294,8 +316,6 @@
               </li>
             </ul>
           </li>
-
-
         </ul>
       </nav>
     </div>
@@ -304,113 +324,109 @@
     <div class="sidebar__footer">
       <button class="sidebar__logout-btn" (click)="logout()">
         <i class="pi pi-sign-out" style="color: rgb(125, 3, 3)"></i>
-        <span *ngIf="!sidebarCollapsed">Logout</span>
+        <span>Logout</span>
       </button>
     </div>
   </aside>
 
   <!-- ========== MAIN CONTENT ========== -->
-  <!-- ========== MAIN CONTENT ========== -->
-<main class="main-content">
-  <!-- Top Navigation Bar -->
-  <header class="topbar">
-    <div class="topbar__left">
-      <button class="topbar__toggle" (click)="toggleSidebar()">
-        <i class="pi pi-bars"></i>
-      </button>
-    </div>
+  <main class="main-content" [class.main-content--sidebar-collapsed]="sidebarCollapsed">
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <button class="topbar__toggle" (click)="toggleSidebar()">
+          <i class="pi pi-bars"></i>
+        </button>
+      </div>
 
-    <div class="topbar__right">
-      <!-- 🔔 Notifications -->
-      <button
-        class="topbar__icon-btn"
-        (click)="showNotifications()"
-      >
-        <i class="pi pi-bell"></i>
-        <span class="topbar__badge">{{ unreadCount }}</span>
-      </button>
+      <div class="topbar__right">
+        <!-- 🔔 Notifications -->
+        <button
+          class="topbar__icon-btn"
+          (click)="showNotifications()"
+        >
+          <i class="pi pi-bell"></i>
+          <span class="topbar__badge">{{ unreadCount }}</span>
+        </button>
 
-      <!-- Notifications Dialog -->
-      <p-dialog
-        header="Notifications"
-        [(visible)]="notificationDialogVisible"
-        [style]="{ width: '400px', backgroundColor: '#fff' }"
-        [modal]="true"
-        [closable]="true"
-        [dismissableMask]="true"
-        [styleClass]="'notification-dialog'"
-        [baseZIndex]="10000"
-        (onHide)="hideNotifications()"
-      >
-        <div class="notification-panel">
-          <div
-            class="notification-item"
-            *ngFor="let n of notifications"
-            [class.unread]="!n.read"
-          >
-            <div class="notification-title">{{ n.title }}</div>
-            <div class="notification-message">{{ n.message }}</div>
-            <div class="notification-time">{{ n.time }}</div>
+        <!-- Notifications Dialog -->
+        <p-dialog
+          header="Notifications"
+          [(visible)]="notificationDialogVisible"
+          [style]="{ width: '400px', backgroundColor: '#fff' }"
+          [modal]="true"
+          [closable]="true"
+          [dismissableMask]="true"
+          [styleClass]="'notification-dialog'"
+          [baseZIndex]="10000"
+          (onHide)="hideNotifications()"
+        >
+          <div class="notification-panel">
+            <div
+              class="notification-item"
+              *ngFor="let n of notifications"
+              [class.unread]="!n.read"
+            >
+              <div class="notification-title">{{ n.title }}</div>
+              <div class="notification-message">{{ n.message }}</div>
+              <div class="notification-time">{{ n.time }}</div>
+            </div>
+
+            <div class="notification-footer">
+              <button
+                pButton
+                label="View All"
+                class="p-button-text"
+              ></button>
+            </div>
           </div>
+        </p-dialog>
 
-          <div class="notification-footer">
+        <!-- ⚙️ Settings -->
+        <button
+          class="topbar__icon-btn"
+          (click)="showSettings()"
+        >
+          <i class="pi pi-cog"></i>
+        </button>
+
+        <!-- Settings Dialog -->
+        <p-dialog
+          header="Settings"
+          [(visible)]="settingsDialogVisible"
+          [style]="{ width: '320px', backgroundColor: '#fff' }"
+          [modal]="true"
+          [closable]="true"
+          [dismissableMask]="true"
+          [styleClass]="'settings-dialog'"
+          [baseZIndex]="10000"
+        >
+          <div class="settings-panel">
+            <div class="settings-item">
+              <span>Dark Mode</span>
+              <p-toggleSwitch [(ngModel)]="darkModeEnabled"></p-toggleSwitch>
+            </div>
+
+            <div class="settings-item">
+              <span>Email Notifications</span>
+              <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"></p-toggleSwitch>
+            </div>
+
+            <div class="settings-item">
+              <span>Auto Logout</span>
+              <p-toggleSwitch [(ngModel)]="autoLogoutEnabled"></p-toggleSwitch>
+            </div>
+
             <button
               pButton
-              label="View All"
+              label="Account Settings"
+              icon="pi pi-user"
               class="p-button-text"
             ></button>
           </div>
-        </div>
-      </p-dialog>
-
-
-
-      <!-- ⚙️ Settings -->
-      <button
-        class="topbar__icon-btn"
-        (click)="showSettings()"
-      >
-        <i class="pi pi-cog"></i>
-      </button>
-
-     <!-- Settings Dialog -->
-    <p-dialog
-      header="Settings"
-      [(visible)]="settingsDialogVisible"
-      [style]="{ width: '320px', backgroundColor: '#fff' }"
-      [modal]="true"
-      [closable]="true"
-      [dismissableMask]="true"
-      [styleClass]="'settings-dialog'"
-      [baseZIndex]="10000"
-    >
-      <div class="settings-panel">
-        <div class="settings-item">
-          <span>Dark Mode</span>
-          <p-toggleSwitch [(ngModel)]="darkModeEnabled"></p-toggleSwitch>
-        </div>
-
-        <div class="settings-item">
-          <span>Email Notifications</span>
-          <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"></p-toggleSwitch>
-        </div>
-
-        <div class="settings-item">
-          <span>Auto Logout</span>
-          <p-toggleSwitch [(ngModel)]="autoLogoutEnabled"></p-toggleSwitch>
-        </div>
-
-        <button
-          pButton
-          label="Account Settings"
-          icon="pi pi-user"
-          class="p-button-text"
-        ></button>
+        </p-dialog>
       </div>
-    </p-dialog>
-    </div>
-  </header>
-
+    </header>
 
     <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
     <nav class="tab-nav" *ngIf="showTabs">

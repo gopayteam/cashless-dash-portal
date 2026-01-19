@@ -1,32 +1,593 @@
+/* styles/modules/_forms.css - Reusable form styles for PrimeNG */
 
-
-/* ============================================================
-   REUSABLE FORM STYLES
-   ============================================================ */
-.form-group {
+/* ===========================
+   Page Layout - Centered Design
+   =========================== */
+.page-container {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - var(--topbar-height));
+  padding: 2rem 1rem;
+  background: var(--light-bg);
 }
 
-.form-label {
+.page-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.page-header h1 {
+  font-size: 1.5rem;
   font-weight: 600;
+  color: var(--dark-text);
+  margin: 0 0 0.25rem 0;
+}
+
+.page-description {
   color: var(--medium-text);
+  margin: 0;
   font-size: 0.875rem;
 }
 
-.form-input {
+/* ===========================
+   Form Container
+   =========================== */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
 }
 
-.form-input:focus {
+/* ===========================
+   Form Fields
+   =========================== */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--dark-text);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.required-indicator {
+  color: var(--danger-color);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* ===========================
+   Form Controls - Base Styles
+   =========================== */
+::ng-deep .p-select,
+::ng-deep .p-datepicker {
+  width: 100%;
+}
+
+::ng-deep .p-select.w-full,
+::ng-deep .p-datepicker.w-full {
+  width: 100%;
+}
+
+::ng-deep .p-inputtext {
+  width: 100%;
+  font-size: 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+  color: var(--dark-text);
+}
+
+::ng-deep .p-inputtext::placeholder {
+  color: var(--light-text);
+}
+
+::ng-deep .p-inputtext:enabled:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
-  outline: none;
+}
+
+::ng-deep .p-inputtext:enabled:focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+/* ===========================
+   Select (p-select) Styles - Replaces p-dropdown
+   =========================== */
+::ng-deep .p-select {
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+::ng-deep .p-select:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+::ng-deep .p-select .p-select-label {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--medium-text);
+  background: var(--white);
+}
+
+::ng-deep .p-select .p-select-label.p-placeholder {
+  color: var(--light-text);
+}
+
+::ng-deep .p-select .p-select-dropdown {
+  width: 2.5rem;
+  color: var(--medium-text);
+}
+
+/* Disabled select styles */
+::ng-deep .p-select.p-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--light-bg);
+}
+
+/* Select overlay panel */
+::ng-deep .p-select-overlay {
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+::ng-deep .p-select-list {
+  background: var(--white);
+}
+
+::ng-deep .p-select-option {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--dark-text);
+  background: var(--white);
+}
+
+::ng-deep .p-select-option:not(.p-disabled):not(.p-select-option-selected):hover {
+  background: var(--light-bg);
+}
+
+::ng-deep .p-select-option.p-select-option-selected {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+::ng-deep .p-select-option.p-focus {
+  background: var(--light-bg);
+}
+
+::ng-deep .p-select-option.p-select-option-selected.p-focus {
+  background: var(--primary-color-dark);
+}
+
+/* ===========================
+   DatePicker (p-datepicker) Styles - Replaces p-calendar
+   =========================== */
+::ng-deep .p-datepicker {
+  width: 100%;
+}
+
+::ng-deep .p-datepicker .p-inputtext {
+  padding-right: 2.5rem;
+  background: var(--white);
+}
+
+::ng-deep .p-datepicker-dropdown {
+  width: 2.5rem;
+  color: var(--medium-text);
+  transition: color 0.2s ease;
+}
+
+::ng-deep .p-datepicker-dropdown:hover {
+  color: var(--primary-color);
+}
+
+::ng-deep .p-datepicker-panel {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===========================
+   Invalid State - Updated for new components
+   =========================== */
+::ng-deep .p-select.p-invalid,
+::ng-deep .p-datepicker.p-invalid .p-inputtext,
+::ng-deep .p-inputtext.ng-invalid.ng-dirty,
+::ng-deep .p-inputtext.ng-invalid.ng-touched {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-select.p-invalid:not(.p-disabled):hover,
+::ng-deep .p-datepicker.p-invalid .p-inputtext:enabled:hover {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-select.p-invalid:not(.p-disabled).p-focus,
+::ng-deep .p-datepicker.p-invalid .p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color);
+}
+
+/* Support for [invalid] attribute */
+::ng-deep .p-select[invalid="true"],
+::ng-deep .p-datepicker[invalid="true"] .p-inputtext {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-select[invalid="true"]:not(.p-disabled):hover,
+::ng-deep .p-datepicker[invalid="true"] .p-inputtext:enabled:hover {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-select[invalid="true"]:not(.p-disabled).p-focus,
+::ng-deep .p-datepicker[invalid="true"] .p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color);
+}
+
+/* ===========================
+   Form Messages
+   =========================== */
+.form-error {
+  color: var(--danger-color);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: 0.875rem;
+}
+
+.form-hint {
+  color: var(--light-text);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.form-success {
+  color: var(--success-color);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.form-success::before {
+  content: '✓';
+  font-size: 0.875rem;
+}
+
+/* ===========================
+   Form Actions
+   =========================== */
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  padding-top: 0;
+}
+
+.form-actions p-button {
+  min-width: 90px;
+}
+
+/* ===========================
+   Button Styles - Matching Design
+   =========================== */
+::ng-deep .p-button {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Primary button (Submit) */
+::ng-deep .p-button:not(.p-button-outlined):not(.p-button-secondary) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+  box-shadow: var(--shadow-md);
+}
+
+::ng-deep .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:active {
+  background: #072040;
+  border-color: #072040;
+}
+
+/* Secondary/Outlined button (Cancel/Reset) */
+::ng-deep .p-button.p-button-outlined,
+::ng-deep .p-button.p-button-secondary {
+  background: var(--white);
+  border-color: var(--border-color);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+
+::ng-deep .p-button.p-button-outlined:enabled:hover,
+::ng-deep .p-button.p-button-secondary:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+  color: var(--dark-text);
+}
+
+::ng-deep .p-button.p-button-outlined:enabled:active,
+::ng-deep .p-button.p-button-secondary:enabled:active {
+  background: var(--border-color);
+}
+
+/* Disabled state */
+::ng-deep .p-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Card Styles - Matching Design
+   =========================== */
+::ng-deep .p-card {
+  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--white);
+  transition: box-shadow var(--transition);
+  max-width: 500px;
+  width: 100%;
+}
+
+::ng-deep .p-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+::ng-deep .p-card .p-card-body {
+  padding: 2rem;
+}
+
+::ng-deep .p-card .p-card-content {
+  padding: 0;
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .form-actions p-button {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .page-header h1 {
+    font-size: 1.25rem;
+  }
+
+  ::ng-deep .p-card {
+    max-width: 100%;
+  }
+
+  ::ng-deep .p-card .p-card-body {
+    padding: 1.5rem;
+  }
+
+  ::ng-deep .p-button {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* ===========================
+   Multi-column Forms
+   =========================== */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.form-row .form-field {
+  min-width: 0;
+}
+
+/* ===========================
+   Fieldset Styles
+   =========================== */
+.form-fieldset {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  background: var(--white);
+}
+
+.form-fieldset legend {
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* ===========================
+   Loading State
+   =========================== */
+.form-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.form-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+}
+
+/* ===========================
+   Focus Visible (Accessibility)
+   =========================== */
+::ng-deep .p-button:focus-visible,
+::ng-deep .p-inputtext:focus-visible,
+::ng-deep .p-select:focus-visible,
+::ng-deep .p-datepicker:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ===========================
+   Backward Compatibility for p-dropdown
+   (in case some components still use it)
+   =========================== */
+::ng-deep .p-dropdown {
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+  width: 100%;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+::ng-deep .p-dropdown:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--medium-text);
+  background: var(--white);
+}
+
+::ng-deep .p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--light-text);
+}
+
+::ng-deep .p-dropdown .p-dropdown-trigger {
+  width: 2.5rem;
+  color: var(--medium-text);
+}
+
+::ng-deep .p-dropdown.p-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--light-bg);
+}
+
+::ng-deep .p-dropdown-panel {
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+::ng-deep .p-dropdown-item {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--dark-text);
+  background: var(--white);
+}
+
+::ng-deep .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+  background: var(--light-bg);
+}
+
+::ng-deep .p-dropdown-item.p-highlight {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+::ng-deep .p-dropdown.invalid,
+::ng-deep .p-dropdown.p-invalid {
+  border-color: var(--danger-color);
+}
+
+/* ===========================
+   Backward Compatibility for p-calendar
+   =========================== */
+::ng-deep .p-calendar {
+  width: auto;
+  background: white;
+}
+
+::ng-deep .p-calendar .p-inputtext {
+  /* padding-right: 2.5rem; */
+  background: var(--white);
+}
+
+::ng-deep .p-calendar .p-datepicker-trigger {
+  /* width: 2.5rem; */
+  color: var(--medium-text);
+  transition: color 0.2s ease;
+}
+
+::ng-deep .p-calendar .p-datepicker-trigger:hover {
+  color: var(--primary-color);
+}
+
+::ng-deep .p-calendar.invalid .p-inputtext,
+::ng-deep .p-calendar.p-invalid .p-inputtext {
+  border-color: var(--danger-color);
 }

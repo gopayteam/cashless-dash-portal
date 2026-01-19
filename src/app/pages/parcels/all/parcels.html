@@ -181,16 +181,13 @@
       <ng-template pTemplate="header">
         <tr>
           <th>Parcel Number</th>
-          <th>Created Date</th>
           <th>Sender</th>
           <th>Receiver</th>
           <th>Route</th>
           <th>Fleet No</th>
           <th>Amount</th>
           <th>Payment Method</th>
-          <th>Payment Status</th>
           <th>Parcel Status</th>
-          <th>Actions</th>
         </tr>
       </ng-template>
 
@@ -199,12 +196,14 @@
           <td>
             <span class="receipt-number">{{ parcel.parcelNumber }}</span>
           </td>
-          <td>
+
+          <!-- <td>
             <div class="date-cell">
               <span class="date">{{ parcel.createdAt | date : 'dd MMM yyyy' }}</span>
               <span class="time">{{ parcel.createdAt | date : 'hh:mm a' }}</span>
             </div>
-          </td>
+          </td> -->
+
           <td>
             <div class="customer-cell">
               <i class="pi pi-user"></i>
@@ -251,7 +250,8 @@
               {{ parcel.paymentMethod }}
             </span>
           </td>
-          <td>
+
+          <!-- <td>
             <span [class]="'badge ' + getPaymentStatusClass(parcel.paymentStatus)">
               <i
                 [class]="
@@ -264,7 +264,8 @@
               ></i>
               {{ parcel.paymentStatus }}
             </span>
-          </td>
+          </td> -->
+
           <td>
             <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
               <i
@@ -283,7 +284,8 @@
               {{ parcel.parcelStatus.replace('_', ' ') }}
             </span>
           </td>
-          <td>
+
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -292,7 +294,8 @@
               tooltipPosition="top"
               (click)="viewParcelDetails(parcel); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
+
         </tr>
       </ng-template>
 

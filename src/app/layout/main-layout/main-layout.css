@@ -1,63 +1,11 @@
-/* ===== MOBILE SIDEBAR OVERLAY ===== */
-.sidebar-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1000;
+/* =====================================================
+   1. ANIMATIONS
+===================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Mobile behavior */
-@media (max-width: 1024px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar--collapsed {
-    transform: translateX(-100%);
-  }
-
-  .main-content {
-    margin-left: 0 !important;
-  }
-}
-
-/* ===== DIALOG POSITIONING ===== */
-/* Override PrimeNG dialog positioning for notifications */
-::ng-deep .p-dialog.notification-dialog {
-  position: fixed !important;
-  top: 70px !important;
-  right: 20px !important;
-  left: auto !important;
-  margin: 0 !important;
-  transform: none !important;
-  animation: slideInFromTop 0.3s ease-out;
-}
-
-::ng-deep .p-dialog.notification-dialog .p-dialog-content {
-  padding: 0;
-}
-
-/* Override PrimeNG dialog positioning for settings */
-::ng-deep .p-dialog.settings-dialog {
-  position: fixed !important;
-  top: 70px !important;
-  right: 20px !important;
-  left: auto !important;
-  margin: 0 !important;
-  transform: none !important;
-  animation: slideInFromTop 0.3s ease-out;
-}
-
-::ng-deep .p-dialog.settings-dialog .p-dialog-content {
-  padding: 0;
-}
-
-/* Dialog animation */
 @keyframes slideInFromTop {
   from {
     opacity: 0;
@@ -69,7 +17,145 @@
   }
 }
 
-/* Mobile responsive positioning */
+/* =====================================================
+   2. SIDEBAR BACKDROP (MOBILE)
+===================================================== */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* =====================================================
+   3. SIDEBAR BASE
+===================================================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  /* background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); */
+  background: var(--light-bg);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* =====================================================
+   4. DESKTOP SIDEBAR BEHAVIOR
+===================================================== */
+@media (min-width: 1025px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar--collapsed {
+    width: 0;
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .main-content {
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .main-content--sidebar-collapsed {
+    margin-left: 0;
+  }
+
+  .sidebar__close-btn {
+    display: none;
+  }
+}
+
+/* =====================================================
+   5. MOBILE SIDEBAR BEHAVIOR
+===================================================== */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar--mobile-visible {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* =====================================================
+   6. SIDEBAR STRUCTURE
+===================================================== */
+.sidebar__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  /* background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); */
+  background: var(--light-bg);
+  border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar__close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar__close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* =====================================================
+   7. SIDEBAR BODY & SCROLL
+===================================================== */
+.sidebar__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.sidebar__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar__body::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 10px;
+}
+
+/* =====================================================
+   8. DIALOG POSITIONING (PrimeNG)
+===================================================== */
+::ng-deep .p-dialog.notification-dialog,
+::ng-deep .p-dialog.settings-dialog {
+  position: fixed !important;
+  top: 70px !important;
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  transform: none !important;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+::ng-deep .p-dialog.notification-dialog .p-dialog-content,
+::ng-deep .p-dialog.settings-dialog .p-dialog-content {
+  padding: 0;
+}
+
 @media (max-width: 768px) {
   ::ng-deep .p-dialog.notification-dialog,
   ::ng-deep .p-dialog.settings-dialog {
@@ -77,30 +163,43 @@
     right: 10px !important;
     left: 10px !important;
     width: calc(100% - 20px) !important;
-    max-width: none !important;
   }
 }
 
-/* ===== NOTIFICATION PANEL STYLING ===== */
+/* =====================================================
+   SHARED PANEL BASE
+===================================================== */
+.notification-panel,
+.settings-panel {
+  padding: 1.25rem;
+  background: #fff;
+}
+
+/* Section titles */
+.notification-panel h4,
+.settings-panel h4 {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* =====================================================
+   NOTIFICATION PANEL
+===================================================== */
 .notification-panel {
-  padding: 1rem;
-  max-height: 500px;
+  max-height: 480px;
   overflow-y: auto;
 }
 
-.notification-panel h4 {
-  margin: 0 0 0.75rem;
-  font-size: 1rem;
-}
-
 .notification-item {
-  padding: 0.875rem;
+  padding: 0.875rem 1rem;
   border-radius: 10px;
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.75rem;
   background: #f8f9fa;
+  border-left: 3px solid transparent;
   transition: all 0.2s ease;
   cursor: pointer;
-  border-left: 3px solid transparent;
 }
 
 .notification-item:hover {
@@ -109,9 +208,12 @@
 }
 
 .notification-item.unread {
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.12) 100%);
-  border-left-color:  var(--secondary-color);
-  font-weight: 500;
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.08),
+    rgba(220, 53, 69, 0.12)
+  );
+  border-left-color: var(--secondary-color);
 }
 
 .notification-title {
@@ -124,16 +226,16 @@
 .notification-message {
   font-size: 0.85rem;
   color: #6c757d;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .notification-time {
+  margin-top: 0.5rem;
   font-size: 0.75rem;
   color: #adb5bd;
-  margin-top: 0.5rem;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .notification-time::before {
@@ -141,45 +243,32 @@
   color: #dee2e6;
 }
 
+/* Footer aligned with settings button */
 .notification-footer {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid #e9ecef;
   text-align: center;
 }
 
 .notification-footer button {
-  color: var(--secondary-color) !important;
   font-weight: 500;
+  color: var(--secondary-color) !important;
 }
 
-/* Empty state */
-.notification-panel:empty::before {
-  content: "No notifications";
-  display: block;
-  text-align: center;
-  padding: 2rem;
-  color: #adb5bd;
-  font-style: italic;
-}
 
-/* ===== SETTINGS PANEL STYLING ===== */
+/* =====================================================
+   SETTINGS PANEL
+===================================================== */
 .settings-panel {
-  padding: 1.25rem;
-}
-
-.settings-panel h4 {
-  margin-bottom: 1.25rem;
-  font-size: 1rem;
-  color: var(--primary-color);
+  padding-top: 1.25rem;
 }
 
 .settings-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 0.875rem 0;
-  gap: 1rem;
 }
 
 .settings-item + .settings-item {
@@ -188,29 +277,34 @@
 
 .settings-item span {
   font-size: 0.9rem;
-  color: var(--primary-color);
   font-weight: 500;
+  color: #2c3e50;
 }
 
+/* Bottom action button aligned with notification footer */
 .settings-panel > button {
   margin-top: 1rem;
+  padding-top: 0.75rem;
   width: 100%;
   justify-content: center;
-  color: var(--secondary-color) !important;
   font-weight: 500;
+  color: var(--secondary-color) !important;
 }
 
-/* ===== PRIMENG TOGGLE SWITCH CUSTOM STYLING ===== */
+/* =====================================================
+   PRIMENG TOGGLE SWITCH
+===================================================== */
 ::ng-deep .p-toggleswitch {
   width: 3rem;
   height: 1.75rem;
+  flex-shrink: 0;
 }
 
 ::ng-deep .p-toggleswitch .p-toggleswitch-slider {
   background: #dee2e6;
   border-radius: 30px;
-  transition: background-color 0.3s ease;
   border: none;
+  transition: background-color 0.3s ease;
 }
 
 ::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
@@ -218,93 +312,67 @@
   height: 1.25rem;
   left: 0.25rem;
   bottom: 0.25rem;
-  background: white;
+  background: #fff;
   border-radius: 50%;
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+::ng-deep
+  .p-toggleswitch.p-toggleswitch-checked
+  .p-toggleswitch-slider {
+  background: linear-gradient(135deg, #dc3545, #c82333);
 }
 
-::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
+::ng-deep
+  .p-toggleswitch.p-toggleswitch-checked
+  .p-toggleswitch-slider:before {
   transform: translateX(1.25rem);
-}
-
-::ng-deep .p-toggleswitch:not(.p-disabled):hover .p-toggleswitch-slider {
-  background: #ced4da;
-}
-
-::ng-deep .p-toggleswitch.p-toggleswitch-checked:not(.p-disabled):hover .p-toggleswitch-slider {
-  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
 }
 
 ::ng-deep .p-toggleswitch.p-focus .p-toggleswitch-slider {
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
 }
 
-/* ===== DIALOG HEADER STYLING ===== */
+
+/* =====================================================
+   12. DIALOG HEADER
+===================================================== */
 ::ng-deep .p-dialog .p-dialog-header {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color-dark));
   color: white;
   border-radius: 10px 10px 0 0;
-  padding: 1rem 1.25rem;
 }
 
-::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
-  width: 2rem;
-  height: 2rem;
-  transition: all 0.2s ease;
-}
-
-::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-::ng-deep .p-dialog {
-  border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-}
-
-/* ===== TOPBAR BADGE STYLING ===== */
+/* =====================================================
+   13. TOPBAR BADGE
+===================================================== */
 .topbar__badge {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--secondary-color),
+    var(--secondary-color-dark)
+  );
   color: white;
   border-radius: 10px;
-  padding: 0.125rem 0.375rem;
   font-size: 0.65rem;
-  font-weight: 700;
   min-width: 18px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
 
-/* Hide badge when count is 0 */
 .topbar__badge:empty,
 .topbar__badge[data-count="0"] {
   display: none;
 }
 
-/* ===== SCROLLBAR STYLING ===== */
+/* =====================================================
+   14. SCROLLBARS
+===================================================== */
 .notification-panel::-webkit-scrollbar {
   width: 6px;
-}
-
-.notification-panel::-webkit-scrollbar-track {
-  background: var(--secondary-color);
-  border-radius: 10px;
 }
 
 .notification-panel::-webkit-scrollbar-thumb {
@@ -312,6 +380,54 @@
   border-radius: 10px;
 }
 
-.notification-panel::-webkit-scrollbar-thumb:hover {
-  background: #c82333;
+
+/* =====================================================
+   SIDEBAR LOGO
+===================================================== */
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0; /* Prevent flex overflow */
 }
+
+/* Logo image
+.sidebar__logo-img {
+  height: 80px;
+  max-width: 160px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+} */
+
+.sidebar__logo-img {
+  height: 40px;
+  transform: scale(3.15);
+  transform-origin: center;
+}
+
+
+/* Optional hover polish */
+.sidebar__logo:hover .sidebar__logo-img {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+/* =====================================================
+   RESPONSIVE LOGO ADJUSTMENTS
+===================================================== */
+@media (max-width: 1024px) {
+  .sidebar__logo-img {
+    height: 36px;
+    max-width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar__logo-img {
+    height: 32px;
+    max-width: 120px;
+  }
+}
+
