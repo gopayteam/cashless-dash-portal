@@ -5,29 +5,22 @@
 @import 'primeicons/primeicons.css';
 
 
-/* Import CSS modules */
-@import './modules/_badges.css';
-@import './modules/_buttons.css';
-@import './modules/_tables.css';
-@import './modules/_forms.css';
-@import './modules/_cards.css';
-@import './modules/_loading.css';
-@import './modules/_utility.css';
-@import './modules/_animations.css';
-@import './modules/_grid_layout.css';
-@import './modules/_scrollbar.css';
-@import './modules/_primeng.css';
-@import './modules/_empty_state.css';
-@import './modules/_transactions.css';
-@import './modules/_parcels.css';
-@import './modules/_drivers.css';
-@import './modules/_date_picker.css';
-@import './modules/_filter_actions.css';
-@import './modules/_dialog_module.css';
-/* @import './modules/_dropdown.css'; */
+/* Import global override modules */
+@import './global/_primeng_overrides.css';
 
-/* @import './modules/_user_module.css'; */
-/* @import './modules/_audit_module.css'; */
+/* Import CSS modules from global directory */
+@import './global/_badges.css';
+@import './global/_loading.css';
+@import './global/_utility.css';
+@import './global/_animations.css';
+@import './global/_grid_layout.css';
+@import './global/_scrollbar.css';
+@import './global/_empty_state.css';
+@import './global/_date_picker.css';
+@import './global/_filter_actions.css';
+@import './global/_dialog_module.css';
+@import './global/_paginator.css';
+@import './global/_tab_menu.css';
 
 /* Import layout styles */
 @import './layout/_topbar.css';

@@ -128,6 +128,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
       (onLazyLoad)="loadTransactions($event)"
       styleClass="data-table"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -138,7 +139,7 @@
           <th>Amount</th>
           <th>Type</th>
           <th>Status</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -167,7 +168,7 @@
               {{ transaction.paymentStatus }}
             </span>
           </td>
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -175,7 +176,7 @@
               pTooltip="View Details"
               tooltipPosition="top"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
     </p-table>

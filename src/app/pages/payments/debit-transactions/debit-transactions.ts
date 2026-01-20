@@ -18,6 +18,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-debit-transactions',
@@ -38,11 +40,13 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
     MatNativeDateModule,
   ],
   templateUrl: './debit-transactions.html',
-  styleUrls: ['./debit-transactions.css',
-    '../../../../styles/modules/_date_picker.css',
+  styleUrls: [
+    './debit-transactions.css',
+    '../../../../styles/modules/_transactions.css'
   ],
 })
 export class DebitTransactionsComponent implements OnInit {
+  entityId: string | null = null;
   transactions: PaymentRecord[] = [];
   allTransactions: PaymentRecord[] = []; // Store all transactions for filtering
   dateRange: Date[] = [];
@@ -62,6 +66,8 @@ export class DebitTransactionsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -70,6 +76,15 @@ export class DebitTransactionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.setDefaultDateRange();
     this.loadTransactions();
   }
@@ -104,7 +119,7 @@ export class DebitTransactionsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,

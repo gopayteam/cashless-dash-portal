@@ -29,7 +29,7 @@
 
   <!-- ================= TRANSACTIONS TABLE ================= -->
   <!-- Using global .p-card class -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Transactions List</h3>
@@ -72,7 +72,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
       styleClass="data-table"
       (onLazyLoad)="loadTransactions($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
+      [tableStyle]="{ 'min-width': '40rem' }"
     >
       <ng-template pTemplate="header">
         <tr>

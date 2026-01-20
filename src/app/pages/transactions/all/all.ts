@@ -18,6 +18,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { PaymentRecord } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../@core/services/auth.service';
 
 @Component({
   selector: 'app-all-transactions',
@@ -40,11 +42,11 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
   templateUrl: './all.html',
   styleUrls: [
     './all.css',
-    '../../../../styles/modules/_date_picker.css',
-    // '../../../../styles/modules/_transactions.css',
+    '../../../../styles/modules/_transactions.css'
   ],
 })
 export class AllTransactionsComponent implements OnInit {
+  entityId: string | null = null;
   transactions: PaymentRecord[] = [];
   allTransactions: PaymentRecord[] = []; // Store all transactions for filtering
   dateRange: Date[] = [];
@@ -64,8 +66,9 @@ export class AllTransactionsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
-    // private cdr: ChangeDetectorRef
-    @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
+    public authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {
@@ -73,6 +76,15 @@ export class AllTransactionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.setDefaultDateRange();
     this.loadTransactions();
   }
@@ -107,7 +119,7 @@ export class AllTransactionsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,

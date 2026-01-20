@@ -14,6 +14,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { Wallet } from '../../../../@core/models/wallet/wallet.model';
 import { WalletApiResponse } from '../../../../@core/models/wallet/wallet_reponse.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-all-wallets',
@@ -30,9 +32,10 @@ import { WalletApiResponse } from '../../../../@core/models/wallet/wallet_repons
     InputTextModule,
   ],
   templateUrl: './user-wallet.html',
-  styleUrls: ['./user-wallet.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./user-wallet.css'],
 })
 export class UserWallet implements OnInit {
+  entityId: string | null = null;
   wallets: Wallet[] = [];
   allWallets: Wallet[] = []; // Store all wallets for filtering
 
@@ -50,6 +53,8 @@ export class UserWallet implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -58,6 +63,15 @@ export class UserWallet implements OnInit {
   }
 
   ngOnInit(): void {
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadWallets();
   }
 
@@ -77,7 +91,7 @@ export class UserWallet implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: pageSize,
     };

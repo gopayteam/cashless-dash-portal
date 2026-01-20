@@ -11,22 +11,20 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { Driver, DriverStatus } from '../../../../../@core/models/drivers/driver.model';
-import { DataService } from '../../../../../@core/api/data.service';
-import { LoadingStore } from '../../../../../@core/state/loading.store';
-import { DriveApiResponse } from '../../../../../@core/models/drivers/driver_response.model';
-import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
+import { Driver, DriverStatus } from '../../../../@core/models/drivers/driver.model';
+import { DataService } from '../../../../@core/api/data.service';
+import { LoadingStore } from '../../../../@core/state/loading.store';
+import { DriveApiResponse } from '../../../../@core/models/drivers/driver_response.model';
+import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 
 @Component({
   standalone: true,
-  selector: 'app-drivers',
+  selector: 'app-inactive-drivers',
   templateUrl: './drivers.html',
-  styleUrls: [
-    './drivers.css',
-    '../../../../../styles/modules/_date_picker.css',
-    '../../../../../styles/modules/_filter_actions.css',
-  ],
+  styleUrls: ['./drivers.css'],
   imports: [
     CommonModule,
     FormsModule,
@@ -41,7 +39,8 @@ import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
     MatFormFieldModule,
   ],
 })
-export class AllDriversComponent implements OnInit {
+export class InactiveDriversComponent implements OnInit {
+  entityId: string | null = null;
   drivers: Driver[] = [];
 
   // Pagination
@@ -71,6 +70,8 @@ export class AllDriversComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -79,6 +80,16 @@ export class AllDriversComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadDrivers({ first: 0, rows: this.rows });
   }
 
@@ -88,9 +99,10 @@ export class AllDriversComponent implements OnInit {
     const page = event.first / event.rows;
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: event.rows,
+      status: "INACTIVE",
     };
 
     this.dataService
@@ -158,7 +170,7 @@ export class AllDriversComponent implements OnInit {
     this.statsCards = [
       {
         title: 'Total Drivers',
-        count: this.totalRecords,
+        count: totalDrivers,
         icon: 'pi-users',
         color: '#667eea',
         change: null,

@@ -13,6 +13,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { OrganizationWallet } from '../../../../@core/models/wallet/org_wallet.model';
 import { OrganizationWalletApiResponse } from '../../../../@core/models/wallet/org_wallet_response.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-organization-wallets',
@@ -28,9 +30,10 @@ import { OrganizationWalletApiResponse } from '../../../../@core/models/wallet/o
     InputTextModule,
   ],
   templateUrl: './organization-wallet.html',
-  styleUrls: ['./organization-wallet.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./organization-wallet.css'],
 })
 export class OrganizationWalletComponent implements OnInit {
+  entityId: string | null = null;
   wallets: OrganizationWallet[] = [];
   allWallets: OrganizationWallet[] = [];
   filteredWallets: OrganizationWallet[] = [];
@@ -48,6 +51,8 @@ export class OrganizationWalletComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -56,6 +61,15 @@ export class OrganizationWalletComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadWallets();
   }
 
@@ -63,7 +77,7 @@ export class OrganizationWalletComponent implements OnInit {
     const params = {
       size: 200,
       page: 0,
-      entityId: 'GS000002'
+      entityId: this.entityId
     };
 
     this.loadingStore.start();

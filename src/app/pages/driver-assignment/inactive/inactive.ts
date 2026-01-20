@@ -15,6 +15,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { InactiveDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
 import { DriverAssignmentApiResponse, InactiveDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 
 interface ApprovalStatusOption {
@@ -43,9 +45,10 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './inactive.html',
-  styleUrls: ['./inactive.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./inactive.css'],
 })
 export class AllInactiveDriverAssignmentsComponent implements OnInit {
+  entityId: string | null = null;
   assignments: InactiveDriverAssignment[] = [];
   allAssignments: InactiveDriverAssignment[] = [];
   filteredAssignments: InactiveDriverAssignment[] = [];
@@ -86,6 +89,8 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -94,6 +99,15 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadAssignments();
   }
 
@@ -112,7 +126,7 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: pageSize,
       status: 'INACTIVE',

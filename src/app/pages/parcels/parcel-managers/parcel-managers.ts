@@ -17,12 +17,15 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { ParcelManager } from '../../../../@core/models/parcels/parcel_manager.model';
 import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parcel_manager_response.model';
 import { DialogModule } from 'primeng/dialog';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-parcel-managers',
   templateUrl: './parcel-managers.html',
-  styleUrls: ['./parcel-managers.css', '../../../../styles/modules/_date_picker.css',
+  styleUrls: [
+    './parcel-managers.css',
     '../../../../styles/modules/_filter_actions.css'
   ],
   imports: [
@@ -40,6 +43,7 @@ import { DialogModule } from 'primeng/dialog';
   ],
 })
 export class ParcelManagersComponent implements OnInit {
+  entityId: string | null = null;
   parcelManagers: ParcelManager[] = [];
 
   // Pagination
@@ -53,6 +57,8 @@ export class ParcelManagersComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -61,6 +67,15 @@ export class ParcelManagersComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadParcelManagers({ first: 0, rows: this.rows });
   }
 
@@ -71,7 +86,7 @@ export class ParcelManagersComponent implements OnInit {
     const [start, end] = this.dateRange || [];
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: event.rows,
       transactionType: 'DEBIT',

@@ -303,28 +303,3 @@
 ::ng-deep .mat-date-range-input-container {
   width: 100%;
 }
-
-/* ================= DIALOG STYLING ================= */
-::ng-deep .transaction-detail-dialog .p-dialog-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 6px 6px 0 0;
-}
-
-::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-title {
-  color: white;
-}
-
-::ng-deep .transaction-detail-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
-}
-
-::ng-deep .transaction-detail-dialog .p-dialog-content {
-  padding: 2rem;
-}
-
-::ng-deep .transaction-detail-dialog .p-dialog-footer {
-  padding: 1rem 2rem;
-  border-top: 1px solid var(--border-color);
-}

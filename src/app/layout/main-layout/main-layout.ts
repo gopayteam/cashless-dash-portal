@@ -24,6 +24,7 @@ interface TabItem {
 }
 
 interface NotificationItem {
+type: any;
   id: number;
   title: string;
   message: string;
@@ -39,24 +40,45 @@ interface NotificationItem {
   styleUrls: ['./main-layout.css'],
 })
 export class MainLayoutComponent implements OnInit {
-  loading: any;
 
-  notifications: NotificationItem[] = [
+  loading: any;
+  notifications = [
     {
       id: 1,
-      title: 'New Parcel Received',
-      message: 'Parcel arrived at Westlands office',
-      time: '5 mins ago',
-      read: false,
+      type: 'info',
+      title: 'System Update',
+      message: 'A new version of the system is available. Please update to access new features.',
+      time: '5 minutes ago',
+      read: false
     },
     {
       id: 2,
-      title: 'Transfer Completed',
-      message: 'KES 25,000 sent to driver wallet',
+      type: 'success',
+      title: 'Payment Received',
+      message: 'Payment of KES 50,000 has been successfully processed.',
       time: '1 hour ago',
-      read: true,
+      read: false
     },
+    {
+      id: 3,
+      type: 'warning',
+      title: 'Account Alert',
+      message: 'Your account will expire in 7 days. Please renew your subscription.',
+      time: '3 hours ago',
+      read: true
+    },
+    {
+      id: 4,
+      type: 'info',
+      title: 'New Message',
+      message: 'You have received a new message from the support team.',
+      time: '1 day ago',
+      read: true
+    }
   ];
+
+
+
 
   unreadCount = 2;
 
@@ -154,7 +176,7 @@ export class MainLayoutComponent implements OnInit {
         { label: 'All Drivers', icon: 'pi pi-avatar', path: '/users/drivers' },
         { label: 'All Conductors', icon: 'pi pi-avatar', path: '/users/conductors' },
         { label: 'All Passengers', icon: 'pi pi-avatar', path: '/users/customers' },
-        { label: 'Deactivated Users', icon: 'pi pi-avatar', path: '/users/inactive' },
+        { label: 'Deactivated Users', icon: 'pi pi-avatar', path: '/users/deactivated' },
       ],
     },
     {
@@ -349,6 +371,34 @@ export class MainLayoutComponent implements OnInit {
 
   hideSettings() {
     this.settingsDialogVisible = false;
+  }
+
+  markAsRead(notification: any) {
+    notification.read = true;
+  }
+
+  markAllAsRead() {
+    this.notifications.forEach(n => n.read = true);
+  }
+
+  getNotificationIcon(type: string): string {
+    const iconMap: { [key: string]: string } = {
+      'info': 'pi pi-info-circle',
+      'success': 'pi pi-check-circle',
+      'warning': 'pi pi-exclamation-triangle',
+      'error': 'pi pi-times-circle'
+    };
+    return iconMap[type] || 'pi pi-bell';
+  }
+
+  navigateToNotifications() {
+    this.notificationDialogVisible = false;
+    this.router.navigate(['/dashboard/notifications']);
+  }
+
+  navigateToProfile() {
+    this.settingsDialogVisible = false;
+    this.router.navigate(['/dashboard/profile']);
   }
 
   logout() {

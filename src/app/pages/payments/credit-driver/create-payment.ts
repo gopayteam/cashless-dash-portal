@@ -16,6 +16,8 @@ import { User } from '../../../../@core/models/user/user.model';
 
 import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 interface FleetOption {
   fleetNumber: string;
@@ -47,12 +49,10 @@ interface DriverOption {
   templateUrl: './create-payment.html',
   styleUrls: [
     './create-payment.css',
-    '../../../../styles/modules/_forms.css',
-    '../../../../styles/modules/_date_picker.css',
-    '../../../../styles/modules/_filter_actions.css'
   ],
 })
 export class CreditDriverComponent implements OnInit {
+  entityId: string | null = null;
   creditDriverForm!: FormGroup;
   vehicles: Vehicle[] = [];
   fleets: FleetOption[] = [];
@@ -66,6 +66,8 @@ export class CreditDriverComponent implements OnInit {
     private fb: FormBuilder,
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -74,6 +76,16 @@ export class CreditDriverComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.initForm();
     this.loadVehicles();
     this.loadDrivers();
@@ -96,7 +108,7 @@ export class CreditDriverComponent implements OnInit {
     this.loadingStore.start();
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page: 0,
       size: 10000,
     };
@@ -138,7 +150,7 @@ export class CreditDriverComponent implements OnInit {
 
     const payload = {
       agent: 'DRIVER',
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page: 0,
       size: 10000,
     };
@@ -153,9 +165,9 @@ export class CreditDriverComponent implements OnInit {
           // Create driver options with labels
           this.allDriverOptions = this.drivers.map(d => ({
             driverId: d.entityId,
-            label: d.username ? d.username : this.getDriverLabel(d),
+            label: this.getDriverLabel(d),
             fleetNumber: d.phoneNumber, // Assuming username contains fleet number
-            username: this.getDriverLabel(d),
+            username:  d.username ? d.username : this.getDriverLabel(d),
             phoneNumber: d.phoneNumber,
           }));
 
@@ -250,7 +262,7 @@ export class CreditDriverComponent implements OnInit {
       fleetNumber: formValue.fleetNumber,
       driverId: formValue.driverId,
       activityDate: activityDate,
-      entityId: 'GS000002',
+      entityId: this.entityId,
     };
 
     // TODO: Replace with actual API endpoint for credit driver

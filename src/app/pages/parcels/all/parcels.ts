@@ -22,6 +22,8 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { Parcel } from '../../../../@core/models/parcels/parcel.model';
 import { ParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
 import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mapper';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -29,8 +31,9 @@ import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mappe
   templateUrl: './parcels.html',
   styleUrls: [
     './parcels.css',
-    '../../../../styles/modules/_date_picker.css',
+    '../../../../styles/modules/_cards.css',
     '../../../../styles/modules/_filter_actions.css'
+
   ],
   imports: [
     CommonModule,
@@ -50,6 +53,7 @@ import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mappe
   ],
 })
 export class ParcelsComponent implements OnInit {
+  entityId: string | null = null;
   parcels: Parcel[] = [];
   dateRange: Date[] = [];
 
@@ -91,7 +95,9 @@ export class ParcelsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
-    @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
+    public authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {
@@ -99,6 +105,16 @@ export class ParcelsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.setDefaultDateRange();
     this.loadParcels({ first: 0, rows: this.rows });
   }
@@ -126,7 +142,7 @@ export class ParcelsComponent implements OnInit {
     this.rows = size;
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page: page,
       size: size,
       // transactionType: 'DEBIT',

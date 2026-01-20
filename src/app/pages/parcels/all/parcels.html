@@ -14,8 +14,8 @@
   </div>
 
    <!-- ================= STATS CARDS ================= -->
-  <div class="stats-grid">
-    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+  <div class="stats-grid grid-3">
+    <p-card *ngFor="let card of statsCards" styleClass="card-hover">
       <div class="stat-content">
         <div class="stat-info">
           <span class="stat-title">{{ card.title }}</span>
@@ -176,7 +176,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels"
       styleClass="data-table"
       (onLazyLoad)="loadParcels($event)"
-      [tableStyle]="{ 'min-width': '80rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>

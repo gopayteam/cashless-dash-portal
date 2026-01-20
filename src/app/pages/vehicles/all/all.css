@@ -1,8 +1,5 @@
 /* pages/vehicles/all-vehicles.component.css */
 
-/* Import the reusable dialog module */
-@import '../../../../styles/modules/_dialog_module.css';
-
 .vehicles-container {
   padding: 1.5rem;
   min-height: 100vh;

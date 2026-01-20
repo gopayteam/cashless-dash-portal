@@ -51,7 +51,7 @@
 
   <!-- ================= SUMMARY STATS ================= -->
   <div class="summary-stats">
-    <div class="stat-card summary-card">
+    <div class="card-hover summary-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <i class="pi pi-car"></i>
       </div>
@@ -93,7 +93,7 @@
   </div>
 
   <!-- ================= VEHICLES TABLE ================= -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Vehicles List</h3>
@@ -114,7 +114,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} vehicles"
       styleClass="data-table"
       (onLazyLoad)="loadVehicles($event)"
-      [tableStyle]="{ 'min-width': '70rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -125,7 +125,7 @@
           <th>Status</th>
           <th>Investor</th>
           <th>Marshal</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -180,7 +180,7 @@
               <span>{{ vehicle.marshalNumber }}</span>
             </div>
           </td>
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -189,7 +189,7 @@
               tooltipPosition="top"
               (click)="viewVehicleDetails(vehicle); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 

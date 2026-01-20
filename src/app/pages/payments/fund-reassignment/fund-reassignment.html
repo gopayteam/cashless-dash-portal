@@ -4,195 +4,197 @@
     <p class="page-description">Transfer funds between fleet accounts</p>
   </div>
 
-  <div class="age-container">
+  <div class="page-container card-hover">
 
-  <p-card >
-    <ng-container *ngIf="loading() && sourceFleetOptions.length === 0">
-      <div class="loading-container">
-        <p-progressSpinner
-          styleClass="w-4rem h-4rem"
-          strokeWidth="4"
-          animationDuration="1s">
-        </p-progressSpinner>
-        <p class="loading-text">Loading fleet information...</p>
-      </div>
-    </ng-container>
-
-    <form
-      *ngIf="!loading() || sourceFleetOptions.length > 0"
-      [formGroup]="fundReassignmentForm"
-      (ngSubmit)="onSubmit()"
-      class="form-container">
-
-      <!-- Source Fleet Number Dropdown -->
-      <div class="form-field">
-        <label for="sourceFleetNumber" class="form-label">
-          Source Fleet Number <span class="required-indicator">*</span>
-        </label>
-
-        <p-select
-          id="sourceFleetNumber"
-          formControlName="sourceFleetNumber"
-          [options]="sourceFleetOptions"
-          optionLabel="label"
-          optionValue="fleetNumber"
-          placeholder="Select source fleet"
-          [showClear]="true"
-          [filter]="true"
-          filterBy="label,fleetNumber"
-          class="w-full custom-select"
-          [invalid]="isFieldInvalid('sourceFleetNumber')"
-        >
-          <!-- Selected Item Template -->
-          <ng-template pTemplate="selectedItem" let-option>
-            <div class="flex align-items-center gap-2" *ngIf="option">
-              <i class="pi pi-car"></i>
-              <span>{{ option.label }}</span>
-            </div>
-          </ng-template>
-
-          <!-- Dropdown Item Template -->
-          <ng-template pTemplate="item" let-option>
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-car"></i>
-              <span>  -  </span>
-              <span>{{ option.label }}</span>
-            </div>
-          </ng-template>
-        </p-select>
-
-
-        <small class="form-error" *ngIf="isFieldInvalid('sourceFleetNumber')">
-          {{ getErrorMessage('sourceFleetNumber') }}
-        </small>
-      </div>
-
-      <!-- Destination Fleet Number Dropdown -->
-      <div class="form-field">
-        <label for="destinationFleetNumber" class="form-label">
-          Destination Fleet Number <span class="required-indicator">*</span>
-        </label>
-
-        <p-select
-          id="destinationFleetNumber"
-          formControlName="destinationFleetNumber"
-          [options]="destinationFleetOptions"
-          optionLabel="label"
-          optionValue="fleetNumber"
-          placeholder="Select destination fleet"
-          [showClear]="true"
-          [filter]="true"
-          filterBy="label,fleetNumber"
-          class="w-full custom-select"
-          [invalid]="isFieldInvalid('destinationFleetNumber')"
-        >
-          <!-- Selected Item Template -->
-          <ng-template pTemplate="selectedItem" let-option>
-            <div class="flex align-items-center gap-2" *ngIf="option">
-              <i class="pi pi-car"></i>
-              <span>{{ option.label }}</span>
-            </div>
-          </ng-template>
-
-          <!-- Dropdown Item Template -->
-          <ng-template pTemplate="item" let-option>
-            <div class="flex align-items-center gap-2">
-              <i class="pi pi-car"></i>
-              <span>  -  </span>
-              <span>{{ option.label }}</span>
-            </div>
-          </ng-template>
-        </p-select>
-
-
-        <small class="form-error" *ngIf="isFieldInvalid('destinationFleetNumber')">
-          {{ getErrorMessage('destinationFleetNumber') }}
-        </small>
-        <small class="form-hint" *ngIf="!fundReassignmentForm.get('sourceFleetNumber')?.value">
-          Please select a source fleet first
-        </small>
-      </div>
-
-      <!-- Amount Input -->
-      <div class="form-field">
-        <label for="amount" class="form-label">
-          Enter Amount <span class="required-indicator">*</span>
-        </label>
-        <p-inputNumber
-          id="amount"
-          formControlName="amount"
-          mode="currency"
-          currency="KES"
-          locale="en-KE"
-          [minFractionDigits]="2"
-          [maxFractionDigits]="2"
-          placeholder="0.00"
-          styleClass="w-full"
-          [class.invalid]="isFieldInvalid('amount')"
-        >
-        </p-inputNumber>
-        <small class="form-error" *ngIf="isFieldInvalid('amount')">
-          {{ getErrorMessage('amount') }}
-        </small>
-        <small class="form-hint" *ngIf="!isFieldInvalid('amount')">
-          Enter the amount to transfer from source to destination fleet
-        </small>
-      </div>
-
-      <!-- Summary Section -->
-      <div
-        class="transfer-summary"
-        *ngIf="fundReassignmentForm.get('sourceFleetNumber')?.value &&
-               fundReassignmentForm.get('destinationFleetNumber')?.value &&
-               fundReassignmentForm.get('amount')?.value">
-        <div class="summary-header">
-          <i class="pi pi-info-circle"></i>
-          <span>Transfer Summary</span>
+    <p-card >
+      <ng-container *ngIf="loading() && sourceFleetOptions.length === 0">
+        <div class="loading-container">
+          <p-progressSpinner
+            styleClass="w-4rem h-4rem"
+            strokeWidth="4"
+            animationDuration="1s">
+          </p-progressSpinner>
+          <p class="loading-text">Loading fleet information...</p>
         </div>
-        <div class="summary-content">
-          <div class="summary-item">
-            <span class="summary-label">From:</span>
-            <span class="summary-value">
-              Fleet {{ fundReassignmentForm.get('sourceFleetNumber')?.value }}
-            </span>
+      </ng-container>
+
+      <form
+        *ngIf="!loading() || sourceFleetOptions.length > 0"
+        [formGroup]="fundReassignmentForm"
+        (ngSubmit)="onSubmit()"
+        class="form-container">
+
+        <!-- Source Fleet Number Dropdown -->
+        <div class="form-field">
+          <label for="sourceFleetNumber" class="form-label">
+            Source Fleet Number <span class="required-indicator">*</span>
+          </label>
+
+          <p-select
+            id="sourceFleetNumber"
+            formControlName="sourceFleetNumber"
+            [options]="sourceFleetOptions"
+            optionLabel="label"
+            optionValue="fleetNumber"
+            placeholder="Select source fleet"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="label,fleetNumber"
+            class="w-full custom-select"
+            [invalid]="isFieldInvalid('sourceFleetNumber')"
+          >
+            <!-- Selected Item Template -->
+            <ng-template pTemplate="selectedItem" let-option>
+              <div class="flex align-items-center gap-2" *ngIf="option">
+                <i class="pi pi-car"></i>
+                <span>  -  </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+
+            <!-- Dropdown Item Template -->
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-car"></i>
+                <span>  -  </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+
+          <small class="form-error" *ngIf="isFieldInvalid('sourceFleetNumber')">
+            {{ getErrorMessage('sourceFleetNumber') }}
+          </small>
+        </div>
+
+        <!-- Destination Fleet Number Dropdown -->
+        <div class="form-field">
+          <label for="destinationFleetNumber" class="form-label">
+            Destination Fleet Number <span class="required-indicator">*</span>
+          </label>
+
+          <p-select
+            id="destinationFleetNumber"
+            formControlName="destinationFleetNumber"
+            [options]="destinationFleetOptions"
+            optionLabel="label"
+            optionValue="fleetNumber"
+            placeholder="Select destination fleet"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="label,fleetNumber"
+            class="w-full custom-select"
+            [invalid]="isFieldInvalid('destinationFleetNumber')"
+          >
+            <!-- Selected Item Template -->
+            <ng-template pTemplate="selectedItem" let-option>
+              <div class="flex align-items-center gap-2" *ngIf="option">
+                <i class="pi pi-car"></i>
+                <span>  -  </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+
+            <!-- Dropdown Item Template -->
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-car"></i>
+                <span>  -  </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+
+          <small class="form-error" *ngIf="isFieldInvalid('destinationFleetNumber')">
+            {{ getErrorMessage('destinationFleetNumber') }}
+          </small>
+          <small class="form-hint" *ngIf="!fundReassignmentForm.get('sourceFleetNumber')?.value">
+            Please select a source fleet first
+          </small>
+        </div>
+
+        <!-- Amount Input -->
+        <div class="form-field">
+          <label for="amount" class="form-label">
+            Enter Amount <span class="required-indicator">*</span>
+          </label>
+          <p-inputNumber
+            id="amount"
+            formControlName="amount"
+            mode="currency"
+            currency="KES"
+            locale="en-KE"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="0.00"
+            styleClass="w-full"
+            [class.invalid]="isFieldInvalid('amount')"
+          >
+          </p-inputNumber>
+          <small class="form-error" *ngIf="isFieldInvalid('amount')">
+            {{ getErrorMessage('amount') }}
+          </small>
+          <small class="form-hint" *ngIf="!isFieldInvalid('amount')">
+            Enter the amount to transfer from source to destination fleet
+          </small>
+        </div>
+
+        <!-- Summary Section -->
+        <div
+          class="transfer-summary"
+          *ngIf="fundReassignmentForm.get('sourceFleetNumber')?.value &&
+                fundReassignmentForm.get('destinationFleetNumber')?.value &&
+                fundReassignmentForm.get('amount')?.value">
+          <div class="summary-header">
+            <i class="pi pi-info-circle"></i>
+            <span>Transfer Summary</span>
           </div>
-          <div class="summary-arrow">
-            <i class="pi pi-arrow-right"></i>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">To:</span>
-            <span class="summary-value">
-              Fleet {{ fundReassignmentForm.get('destinationFleetNumber')?.value }}
-            </span>
-          </div>
-          <div class="summary-amount">
-            <span class="summary-label">Amount:</span>
-            <span class="summary-value amount">
-              KES {{ fundReassignmentForm.get('amount')?.value | number:'1.2-2' }}
-            </span>
+          <div class="summary-content">
+            <div class="summary-item">
+              <span class="summary-label">From:</span>
+              <span class="summary-value">
+                Fleet {{ fundReassignmentForm.get('sourceFleetNumber')?.value }}
+              </span>
+            </div>
+            <div class="summary-arrow">
+              <i class="pi pi-arrow-right"></i>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">To:</span>
+              <span class="summary-value">
+                Fleet {{ fundReassignmentForm.get('destinationFleetNumber')?.value }}
+              </span>
+            </div>
+            <div class="summary-amount">
+              <span class="summary-label">Amount:</span>
+              <span class="summary-value amount">
+                KES {{ fundReassignmentForm.get('amount')?.value | number:'1.2-2' }}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Form Actions -->
-      <div class="form-actions">
-        <p-button
-          type="button"
-          label="Reset"
-          severity="secondary"
-          [outlined]="true"
-          (click)="resetForm()"
-          [disabled]="loading()"
-        ></p-button>
-        <p-button
-          type="submit"
-          label="Transfer Funds"
-          [loading]="loading()"
-          icon="pi pi-arrow-right-arrow-left"
-        ></p-button>
-      </div>
-    </form>
-  </p-card>
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <p-button
+            type="button"
+            label="Reset"
+            severity="secondary"
+            [outlined]="true"
+            (click)="resetForm()"
+            [disabled]="loading()"
+          ></p-button>
+          <p-button
+            type="submit"
+            label="Transfer Funds"
+            [loading]="loading()"
+            icon="pi pi-arrow-right-arrow-left"
+          ></p-button>
+        </div>
+      </form>
+    </p-card>
 
   </div>
 </div>

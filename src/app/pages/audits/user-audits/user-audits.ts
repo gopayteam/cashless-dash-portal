@@ -52,8 +52,6 @@ interface OSOption {
   templateUrl: './user-audits.html',
   styleUrls: [
     './user-audits.css',
-    '../../../../styles/modules/_dialog_module.css',
-    '../../../../styles/modules/_date_picker.css',
     '../../../../styles/modules/_audit_module.css',
   ],
 })

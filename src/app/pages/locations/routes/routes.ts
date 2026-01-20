@@ -18,12 +18,17 @@ import { Stage } from '../../../../@core/models/locations/stage.model';
 import { Route } from '../../../../@core/models/locations/route.model';
 import { RoutesResponse } from '../../../../@core/models/locations/route_response.model';
 import { StagesResponse } from '../../../../@core/models/locations/state_response.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-routes',
   templateUrl: './routes.html',
-  styleUrls: ['./routes.css'],
+  styleUrls: [
+    './routes.css',
+    '../../../../styles/modules/_cards.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -37,6 +42,7 @@ import { StagesResponse } from '../../../../@core/models/locations/state_respons
   ],
 })
 export class LocationRoutesComponent implements OnInit {
+  entityId: string | null = null;
   // Routes Data
   routes: Route[] = [];
   routesTotalRecords = 0;
@@ -54,6 +60,8 @@ export class LocationRoutesComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -62,6 +70,16 @@ export class LocationRoutesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadRoutes({ first: 0, rows: this.routesRows });
   }
 
@@ -73,7 +91,7 @@ export class LocationRoutesComponent implements OnInit {
 
     // ✅ params instead of payload
     const params = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: event.rows,
     };

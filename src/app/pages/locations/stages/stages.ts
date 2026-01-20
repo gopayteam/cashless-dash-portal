@@ -15,12 +15,17 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { Stage } from '../../../../@core/models/locations/stage.model';
 import { StagesResponse } from '../../../../@core/models/locations/state_response.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-stages',
   templateUrl: './stages.html',
-  styleUrls: ['./stages.css'],
+  styleUrls: [
+    './stages.css',
+    '../../../../styles/modules/_cards.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -34,6 +39,7 @@ import { StagesResponse } from '../../../../@core/models/locations/state_respons
   ],
 })
 export class LocationStagesComponent implements OnInit {
+  entityId: string | null = null;
   // Stages Data
   stages: Stage[] = [];
   stagesTotalRecords = 0;
@@ -51,6 +57,8 @@ export class LocationStagesComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -59,6 +67,16 @@ export class LocationStagesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadStages({ first: 0, rows: this.stagesRows });
   }
 
@@ -69,7 +87,7 @@ export class LocationStagesComponent implements OnInit {
     const page = event.first / event.rows;
 
     const payload = {
-      // entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: event.rows,
     };

@@ -1,0 +1,338 @@
+/* ============================================================
+   MASTER PRIMENG OVERRIDE STYLES
+   ============================================================
+   This file consolidates all base PrimeNG component overrides.
+   - All selectors are globally safe and do not use ::ng-deep.
+   - Styles for overlays (dialogs, dropdowns) are prefixed with 'body'.
+   - Component-specific styles (e.g. for a specific page) DO NOT belong here.
+*/
+
+/* ===========================
+   General
+   =========================== */
+.p-component {
+  font-family: inherit;
+}
+
+/* ===========================
+   Form Inputs (p-inputtext)
+   =========================== */
+.p-inputtext.p-component {
+  width: 100%;
+  font-size: 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+  color: var(--dark-text);
+}
+
+.p-inputtext.p-component::placeholder {
+  color: var(--light-text);
+}
+
+.p-inputtext.p-component:enabled:hover {
+  border-color: var(--primary-color);
+}
+
+.p-inputtext.p-component:enabled:focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+/* Invalid State */
+.p-inputtext.p-component.ng-invalid.ng-dirty,
+.p-inputtext.p-component.ng-invalid.ng-touched {
+  border-color: var(--danger-color);
+}
+
+/* ===========================
+   Buttons (p-button)
+   =========================== */
+.p-button.p-component {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Default/Primary button */
+.p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger) {
+  /* background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm); */
+}
+
+.p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover {
+  /* background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark); */
+  box-shadow: var(--shadow-md);
+}
+
+/* Secondary/Outlined button */
+.p-button.p-component.p-button-outlined,
+.p-button.p-component.p-button-secondary {
+  background: var(--white);
+  border-color: var(--border-color);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+
+.p-button.p-component.p-button-outlined:enabled:hover,
+.p-button.p-component.p-button-secondary:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+  color: var(--dark-text);
+}
+
+/* Danger Button */
+.p-button.p-component.p-button-danger {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.p-button.p-component.p-button-danger:enabled:hover {
+  background: var(--secondary-color-dark);
+  border-color: var(--secondary-color-dark);
+}
+
+/* Outlined Variants */
+.p-button.p-button-outlined.p-button-danger {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.p-button.p-button-outlined.p-button-danger:enabled:hover {
+  background: rgba(200, 35, 51, 0.04);
+  color: var(--secondary-color);
+}
+
+/* Disabled state */
+.p-button.p-component:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus Visible (Accessibility) */
+.p-button.p-component:focus-visible,
+.p-inputtext.p-component:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+
+/* ===========================
+   Cards (p-card)
+   =========================== */
+.p-card.p-component {
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  border: none;
+  background: var(--white);
+}
+
+.p-card.p-component .p-card-header {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--dark-text);
+  padding: 1.5rem 1.5rem 0;
+}
+
+.p-card.p-component .p-card-body {
+  padding: 1.5rem;
+}
+
+.p-card.p-component .p-card-content {
+  padding: 0;
+}
+
+/* Opt-in hover effect */
+.p-card.p-component.card-hover {
+  transition: all 0.2s ease;
+}
+
+.p-card.p-component.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+
+/* ===========================
+   Select (p-select)
+   =========================== */
+p-select .p-select {
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+  width: 100%;
+}
+
+/* Hover */
+p-select .p-select:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+/* Focus */
+p-select .p-select:not(.p-disabled).p-focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+/* Selected label */
+p-select .p-select-label {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--medium-text);
+  background: var(--white);
+}
+
+/* Invalid state */
+p-select.ng-invalid.ng-touched .p-select {
+  border-color: var(--danger-color) !important;
+}
+
+/* ===========================
+   Select Overlay (GLOBAL)
+   =========================== */
+body .p-select-overlay {
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+/* Options */
+body .p-select-option {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--dark-text);
+  background: var(--white);
+}
+
+/* Hover */
+body .p-select-option:not(.p-highlight):not(.p-disabled):hover {
+  background: var(--light-bg);
+}
+
+/* Selected option */
+body .p-select-option.p-highlight {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+
+
+/* ===========================
+   Calendar (p-calendar)
+   =========================== */
+p-calendar .p-inputtext {
+  border: 1px solid var(--border-color);
+}
+
+p-calendar .p-inputtext:enabled:hover {
+  border-color: var(--primary-color);
+}
+
+p-calendar .p-inputtext:enabled:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+}
+
+p-calendar.ng-invalid.ng-touched .p-inputtext {
+  border-color: var(--danger-color) !important;
+}
+
+
+/* Datepicker Panel - MUST BE GLOBAL */
+body .p-datepicker .p-datepicker-header {
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+}
+
+body .p-datepicker .p-datepicker-header .p-datepicker-prev,
+body .p-datepicker .p-datepicker-header .p-datepicker-next {
+  color: white;
+}
+
+body .p-datepicker table td > span.p-highlight {
+  background: var(--primary-color);
+  color: white;
+}
+
+body .p-datepicker table td > span:focus {
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
+}
+
+
+/* ===========================
+   Data Table (p-datatable)
+   =========================== */
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--light-bg);
+  color: var(--medium-text);
+  font-weight: 600;
+  border: none;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 0.75rem;
+  padding: 1rem;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+    transition: background-color 0.2s ease;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: #f8f9fa;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--border-color);
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+
+
+/* ====================== PrimeNG Overrides ====================== */
+
+/* Dropdown panel background (PrimeNG) */
+::ng-deep .p-dropdown-panel {
+  background-color: white !important;
+}
+
+/* Dropdown items background */
+::ng-deep .p-dropdown-item {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* ====================== Angular Material Overrides ====================== */
+
+/* mat-select dropdown panel */
+::ng-deep .mat-select-panel {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* mat-option items */
+::ng-deep .mat-option {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Optional: Hover effect */
+::ng-deep .mat-option:hover,
+::ng-deep .p-dropdown-item:hover {
+  background-color: #f0f0f0 !important;
+}

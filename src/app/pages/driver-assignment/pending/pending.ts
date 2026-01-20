@@ -14,6 +14,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { PendingDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
 import { DriverAssignmentApiResponse, PendingDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../@core/services/auth.service';
 
 
 interface ApprovalStatusOption {
@@ -42,9 +44,10 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './pending.html',
-  styleUrls: ['./pending.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./pending.css'],
 })
 export class AllPendingDriverAssignmentsComponent implements OnInit {
+  entityId: string | null = null;
   assignments: PendingDriverAssignment[] = [];
   allAssignments: PendingDriverAssignment[] = [];
   filteredAssignments: PendingDriverAssignment[] = [];
@@ -85,6 +88,8 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -93,6 +98,15 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadAssignments();
   }
 
@@ -111,7 +125,7 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: pageSize,
       status: 'PENDING',

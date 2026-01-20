@@ -15,6 +15,8 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { User } from '../../../../@core/models/user/user.model';
 import { UserApiResponse } from '../../../../@core/models/user/user_api_Response.mode';
 import { SelectModule } from 'primeng/select';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 interface ProfileOption {
   label: string;
@@ -49,11 +51,12 @@ interface StatusOption {
   templateUrl: './admin.html',
   styleUrls: [
     './admin.css',
-    '../../../../styles/modules/_dialog_module.css',
+    '../../../../styles/modules/_cards.css',
     '../../../../styles/modules/_user_module.css'
   ],
 })
 export class AdminUserComponent implements OnInit {
+  entityId: string | null = null;
   users: User[] = [];
   allUsers: User[] = [];
   filteredUsers: User[] = [];
@@ -104,6 +107,8 @@ export class AdminUserComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -112,6 +117,16 @@ export class AdminUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadUsers();
   }
 
@@ -130,7 +145,7 @@ export class AdminUserComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       agent: "ADMIN",
       page,
       size: pageSize,

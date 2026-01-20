@@ -8,6 +8,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { DividerModule } from 'primeng/divider';
+import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 
@@ -22,13 +25,12 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
     ButtonModule,
     InputTextModule,
     PasswordModule,
-    MessageModule
+    MessageModule,
+    ToastModule,
+    DividerModule,
   ],
   templateUrl: './signin.html',
-  styleUrls: [
-    './signin.css',
-    '../../../../styles/modules/_forms.css'
-  ]
+  styleUrls: ['./signin.css']
 })
 export class SignInComponent implements OnInit {
   signInForm!: FormGroup;
@@ -39,7 +41,8 @@ export class SignInComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    public loadingStore: LoadingStore
+    public loadingStore: LoadingStore,
+    private messageService: MessageService
   ) {}
 
   get loading() {
@@ -49,7 +52,7 @@ export class SignInComponent implements OnInit {
   ngOnInit(): void {
     // If already authenticated, redirect to dashboard
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/dashboard/home']);
       return;
     }
 
@@ -67,8 +70,17 @@ export class SignInComponent implements OnInit {
     this.submitted = true;
     this.errorMessage = '';
 
+    // Validate form
     if (this.signInForm.invalid) {
       this.markFormGroupTouched(this.signInForm);
+
+      // Show validation error toast
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields correctly',
+        life: 4000
+      });
       return;
     }
 
@@ -86,18 +98,36 @@ export class SignInComponent implements OnInit {
         console.log('Sign in successful', response);
         this.loadingStore.stop();
 
-        // Redirect to dashboard or intended route
-        this.router.navigate(['/dashboard/home']);
+        // Show success toast
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sign In Successful',
+          detail: `Welcome back, ${this.signInForm.value.username}!`,
+          life: 3000
+        });
+
+        // Redirect to dashboard after short delay
+        setTimeout(() => {
+          this.router.navigate(['/dashboard/home']);
+        }, 1500);
       },
       error: (error: any) => {
         console.error('Sign in failed', error);
         this.loadingStore.stop();
 
-        this.errorMessage = error.error?.message || 'Invalid username or password. Please try again.';
+        const errorMsg = error.error?.message || 'Invalid username or password. Please try again.';
+        this.errorMessage = errorMsg;
+
+        // Show error toast
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Sign In Failed',
+          detail: errorMsg,
+          life: 5000
+        });
       }
     });
   }
-
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.signInForm.get(fieldName);

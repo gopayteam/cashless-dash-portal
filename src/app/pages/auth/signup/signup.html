@@ -1,38 +1,44 @@
 <div class="auth-container">
+  <!-- Background Logo - Full Screen -->
+  <div class="auth-background"></div>
+
   <div class="auth-wrapper">
-    <div class="auth-header">
-      <h1>Sign Up</h1>
-      <p class="auth-description">Create your account to get started</p>
-    </div>
+    <p-card styleClass="auth-card">
+      <!-- Company Branding Inside Card -->
+      <div class="auth-brand">
+        <img src="logo_2.png" alt="GoPay Logo" class="brand-logo brand__logo-img" />
+        <h1 class="brand-title">GOPAY</h1>
+        <p class="brand-subtitle">MANAGEMENT SOLUTION</p>
+      </div>
 
-    <p-card>
+      <!-- Auth Header Inside Card -->
+      <div class="auth-header">
+        <h2>Create Account</h2>
+        <p class="auth-description">Join us today and start managing your finances</p>
+      </div>
+
       <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" class="form-container">
-
-        <!-- Error Message -->
-        <p-message
-          *ngIf="errorMessage"
-          severity="error"
-          [text]="errorMessage"
-          styleClass="w-full">
-        </p-message>
 
         <!-- Name Fields Row -->
         <div class="form-row">
           <!-- First Name -->
           <div class="form-field">
             <label for="firstName" class="form-label">
+              <i class="pi pi-user"></i>
               First Name <span class="required-indicator">*</span>
             </label>
-            <input
-              pInputText
-              id="firstName"
-              formControlName="firstName"
-              placeholder="Enter first name"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('firstName')"
-              [class.ng-dirty]="signUpForm.get('firstName')?.dirty"
-            />
-            <small class="form-error" *ngIf="isFieldInvalid('firstName')">
+            <span class="p-input-icon-left w-full">
+
+              <input
+                pInputText
+                id="firstName"
+                formControlName="firstName"
+                placeholder="First name"
+                class="w-full"
+                [class.p-invalid]="isFieldInvalid('firstName')"
+              />
+            </span>
+            <small class="p-error" *ngIf="isFieldInvalid('firstName')">
               {{ getErrorMessage('firstName') }}
             </small>
           </div>
@@ -40,18 +46,20 @@
           <!-- Last Name -->
           <div class="form-field">
             <label for="lastName" class="form-label">
+              <i class="pi pi-user"></i>
               Last Name <span class="required-indicator">*</span>
             </label>
-            <input
-              pInputText
-              id="lastName"
-              formControlName="lastName"
-              placeholder="Enter last name"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('lastName')"
-              [class.ng-dirty]="signUpForm.get('lastName')?.dirty"
-            />
-            <small class="form-error" *ngIf="isFieldInvalid('lastName')">
+            <span class="p-input-icon-left w-full">
+              <input
+                pInputText
+                id="lastName"
+                formControlName="lastName"
+                placeholder="Last name"
+                class="w-full"
+                [class.p-invalid]="isFieldInvalid('lastName')"
+              />
+            </span>
+            <small class="p-error" *ngIf="isFieldInvalid('lastName')">
               {{ getErrorMessage('lastName') }}
             </small>
           </div>
@@ -60,18 +68,20 @@
         <!-- Username Field -->
         <div class="form-field">
           <label for="username" class="form-label">
+            <i class="pi pi-at"></i>
             Username <span class="required-indicator">*</span>
           </label>
-          <input
-            pInputText
-            id="username"
-            formControlName="username"
-            placeholder="Choose a username"
-            class="w-full"
-            [class.ng-invalid]="isFieldInvalid('username')"
-            [class.ng-dirty]="signUpForm.get('username')?.dirty"
-          />
-          <small class="form-error" *ngIf="isFieldInvalid('username')">
+          <span class="p-input-icon-left w-full">
+            <input
+              pInputText
+              id="username"
+              formControlName="username"
+              placeholder="Choose a username"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('username')"
+            />
+          </span>
+          <small class="p-error" *ngIf="isFieldInvalid('username')">
             {{ getErrorMessage('username') }}
           </small>
         </div>
@@ -79,19 +89,21 @@
         <!-- Email Field -->
         <div class="form-field">
           <label for="email" class="form-label">
+            <i class="pi pi-envelope"></i>
             Email <span class="required-indicator">*</span>
           </label>
-          <input
-            pInputText
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="Enter your email"
-            class="w-full"
-            [class.ng-invalid]="isFieldInvalid('email')"
-            [class.ng-dirty]="signUpForm.get('email')?.dirty"
-          />
-          <small class="form-error" *ngIf="isFieldInvalid('email')">
+          <span class="p-input-icon-left w-full">
+            <input
+              pInputText
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="your.email@example.com"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('email')"
+            />
+          </span>
+          <small class="p-error" *ngIf="isFieldInvalid('email')">
             {{ getErrorMessage('email') }}
           </small>
         </div>
@@ -99,19 +111,21 @@
         <!-- Phone Number Field -->
         <div class="form-field">
           <label for="phoneNumber" class="form-label">
+            <i class="pi pi-phone"></i>
             Phone Number <span class="required-indicator">*</span>
           </label>
-          <input
-            pInputText
-            id="phoneNumber"
-            type="tel"
-            formControlName="phoneNumber"
-            placeholder="e.g., 0712345678"
-            class="w-full"
-            [class.ng-invalid]="isFieldInvalid('phoneNumber')"
-            [class.ng-dirty]="signUpForm.get('phoneNumber')?.dirty"
-          />
-          <small class="form-error" *ngIf="isFieldInvalid('phoneNumber')">
+          <span class="p-input-icon-left w-full">
+            <input
+              pInputText
+              id="phoneNumber"
+              type="tel"
+              formControlName="phoneNumber"
+              placeholder="0712345678"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('phoneNumber')"
+            />
+          </span>
+          <small class="p-error" *ngIf="isFieldInvalid('phoneNumber')">
             {{ getErrorMessage('phoneNumber') }}
           </small>
         </div>
@@ -124,15 +138,14 @@
           <p-password
             id="password"
             formControlName="password"
-            placeholder="Create a password"
+            placeholder="Create a strong password"
             [toggleMask]="true"
             [feedback]="true"
             styleClass="w-full"
             inputStyleClass="w-full"
-            [class.ng-invalid]="isFieldInvalid('password')"
-            [class.ng-dirty]="signUpForm.get('password')?.dirty">
+            [class.p-invalid]="isFieldInvalid('password')">
           </p-password>
-          <small class="form-error" *ngIf="isFieldInvalid('password')">
+          <small class="p-error" *ngIf="isFieldInvalid('password')">
             {{ getErrorMessage('password') }}
           </small>
         </div>
@@ -150,30 +163,49 @@
             [feedback]="false"
             styleClass="w-full"
             inputStyleClass="w-full"
-            [class.ng-invalid]="isFieldInvalid('confirmPassword')"
-            [class.ng-dirty]="signUpForm.get('confirmPassword')?.dirty">
+            [class.p-invalid]="isFieldInvalid('confirmPassword')">
+            <ng-template pTemplate="header"></ng-template>
+            <ng-template pTemplate="footer"></ng-template>
           </p-password>
-          <small class="form-error" *ngIf="isFieldInvalid('confirmPassword')">
+          <small class="p-error" *ngIf="isFieldInvalid('confirmPassword')">
             {{ getErrorMessage('confirmPassword') }}
           </small>
         </div>
 
         <!-- Submit Button -->
-        <div class="form-actions-single">
+        <div class="form-actions">
           <p-button
             type="submit"
-            label="Sign Up"
+            label="Create Account"
             [loading]="loading()"
-            icon="pi pi-user-plus"
-            styleClass="w-full">
-          </p-button>
+            
+            iconPos="right"
+            styleClass="w-full p-button-lg primary-button"
+            [style]="{'--icon-margin-left': '10px'}"
+          ></p-button>
         </div>
 
         <!-- Sign In Link -->
         <div class="auth-footer">
-          <p>Already have an account? <a routerLink="/auth/signin" class="auth-link">Sign In</a></p>
+          <p>
+            Already have an account?
+            <a routerLink="/auth/signin" class="auth-link">
+              Sign In <i class="pi pi-arrow-right"></i>
+            </a>
+          </p>
         </div>
       </form>
+
+      <!-- Footer Branding Inside Card -->
+      <div class="auth-powered">
+        <p>
+          <i class="pi pi-shield"></i>
+          Powered by <strong>GOPAY Team</strong>
+        </p>
+      </div>
     </p-card>
   </div>
 </div>
+
+<!-- Toast for notifications -->
+<p-toast position="top-right" [life]="4000"></p-toast>

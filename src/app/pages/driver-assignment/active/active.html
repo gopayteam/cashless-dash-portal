@@ -102,7 +102,7 @@
   </div>
 
   <!-- ================= ASSIGNMENTS TABLE ================= -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Driver Assignments</h3>
@@ -123,7 +123,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} assignments"
       styleClass="data-table"
       (onLazyLoad)="loadAssignments($event)"
-      [tableStyle]="{ 'min-width': '75rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -135,7 +135,7 @@
           <th>Approved</th>
           <th>Approvals</th>
           <th>Active Days</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -198,7 +198,7 @@
             </div>
           </td>
 
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -207,7 +207,7 @@
               tooltipPosition="top"
               (click)="viewAssignmentDetails(assignment); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 

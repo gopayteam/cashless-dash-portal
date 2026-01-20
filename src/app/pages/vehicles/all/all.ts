@@ -15,6 +15,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 interface StatusOption {
   label: string;
@@ -37,9 +39,10 @@ interface StatusOption {
     SelectModule,
   ],
   templateUrl: './all.html',
-  styleUrls: ['./all.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./all.css'],
 })
 export class AllVehiclesComponent implements OnInit {
+  entityId: string | null = null;
   vehicles: Vehicle[] = [];
   allVehicles: Vehicle[] = [];
   filteredVehicles: Vehicle[] = [];
@@ -72,6 +75,8 @@ export class AllVehiclesComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -80,6 +85,16 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadVehicles();
   }
 
@@ -98,7 +113,7 @@ export class AllVehiclesComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: pageSize,
     };

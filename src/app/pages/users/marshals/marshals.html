@@ -143,7 +143,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users"
       styleClass="data-table"
       (onLazyLoad)="loadUsers($event)"
-      [tableStyle]="{ 'min-width': '75rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -155,7 +155,7 @@
           <th>Login Trials</th>
           <th>First Login</th>
           <th>Created On</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -223,7 +223,7 @@
               <span class="time">{{ user.createdOn | date : 'hh:mm a' }}</span>
             </div>
           </td>
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -232,7 +232,7 @@
               tooltipPosition="top"
               (click)="viewUserDetails(user); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 

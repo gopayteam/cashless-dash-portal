@@ -19,6 +19,8 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { Statement } from '../../../../@core/models/statement/statements.model';
 import { StatementApiResponse } from '../../../../@core/models/statement/statements_response.model';
 import { SelectModule } from 'primeng/select';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 interface TransactionTypeOption {
   label: string;
@@ -52,11 +54,10 @@ interface CategoryOption {
   templateUrl: './statements.html',
   styleUrls: [
     './statements.css',
-    '../../../../styles/modules/_date_picker.css',
-    '../../../../styles/modules/_dialog_module.css',
   ],
 })
 export class WithdrawalStatementsComponent implements OnInit {
+  entityId: string | null = null;
   statements: Statement[] = [];
   allStatements: Statement[] = [];
   filteredStatements: Statement[] = [];
@@ -100,6 +101,8 @@ export class WithdrawalStatementsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -108,6 +111,15 @@ export class WithdrawalStatementsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.setDefaultDateRange();
     this.loadStatements();
   }
@@ -140,7 +152,7 @@ export class WithdrawalStatementsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,

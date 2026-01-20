@@ -20,7 +20,6 @@ import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
-import { ActiveDriversComponent } from './pages/users/drivers/active/drivers';
 import { CustomersComponent } from './pages/users/customers/customers';
 import { AdminUserComponent } from './pages/users/admin/admin';
 import { DebitTransactionsComponent } from './pages/payments/debit-transactions/debit-transactions';
@@ -39,8 +38,6 @@ import { InvestorsComponent } from './pages/users/investors/investors';
 import { MarshalsComponent } from './pages/users/marshals/marshals';
 import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
-import { AllDriversComponent } from './pages/users/drivers/all/drivers';
-import { InactiveDriversComponent } from './pages/users/drivers/inactive/drivers';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
 import { LocationRoutesComponent } from './pages/locations/routes/routes';
 import { AllDriverAssignmentsComponent } from './pages/driver-assignment/all/all';
@@ -56,6 +53,11 @@ import { DeletedParcels } from './pages/parcels/deleted-parcels/deleted-parcels'
 import { SignInComponent } from './pages/auth/signin/signin';
 import { SignUpComponent } from './pages/auth/signup/signup';
 import { AuthGuard } from '../@core/services/auth.guard';
+import { AllDriversComponent } from './pages/drivers/all/drivers';
+import { ActiveDriversComponent } from './pages/drivers/active/drivers';
+import { InactiveDriversComponent } from './pages/drivers/inactive/drivers';
+import { NotificationsComponent } from './pages/profile/notifications/notifications';
+import { SettingsComponent } from './pages/profile/settings/settings';
 
 /* =====================================================
    ROUTES
@@ -165,6 +167,10 @@ export const routes: Routes = [
       /* Audits */
       { path: 'audits/all', component: SystemAudits },
       { path: 'audits/user', component: UserAudits },
+
+      /* Profile */
+      { path: 'dashboard/notifications', component: NotificationsComponent },
+      { path: 'dashboard/profile', component: SettingsComponent },
 
       /* Default protected redirect */
       { path: '', redirectTo: 'dashboard/home', pathMatch: 'full' }

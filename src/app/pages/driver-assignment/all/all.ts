@@ -15,6 +15,8 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { GeneralDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
 import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 
 interface ApprovalStatusOption {
@@ -43,9 +45,10 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './all.html',
-  styleUrls: ['./all.css', '../../../../styles/modules/_dialog_module.css'],
+  styleUrls: ['./all.css'],
 })
 export class AllDriverAssignmentsComponent implements OnInit {
+  entityId: string | null = null;
   assignments: GeneralDriverAssignment[] = [];
   allAssignments: GeneralDriverAssignment[] = [];
   filteredAssignments: GeneralDriverAssignment[] = [];
@@ -86,6 +89,8 @@ export class AllDriverAssignmentsComponent implements OnInit {
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -94,6 +99,15 @@ export class AllDriverAssignmentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadAssignments();
   }
 
@@ -112,7 +126,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
     }
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page,
       size: pageSize,
     };
@@ -143,7 +157,7 @@ export class AllDriverAssignmentsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalDrivers = this.allAssignments.length;
-    
+
     // Count unique fleets
     const uniqueFleets = new Set(this.allAssignments.map(a => a.fleetNumber));
     this.totalFleets = uniqueFleets.size;

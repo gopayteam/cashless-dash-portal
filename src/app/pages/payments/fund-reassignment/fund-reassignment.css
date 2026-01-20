@@ -1,7 +1,7 @@
 /* fund-reassignment.component.css - Component-specific styles */
 
 /* Container wrapper - centered layout */
-.age-container {
+.page-container {
   display: flex;
   justify-content: center;   /* horizontal center */
   align-items: center;       /* vertical center */

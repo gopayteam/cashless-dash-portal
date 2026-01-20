@@ -68,7 +68,7 @@
   </div> -->
 
   <!-- ================= STATEMENTS TABLE ================= -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Statements List</h3>
@@ -138,7 +138,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} statements"
       styleClass="data-table"
       (onLazyLoad)="loadStatements($event)"
-      [tableStyle]="{ 'min-width': '70rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -151,7 +151,7 @@
           <th>Balance Before</th>
           <th>Balance After</th>
           <th>Change</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -201,7 +201,7 @@
               <span>{{ getBalanceChange(statement) | number : '1.2-2' }}</span>
             </div>
           </td>
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -210,7 +210,7 @@
               tooltipPosition="top"
               (click)="viewStatementDetails(statement); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 

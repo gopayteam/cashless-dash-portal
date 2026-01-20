@@ -13,69 +13,6 @@
     </div>
   </div>
 
-  <!-- ================= FILTER SECTION ================= -->
-  <p-card styleClass="stat-card card filter-card">
-    <div class="filters-grid">
-      <div class="filter-group">
-        <label class="filter-label">Fleet Number</label>
-        <input
-          pInputText
-          placeholder="Search by fleet number..."
-          [(ngModel)]="filters.fleetNumber"
-          class="form-input"
-        />
-      </div>
-
-      <div class="filter-item filter-item-filled">
-        <label class="filter-label">Driver Status</label>
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-select [(ngModel)]="filters.status">
-            <mat-option [value]="null">All Statuses</mat-option>
-            <mat-option *ngFor="let status of driverStatuses" [value]="status">
-              {{ status }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="filter-actions">
-        <button
-          pButton
-          icon="pi pi-filter"
-          label="Apply"
-          class="filter-btn filter-btn--apply"
-          (click)="applyFilters()">
-        </button>
-
-        <button
-          pButton
-          icon="pi pi-refresh"
-          label="Reset"
-          class="filter-btn filter-btn--reset"
-          (click)="resetFilters()">
-        </button>
-      </div>
-    </div>
-  </p-card>
-
-  <!-- ================= STATS CARDS ================= -->
-  <div class="stats-grid">
-    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
-      <div class="stat-content">
-        <div class="stat-info">
-          <span class="stat-title">{{ card.title }}</span>
-          <h2 class="stat-value">
-            <span class="amount">{{ card.count | number }}</span>
-          </h2>
-        </div>
-
-        <div class="stat-icon" [style.background-color]="card.color + '20'">
-          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
-        </div>
-      </div>
-    </p-card>
-  </div>
-
   <!-- ================= DRIVERS TABLE ================= -->
   <p-card styleClass="stat-card card">
     <div class="table-header">
@@ -119,12 +56,12 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} drivers"
       styleClass="data-table"
       (onLazyLoad)="loadDrivers($event)"
-      [tableStyle]="{ 'min-width': '70rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>
           <th>Driver Name</th>
-          <th>Username</th>
+          <!-- <th>Username</th> -->
           <th>Phone Number</th>
           <th>Fleet Number</th>
           <th>Investor Number</th>
@@ -132,7 +69,7 @@
           <th>Active Period</th>
           <th>Days Remaining</th>
           <th>Status</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -149,9 +86,9 @@
               </div>
             </div>
           </td>
-          <td>
+          <!-- <td>
             <span class="username-cell">{{ driver.username }}</span>
-          </td>
+          </td> -->
           <td>
             <div class="phone-cell">
               <i class="pi pi-phone"></i>
@@ -207,7 +144,7 @@
               {{ driver.status }}
             </span>
           </td>
-          <td>
+          <!-- <td>
             <button
               pButton
               icon="pi pi-eye"
@@ -216,7 +153,7 @@
               tooltipPosition="top"
               (click)="viewDriverDetails(driver); $event.stopPropagation()"
             ></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 

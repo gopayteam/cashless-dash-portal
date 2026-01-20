@@ -13,7 +13,7 @@
   </div>
 
   <!-- ================= FILTERS ================= -->
-  <p-card styleClass="stat-card card filter-card">
+  <p-card styleClass="card-hover card filter-card">
     <div class="filters-grid">
 
 
@@ -50,7 +50,7 @@
   </p-card>
 
   <!-- ================= TABLE ================= -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Parcel Managers</h3>
@@ -71,7 +71,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} managers"
       (onLazyLoad)="loadParcelManagers($event)"
       styleClass="data-table"
-      [tableStyle]="{ 'min-width': '80rem' }"
+      [tableStyle]="{ 'min-width': '60rem' }"
     >
       <ng-template pTemplate="header">
         <tr>

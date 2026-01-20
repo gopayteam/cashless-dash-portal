@@ -11,6 +11,8 @@ import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { SelectModule } from 'primeng/select';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 interface Vehicle {
   fleetNumber: string;
@@ -41,12 +43,10 @@ interface VehicleOption {
   templateUrl: './fund-reassignment.html',
   styleUrls: [
     './fund-reassignment.css',
-    '../../../../styles/modules/_forms.css',
-     '../../../../styles/modules/_date_picker.css',
-    '../../../../styles/modules/_filter_actions.css'
   ],
 })
 export class FundReassignmentComponent implements OnInit {
+  entityId: string | null = null;
   fundReassignmentForm!: FormGroup;
   vehicles: Vehicle[] = [];
   sourceFleetOptions: VehicleOption[] = [];
@@ -57,6 +57,8 @@ export class FundReassignmentComponent implements OnInit {
     private fb: FormBuilder,
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -65,6 +67,15 @@ export class FundReassignmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.initForm();
     this.loadVehicles();
   }
@@ -86,7 +97,7 @@ export class FundReassignmentComponent implements OnInit {
     this.loadingStore.start();
 
     const payload = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       page: 0,
       size: 10000,
     };
@@ -103,7 +114,7 @@ export class FundReassignmentComponent implements OnInit {
 
           this.sourceFleetOptions = this.vehicles.map(v => ({
             fleetNumber: v.fleetNumber,
-            label: `Fleet ${v.fleetNumber}`,
+            label: `${v.fleetNumber} - ${v.registrationNumber}`,
           }));
 
           this.destinationFleetOptions = [...this.sourceFleetOptions];
@@ -175,7 +186,7 @@ export class FundReassignmentComponent implements OnInit {
       sourceFleetNumber: formValue.sourceFleetNumber,
       destinationFleetNumber: formValue.destinationFleetNumber,
       amount: formValue.amount,
-      entityId: 'GS000002',
+      entityId: this.entityId,
     };
 
     // TODO: Replace with actual API endpoint for fund reassignment
