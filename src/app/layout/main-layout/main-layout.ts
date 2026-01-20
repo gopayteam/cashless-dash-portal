@@ -1,340 +1,277 @@
-// layout/main-layout/main-layout.component.ts
+import { Component, OnInit, inject } from '@angular/core';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, HostListener } from '@angular/core';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
-import { DialogModule } from 'primeng/dialog';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { DataService } from '../../../@core/api/data.service';
-import { LoadingStore } from '../../../@core/state/loading.store';
-import { API_ENDPOINTS } from '../../../@core/api/endpoints';
-import { ButtonModule } from 'primeng/button';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../@core/services/auth.service';
+import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
+import { Dialog } from "primeng/dialog";
 
-interface NavConfig {
-  route: string;
-  tabs?: TabItem[];
-}
-
-interface TabItem {
+interface TabConfig {
   label: string;
   icon: string;
-  path: string;
+  route: string;
+  roles?: string[]; // Required roles to view this tab
 }
 
-interface NotificationItem {
-type: any;
-  id: number;
+interface Notification {
+  id: string;
   title: string;
   message: string;
   time: string;
+  type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
 }
 
 @Component({
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, DialogModule, ButtonModule, ToggleSwitchModule, FormsModule],
   selector: 'app-main-layout',
+  standalone: true,
+  imports: [CommonModule, FormsModule, HasRoleDirective, RouterOutlet, Dialog],
   templateUrl: './main-layout.html',
-  styleUrls: ['./main-layout.css'],
+  styleUrls: ['./main-layout.css']
 })
 export class MainLayoutComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  loading: any;
-  notifications = [
-    {
-      id: 1,
-      type: 'info',
-      title: 'System Update',
-      message: 'A new version of the system is available. Please update to access new features.',
-      time: '5 minutes ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'success',
-      title: 'Payment Received',
-      message: 'Payment of KES 50,000 has been successfully processed.',
-      time: '1 hour ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'warning',
-      title: 'Account Alert',
-      message: 'Your account will expire in 7 days. Please renew your subscription.',
-      time: '3 hours ago',
-      read: true
-    },
-    {
-      id: 4,
-      type: 'info',
-      title: 'New Message',
-      message: 'You have received a new message from the support team.',
-      time: '1 day ago',
-      read: true
-    }
-  ];
-
-
-
-
-  unreadCount = 2;
-
-  // UI State
+  // Sidebar state
   sidebarCollapsed = false;
-  sidebarVisible = false; // For mobile overlay
-  currentRoute = '';
-  activeTabIndex = 0;
+  sidebarVisible = false;
 
-  // User Info
-  // User Info
+  // User info
   userInfo = {
     name: '',
     email: '',
-    initials: '',
+    initials: ''
   };
 
-
-  // Navigation Configuration - Maps routes to their tab menus
-  private navigationConfig: NavConfig[] = [
-    {
-      route: '/transactions',
-      tabs: [
-        { label: 'All Transactions', icon: 'pi pi-list', path: '/transactions/all' },
-        { label: 'Pending', icon: 'pi pi-clock', path: '/transactions/pending' },
-        { label: 'Failed', icon: 'pi pi-times-circle', path: '/transactions/failed' },
-      ],
-    },
-    {
-      route: '/transfer-payment',
-      tabs: [
-        { label: 'Credit Driver', icon: 'pi pi-list', path: '/transfer-payment/1' },
-        { label: 'Funds Re-assignment', icon: 'pi pi-clock', path: '/transfer-payment/2' },
-      ],
-    },
-    {
-      route: '/vehicle-analysis',
-      tabs: [
-        { label: 'Daily', icon: 'pi pi-calendar', path: '/vehicle-analysis/daily' },
-        { label: 'Weekly', icon: 'pi pi-calendar-plus', path: '/vehicle-analysis/weekly' },
-        { label: 'Monthly', icon: 'pi pi-calendar-times', path: '/vehicle-analysis/monthly' },
-        { label: 'Yearly', icon: 'pi pi-chart-line', path: '/vehicle-analysis/yearly' },
-      ],
-    },
-    {
-      route: '/prediction',
-      tabs: [
-        { label: 'Short Term', icon: 'pi pi-clock', path: '/prediction/short-term' },
-        { label: 'Long Term', icon: 'pi pi-history', path: '/prediction/long-term' },
-        { label: 'Trends', icon: 'pi pi-chart-bar', path: '/prediction/trends' },
-      ],
-    },
-    {
-      route: '/revenue',
-      tabs: [
-        { label: 'Overview', icon: 'pi pi-dollar', path: '/revenue/all' },
-        { label: 'By Vehicle', icon: 'pi pi-car', path: '/revenue/by-vehicle' },
-        { label: 'By Location', icon: 'pi pi-map-marker', path: '/revenue/by-location' },
-      ],
-    },
-    {
-      route: '/vehicles',
-      tabs: [
-        { label: 'All Vehicles', icon: 'pi pi-car', path: '/vehicles/all' },
-        { label: 'Active', icon: 'pi pi-check', path: '/vehicles/active' },
-        { label: 'Inactive', icon: 'pi pi-ban', path: '/vehicles/inactive' },
-        { label: 'Maintenance', icon: 'pi pi-wrench', path: '/vehicles/maintenance' },
-      ],
-    },
-    {
-      route: '/driver-assignments',
-      tabs: [
-        { label: 'Overview', icon: 'pi pi-list', path: '/driver-assignments/all' },
-        { label: 'Active', icon: 'pi pi-check', path: '/driver-assignments/active' },
-        { label: 'Inactive', icon: 'pi pi-wrench', path: '/driver-assignments/inactive' },
-        { label: 'Rejected', icon: 'pi pi-ban', path: '/driver-assignments/rejected' },
-        { label: 'Pending', icon: 'pi pi-clock', path: '/driver-assignments/pending' },
-      ],
-    },
-    {
-      route: '/drivers',
-      tabs: [
-        { label: 'All Drivers', icon: 'pi pi-user', path: '/drivers/all' },
-        { label: 'Active Drivers', icon: 'pi pi-check', path: '/drivers/active' },
-        { label: 'Inactive Drivers', icon: 'pi pi-ban', path: '/drivers/inactive' },
-      ],
-    },
-    {
-      route: '/users',
-      tabs: [
-        { label: 'All Users', icon: 'pi pi-avatar', path: '/users/all' },
-        { label: 'All Admins', icon: 'pi pi-avatar', path: '/users/admins' },
-        { label: 'All Investors', icon: 'pi pi-avatar', path: '/users/investors' },
-        { label: 'All Marshalls', icon: 'pi pi-avatar', path: '/users/marshals' },
-        { label: 'All Drivers', icon: 'pi pi-avatar', path: '/users/drivers' },
-        { label: 'All Conductors', icon: 'pi pi-avatar', path: '/users/conductors' },
-        { label: 'All Passengers', icon: 'pi pi-avatar', path: '/users/customers' },
-        { label: 'Deactivated Users', icon: 'pi pi-avatar', path: '/users/deactivated' },
-      ],
-    },
-    {
-      route: '/locations',
-      tabs: [
-        { label: 'Stages', icon: 'pi pi-location', path: '/locations/stages' },
-        { label: 'Routes', icon: 'pi pi-location', path: '/locations/routes' },
-      ],
-    },
-    {
-      route: '/audits',
-      tabs: [
-        { label: 'System Audits', icon: 'pi pi-location', path: '/audits/all' },
-        { label: 'User Audits', icon: 'pi pi-location', path: '/audits/user' },
-      ],
-    },
-    {
-      route: '/wallet',
-      tabs: [
-        { label: 'Organization Wallet', icon: 'pi pi-wallet', path: '/wallet/organization' },
-        { label: 'User Wallet', icon: 'pi pi-wallet', path: '/wallet/user' },
-      ],
-    },
-    {
-      route: '/parcel-offices',
-      tabs: [
-        { label: 'Parcel Source', icon: 'pi pi-location', path: '/parcel-offices/parcel-source' },
-        { label: 'Parcel Destination', icon: 'pi pi-location', path: '/parcel-offices/parcel-destination' },
-      ],
-    },
-  ];
-
-  // Current tabs to display
-  currentTabs: TabItem[] = [];
-  showTabs = false;
+  // Notifications
   notificationDialogVisible = false;
-  settingsDialogVisible = false;
+  notifications: Notification[] = [];
+  unreadCount = 0;
 
-  // Settings toggles
+  // Settings
+  settingsDialogVisible = false;
   darkModeEnabled = false;
   emailNotificationsEnabled = true;
   autoLogoutEnabled = false;
 
-  constructor(
-    private router: Router,
-    private dataService: DataService,
-    public loadingStore: LoadingStore,
-    public authService: AuthService,
-    private cdr: ChangeDetectorRef
-  ) {}
+  // Tab navigation
+  showTabs = false;
+  currentTabs: TabConfig[] = [];
+  filteredTabs: TabConfig[] = [];
+  activeTabIndex = 0;
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    // Close mobile sidebar on resize to desktop
-    if (window.innerWidth > 1024 && this.sidebarVisible) {
-      this.sidebarVisible = false;
-    }
-    // Show desktop sidebar when resizing from mobile
-    if (window.innerWidth > 1024) {
-      this.sidebarCollapsed = false;
-    }
-  }
-
-  private getInitials(firstName: string, lastName: string): string {
-    const firstInitial = firstName?.charAt(0).toUpperCase() || '';
-    const lastInitial = lastName?.charAt(0).toUpperCase() || '';
-    return `${firstInitial}${lastInitial}`;
-  }
+  /* =============================================
+     TAB CONFIGURATION BY ROUTE
+  ============================================= */
+  private tabConfigs: { [key: string]: TabConfig[] } = {
+    '/dashboard': [
+      { label: 'Overview', icon: 'pi pi-home', route: '/dashboard/home', roles: ['CAN_VIEW_DASHBOARD'] },
+      { label: 'Statistics', icon: 'pi pi-chart-bar', route: '/dashboard/stats', roles: ['CAN_VIEW_DASHBOARD'] },
+      { label: 'Reports', icon: 'pi pi-file', route: '/dashboard/reports', roles: ['CAN_VIEW_DASHBOARD'] }
+    ],
+    '/transactions': [
+      { label: 'All Transactions', icon: 'pi pi-list', route: '/transactions/all', roles: ['CAN_VIEW_TRANSACTIONS'] },
+      { label: 'Failed', icon: 'pi pi-times-circle', route: '/transactions/failed', roles: ['CAN_VIEW_TRANSACTIONS'] },
+      { label: 'Pending', icon: 'pi pi-clock', route: '/transactions/pending', roles: ['CAN_VIEW_TRANSACTIONS'] }
+    ],
+    '/vehicles': [
+      { label: 'All Vehicles', icon: 'pi pi-car', route: '/vehicles/all', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+      { label: 'Active', icon: 'pi pi-check-circle', route: '/vehicles/active', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+      { label: 'Inactive', icon: 'pi pi-ban', route: '/vehicles/inactive', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+      { label: 'Maintenance', icon: 'pi pi-wrench', route: '/vehicles/maintenance', roles: ['CAN_VIEW_VEHICLES', 'CAN_EDIT_VEHICLE'] }
+    ],
+    '/drivers': [
+      { label: 'All Drivers', icon: 'pi pi-users', route: '/drivers/all', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
+      { label: 'Active', icon: 'pi pi-check-circle', route: '/drivers/active', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
+      { label: 'Inactive', icon: 'pi pi-ban', route: '/drivers/inactive', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
+    ],
+    '/driver-assignments': [
+      { label: 'All Assignments', icon: 'pi pi-list', route: '/driver-assignments/all', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
+      { label: 'Active', icon: 'pi pi-check-circle', route: '/driver-assignments/active', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
+      { label: 'Inactive', icon: 'pi pi-ban', route: '/driver-assignments/inactive', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
+      { label: 'Pending', icon: 'pi pi-clock', route: '/driver-assignments/pending', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
+      { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
+    ],
+    '/parcels': [
+      { label: 'All Parcels', icon: 'pi pi-box', route: '/parcels/all', roles: ['CAN_MANAGE_PARCELS'] }
+    ],
+    '/parcel-offices': [
+      { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
+      { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] }
+    ],
+    '/locations': [
+      { label: 'Stages', icon: 'pi pi-map', route: '/locations/stages', roles: ['CAN_VIEW_STAGES', 'CAN_VIEW_LOCATIONS'] },
+      { label: 'Routes', icon: 'pi pi-directions', route: '/locations/routes', roles: ['CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS'] }
+    ],
+    '/wallet': [
+      { label: 'Organization', icon: 'pi pi-building', route: '/wallet/organization', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
+      { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] }
+    ],
+    '/users': [
+      { label: 'All Users', icon: 'pi pi-users', route: '/users/all', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] },
+      { label: 'Admins', icon: 'pi pi-shield', route: '/users/admins', roles: ['CAN_VIEW_ADMINS'] },
+      { label: 'Drivers', icon: 'pi pi-user', route: '/users/drivers', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
+      { label: 'Conductors', icon: 'pi pi-user', route: '/users/conductors', roles: ['CAN_VIEW_TOUTS'] },
+      { label: 'Customers', icon: 'pi pi-shopping-cart', route: '/users/customers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
+      { label: 'Investors', icon: 'pi pi-money-bill', route: '/users/investors', roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] },
+      { label: 'Marshals', icon: 'pi pi-flag', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
+      { label: 'Deactivated', icon: 'pi pi-ban', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
+    ],
+    '/audits': [
+      { label: 'System Audits', icon: 'pi pi-server', route: '/audits/all', roles: ['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD'] },
+      { label: 'User Audits', icon: 'pi pi-users', route: '/audits/user', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_ADMINS'] }
+    ],
+    '/revenue': [
+      { label: 'All Revenue', icon: 'pi pi-chart-line', route: '/revenue/all', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_DASHBOARD'] },
+      { label: 'By Vehicle', icon: 'pi pi-car', route: '/revenue/by-vehicle', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] },
+      { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] }
+    ],
+    '/vehicle-analysis': [
+      { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+      { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+      { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+      { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
+    ],
+    '/prediction': [
+      { label: 'Short Term', icon: 'pi pi-calendar', route: '/prediction/short-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
+      { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
+      { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
+    ]
+  };
 
   ngOnInit() {
+    this.loadUserInfo();
     this.setupRouteListener();
-    // Initialize sidebar state based on screen size
-    if (this.isMobile()) {
-      this.sidebarVisible = false;
-      this.sidebarCollapsed = true;
-    }
+    this.loadNotifications();
+  }
 
-    // Get current user from AuthService
+  /* =============================================
+     USER INFO
+  ============================================= */
+  private loadUserInfo() {
     const user = this.authService.currentUser();
     if (user) {
-      console.log('Logged in as:', user.username);
-
-      // Set user info for UI
       this.userInfo = {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         initials: this.getInitials(user.firstName, user.lastName)
       };
-    } else {
-      console.log('No user logged in');
     }
   }
 
+  private getInitials(firstName: string, lastName: string): string {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  }
+
+  /* =============================================
+     ROLE-BASED ACCESS HELPERS
+  ============================================= */
+  hasTransactionAccess(): boolean {
+    return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONS', 'CAN_ADD', 'CAN_EDIT']);
+  }
+
+  hasParcelAccess(): boolean {
+    return this.authService.hasAnyRole(['CAN_MANAGE_PARCELS', 'CAN_DELETE']);
+  }
+
+  hasVehicleOrDriverAccess(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_VEHICLES',
+      'CAN_VIEW_VEHICLE',
+      'CAN_VIEW_DRIVERS',
+      'CAN_VIEW_DRIVER',
+      'CAN_VIEW_DRIVER_FLEET_REQUESTS',
+      'CAN_VIEW_DRIVER_FLEET'
+    ]);
+  }
+
+  hasFinanceAccess(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_MANAGE_ORGANIZATION_WALLETS',
+      'CAN_MANAGE_ORG_WALLETS',
+      'CAN_VIEW_TRANSACTIONS'
+    ]);
+  }
+
+  hasUserManagementAccess(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_USERS',
+      'CAN_VIEW_USER',
+      'CAN_VIEW_ADMINS',
+      'CAN_VIEW_DRIVERS',
+      'CAN_VIEW_CUSTOMERS',
+      'CAN_VIEW_INVESTORS'
+    ]);
+  }
+
+  hasAuditAccess(): boolean {
+    return this.authService.hasAnyRole(['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD', 'CAN_VIEW_USERS']);
+  }
+
+  /* =============================================
+     TAB NAVIGATION WITH ROLE FILTERING
+  ============================================= */
   private setupRouteListener() {
-    // Handle initial route
-    this.handleRouteChange(this.router.url);
-
-    // Listen to route changes
     this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event: NavigationEnd) => {
-        this.handleRouteChange(event.urlAfterRedirects);
-        // Close mobile sidebar on navigation
-        if (this.isMobile()) {
-          this.sidebarVisible = false;
-        }
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateTabsForCurrentRoute(event.url);
       });
+
+    // Set tabs for initial route
+    this.updateTabsForCurrentRoute(this.router.url);
   }
 
-  private handleRouteChange(url: string) {
-    this.currentRoute = url.split('?')[0];
+  private updateTabsForCurrentRoute(url: string) {
+    // Find matching tab config based on URL
+    const routeKey = Object.keys(this.tabConfigs).find(key => url.includes(key));
 
-    // Find matching navigation config
-    const config = this.navigationConfig.find((nav) => this.currentRoute.startsWith(nav.route));
-
-    if (config && config.tabs) {
-      this.currentTabs = config.tabs;
-      this.showTabs = true;
-      this.updateActiveTab();
+    if (routeKey) {
+      this.currentTabs = this.tabConfigs[routeKey];
+      // Filter tabs based on user roles
+      this.filteredTabs = this.filterTabsByRole(this.currentTabs);
+      this.showTabs = this.filteredTabs.length > 0;
+      this.updateActiveTab(url);
     } else {
-      this.currentTabs = [];
       this.showTabs = false;
+      this.currentTabs = [];
+      this.filteredTabs = [];
     }
   }
 
-  private updateActiveTab() {
-    const index = this.currentTabs.findIndex(
-      (tab) => this.currentRoute === tab.path || this.currentRoute.startsWith(tab.path + '/')
-    );
-    this.activeTabIndex = index !== -1 ? index : 0;
+  private filterTabsByRole(tabs: TabConfig[]): TabConfig[] {
+    return tabs.filter(tab => {
+      // If no roles specified, show tab
+      if (!tab.roles || tab.roles.length === 0) {
+        return true;
+      }
+      // Check if user has any of the required roles
+      return this.authService.hasAnyRole(tab.roles);
+    });
   }
 
-  navigate(route: string) {
-    this.router.navigate([route]);
-    // Close mobile sidebar after navigation
-    if (this.isMobile()) {
-      this.sidebarVisible = false;
-    }
+  private updateActiveTab(url: string) {
+    const index = this.filteredTabs.findIndex(tab => url.includes(tab.route));
+    this.activeTabIndex = index >= 0 ? index : 0;
   }
 
   onTabChange(index: number) {
-    const selectedTab = this.currentTabs[index];
-    if (selectedTab) {
-      this.activeTabIndex = index;
-      this.router.navigate([selectedTab.path]);
+    this.activeTabIndex = index;
+    const tab = this.filteredTabs[index];
+    if (tab) {
+      this.router.navigate([tab.route]);
     }
   }
 
-  isMobile(): boolean {
-    return window.innerWidth <= 1024;
-  }
-
+  /* =============================================
+     SIDEBAR & NAVIGATION
+  ============================================= */
   toggleSidebar() {
     if (this.isMobile()) {
-      // On mobile, toggle the overlay visibility
       this.sidebarVisible = !this.sidebarVisible;
     } else {
-      // On desktop, toggle collapsed state
       this.sidebarCollapsed = !this.sidebarCollapsed;
     }
   }
@@ -343,18 +280,45 @@ export class MainLayoutComponent implements OnInit {
     this.sidebarVisible = false;
   }
 
-  isRouteActive(route: string, exact: boolean = false): boolean {
-    if (exact) {
-      return this.currentRoute === route;
-    }
-    return this.currentRoute.startsWith(route);
+  isMobile(): boolean {
+    return window.innerWidth < 768;
   }
 
-  loadNotifications() {
-    this.dataService.get<NotificationItem[]>(API_ENDPOINTS.ALL_NOTIFICATIONS).subscribe((data) => {
-      this.notifications = data;
-      this.unreadCount = data.filter((n) => !n.read).length;
-    });
+  isRouteActive(route: string): boolean {
+    return this.router.url.includes(route);
+  }
+
+  navigate(route: string) {
+    this.router.navigate([route]);
+    if (this.isMobile()) {
+      this.closeMobileSidebar();
+    }
+  }
+
+  /* =============================================
+     NOTIFICATIONS
+  ============================================= */
+  private loadNotifications() {
+    // Mock notifications - replace with actual service call
+    this.notifications = [
+      {
+        id: '1',
+        title: 'New Driver Approved',
+        message: 'Driver John Doe has been approved',
+        time: '2 minutes ago',
+        type: 'success',
+        read: false
+      },
+      {
+        id: '2',
+        title: 'Vehicle Maintenance Due',
+        message: 'KBX 123A requires maintenance',
+        time: '1 hour ago',
+        type: 'warning',
+        read: false
+      }
+    ];
+    this.updateUnreadCount();
   }
 
   showNotifications() {
@@ -365,30 +329,28 @@ export class MainLayoutComponent implements OnInit {
     this.notificationDialogVisible = false;
   }
 
-  showSettings() {
-    this.settingsDialogVisible = true;
-  }
-
-  hideSettings() {
-    this.settingsDialogVisible = false;
-  }
-
-  markAsRead(notification: any) {
+  markAsRead(notification: Notification) {
     notification.read = true;
+    this.updateUnreadCount();
   }
 
   markAllAsRead() {
     this.notifications.forEach(n => n.read = true);
+    this.updateUnreadCount();
+  }
+
+  private updateUnreadCount() {
+    this.unreadCount = this.notifications.filter(n => !n.read).length;
   }
 
   getNotificationIcon(type: string): string {
-    const iconMap: { [key: string]: string } = {
-      'info': 'pi pi-info-circle',
-      'success': 'pi pi-check-circle',
-      'warning': 'pi pi-exclamation-triangle',
-      'error': 'pi pi-times-circle'
+    const icons: { [key: string]: string } = {
+      info: 'pi pi-info-circle',
+      success: 'pi pi-check-circle',
+      warning: 'pi pi-exclamation-triangle',
+      error: 'pi pi-times-circle'
     };
-    return iconMap[type] || 'pi pi-bell';
+    return icons[type] || 'pi pi-info-circle';
   }
 
   navigateToNotifications() {
@@ -396,15 +358,22 @@ export class MainLayoutComponent implements OnInit {
     this.router.navigate(['/dashboard/notifications']);
   }
 
+  /* =============================================
+     SETTINGS
+  ============================================= */
+  showSettings() {
+    this.settingsDialogVisible = true;
+  }
+
   navigateToProfile() {
     this.settingsDialogVisible = false;
     this.router.navigate(['/dashboard/profile']);
   }
 
+  /* =============================================
+     LOGOUT
+  ============================================= */
   logout() {
-    console.log('Logging out...');
-    // Implement logout logic here
-    this.authService.signOut()
-    this.router.navigate(['/login']);
+    this.authService.signOut();
   }
 }

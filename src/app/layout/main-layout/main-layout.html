@@ -45,7 +45,7 @@
           <li>
             <div class="menu-category">Main</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/dashboard')"
@@ -61,10 +61,10 @@
           </li>
 
           <!-- Transactions Category -->
-          <li>
+          <li *ngIf="hasTransactionAccess()">
             <div class="menu-category">Transactions</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/transactions')"
@@ -77,7 +77,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/deposits')"
@@ -90,7 +90,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/withdrawals')"
@@ -103,7 +103,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/transfer-payment')"
@@ -119,10 +119,10 @@
           </li>
 
           <!-- Parcels Category -->
-          <li>
+          <li *ngIf="hasParcelAccess()">
             <div class="menu-category">Parcels</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/parcels')"
@@ -135,7 +135,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/parcel-managers')"
@@ -148,7 +148,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/parcel-offices')"
@@ -161,7 +161,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_MANAGE_PARCELS', 'CAN_DELETE']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/deleted-parcels')"
@@ -177,10 +177,10 @@
           </li>
 
           <!-- Vehicles and Operations Category -->
-          <li>
+          <li *ngIf="hasVehicleOrDriverAccess()">
             <div class="menu-category">Vehicles and Operations</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/vehicles')"
@@ -193,7 +193,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/drivers')"
@@ -206,7 +206,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/driver-assignments')"
@@ -221,7 +221,7 @@
             </ul>
           </li>
 
-          <li class="menu-item">
+          <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS']">
             <button
               class="menu-link"
               [class.menu-link--active]="isRouteActive('/locations')"
@@ -235,10 +235,10 @@
           </li>
 
           <!-- Finance Category -->
-          <li>
+          <li *ngIf="hasFinanceAccess()">
             <div class="menu-category">Finance</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/wallet')"
@@ -251,7 +251,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/management-statements')"
@@ -264,7 +264,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/obligations')"
@@ -280,10 +280,10 @@
           </li>
 
           <!-- User Management Category -->
-          <li>
+          <li *ngIf="hasUserManagementAccess()">
             <div class="menu-category">User Management</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/users')"
@@ -299,10 +299,10 @@
           </li>
 
           <!-- Audits Category -->
-          <li>
+          <li *ngIf="hasAuditAccess()">
             <div class="menu-category">Audits</div>
             <ul class="menu-items">
-              <li class="menu-item">
+              <li class="menu-item" *hasRole="['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD']">
                 <button
                   class="menu-link"
                   [class.menu-link--active]="isRouteActive('/audits')"
@@ -495,10 +495,10 @@
     </header>
 
     <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
-    <nav class="tab-nav" *ngIf="showTabs">
+    <nav class="tab-nav" *ngIf="showTabs && filteredTabs.length > 0">
       <div class="tab-nav__group">
         <button
-          *ngFor="let tab of currentTabs; let i = index"
+          *ngFor="let tab of filteredTabs; let i = index"
           class="tab-nav__item"
           [class.tab-nav__item--active]="activeTabIndex === i"
           (click)="onTabChange(i)"
