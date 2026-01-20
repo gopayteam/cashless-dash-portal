@@ -13,7 +13,7 @@
     </div>
   </div>
 
-   <!-- ================= STATS CARDS ================= -->
+  <!-- ================= STATS CARDS ================= -->
   <div class="stats-grid grid-3">
     <p-card *ngFor="let card of statsCards" styleClass="card-hover">
       <div class="stat-content">
@@ -47,32 +47,19 @@
     <div class="filters-grid">
       <div class="filter-group">
         <label class="filter-label">Parcel Number</label>
-        <input
-          pInputText
-          placeholder="Search by parcel number..."
-          [(ngModel)]="filters.parcelNumber"
-          class="form-input"
-        />
+        <input pInputText placeholder="Search by parcel number..." [(ngModel)]="filters.parcelNumber"
+          class="form-input" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label">Source</label>
-        <input
-          pInputText
-          placeholder="Source location..."
-          [(ngModel)]="filters.sourceName"
-          class="form-input"
-        />
+        <input pInputText placeholder="Source location..." [(ngModel)]="filters.sourceName" class="form-input" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label">Destination</label>
-        <input
-          pInputText
-          placeholder="Destination location..."
-          [(ngModel)]="filters.destinationName"
-          class="form-input"
-        />
+        <input pInputText placeholder="Destination location..." [(ngModel)]="filters.destinationName"
+          class="form-input" />
       </div>
 
       <div class="filter-item filter-item-filled">
@@ -89,7 +76,7 @@
 
       <div class="filter-item filter-item-filled">
         <label class="filter-label">Parcel Status</label>
-        <mat-form-field appearance="outline" class="filter-field">
+        <mat-form-field appearance="outline" class="filter-field" style="background-color: white;">
           <mat-select placeholder="Select Parcel Status" [(ngModel)]="filters.parcelStatus">
             <mat-option [value]="null">All Statuses</mat-option>
             <mat-option *ngFor="let status of parcelStatuses" [value]="status">
@@ -113,19 +100,10 @@
 
 
       <div class="filter-actions">
-        <button
-          pButton
-          icon="pi pi-filter"
-          label="Apply"
-          class="filter-btn filter-btn--apply"
-          (click)="applyFilters()">
+        <button pButton icon="pi pi-filter" label="Apply" class="filter-btn filter-btn--apply" (click)="applyFilters()">
         </button>
 
-        <button
-          pButton
-          icon="pi pi-refresh"
-          label="Reset"
-          class="filter-btn filter-btn--reset"
+        <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset"
           (click)="resetFilters()">
         </button>
       </div>
@@ -143,41 +121,18 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search parcels..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search parcels..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
     </div>
 
-    <p-table
-      [value]="parcels"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels"
-      styleClass="data-table"
-      (onLazyLoad)="loadParcels($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="parcels" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels" styleClass="data-table"
+      (onLazyLoad)="loadParcels($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Parcel Number</th>
@@ -268,8 +223,7 @@
 
           <td>
             <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
-              <i
-                [class]="
+              <i [class]="
                   parcel.parcelStatus === 'COLLECTED'
                     ? 'pi pi-check-circle'
                     : parcel.parcelStatus === 'IN_TRANSIT'
@@ -279,8 +233,7 @@
                         : parcel.parcelStatus === 'CANCELLED'
                           ? 'pi pi-times-circle'
                           : 'pi pi-box'
-                "
-              ></i>
+                "></i>
               {{ parcel.parcelStatus.replace('_', ' ') }}
             </span>
           </td>
@@ -314,16 +267,9 @@
   </p-card>
 
   <!-- ================= PARCEL DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="parcel-detail-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="parcel-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <h2>Parcel Details</h2>
@@ -493,13 +439,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

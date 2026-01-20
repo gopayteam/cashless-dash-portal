@@ -98,7 +98,7 @@ export class ParcelsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -106,7 +106,7 @@ export class ParcelsComponent implements OnInit {
 
   ngOnInit(): void {
 
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);
@@ -156,7 +156,6 @@ export class ParcelsComponent implements OnInit {
       parcelStatus: this.filters.parcelStatus || null,
       startDate: start ? start.toISOString().split('T')[0] : null,
       endDate: end ? end.toISOString().split('T')[0] : null,
-
       sort: 'createdAt,DESC',
     };
 
