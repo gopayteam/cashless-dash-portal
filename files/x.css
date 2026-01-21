@@ -1,0 +1,317 @@
+/* ===== MOBILE SIDEBAR OVERLAY ===== */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+}
+
+/* Mobile behavior */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar--collapsed {
+    transform: translateX(-100%);
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+}
+
+/* ===== DIALOG POSITIONING ===== */
+/* Override PrimeNG dialog positioning for notifications */
+::ng-deep .p-dialog.notification-dialog {
+  position: fixed !important;
+  top: 70px !important;
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  transform: none !important;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+::ng-deep .p-dialog.notification-dialog .p-dialog-content {
+  padding: 0;
+}
+
+/* Override PrimeNG dialog positioning for settings */
+::ng-deep .p-dialog.settings-dialog {
+  position: fixed !important;
+  top: 70px !important;
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  transform: none !important;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+::ng-deep .p-dialog.settings-dialog .p-dialog-content {
+  padding: 0;
+}
+
+/* Dialog animation */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsive positioning */
+@media (max-width: 768px) {
+  ::ng-deep .p-dialog.notification-dialog,
+  ::ng-deep .p-dialog.settings-dialog {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
+  }
+}
+
+/* ===== NOTIFICATION PANEL STYLING ===== */
+.notification-panel {
+  padding: 1rem;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.notification-panel h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.notification-item {
+  padding: 0.875rem;
+  border-radius: 10px;
+  margin-bottom: 0.625rem;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+
+.notification-item:hover {
+  background: #e9ecef;
+  transform: translateX(2px);
+}
+
+.notification-item.unread {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(220, 53, 69, 0.12) 100%);
+  border-left-color:  var(--secondary-color);
+  font-weight: 500;
+}
+
+.notification-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.notification-message {
+  font-size: 0.85rem;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+  color: #adb5bd;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.notification-time::before {
+  content: "•";
+  color: #dee2e6;
+}
+
+.notification-footer {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+}
+
+.notification-footer button {
+  color: var(--secondary-color) !important;
+  font-weight: 500;
+}
+
+/* Empty state */
+.notification-panel:empty::before {
+  content: "No notifications";
+  display: block;
+  text-align: center;
+  padding: 2rem;
+  color: #adb5bd;
+  font-style: italic;
+}
+
+/* ===== SETTINGS PANEL STYLING ===== */
+.settings-panel {
+  padding: 1.25rem;
+}
+
+.settings-panel h4 {
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+  color: var(--primary-color);
+}
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 0;
+  gap: 1rem;
+}
+
+.settings-item + .settings-item {
+  border-top: 1px solid #e9ecef;
+}
+
+.settings-item span {
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.settings-panel > button {
+  margin-top: 1rem;
+  width: 100%;
+  justify-content: center;
+  color: var(--secondary-color) !important;
+  font-weight: 500;
+}
+
+/* ===== PRIMENG TOGGLE SWITCH CUSTOM STYLING ===== */
+::ng-deep .p-toggleswitch {
+  width: 3rem;
+  height: 1.75rem;
+}
+
+::ng-deep .p-toggleswitch .p-toggleswitch-slider {
+  background: #dee2e6;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+  border: none;
+}
+
+::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
+  width: 1.25rem;
+  height: 1.25rem;
+  left: 0.25rem;
+  bottom: 0.25rem;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
+  transform: translateX(1.25rem);
+}
+
+::ng-deep .p-toggleswitch:not(.p-disabled):hover .p-toggleswitch-slider {
+  background: #ced4da;
+}
+
+::ng-deep .p-toggleswitch.p-toggleswitch-checked:not(.p-disabled):hover .p-toggleswitch-slider {
+  background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+}
+
+::ng-deep .p-toggleswitch.p-focus .p-toggleswitch-slider {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+/* ===== DIALOG HEADER STYLING ===== */
+::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem 1.25rem;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+::ng-deep .p-dialog {
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* ===== TOPBAR BADGE STYLING ===== */
+.topbar__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
+  color: white;
+  border-radius: 10px;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* Hide badge when count is 0 */
+.topbar__badge:empty,
+.topbar__badge[data-count="0"] {
+  display: none;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.notification-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-panel::-webkit-scrollbar-track {
+  background: var(--secondary-color);
+  border-radius: 10px;
+}
+
+.notification-panel::-webkit-scrollbar-thumb {
+  background: var(--secondary-color-dark);
+  border-radius: 10px;
+}
+
+.notification-panel::-webkit-scrollbar-thumb:hover {
+  background: #c82333;
+}
