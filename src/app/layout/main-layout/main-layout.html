@@ -1,28 +1,16 @@
 <div class="layout-container">
   <!-- ========== MOBILE BACKDROP ========== -->
-  <div
-    class="sidebar-backdrop"
-    *ngIf="sidebarVisible && isMobile()"
-    (click)="closeMobileSidebar()"
-  ></div>
+  <div class="sidebar-backdrop" *ngIf="sidebarVisible && isMobile()" (click)="closeMobileSidebar()"></div>
 
   <!-- ========== SIDEBAR ========== -->
-  <aside
-    class="sidebar"
-    [class.sidebar--collapsed]="sidebarCollapsed"
-    [class.sidebar--mobile-visible]="sidebarVisible"
-  >
+  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed" [class.sidebar--mobile-visible]="sidebarVisible">
     <!-- Logo Header -->
     <div class="sidebar__header">
       <div class="sidebar__logo">
         <img src="/logo_2.png" alt="Gopay Logo" class="sidebar__logo-img" />
       </div>
       <!-- Close button for mobile -->
-      <button
-        class="sidebar__close-btn"
-        (click)="closeMobileSidebar()"
-        *ngIf="isMobile()"
-      >
+      <button class="sidebar__close-btn" (click)="closeMobileSidebar()" *ngIf="isMobile()">
         <i class="pi pi-times"></i>
       </button>
     </div>
@@ -46,11 +34,8 @@
             <div class="menu-category">Main</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/dashboard')"
-                  (click)="navigate('/dashboard/home')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/dashboard')"
+                  (click)="navigate('/dashboard/home')">
                   <span class="menu-link-content">
                     <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
                     <span class="menu-text">Dashboard</span>
@@ -65,11 +50,8 @@
             <div class="menu-category">Transactions</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/transactions')"
-                  (click)="navigate('/transactions/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/transactions')"
+                  (click)="navigate('/transactions/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-list menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">All Transactions</span>
@@ -78,11 +60,8 @@
               </li>
 
               <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/deposits')"
-                  (click)="navigate('/deposits/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/deposits')"
+                  (click)="navigate('/deposits/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Deposits</span>
@@ -91,11 +70,8 @@
               </li>
 
               <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/withdrawals')"
-                  (click)="navigate('/withdrawals/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/withdrawals')"
+                  (click)="navigate('/withdrawals/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Withdrawals</span>
@@ -104,11 +80,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/transfer-payment')"
-                  (click)="navigate('/transfer-payment/1')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/transfer-payment')"
+                  (click)="navigate('/transfer-payment/1')">
                   <span class="menu-link-content">
                     <i class="pi pi-send menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Initiate Transfer</span>
@@ -123,11 +96,8 @@
             <div class="menu-category">Parcels</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcels')"
-                  (click)="navigate('/parcels/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcels')"
+                  (click)="navigate('/parcels/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-box menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">All Parcels</span>
@@ -136,11 +106,8 @@
               </li>
 
               <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-managers')"
-                  (click)="navigate('/parcel-managers')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcel-managers')"
+                  (click)="navigate('/parcel-managers')">
                   <span class="menu-link-content">
                     <i class="pi pi-users menu-icon" style="color: rgb(116, 4, 4)"></i>
                     <span class="menu-text">Parcel managers</span>
@@ -149,11 +116,8 @@
               </li>
 
               <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-offices')"
-                  (click)="navigate('/parcel-offices/parcel-source')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcel-offices')"
+                  (click)="navigate('/parcel-offices/parcel-source')">
                   <span class="menu-link-content">
                     <i class="pi pi-building menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Parcel Offices</span>
@@ -162,11 +126,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_MANAGE_PARCELS', 'CAN_DELETE']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/deleted-parcels')"
-                  (click)="navigate('/deleted-parcels')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/deleted-parcels')"
+                  (click)="navigate('/deleted-parcels')">
                   <span class="menu-link-content">
                     <i class="pi pi-trash menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Deleted Parcels</span>
@@ -181,11 +142,8 @@
             <div class="menu-category">Vehicles and Operations</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/vehicles')"
-                  (click)="navigate('/vehicles/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/vehicles')"
+                  (click)="navigate('/vehicles/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-car menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Vehicles</span>
@@ -194,11 +152,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/drivers')"
-                  (click)="navigate('/drivers/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/drivers')"
+                  (click)="navigate('/drivers/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-user menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Drivers</span>
@@ -207,11 +162,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/driver-assignments')"
-                  (click)="navigate('/driver-assignments/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/driver-assignments')"
+                  (click)="navigate('/driver-assignments/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-map menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Driver Assignment</span>
@@ -222,11 +174,8 @@
           </li>
 
           <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS']">
-            <button
-              class="menu-link"
-              [class.menu-link--active]="isRouteActive('/locations')"
-              (click)="navigate('/locations/stages')"
-            >
+            <button class="menu-link" [class.menu-link--active]="isRouteActive('/locations')"
+              (click)="navigate('/locations/stages')">
               <span class="menu-link-content">
                 <i class="pi pi-map-marker menu-icon" style="color: rgb(134, 5, 5)"></i>
                 <span class="menu-text">Locations</span>
@@ -239,11 +188,8 @@
             <div class="menu-category">Finance</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/wallet')"
-                  (click)="navigate('/wallet/organization')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/wallet')"
+                  (click)="navigate('/wallet/organization')">
                   <span class="menu-link-content">
                     <i class="pi pi-wallet menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Wallets</span>
@@ -252,11 +198,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/management-statements')"
-                  (click)="navigate('/management-statements')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/management-statements')"
+                  (click)="navigate('/management-statements')">
                   <span class="menu-link-content">
                     <i class="pi pi-file menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Withdrawal Statements</span>
@@ -265,11 +208,8 @@
               </li>
 
               <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/obligations')"
-                  (click)="navigate('/obligations')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/obligations')"
+                  (click)="navigate('/obligations')">
                   <span class="menu-link-content">
                     <i class="pi pi-briefcase menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Obligations</span>
@@ -284,11 +224,8 @@
             <div class="menu-category">User Management</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/users')"
-                  (click)="navigate('/users/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/users')"
+                  (click)="navigate('/users/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Users</span>
@@ -303,11 +240,8 @@
             <div class="menu-category">Audits</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD']">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/audits')"
-                  (click)="navigate('/audits/all')"
-                >
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/audits')"
+                  (click)="navigate('/audits/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">All Audits</span>
@@ -347,17 +281,9 @@
         </button>
 
         <!-- Notifications Dialog -->
-        <p-dialog
-          header="Notifications"
-          [(visible)]="notificationDialogVisible"
-          [style]="{ width: '420px' }"
-          [modal]="true"
-          [closable]="true"
-          [dismissableMask]="true"
-          styleClass="notification-dialog"
-          [baseZIndex]="10000"
-          (onHide)="hideNotifications()"
-        >
+        <p-dialog header="Notifications" [(visible)]="notificationDialogVisible" [style]="{ width: '420px' }"
+          [modal]="true" [closable]="true" [dismissableMask]="true" styleClass="notification-dialog"
+          [baseZIndex]="10000" (onHide)="hideNotifications()">
           <div class="notification-panel">
             <!-- Notifications Header -->
             <div class="panel-header">
@@ -365,23 +291,14 @@
                 <i class="pi pi-bell"></i>
                 Recent Notifications
               </h3>
-              <button
-                pButton
-                label="Mark all as read"
-                class="p-button-text p-button-sm mark-read-btn"
-                *ngIf="unreadCount > 0"
-                (click)="markAllAsRead()"
-              ></button>
+              <button pButton label="Mark all as read" class="p-button-text p-button-sm mark-read-btn" style="cursor: pointer;"
+                *ngIf="unreadCount > 0" (click)="markAllAsRead()">Mark all as read </button>
             </div>
 
             <!-- Notification List -->
             <div class="notification-list">
-              <div
-                class="notification-item"
-                *ngFor="let n of notifications"
-                [class.unread]="!n.read"
-                (click)="markAsRead(n)"
-              >
+              <div class="notification-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+                (click)="markAsRead(n)">
                 <div class="notification-icon">
                   <i [class]="getNotificationIcon(n.type)"></i>
                 </div>
@@ -405,14 +322,10 @@
 
             <!-- Footer -->
             <div class="panel-footer">
-              <button
-                pButton
-                label="View All Notifications"
-                icon="pi pi-arrow-right"
-                iconPos="right"
-                class="p-button-text footer-btn"
-                (click)="navigateToNotifications()"
-              ></button>
+              <button pButton label="View All Notifications" icon="pi pi-arrow-right" iconPos="right"
+                class="p-button-text footer-btn" (click)="navigateToNotifications()">
+                View all notifications
+              </button>
             </div>
           </div>
         </p-dialog>
@@ -423,16 +336,8 @@
         </button>
 
         <!-- Settings Dialog -->
-        <p-dialog
-          header="Quick Settings"
-          [(visible)]="settingsDialogVisible"
-          [style]="{ width: '360px' }"
-          [modal]="true"
-          [closable]="true"
-          [dismissableMask]="true"
-          styleClass="settings-dialog"
-          [baseZIndex]="10000"
-        >
+        <p-dialog header="Quick Settings" [(visible)]="settingsDialogVisible" [style]="{ width: '360px' }"
+          [modal]="true" [closable]="true" [dismissableMask]="true" styleClass="settings-dialog" [baseZIndex]="10000">
           <div class="settings-panel">
             <!-- Settings Header -->
             <div class="panel-header">
@@ -480,14 +385,10 @@
 
             <!-- Footer -->
             <div class="panel-footer">
-              <button
-                pButton
-                label="Account Settings"
-                icon="pi pi-user"
-                iconPos="left"
-                class="p-button-outlined footer-btn full-width"
-                (click)="navigateToProfile()"
-              ></button>
+              <button pButton label="Account Settings" icon="pi pi-user" iconPos="left"
+                class="p-button-outlined footer-btn full-width" (click)="navigateToProfile()">
+                View Profile
+              </button>
             </div>
           </div>
         </p-dialog>
@@ -497,12 +398,8 @@
     <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
     <nav class="tab-nav" *ngIf="showTabs && filteredTabs.length > 0">
       <div class="tab-nav__group">
-        <button
-          *ngFor="let tab of filteredTabs; let i = index"
-          class="tab-nav__item"
-          [class.tab-nav__item--active]="activeTabIndex === i"
-          (click)="onTabChange(i)"
-        >
+        <button *ngFor="let tab of filteredTabs; let i = index" class="tab-nav__item"
+          [class.tab-nav__item--active]="activeTabIndex === i" (click)="onTabChange(i)">
           <i [class]="tab.icon" class="tab-nav__icon"></i>
           <span class="tab-nav__label">{{ tab.label }}</span>
         </button>

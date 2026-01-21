@@ -1,11 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../@core/services/auth.service';
 import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
 import { Dialog } from "primeng/dialog";
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 interface TabConfig {
   label: string;
@@ -26,13 +27,19 @@ interface Notification {
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule, HasRoleDirective, RouterOutlet, Dialog],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HasRoleDirective,
+    RouterOutlet,
+    Dialog,
+    ReactiveFormsModule,
+    ToggleSwitchModule,
+  ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.css']
 })
 export class MainLayoutComponent implements OnInit {
-  private authService = inject(AuthService);
-  private router = inject(Router);
 
   // Sidebar state
   sidebarCollapsed = false;
@@ -62,26 +69,50 @@ export class MainLayoutComponent implements OnInit {
   filteredTabs: TabConfig[] = [];
   activeTabIndex = 0;
 
+  private fb = inject(FormBuilder);
+
+  settingsForm!: FormGroup;
+
+  private initializeSettingsForm() {
+    this.settingsForm = this.fb.group({
+      darkMode: [false],
+      emailNotifications: [true],
+      autoLogout: [false]
+    });
+  }
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) { }
+
   /* =============================================
      TAB CONFIGURATION BY ROUTE
   ============================================= */
   private tabConfigs: { [key: string]: TabConfig[] } = {
-    '/dashboard': [
-      { label: 'Overview', icon: 'pi pi-home', route: '/dashboard/home', roles: ['CAN_VIEW_DASHBOARD'] },
-      { label: 'Statistics', icon: 'pi pi-chart-bar', route: '/dashboard/stats', roles: ['CAN_VIEW_DASHBOARD'] },
-      { label: 'Reports', icon: 'pi pi-file', route: '/dashboard/reports', roles: ['CAN_VIEW_DASHBOARD'] }
-    ],
+    // '/dashboard': [
+    //   { label: 'Overview', icon: 'pi pi-home', route: '/dashboard/home', roles: ['CAN_VIEW_DASHBOARD'] },
+    //   { label: 'Statistics', icon: 'pi pi-chart-bar', route: '/dashboard/stats', roles: ['CAN_VIEW_DASHBOARD'] },
+    //   { label: 'Reports', icon: 'pi pi-file', route: '/dashboard/reports', roles: ['CAN_VIEW_DASHBOARD'] }
+    // ],
+
     '/transactions': [
       { label: 'All Transactions', icon: 'pi pi-list', route: '/transactions/all', roles: ['CAN_VIEW_TRANSACTIONS'] },
       { label: 'Failed', icon: 'pi pi-times-circle', route: '/transactions/failed', roles: ['CAN_VIEW_TRANSACTIONS'] },
       { label: 'Pending', icon: 'pi pi-clock', route: '/transactions/pending', roles: ['CAN_VIEW_TRANSACTIONS'] }
     ],
-    '/vehicles': [
-      { label: 'All Vehicles', icon: 'pi pi-car', route: '/vehicles/all', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
-      { label: 'Active', icon: 'pi pi-check-circle', route: '/vehicles/active', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
-      { label: 'Inactive', icon: 'pi pi-ban', route: '/vehicles/inactive', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
-      { label: 'Maintenance', icon: 'pi pi-wrench', route: '/vehicles/maintenance', roles: ['CAN_VIEW_VEHICLES', 'CAN_EDIT_VEHICLE'] }
+
+    '/transfer-payment': [
+      { label: 'Credit Driver', icon: 'pi pi-list', route: '/transfer-payment/1' },
+      { label: 'Funds Re-assignment', icon: 'pi pi-clock', route: '/transfer-payment/2' },
     ],
+
+    // '/vehicles': [
+    //   { label: 'All Vehicles', icon: 'pi pi-car', route: '/vehicles/all', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+    //   { label: 'Active', icon: 'pi pi-check-circle', route: '/vehicles/active', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+    //   { label: 'Inactive', icon: 'pi pi-ban', route: '/vehicles/inactive', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
+    //   { label: 'Maintenance', icon: 'pi pi-wrench', route: '/vehicles/maintenance', roles: ['CAN_VIEW_VEHICLES', 'CAN_EDIT_VEHICLE'] }
+    // ],
     '/drivers': [
       { label: 'All Drivers', icon: 'pi pi-users', route: '/drivers/all', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
       { label: 'Active', icon: 'pi pi-check-circle', route: '/drivers/active', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
@@ -94,9 +125,9 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Pending', icon: 'pi pi-clock', route: '/driver-assignments/pending', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
       { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
     ],
-    '/parcels': [
-      { label: 'All Parcels', icon: 'pi pi-box', route: '/parcels/all', roles: ['CAN_MANAGE_PARCELS'] }
-    ],
+    // '/parcels': [
+    //   { label: 'All Parcels', icon: 'pi pi-box', route: '/parcels/all', roles: ['CAN_MANAGE_PARCELS'] }
+    // ],
     '/parcel-offices': [
       { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
       { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] }
@@ -145,6 +176,7 @@ export class MainLayoutComponent implements OnInit {
     this.loadUserInfo();
     this.setupRouteListener();
     this.loadNotifications();
+    this.initializeSettingsForm();
   }
 
   /* =============================================
@@ -215,7 +247,7 @@ export class MainLayoutComponent implements OnInit {
   ============================================= */
   private setupRouteListener() {
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event: any) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.updateTabsForCurrentRoute(event.url);
       });
@@ -225,12 +257,15 @@ export class MainLayoutComponent implements OnInit {
   }
 
   private updateTabsForCurrentRoute(url: string) {
-    // Find matching tab config based on URL
-    const routeKey = Object.keys(this.tabConfigs).find(key => url.includes(key));
+    // Extract the base path (first two segments)
+    const pathSegments = url.split('/').filter(seg => seg);
+    const basePath = pathSegments.length > 0 ? `/${pathSegments[0]}` : '';
+
+    // Find exact match for base path
+    const routeKey = Object.keys(this.tabConfigs).find(key => basePath === key);
 
     if (routeKey) {
       this.currentTabs = this.tabConfigs[routeKey];
-      // Filter tabs based on user roles
       this.filteredTabs = this.filterTabsByRole(this.currentTabs);
       this.showTabs = this.filteredTabs.length > 0;
       this.updateActiveTab(url);
@@ -375,5 +410,70 @@ export class MainLayoutComponent implements OnInit {
   ============================================= */
   logout() {
     this.authService.signOut();
+  }
+
+
+  /* =============================================
+   SECTION VISIBILITY HELPERS
+  ============================================= */
+  hasAnyItemInSection(items: string[]): boolean {
+    return items.some(role => this.authService.hasRole(role));
+  }
+
+  // Check if user can see any transaction items
+  showTransactionsSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_TRANSACTIONS',
+      'CAN_ADD',
+      'CAN_EDIT'
+    ]);
+  }
+
+  // Check if user can see any parcel items
+  showParcelsSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_MANAGE_PARCELS',
+      'CAN_DELETE'
+    ]);
+  }
+
+  // Check if user can see any vehicle/operations items
+  showVehiclesSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_VEHICLES',
+      'CAN_VIEW_VEHICLE',
+      'CAN_VIEW_DRIVERS',
+      'CAN_VIEW_DRIVER',
+      'CAN_VIEW_DRIVER_FLEET_REQUESTS',
+      'CAN_VIEW_DRIVER_FLEET',
+      'CAN_VIEW_STAGES',
+      'CAN_VIEW_ROUTES',
+      'CAN_VIEW_LOCATIONS'
+    ]);
+  }
+
+  // Check if user can see any finance items
+  showFinanceSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_MANAGE_ORGANIZATION_WALLETS',
+      'CAN_MANAGE_ORG_WALLETS',
+      'CAN_VIEW_TRANSACTIONS'
+    ]);
+  }
+
+  // Check if user can see any user management items
+  showUserManagementSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_USERS',
+      'CAN_VIEW_USER'
+    ]);
+  }
+
+  // Check if user can see any audit items
+  showAuditsSection(): boolean {
+    return this.authService.hasAnyRole([
+      'CAN_VIEW_ADMINS',
+      'CAN_VIEW_DASHBOARD'
+    ]);
   }
 }
