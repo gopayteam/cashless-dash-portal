@@ -1,1 +1,158 @@
-<p>Credit Driver works!</p>
+<div>
+  <div class="page-header">
+    <h1>Credit Driver</h1>
+    <p class="page-description">Submit driver activity information</p>
+  </div>
+
+  <div class="page-container card-hover">
+    <p-card>
+      <!-- Loading State -->
+      <ng-container *ngIf="loading() && fleets.length === 0">
+        <div class="loading-container">
+          <p-progressSpinner
+            styleClass="w-4rem h-4rem"
+            strokeWidth="4"
+            animationDuration="1s">
+          </p-progressSpinner>
+          <p class="loading-text">Loading information...</p>
+        </div>
+      </ng-container>
+
+      <!-- Form -->
+      <form
+        *ngIf="!loading() || fleets.length > 0"
+        [formGroup]="creditDriverForm"
+        (ngSubmit)="onSubmit()"
+        class="form-container">
+
+        <!-- Fleet Number Dropdown -->
+        <div class="form-field">
+          <label for="fleetNumber" class="form-label">
+            Select Fleet Number <span class="required-indicator">*</span>
+          </label>
+          <p-select
+            id="fleetNumber"
+            formControlName="fleetNumber"
+            [options]="fleets"
+            optionLabel="label"
+            optionValue="fleetNumber"
+            placeholder="Select a fleet"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="label,fleetNumber"
+            class="w-full"
+            [invalid]="isFieldInvalid('fleetNumber')">
+
+            <!-- Selected Item Template -->
+            <ng-template pTemplate="selectedItem" let-option>
+              <div class="flex align-items-center gap-2" *ngIf="option">
+                <i class="pi pi-car"></i>
+                <span> - </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+
+            <!-- Dropdown Item Template -->
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-car"></i>
+                <span> - </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+          <small class="form-error" *ngIf="isFieldInvalid('fleetNumber')">
+            {{ getErrorMessage('fleetNumber') }}
+          </small>
+        </div>
+
+        <!-- Driver Dropdown -->
+        <div class="form-field">
+          <label for="driverId" class="form-label">
+            Select Driver <span class="required-indicator">*</span>
+          </label>
+
+          <p-select
+            id="driverId"
+            formControlName="driverId"
+            [options]="filteredDrivers"
+            optionLabel="label"
+            optionValue="driverId"
+            placeholder="Select a driver"
+            [showClear]="true"
+            [filter]="true"
+            filterBy="label,driverId"
+            class="w-full"
+            [invalid]="isFieldInvalid('driverId')"
+            [disabled]="!creditDriverForm.get('fleetNumber')?.value">
+
+            <!-- Selected Item Template -->
+            <ng-template pTemplate="selectedItem" let-option>
+              <div class="flex align-items-center gap-2" *ngIf="option">
+                <i class="pi pi-user"></i>
+                <span> - </span>
+                <span>{{ option.label  }} </span>
+              </div>
+            </ng-template>
+
+            <!-- Dropdown Item Template -->
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-user"></i>
+                <span> - </span>
+                <span>{{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+          <small class="form-error" *ngIf="isFieldInvalid('driverId')">
+            {{ getErrorMessage('driverId') }}
+          </small>
+          <small class="form-hint" *ngIf="!creditDriverForm.get('fleetNumber')?.value">
+            Please select a fleet first
+          </small>
+        </div>
+
+        <!-- Activity Date Calendar -->
+        <div class="form-field">
+          <label for="activityDate" class="form-label">
+            Driver Activity Date <span class="required-indicator">*</span>
+          </label>
+          <p-datepicker
+            id="activityDate"
+            formControlName="activityDate"
+            [showIcon]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="Select date"
+            [maxDate]="maxDate"
+            class="w-full"
+            [invalid]="isFieldInvalid('activityDate')">
+          </p-datepicker>
+
+          <small class="form-error" *ngIf="isFieldInvalid('activityDate')">
+            {{ getErrorMessage('activityDate') }}
+          </small>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <p-button
+            type="button"
+            label="Reset"
+            severity="secondary"
+            [outlined]="true"
+            (click)="resetForm()"
+            [disabled]="loading()">
+          </p-button>
+          <p-button
+            type="submit"
+            label="Submit"
+            [loading]="loading()"
+            icon="pi pi-check">
+          </p-button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

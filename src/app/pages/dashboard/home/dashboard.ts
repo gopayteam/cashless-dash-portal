@@ -36,6 +36,8 @@ import { forkJoin } from 'rxjs';
 import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [
@@ -59,7 +61,7 @@ import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
   templateUrl: './dashboard.html',
   styleUrls: [
     './dashboard.css',
-    '../../../../styles/modules/_date_picker.css',
+    '../../../../styles/modules/_cards.css'
   ],
 })
 export class DashboardComponent implements OnInit {
@@ -70,6 +72,7 @@ export class DashboardComponent implements OnInit {
   pieChartOptions: any;
   dateRange: Date[] = [];
   recentTransactions: PaymentRecord[] | PaymentRecordVM[] = [];
+  entityId: string = '';
 
   // pagination state
   rows: number = 5;
@@ -78,7 +81,9 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private dataService: DataService,
+    private router: Router,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -88,6 +93,15 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.setDateRange();
     this.loadDashboardData();
   }
@@ -141,7 +155,7 @@ export class DashboardComponent implements OnInit {
     const [start, end] = this.dateRange;
 
     const baseParams = {
-      entityId: 'GS000002',
+      entityId: this.entityId,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
     };
@@ -222,5 +236,10 @@ export class DashboardComponent implements OnInit {
   exportData() {
     // TODO: Implement export functionality
     console.log('Exporting data...');
+  }
+
+  // Sign out
+  signOut() {
+    this.authService.signOut(); // Auto redirects to signin
   }
 }

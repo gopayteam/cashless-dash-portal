@@ -1,28 +1,26 @@
 <div class="layout-container">
+  <!-- ========== MOBILE BACKDROP ========== -->
+  <div class="sidebar-backdrop" *ngIf="sidebarVisible && isMobile()" (click)="closeMobileSidebar()"></div>
+
   <!-- ========== SIDEBAR ========== -->
-  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed">
-
-    <!-- Mobile Backdrop -->
-    <!-- <div
-      class="sidebar-backdrop"
-      *ngIf="sidebarCollapsed"
-      (click)="toggleSidebar()"
-    ></div> -->
-
+  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed" [class.sidebar--mobile-visible]="sidebarVisible">
     <!-- Logo Header -->
-     <div class="sidebar__header">
+    <div class="sidebar__header">
       <div class="sidebar__logo">
-        <img src="/logo.png" alt="Gopay Logo" class="sidebar__logo-img" />
+        <img src="/logo_2.png" alt="Gopay Logo" class="sidebar__logo-img" />
       </div>
+      <!-- Close button for mobile -->
+      <button class="sidebar__close-btn" (click)="closeMobileSidebar()" *ngIf="isMobile()">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
-
 
     <!-- Sidebar Body -->
     <div class="sidebar__body">
       <!-- User Profile Card -->
       <div class="sidebar__profile">
         <div class="sidebar__avatar">{{ userInfo.initials }}</div>
-        <div class="sidebar__user-info" *ngIf="!sidebarCollapsed">
+        <div class="sidebar__user-info">
           <div class="sidebar__user-name">{{ userInfo.name }}</div>
           <div class="sidebar__user-email">{{ userInfo.email }}</div>
         </div>
@@ -33,14 +31,11 @@
         <ul class="sidebar-menu">
           <!-- Main Category -->
           <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Main</div>
+            <div class="menu-category">Main</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/dashboard')"
-                  (click)="navigate('/dashboard/home')"
-                >
+              <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/dashboard')"
+                  (click)="navigate('/dashboard/home')">
                   <span class="menu-link-content">
                     <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
                     <span class="menu-text">Dashboard</span>
@@ -51,57 +46,45 @@
           </li>
 
           <!-- Transactions Category -->
-          <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Transactions</div>
+          <li *ngIf="hasTransactionAccess()">
+            <div class="menu-category">Transactions</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/transactions')"
-                  (click)="navigate('/transactions/all')"
-                >
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/transactions')"
+                  (click)="navigate('/transactions/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-list menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> All Transactions</span>
+                    <span class="menu-text">All Transactions</span>
                   </span>
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/deposits')"
-                  (click)="navigate('/deposits/all')"
-                >
-                  <span class="menu-link-content">
-                    <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Deposits (Debit)</span>
-                  </span>
-                </button>
-              </li>
-
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/withdrawals')"
-                  (click)="navigate('/withdrawals/all')"
-                >
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/deposits')"
+                  (click)="navigate('/deposits/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-arrow-down menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Withdrawals (Credit)</span>
+                    <span class="menu-text">Deposits</span>
                   </span>
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/transfer-payment')"
-                  (click)="navigate('/transfer-payment/1')"
-                >
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/withdrawals')"
+                  (click)="navigate('/withdrawals/all')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-arrow-up menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <span class="menu-text">Withdrawals</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/transfer-payment')"
+                  (click)="navigate('/transfer-payment/1')">
                   <span class="menu-link-content">
                     <i class="pi pi-send menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text"> Initiate Transfer</span>
+                    <span class="menu-text">Initiate Transfer</span>
                   </span>
                 </button>
               </li>
@@ -109,15 +92,12 @@
           </li>
 
           <!-- Parcels Category -->
-          <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Parcels</div>
+          <li *ngIf="hasParcelAccess()">
+            <div class="menu-category">Parcels</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcels')"
-                  (click)="navigate('/parcels/all')"
-                >
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcels')"
+                  (click)="navigate('/parcels/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-box menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">All Parcels</span>
@@ -125,12 +105,9 @@
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-managers')"
-                  (click)="navigate('/parcel-managers')"
-                >
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcel-managers')"
+                  (click)="navigate('/parcel-managers')">
                   <span class="menu-link-content">
                     <i class="pi pi-users menu-icon" style="color: rgb(116, 4, 4)"></i>
                     <span class="menu-text">Parcel managers</span>
@@ -138,15 +115,22 @@
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/parcel-offices')"
-                  (click)="navigate('/parcel-offices/parcel-source')"
-                >
+              <li class="menu-item" *hasRole="'CAN_MANAGE_PARCELS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/parcel-offices')"
+                  (click)="navigate('/parcel-offices/parcel-source')">
                   <span class="menu-link-content">
                     <i class="pi pi-building menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Parcel Offices</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item" *hasRole="['CAN_MANAGE_PARCELS', 'CAN_DELETE']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/deleted-parcels')"
+                  (click)="navigate('/deleted-parcels')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-trash menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Deleted Parcels</span>
                   </span>
                 </button>
               </li>
@@ -154,15 +138,12 @@
           </li>
 
           <!-- Vehicles and Operations Category -->
-          <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Vehicles and Operations</div>
+          <li *ngIf="hasVehicleOrDriverAccess()">
+            <div class="menu-category">Vehicles and Operations</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/vehicles')"
-                  (click)="navigate('/vehicles/all')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/vehicles')"
+                  (click)="navigate('/vehicles/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-car menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Vehicles</span>
@@ -170,12 +151,9 @@
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/drivers')"
-                  (click)="navigate('/drivers/all')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/drivers')"
+                  (click)="navigate('/drivers/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-user menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Drivers</span>
@@ -183,12 +161,9 @@
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/driver-assignments')"
-                  (click)="navigate('/driver-assignments')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/driver-assignments')"
+                  (click)="navigate('/driver-assignments/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-map menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Driver Assignment</span>
@@ -198,12 +173,9 @@
             </ul>
           </li>
 
-          <li class="menu-item">
-            <button
-              class="menu-link"
-              [class.menu-link--active]="isRouteActive('/locations')"
-              (click)="navigate('/locations/stages')"
-            >
+          <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS']">
+            <button class="menu-link" [class.menu-link--active]="isRouteActive('/locations')"
+              (click)="navigate('/locations/stages')">
               <span class="menu-link-content">
                 <i class="pi pi-map-marker menu-icon" style="color: rgb(134, 5, 5)"></i>
                 <span class="menu-text">Locations</span>
@@ -212,28 +184,22 @@
           </li>
 
           <!-- Finance Category -->
-          <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">Finance</div>
+          <li *ngIf="hasFinanceAccess()">
+            <div class="menu-category">Finance</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/organization-wallet')"
-                  (click)="navigate('/organization-wallet')"
-                >
+              <li class="menu-item" *hasRole="['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/wallet')"
+                  (click)="navigate('/wallet/organization')">
                   <span class="menu-link-content">
                     <i class="pi pi-wallet menu-icon" style="color: rgb(134, 5, 5)"></i>
-                    <span class="menu-text">Organization Wallets</span>
+                    <span class="menu-text">Wallets</span>
                   </span>
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/management-statements')"
-                  (click)="navigate('/management-statements')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/management-statements')"
+                  (click)="navigate('/management-statements')">
                   <span class="menu-link-content">
                     <i class="pi pi-file menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Withdrawal Statements</span>
@@ -241,12 +207,9 @@
                 </button>
               </li>
 
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/obligations')"
-                  (click)="navigate('/obligations')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/obligations')"
+                  (click)="navigate('/obligations')">
                   <span class="menu-link-content">
                     <i class="pi pi-briefcase menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Obligations</span>
@@ -257,18 +220,31 @@
           </li>
 
           <!-- User Management Category -->
-          <li>
-            <div class="menu-category" *ngIf="!sidebarCollapsed">User Management</div>
+          <li *ngIf="hasUserManagementAccess()">
+            <div class="menu-category">User Management</div>
             <ul class="menu-items">
-              <li class="menu-item">
-                <button
-                  class="menu-link"
-                  [class.menu-link--active]="isRouteActive('/users')"
-                  (click)="navigate('/users/all')"
-                >
+              <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/users')"
+                  (click)="navigate('/users/all')">
                   <span class="menu-link-content">
                     <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
                     <span class="menu-text">Users</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Audits Category -->
+          <li *ngIf="hasAuditAccess()">
+            <div class="menu-category">Audits</div>
+            <ul class="menu-items">
+              <li class="menu-item" *hasRole="['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/audits')"
+                  (click)="navigate('/audits/all')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">All Audits</span>
                   </span>
                 </button>
               </li>
@@ -282,123 +258,148 @@
     <div class="sidebar__footer">
       <button class="sidebar__logout-btn" (click)="logout()">
         <i class="pi pi-sign-out" style="color: rgb(125, 3, 3)"></i>
-        <span *ngIf="!sidebarCollapsed">Logout</span>
+        <span>Logout</span>
       </button>
     </div>
   </aside>
 
   <!-- ========== MAIN CONTENT ========== -->
-  <!-- ========== MAIN CONTENT ========== -->
-<main class="main-content">
-  <!-- Top Navigation Bar -->
-  <header class="topbar">
-    <div class="topbar__left">
-      <button class="topbar__toggle" (click)="toggleSidebar()">
-        <i class="pi pi-bars"></i>
-      </button>
-    </div>
-
-    <div class="topbar__right">
-      <!-- 🔔 Notifications -->
-      <button
-        class="topbar__icon-btn"
-        (click)="showNotifications()"
-      >
-        <i class="pi pi-bell"></i>
-        <span class="topbar__badge">{{ unreadCount }}</span>
-      </button>
-
-      <!-- Notifications Dialog -->
-      <p-dialog
-        header="Notifications"
-        [(visible)]="notificationDialogVisible"
-        [style]="{ width: '400px', backgroundColor: '#fff' }"
-        [modal]="true"
-        [closable]="true"
-        [dismissableMask]="true"
-        [styleClass]="'notification-dialog'"
-        [baseZIndex]="10000"
-        (onHide)="hideNotifications()"
-      >
-        <div class="notification-panel">
-          <div
-            class="notification-item"
-            *ngFor="let n of notifications"
-            [class.unread]="!n.read"
-          >
-            <div class="notification-title">{{ n.title }}</div>
-            <div class="notification-message">{{ n.message }}</div>
-            <div class="notification-time">{{ n.time }}</div>
-          </div>
-
-          <div class="notification-footer">
-            <button
-              pButton
-              label="View All"
-              class="p-button-text"
-            ></button>
-          </div>
-        </div>
-      </p-dialog>
-
-
-
-      <!-- ⚙️ Settings -->
-      <button
-        class="topbar__icon-btn"
-        (click)="showSettings()"
-      >
-        <i class="pi pi-cog"></i>
-      </button>
-
-     <!-- Settings Dialog -->
-    <p-dialog
-      header="Settings"
-      [(visible)]="settingsDialogVisible"
-      [style]="{ width: '320px', backgroundColor: '#fff' }"
-      [modal]="true"
-      [closable]="true"
-      [dismissableMask]="true"
-      [styleClass]="'settings-dialog'"
-      [baseZIndex]="10000"
-    >
-      <div class="settings-panel">
-        <div class="settings-item">
-          <span>Dark Mode</span>
-          <p-toggleSwitch [(ngModel)]="darkModeEnabled"></p-toggleSwitch>
-        </div>
-
-        <div class="settings-item">
-          <span>Email Notifications</span>
-          <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"></p-toggleSwitch>
-        </div>
-
-        <div class="settings-item">
-          <span>Auto Logout</span>
-          <p-toggleSwitch [(ngModel)]="autoLogoutEnabled"></p-toggleSwitch>
-        </div>
-
-        <button
-          pButton
-          label="Account Settings"
-          icon="pi pi-user"
-          class="p-button-text"
-        ></button>
+  <main class="main-content" [class.main-content--sidebar-collapsed]="sidebarCollapsed">
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <button class="topbar__toggle" (click)="toggleSidebar()">
+          <i class="pi pi-bars"></i>
+        </button>
       </div>
-    </p-dialog>
-    </div>
-  </header>
 
+      <div class="topbar__right">
+        <!-- 🔔 Notifications -->
+        <button class="topbar__icon-btn" (click)="showNotifications()">
+          <i class="pi pi-bell"></i>
+          <span class="topbar__badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+
+        <!-- Notifications Dialog -->
+        <p-dialog header="Notifications" [(visible)]="notificationDialogVisible" [style]="{ width: '420px' }"
+          [modal]="true" [closable]="true" [dismissableMask]="true" styleClass="notification-dialog"
+          [baseZIndex]="10000" (onHide)="hideNotifications()">
+          <div class="notification-panel">
+            <!-- Notifications Header -->
+            <div class="panel-header">
+              <h3 class="panel-title">
+                <i class="pi pi-bell"></i>
+                Recent Notifications
+              </h3>
+              <button pButton label="Mark all as read" class="p-button-text p-button-sm mark-read-btn" style="cursor: pointer;"
+                *ngIf="unreadCount > 0" (click)="markAllAsRead()">Mark all as read </button>
+            </div>
+
+            <!-- Notification List -->
+            <div class="notification-list">
+              <div class="notification-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+                (click)="markAsRead(n)">
+                <div class="notification-icon">
+                  <i [class]="getNotificationIcon(n.type)"></i>
+                </div>
+                <div class="notification-content">
+                  <div class="notification-title">{{ n.title }}</div>
+                  <div class="notification-message">{{ n.message }}</div>
+                  <div class="notification-time">
+                    <i class="pi pi-clock"></i>
+                    {{ n.time }}
+                  </div>
+                </div>
+                <div class="notification-indicator" *ngIf="!n.read"></div>
+              </div>
+
+              <!-- Empty State -->
+              <div class="empty-state" *ngIf="notifications.length === 0">
+                <i class="pi pi-bell-slash"></i>
+                <p>No notifications yet</p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="panel-footer">
+              <button pButton label="View All Notifications" icon="pi pi-arrow-right" iconPos="right"
+                class="p-button-text footer-btn" (click)="navigateToNotifications()">
+                View all notifications
+              </button>
+            </div>
+          </div>
+        </p-dialog>
+
+        <!-- ⚙️ Settings -->
+        <button class="topbar__icon-btn" (click)="showSettings()">
+          <i class="pi pi-cog"></i>
+        </button>
+
+        <!-- Settings Dialog -->
+        <p-dialog header="Quick Settings" [(visible)]="settingsDialogVisible" [style]="{ width: '360px' }"
+          [modal]="true" [closable]="true" [dismissableMask]="true" styleClass="settings-dialog" [baseZIndex]="10000">
+          <div class="settings-panel">
+            <!-- Settings Header -->
+            <div class="panel-header">
+              <h3 class="panel-title">
+                <i class="pi pi-cog"></i>
+                Preferences
+              </h3>
+            </div>
+
+            <!-- Settings Items -->
+            <div class="settings-list">
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <i class="pi pi-moon"></i>
+                  <div>
+                    <span class="settings-label">Dark Mode</span>
+                    <small class="settings-description">Toggle dark theme</small>
+                  </div>
+                </div>
+                <p-toggleSwitch [(ngModel)]="darkModeEnabled"></p-toggleSwitch>
+              </div>
+
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <i class="pi pi-envelope"></i>
+                  <div>
+                    <span class="settings-label">Email Notifications</span>
+                    <small class="settings-description">Receive email updates</small>
+                  </div>
+                </div>
+                <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"></p-toggleSwitch>
+              </div>
+
+              <div class="settings-item">
+                <div class="settings-item-info">
+                  <i class="pi pi-sign-out"></i>
+                  <div>
+                    <span class="settings-label">Auto Logout</span>
+                    <small class="settings-description">Auto logout after inactivity</small>
+                  </div>
+                </div>
+                <p-toggleSwitch [(ngModel)]="autoLogoutEnabled"></p-toggleSwitch>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="panel-footer">
+              <button pButton label="Account Settings" icon="pi pi-user" iconPos="left"
+                class="p-button-outlined footer-btn full-width" (click)="navigateToProfile()">
+                View Profile
+              </button>
+            </div>
+          </div>
+        </p-dialog>
+      </div>
+    </header>
 
     <!-- ========== HORIZONTAL TAB NAVIGATION ========== -->
-    <nav class="tab-nav" *ngIf="showTabs">
+    <nav class="tab-nav" *ngIf="showTabs && filteredTabs.length > 0">
       <div class="tab-nav__group">
-        <button
-          *ngFor="let tab of currentTabs; let i = index"
-          class="tab-nav__item"
-          [class.tab-nav__item--active]="activeTabIndex === i"
-          (click)="onTabChange(i)"
-        >
+        <button *ngFor="let tab of filteredTabs; let i = index" class="tab-nav__item"
+          [class.tab-nav__item--active]="activeTabIndex === i" (click)="onTabChange(i)">
           <i [class]="tab.icon" class="tab-nav__icon"></i>
           <span class="tab-nav__label">{{ tab.label }}</span>
         </button>

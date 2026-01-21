@@ -1,0 +1,33 @@
+/* ===========================
+   Tabs (p-tabmenu)
+   =========================== */
+.p-tabmenu .p-tabmenu-nav {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--light-text);
+  transition: all 0.2s ease;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link:not(.p-disabled):focus {
+  box-shadow: none;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem:not(.p-highlight) .p-menuitem-link:hover {
+  background: transparent;
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: transparent;
+  font-weight: 600;
+}

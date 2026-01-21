@@ -1,0 +1,432 @@
+<!-- pages/drivers/drivers.component.html -->
+<div class="drivers-container">
+  <!-- ================= LOADING OVERLAY ================= -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
+  </div> -->
+
+  <!-- ================= HEADER ================= -->
+  <div class="drivers-header">
+    <div class="header-content">
+      <h1>Driver Management</h1>
+      <p class="text-muted">Manage and track all registered drivers</p>
+    </div>
+  </div>
+
+  <!-- ================= FILTER SECTION ================= -->
+  <p-card styleClass="stat-card card filter-card">
+    <div class="grid-2">
+      <div class="filter-group">
+        <label class="filter-label">Fleet Number</label>
+        <input
+          pInputText
+          placeholder="Search by fleet number..."
+          [(ngModel)]="filters.fleetNumber"
+          class="form-input"
+        />
+      </div>
+
+      <div class="filter-item filter-item-filled">
+        <label class="filter-label">Driver Status</label>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-select [(ngModel)]="filters.status">
+            <mat-option [value]="null">All Statuses</mat-option>
+            <mat-option *ngFor="let status of driverStatuses" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button
+          pButton
+          icon="pi pi-filter"
+          label="Apply"
+          class="filter-btn filter-btn--apply"
+          (click)="applyFilters()">
+        </button>
+
+        <button
+          pButton
+          icon="pi pi-refresh"
+          label="Reset"
+          class="filter-btn filter-btn--reset"
+          (click)="resetFilters()">
+        </button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ card.count | number }}</span>
+          </h2>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= DRIVERS TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Drivers List</h3>
+        <span class="record-count">{{ totalRecords }} total drivers</span>
+      </div>
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search drivers..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          />
+        </span>
+        <button
+          *ngIf="searchTerm"
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()"
+          pTooltip="Clear search"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="drivers"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} drivers"
+      styleClass="data-table"
+      (onLazyLoad)="loadDrivers($event)"
+      [tableStyle]="{ 'min-width': '60rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Driver Name</th>
+          <!-- <th>Username</th> -->
+          <th>Phone Number</th>
+          <th>Fleet Number</th>
+          <th>Investor Number</th>
+          <th>Registration Number</th>
+          <th>Active Period</th>
+          <th>Days Remaining</th>
+          <th>Status</th>
+          <!-- <th>Actions</th> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-driver>
+        <tr class="clickable-row" (click)="viewDriverDetails(driver)">
+          <td>
+            <div class="driver-cell">
+              <div class="driver-avatar">
+                {{ driver.firstName.charAt(0) }}{{ driver.lastName.charAt(0) }}
+              </div>
+              <div class="driver-info">
+                <span class="driver-name">{{ getDriverFullName(driver) }}</span>
+                <span class="driver-meta">ID: {{ driver.id }}</span>
+              </div>
+            </div>
+          </td>
+          <!-- <td>
+            <span class="username-cell">{{ driver.username }}</span>
+          </td> -->
+          <td>
+            <div class="phone-cell">
+              <i class="pi pi-phone"></i>
+              <span>{{ driver.phoneNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              {{ driver.fleetNumber }}
+            </span>
+          </td>
+          <td>
+            <span class="code-badge">{{ driver.investorNumber }}</span>
+          </td>
+          <td>
+            <span class="code-badge">{{ driver.registrationNumber }}</span>
+          </td>
+          <td>
+            <div class="date-range-cell">
+              <div class="date-item">
+                <i class="pi pi-calendar-plus"></i>
+                <span>{{ driver.startDate | date : 'dd MMM yyyy' }}</span>
+              </div>
+              <i class="pi pi-arrow-right date-arrow"></i>
+              <div class="date-item">
+                <i class="pi pi-calendar-minus"></i>
+                <span>{{ driver.endDate | date : 'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="days-remaining-cell" [class.warning]="getDaysRemaining(driver) <= 7">
+              <i
+                [class]="
+                  getDaysRemaining(driver) > 7
+                    ? 'pi pi-check-circle'
+                    : getDaysRemaining(driver) > 0
+                      ? 'pi pi-exclamation-triangle'
+                      : 'pi pi-times-circle'
+                "
+              ></i>
+              <span>{{ getDaysRemaining(driver) }} days</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge ' + getStatusClass(driver.status)">
+              <i
+                [class]="
+                  driver.status === 'ACTIVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ driver.status }}
+            </span>
+          </td>
+          <!-- <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewDriverDetails(driver); $event.stopPropagation()"
+            ></button>
+          </td> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <h3>No Drivers Found</h3>
+              <p>Try adjusting your filters or search term</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= DRIVER DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="driver-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#f9f9f9' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Driver Details</h2>
+        <span class="driver-name-large">{{ getDriverFullName(selectedDriver!) }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedDriver">
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Personal Information</h4>
+
+            <div class="detail-item">
+              <label>Driver ID</label>
+              <span class="value">{{ selectedDriver.id }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>First Name</label>
+              <span class="value">{{ selectedDriver.firstName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Last Name</label>
+              <span class="value">{{ selectedDriver.lastName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Username</label>
+              <span class="value code-value">{{ selectedDriver.username }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Phone Number</label>
+              <span class="value">
+                <i class="pi pi-phone"></i>
+                {{ selectedDriver.phoneNumber }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4 class="section-title">Assignment Information</h4>
+
+            <div class="detail-item">
+              <label>Fleet Number</label>
+              <span class="value fleet-highlight">
+                <i class="pi pi-car"></i>
+                {{ selectedDriver.fleetNumber }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Investor Number</label>
+              <span class="value code-value">{{ selectedDriver.investorNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Marshal Number</label>
+              <span class="value code-value">{{ selectedDriver.marshalNumber }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Registration Number</label>
+              <span class="value code-value">{{ selectedDriver.registrationNumber }}</span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedDriver.stageId">
+              <label>Stage ID</label>
+              <span class="value">{{ selectedDriver.stageId }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Status & Activity</h4>
+
+            <div class="detail-item">
+              <label>Current Status</label>
+              <span [class]="'value badge ' + getStatusClass(selectedDriver.status)">
+                <i
+                  [class]="
+                    selectedDriver.status === 'ACTIVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                  "
+                ></i>
+                {{ selectedDriver.status }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Allowed Active Days</label>
+              <span class="value">{{ selectedDriver.allowedActiveDays }} days</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Start Date</label>
+              <span class="value">{{ selectedDriver.startDate | date : 'dd MMM yyyy' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>End Date</label>
+              <span class="value">{{ selectedDriver.endDate | date : 'dd MMM yyyy' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Days Remaining</label>
+              <span
+                class="value"
+                [class.warning-text]="getDaysRemaining(selectedDriver) <= 7"
+                [class.success-text]="getDaysRemaining(selectedDriver) > 7"
+              >
+                <i
+                  [class]="
+                    getDaysRemaining(selectedDriver) > 7
+                      ? 'pi pi-check-circle'
+                      : getDaysRemaining(selectedDriver) > 0
+                        ? 'pi pi-exclamation-triangle'
+                        : 'pi pi-times-circle'
+                  "
+                ></i>
+                {{ getDaysRemaining(selectedDriver) }} days
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Currently Active</label>
+              <span class="value">
+                <i
+                  [class]="
+                    isDriverActive(selectedDriver) ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                  "
+                  [style.color]="isDriverActive(selectedDriver) ? '#28a745' : '#dc3545'"
+                ></i>
+                {{ isDriverActive(selectedDriver) ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4 class="section-title">System Information</h4>
+
+            <div class="detail-item">
+              <label>Entity ID</label>
+              <span class="value code-value">{{ selectedDriver.entityId }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created On</label>
+              <span class="value">{{ selectedDriver.createdOn }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created By</label>
+              <span class="value">{{ selectedDriver.createBy }}</span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedDriver.lastModifiedDate">
+              <label>Last Modified</label>
+              <span class="value">{{ selectedDriver.lastModifiedDate }}</span>
+            </div>
+
+            <div class="detail-item" *ngIf="selectedDriver.modifiedBy">
+              <label>Modified By</label>
+              <span class="value">{{ selectedDriver.modifiedBy }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

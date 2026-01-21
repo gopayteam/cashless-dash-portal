@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Statements } from './statements';
+import { WithdrawalStatementsComponent as Statements } from './statements';
 
 describe('Statements', () => {
   let component: Statements;

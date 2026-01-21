@@ -1,0 +1,107 @@
+<div class="auth-container">
+  <!-- Background Logo - Full Screen -->
+  <div class="auth-background"></div>
+
+  <div class="auth-wrapper">
+    <p-card styleClass="auth-card">
+      <!-- Company Branding Inside Card -->
+      <div class="auth-brand">
+        <img src="logo_2.png" alt="GoPay Logo" class="brand-logo brand__logo-img" />
+        <h1 class="brand-title">GOPAY</h1>
+        <p class="brand-subtitle">MANAGEMENT SOLUTION</p>
+      </div>
+
+      <!-- Auth Header Inside Card -->
+      <div class="auth-header">
+        <h2>Welcome Back</h2>
+        <p class="auth-description">Enter your credentials to access your account</p>
+      </div>
+
+      <form [formGroup]="signInForm" (ngSubmit)="onSubmit()" class="form-container">
+
+        <!-- Username Field -->
+        <div class="form-field">
+          <label for="username" class="form-label">
+            Username <span class="required-indicator">*</span>
+          </label>
+          <span class="p-input-icon-left w-full">
+            <input
+              pInputText
+              id="username"
+              formControlName="username"
+              placeholder="Enter your username"
+              class="w-full"
+              [class.p-invalid]="isFieldInvalid('username')"
+            />
+          </span>
+          <small class="p-error" *ngIf="isFieldInvalid('username')">
+            {{ getErrorMessage('username') }}
+          </small>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-field">
+          <label for="password" class="form-label">
+            Password <span class="required-indicator">*</span>
+          </label>
+          <p-password
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full"
+            [class.p-invalid]="isFieldInvalid('password')">
+            <ng-template pTemplate="header"></ng-template>
+            <ng-template pTemplate="footer"></ng-template>
+          </p-password>
+          <small class="p-error" *ngIf="isFieldInvalid('password')">
+            {{ getErrorMessage('password') }}
+          </small>
+        </div>
+
+        <!-- Forgot Password Link -->
+        <div class="forgot-password-wrapper">
+          <a routerLink="/auth/forgot-password" class="forgot-password-link">
+            <i class="pi pi-question-circle"></i> Forgot Password?
+          </a>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <p-button
+            type="submit"
+            label="Sign In"
+            [loading]="loading()"
+            
+            iconPos="right"
+            styleClass="w-full p-button-lg primary-button"
+            [style]="{'--icon-margin-left': '0.5rem'}"
+          ></p-button>
+        </div>
+
+        <!-- Sign Up Link -->
+        <div class="auth-footer">
+          <p>
+            Don't have an account?
+            <a routerLink="/auth/signup" class="auth-link">
+              Sign Up <i class="pi pi-arrow-right"></i>
+            </a>
+          </p>
+        </div>
+      </form>
+
+      <!-- Footer Branding Inside Card -->
+      <div class="auth-powered">
+        <p>
+          <i class="pi pi-shield"></i>
+          Powered by <strong>GOPAY Team</strong>
+        </p>
+      </div>
+    </p-card>
+  </div>
+</div>
+
+<!-- Toast for notifications -->
+<p-toast position="top-right" [life]="4000"></p-toast>

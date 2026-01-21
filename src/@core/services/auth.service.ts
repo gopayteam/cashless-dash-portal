@@ -1,42 +1,163 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiService } from '../api/api.service';
+import { AuthUser } from '../models/auth/auth-user.model';
+import { AuthResponse } from '../models/auth/authResponse.model';
+import { LoginRequest } from '../models/auth/signin-request.model';
+import { API_ENDPOINTS } from '../api/endpoints';
+import { SignUpRequest } from '../models/auth/signup-request.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private baseUrl = environment.apiBaseUrl;
+  private readonly TOKEN_KEY = 'access_token';
+  private readonly USER_KEY = 'auth_user';
+  private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private http: ApiService) {}
+  /* =======================
+     SIGNAL STATE
+  ======================= */
 
-  get token(): string | null {
-    return localStorage.getItem('access_token');
+  private tokenSignal = signal<string | null>(this.getStoredToken());
+  private userSignal = signal<AuthUser | null>(this.getStoredUser());
+
+  token = computed(() => this.tokenSignal());
+  currentUser = computed(() => this.userSignal());
+  isAuthenticated = computed(() => !!this.tokenSignal());
+
+  /** Roles derived from stored user */
+  roles = computed(() =>
+    this.userSignal()?.roles?.map(r => r.name) ?? []
+  );
+
+  constructor(
+    private api: ApiService,
+    private router: Router
+  ) {}
+
+  /* =======================
+     AUTH ACTIONS
+  ======================= */
+
+  /**
+   * Sign in user
+   */
+  signIn(payload: LoginRequest): Observable<AuthResponse> {
+    return this.api
+      .post<AuthResponse>(API_ENDPOINTS.AUTH_LOGIN, payload)
+      .pipe(
+        tap(res => {
+          if (res.status === 0 && res.data) {
+            this.setSession(res.data);
+          }
+        }),
+        catchError(err => {
+          console.error('Login failed', err);
+          return throwError(() => err);
+        })
+      );
   }
 
-  isLoggedIn(): boolean {
-    return !!this.token;
+  /**
+   * Sign up new user
+   */
+  signUp(userData: SignUpRequest): Observable<AuthResponse> {
+    return this.api.post<AuthResponse>(API_ENDPOINTS.REGISTER, userData).pipe(
+      tap(response => {
+        if (response.status === 0 && response.data) {
+          this.setSession(response.data);
+        }
+      }),
+      catchError(error => {
+        console.error('Sign up error:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  logout() {
+  signOut(): void {
     localStorage.clear();
+    this.tokenSignal.set(null);
+    this.userSignal.set(null);
+    this.router.navigate(['/auth/login']);
   }
 
-  private get roles(): string[] {
-    const token = this.token;
-    if (!token) return [];
+  /* =======================
+     SESSION MANAGEMENT
+  ======================= */
 
-    //decode JWT to extract roles
-    const payload = token.split('.')[1];
-    const decodedPayload = atob(payload);
-    const parsedPayload = JSON.parse(decodedPayload);
-    return parsedPayload.roles || [];
+   /**
+   * Set authentication session
+   */
+  private setSession(user: AuthUser): void {
+    localStorage.setItem(this.TOKEN_KEY, user.token);
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.tokenSignal.set(user.token);
+    this.userSignal.set(user);
   }
+
+  /**
+   * Get stored token from localStorage
+   */
+  private getStoredToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  /**
+   * Get stored user from localStorage
+   */
+  private getStoredUser(): AuthUser | null {
+    const raw = localStorage.getItem(this.USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  /* =======================
+     ROLE & PERMISSION HELPERS
+  ======================= */
 
   hasRole(role: string): boolean {
-    return this.roles.includes(role);
+    return this.roles().includes(role);
   }
 
+  hasAnyRole(roles: string[]): boolean {
+    return roles.some(r => this.roles().includes(r));
+  }
+
+  /* =======================
+     JWT HELPERS
+  ======================= */
+
+  isTokenExpired(): boolean {
+    const token = this.tokenSignal();
+    if (!token) return true;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return Date.now() / 1000 >= payload.exp;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * Refresh token (implement if your API supports it)
+   */
+  refreshToken(): Observable<AuthResponse> {
+    return this.api.post<AuthResponse>(API_ENDPOINTS.REFRESH_TOKEN, {}).pipe(
+      tap(response => {
+        if (response.status === 0 && response.data) {
+          this.setSession(response.data);
+        }
+      })
+    );
+  }
+
+  /* =======================
+     GENERIC API CALL (OPTIONAL)
+  ======================= */
+
   get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`);
+    return this.api.get<T>(`${this.baseUrl}${endpoint}`);
   }
 }

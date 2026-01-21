@@ -1,0 +1,224 @@
+<!-- pages/wallets/all-wallets.component.html -->
+<div class="wallets-container">
+  <!-- ================= HEADER ================= -->
+  <div class="wallets-header">
+    <div class="header-content">
+      <h1>All Wallets</h1>
+      <p class="text-muted">View and manage all user wallets</p>
+    </div>
+  </div>
+
+  <!-- ================= WALLETS TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Wallets List</h3>
+        <span class="record-count">{{ totalRecords }} total wallets</span>
+      </div>
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search wallets..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            class="search-input"
+          />
+        </span>
+        <button
+          *ngIf="searchTerm"
+          pButton
+          icon="pi pi-times"
+          class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()"
+          pTooltip="Clear search"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="wallets"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} wallets"
+      styleClass="data-table"
+      (onLazyLoad)="loadWallets($event)"
+      [tableStyle]="{ 'min-width': '60rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Wallet ID</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Balance</th>
+          <th>Created</th>
+          <th>Last Updated</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-wallet>
+        <tr class="clickable-row" (click)="viewWalletDetails(wallet)">
+          <td>
+            <span class="wallet-id">{{ wallet.walletId }}</span>
+          </td>
+          <td>
+            <div class="category-cell">
+              <i [class]="'pi ' + getCategoryIcon(wallet.category)"></i>
+              <span>{{ getCategoryDisplayName(wallet.category) }}</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + wallet.status.toLowerCase()">
+              <i
+                [class]="
+                  wallet.status === 'ACTIVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ wallet.status }}
+            </span>
+          </td>
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ wallet.balance | number : '1.2-2' }}</span>
+          </td>
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ wallet.createdAt | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ wallet.createdAt | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ wallet.updatedAt | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ wallet.updatedAt | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewWalletDetails(wallet); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-wallet"></i>
+              <h3>No Wallets Found</h3>
+              <p>No wallets match your search criteria</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= WALLET DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '700px', background: '#fff' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Wallet Details</h2>
+        <span class="wallet-id-large">{{ selectedWallet?.walletId }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedWallet">
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Wallet ID</label>
+            <span class="value code-value">{{ selectedWallet.walletId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Category</label>
+            <span class="value category-highlight">
+              <i [class]="'pi ' + getCategoryIcon(selectedWallet.category)"></i>
+              {{ getCategoryDisplayName(selectedWallet.category) }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Status</label>
+            <span
+              [class]="'value badge badge-' + selectedWallet.status.toLowerCase()"
+            >
+              <i
+                [class]="
+                  selectedWallet.status === 'ACTIVE'
+                    ? 'pi pi-check-circle'
+                    : 'pi pi-times-circle'
+                "
+              ></i>
+              {{ selectedWallet.status }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Current Balance</label>
+            <span class="value amount-highlight">
+              Ksh {{ selectedWallet.balance | number : '1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Created At</label>
+            <span class="value">
+              {{ selectedWallet.createdAt | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Last Updated</label>
+            <span class="value">
+              {{ selectedWallet.updatedAt | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Entity ID</label>
+            <span class="value code-value">GS000002</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

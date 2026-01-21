@@ -9,10 +9,10 @@
   <!-- ================= HEADER WITH DATE FILTER ================= -->
   <div class="transactions-header">
     <div class="header-content">
-      <h1>All Debit Transactions</h1>
+      <h1>All Deposit Transactions</h1>
       <p class="text-muted">View and manage all your payment transactions</p>
     </div>
-    <div class="filter-item">
+    <div class="filter-item filter-item-gradient">
       <label class="filter-label">Date Range</label>
       <mat-form-field appearance="outline" class="date-range-field">
         <mat-date-range-input [rangePicker]="picker">
@@ -27,7 +27,7 @@
 
   <!-- ================= TRANSACTIONS TABLE ================= -->
   <!-- Using global .p-card class -->
-  <p-card styleClass="stat-card card">
+  <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
         <h3>Transactions List</h3>
@@ -70,7 +70,7 @@
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
       styleClass="data-table"
       (onLazyLoad)="loadTransactions($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
+      [tableStyle]="{ 'min-width': '40rem' }"
     >
       <ng-template pTemplate="header">
         <tr>

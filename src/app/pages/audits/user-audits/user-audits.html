@@ -1,1 +1,439 @@
-<p>user-audits works!</p>
+<!-- pages/audits/user-audits.component.html -->
+<div class="audits-container">
+  <!-- ================= HEADER ================= -->
+  <div class="audits-header">
+    <div class="header-content">
+      <h1>User Audit Trail</h1>
+      <p class="text-muted">Track and monitor all user activities</p>
+    </div>
+
+    <div class="header-filters">
+      <div class="username-input-container">
+        <label class="filter-label">Username</label>
+        <div class="username-input-wrapper">
+          <i class="pi pi-user"></i>
+          <input
+            pInputText
+            type="text"
+            placeholder="Enter username..."
+            [(ngModel)]="username"
+            class="username-input"
+          />
+          <button
+            pButton
+            label="Load"
+            icon="pi pi-refresh"
+            class="p-button-sm"
+            (click)="onUsernameChange()"
+          ></button>
+        </div>
+      </div>
+
+      <div class="filter-item filter-item-gradient">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="date-range-field">
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SUMMARY STATS ================= -->
+  <div class="summary-stats">
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Audits</span>
+        <span class="stat-value">{{ totalRecords | number }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+        <i class="pi pi-globe"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Unique IPs</span>
+        <span class="stat-value">{{ uniqueIPs }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-download"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">GET Requests</span>
+        <span class="stat-value">{{ getRequests }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-upload"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">POST Requests</span>
+        <span class="stat-value">{{ postRequests }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUDITS TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Audit Logs</h3>
+        <span class="record-count">{{ filteredAudits.length }} of {{ totalRecords | number }} records</span>
+      </div>
+
+      <div class="table-header-right">
+        <div class="search-container">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search audits..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+              class="search-input"
+            />
+          </span>
+          <button
+            *ngIf="searchTerm"
+            pButton
+            icon="pi pi-times"
+            class="p-button-text p-button-sm clear-button"
+            (click)="clearSearch()"
+            pTooltip="Clear search"
+          ></button>
+        </div>
+
+        <!-- Method Filter -->
+        <select
+          [(ngModel)]="selectedMethod"
+          (change)="onMethodChange()"
+          class="filter-dropdown"
+        >
+          <option value="" disabled selected>Method</option>
+          <option *ngFor="let option of methodOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+
+        <!-- Operating System Filter -->
+        <select
+          [(ngModel)]="selectedOS"
+          (change)="onOSChange()"
+          class="filter-dropdown"
+        >
+          <option value="" disabled selected>Operating System</option>
+          <option *ngFor="let option of osOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+
+        <button
+          *ngIf="searchTerm || selectedMethod || selectedOS"
+          pButton
+          label="Clear"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-sm"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="audits"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} audits"
+      styleClass="data-table"
+      (onLazyLoad)="loadAudits($event)"
+      [tableStyle]="{ 'min-width': '60rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Timestamp</th>
+          <th>Method</th>
+          <th>Request URL</th>
+          <th>Description</th>
+          <th>IP Address</th>
+          <th>Operating System</th>
+          <th>Username</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-audit>
+        <tr class="clickable-row" (click)="viewAuditDetails(audit)">
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ audit.createdOn | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ audit.createdOn | date : 'HH:mm:ss' }}</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-method badge-' + getMethodClass(audit.method)">
+              <i [class]="'pi ' + getMethodIcon(audit.method)"></i>
+              {{ audit.method }}
+            </span>
+          </td>
+          <td>
+            <div class="url-cell">
+              <i class="pi pi-link"></i>
+              <span class="url-text">{{ audit.requestUrl }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="description-cell">
+              <span class="description-text">{{ audit.description }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="ip-cell">
+              <i class="pi pi-globe"></i>
+              <span class="ip-text">{{ audit.ipAddress }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="os-cell">
+              <i [class]="'pi ' + getOSIcon(audit.operatingSystem)"></i>
+              <span>{{ audit.operatingSystem }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="user-cell">
+              <i class="pi pi-user"></i>
+              <span class="username-text">{{ audit.username }}</span>
+            </div>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewAuditDetails(audit); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-list"></i>
+              <h3>No Audit Logs Found</h3>
+              <p *ngIf="searchTerm || selectedMethod || selectedOS">
+                Try adjusting your filters or date range
+              </p>
+              <p *ngIf="!searchTerm && !selectedMethod && !selectedOS">
+                No audit logs available for this user
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= AUDIT DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '1000px' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon">
+            <i class="pi pi-file-edit"></i>
+          </div>
+          <div class="dialog-title-section">
+            <h2>Audit Log Details</h2>
+            <div class="dialog-badges">
+              <span
+                *ngIf="selectedAudit"
+                [class]="'badge badge-method badge-' + getMethodClass(selectedAudit.method)"
+              >
+                <i [class]="'pi ' + getMethodIcon(selectedAudit.method)"></i>
+                {{ selectedAudit.method }}
+              </span>
+              <span class="badge badge-info" *ngIf="selectedAudit">
+                <i [class]="'pi ' + getOSIcon(selectedAudit.operatingSystem)"></i>
+                {{ selectedAudit.operatingSystem }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedAudit">
+      <!-- Audit Info Card -->
+      <div class="audit-info-card">
+        <div class="info-row">
+          <div class="info-item">
+            <i class="pi pi-calendar"></i>
+            <span class="info-label">Timestamp:</span>
+            <span class="info-value">{{ selectedAudit.createdOn | date : 'dd MMM yyyy, HH:mm:ss' }}</span>
+          </div>
+          <div class="info-item">
+            <i class="pi pi-user"></i>
+            <span class="info-label">Username:</span>
+            <span class="info-value">{{ selectedAudit.username }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <i class="pi pi-globe"></i>
+            <span class="info-label">IP Address:</span>
+            <span class="info-value">{{ selectedAudit.ipAddress }}</span>
+          </div>
+          <div class="info-item">
+            <i class="pi pi-desktop"></i>
+            <span class="info-label">OS:</span>
+            <span class="info-value">{{ selectedAudit.operatingSystem }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Request Information</h4>
+
+            <div class="detail-item">
+              <label>Audit ID</label>
+              <span class="value">{{ selectedAudit.id }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>HTTP Method</label>
+              <span [class]="'value badge badge-method badge-' + getMethodClass(selectedAudit.method)">
+                <i [class]="'pi ' + getMethodIcon(selectedAudit.method)"></i>
+                {{ selectedAudit.method }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Request URL</label>
+              <div class="url-display">
+                <span class="value code-value url-value">{{ selectedAudit.requestUrl }}</span>
+                <button
+                  pButton
+                  icon="pi pi-copy"
+                  class="p-button-text p-button-sm copy-btn"
+                  pTooltip="Copy URL"
+                  (click)="copyToClipboard(selectedAudit.requestUrl)"
+                ></button>
+              </div>
+            </div>
+
+            <div class="detail-item">
+              <label>Description</label>
+              <span class="value">{{ selectedAudit.description }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created By</label>
+              <span class="value">{{ selectedAudit.createBy || 'N/A' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Last Modified</label>
+              <span class="value">
+                {{ selectedAudit.lastModifiedDate ? (selectedAudit.lastModifiedDate | date : 'dd MMM yyyy, HH:mm:ss') : 'N/A' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Modified By</label>
+              <span class="value">{{ selectedAudit.modifiedBy || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Request Body</h4>
+
+            <div class="request-body-container">
+              <div class="request-body-header">
+                <span class="body-label">
+                  <i class="pi pi-code"></i>
+                  JSON Payload
+                </span>
+                <button
+                  pButton
+                  icon="pi pi-copy"
+                  label="Copy"
+                  class="p-button-text p-button-sm"
+                  pTooltip="Copy request body"
+                  (click)="copyToClipboard(selectedAudit.requestBody)"
+                ></button>
+              </div>
+              <pre class="request-body-content">{{ formatRequestBody(selectedAudit.requestBody) }}</pre>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4 class="section-title">Additional Information</h4>
+
+            <div class="detail-item">
+              <label>Soft Delete</label>
+              <span [class]="'value badge badge-' + (selectedAudit.softDelete ? 'inactive' : 'active')">
+                <i [class]="selectedAudit.softDelete ? 'pi pi-trash' : 'pi pi-check'"></i>
+                {{ selectedAudit.softDelete ? 'Yes' : 'No' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created Flag</label>
+              <span [class]="'value badge badge-' + (selectedAudit.created ? 'active' : 'inactive')">
+                <i [class]="selectedAudit.created ? 'pi pi-check' : 'pi pi-times'"></i>
+                {{ selectedAudit.created ? 'Yes' : 'No' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -1,219 +1,284 @@
-/* ===== FILTER ITEM DATE PICKER STYLES ===== */
+/* ===== STANDARDIZED DATE PICKER STYLES ===== */
+/* Primary Blue: #0e2c5a, Secondary Red: #c82333 */
 
-/* Filter Item Container */
+:root {
+  --primary-color: #0e2c5a;
+  --primary-color-dark: #093170;
+  --primary-hover: #c82333;
+  --secondary-color: #c82333;
+  --secondary-color-dark: #7f0000;
+}
+
+/* ===== FILTER ITEM CONTAINER ===== */
 .filter-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   min-width: 280px;
+  text-align: left;
 }
 
-/* Filter Label */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 280px;
+  text-align: left;
+}
+
+/* ===== FILTER LABEL (Standardized) ===== */
 .filter-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--primary-color);
   margin-bottom: 0.25rem;
   display: block;
+
+  width: 100%;
+  text-align: left;
 }
 
-/* ===== MODERN DATE RANGE FIELD ===== */
+/* ===== STANDARDIZED DATE RANGE FIELD ===== */
 
-/* Main Form Field */
-::ng-deep .date-range-field.mat-mdc-form-field {
+/* Main Form Field - Works for all appearances */
+::ng-deep .date-range-field.mat-mdc-form-field,
+::ng-deep .filter-field.mat-mdc-form-field,
+::ng-deep .white-bg.mat-mdc-form-field {
   width: 100%;
 }
 
 /* Outline Container */
-::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+::ng-deep .filter-field .mat-mdc-text-field-wrapper,
+::ng-deep .white-bg .mat-mdc-text-field-wrapper {
   background: #ffffff;
   border-radius: 10px;
   transition: all 0.3s ease;
   padding: 0;
 }
 
-::ng-deep .date-range-field .mdc-notched-outline {
+::ng-deep .date-range-field .mdc-notched-outline,
+::ng-deep .filter-field .mdc-notched-outline,
+::ng-deep .white-bg .mdc-notched-outline {
   border-color: #dee2e6;
   border-width: 2px;
   border-radius: 10px;
   transition: all 0.3s ease;
 }
 
-/* Hover State */
+/* Hover State - Primary Blue */
 ::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__leading,
 ::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__notch,
-::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__trailing {
-  border-color: #adb5bd;
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--primary-color);
 }
 
-/* Focus State */
+/* Focus State - Secondary Red */
 ::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
 ::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
-::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
-  border-color: #dc3545 !important;
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--secondary-color) !important;
   border-width: 2px !important;
 }
 
-/* Remove default outline colors */
+/* Default outline colors */
 ::ng-deep .date-range-field .mdc-notched-outline__leading,
 ::ng-deep .date-range-field .mdc-notched-outline__notch,
-::ng-deep .date-range-field .mdc-notched-outline__trailing {
+::ng-deep .date-range-field .mdc-notched-outline__trailing,
+::ng-deep .filter-field .mdc-notched-outline__leading,
+::ng-deep .filter-field .mdc-notched-outline__notch,
+::ng-deep .filter-field .mdc-notched-outline__trailing,
+::ng-deep .white-bg .mdc-notched-outline__leading,
+::ng-deep .white-bg .mdc-notched-outline__notch,
+::ng-deep .white-bg .mdc-notched-outline__trailing {
   border-color: #dee2e6;
   transition: border-color 0.3s ease;
 }
 
 /* Input Container */
-::ng-deep .date-range-field .mat-mdc-form-field-infix {
+::ng-deep .date-range-field .mat-mdc-form-field-infix,
+::ng-deep .filter-field .mat-mdc-form-field-infix,
+::ng-deep .white-bg .mat-mdc-form-field-infix {
   padding: 0.875rem 0;
   min-height: auto;
 }
 
 /* Input Fields */
-::ng-deep .date-range-field .mat-mdc-input-element {
-  color: #2c3e50;
+::ng-deep .date-range-field .mat-mdc-input-element,
+::ng-deep .filter-field .mat-mdc-input-element,
+::ng-deep .white-bg .mat-mdc-input-element {
+  color: var(--primary-color);
   font-size: 0.9rem;
   font-weight: 500;
   padding: 0.5rem 0.75rem;
 }
 
-::ng-deep .date-range-field .mat-mdc-input-element::placeholder {
+::ng-deep .date-range-field .mat-mdc-input-element::placeholder,
+::ng-deep .filter-field .mat-mdc-input-element::placeholder,
+::ng-deep .white-bg .mat-mdc-input-element::placeholder {
   color: #adb5bd;
   font-weight: 400;
   font-size: 0.85rem;
 }
 
 /* Date Range Separator (dash between dates) */
-::ng-deep .date-range-field .mat-date-range-input-separator {
+::ng-deep .date-range-field .mat-date-range-input-separator,
+::ng-deep .filter-field .mat-date-range-input-separator,
+::ng-deep .white-bg .mat-date-range-input-separator {
   color: #6c757d;
   margin: 0 0.25rem;
   font-weight: 500;
 }
 
-/* Datepicker Toggle Icon */
-::ng-deep .date-range-field .mat-datepicker-toggle {
-  color: #dc3545;
+/* Datepicker Toggle Icon - Secondary Red */
+::ng-deep .date-range-field .mat-datepicker-toggle,
+::ng-deep .filter-field .mat-datepicker-toggle,
+::ng-deep .white-bg .mat-datepicker-toggle {
+  color: var(--secondary-color);
   margin-right: 0.5rem;
 }
 
-::ng-deep .date-range-field .mat-datepicker-toggle-default-icon {
+::ng-deep .date-range-field .mat-datepicker-toggle-default-icon,
+::ng-deep .filter-field .mat-datepicker-toggle-default-icon,
+::ng-deep .white-bg .mat-datepicker-toggle-default-icon {
   width: 1.25rem;
   height: 1.25rem;
 }
 
-::ng-deep .date-range-field .mat-mdc-icon-button {
+::ng-deep .date-range-field .mat-mdc-icon-button,
+::ng-deep .filter-field .mat-mdc-icon-button,
+::ng-deep .white-bg .mat-mdc-icon-button {
   width: 40px;
   height: 40px;
   padding: 8px;
 }
 
-::ng-deep .date-range-field .mat-mdc-icon-button:hover {
-  background: rgba(220, 53, 69, 0.08);
+::ng-deep .date-range-field .mat-mdc-icon-button:hover,
+::ng-deep .filter-field .mat-mdc-icon-button:hover,
+::ng-deep .white-bg .mat-mdc-icon-button:hover {
+  background: rgba(200, 35, 51, 0.08);
   border-radius: 8px;
 }
 
-/* Remove label floating animation since we have external label */
-::ng-deep .date-range-field .mdc-floating-label {
+/* Material Label (for fill appearance) */
+::ng-deep .white-bg .mdc-floating-label {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+::ng-deep .white-bg.mat-focused .mdc-floating-label {
+  color: var(--secondary-color);
+}
+
+/* Hide label for outline appearance (since we use external label) */
+::ng-deep .date-range-field .mdc-floating-label,
+::ng-deep .filter-field .mdc-floating-label {
   display: none;
 }
 
 /* Subscript wrapper (error messages) */
-::ng-deep .date-range-field .mat-mdc-form-field-subscript-wrapper {
+::ng-deep .date-range-field .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .filter-field .mat-mdc-form-field-subscript-wrapper {
   display: none;
 }
 
 /* ===== COMPACT VARIANT ===== */
-::ng-deep .date-picker-compact.date-range-field {
+::ng-deep .date-picker-compact.date-range-field,
+::ng-deep .date-picker-compact.filter-field {
   max-width: 320px;
 }
 
-::ng-deep .date-picker-compact.date-range-field .mat-mdc-input-element {
+::ng-deep .date-picker-compact .mat-mdc-input-element {
   font-size: 0.85rem;
   padding: 0.375rem 0.5rem;
 }
 
-::ng-deep .date-picker-compact.date-range-field .mat-mdc-form-field-infix {
+::ng-deep .date-picker-compact .mat-mdc-form-field-infix {
   padding: 0.75rem 0;
 }
 
 /* ===== FILLED VARIANT (Alternative Style) ===== */
-.filter-item-filled ::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+.filter-item-filled ::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field .mat-mdc-text-field-wrapper {
   background: #f8f9fa;
   border: 2px solid transparent;
   border-radius: 10px;
 }
 
-.filter-item-filled ::ng-deep .date-range-field .mdc-notched-outline {
+.filter-item-filled ::ng-deep .date-range-field .mdc-notched-outline,
+.filter-item-filled ::ng-deep .filter-field .mdc-notched-outline {
   display: none;
 }
 
-.filter-item-filled ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper {
+.filter-item-filled ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field:hover .mat-mdc-text-field-wrapper {
   background: #e9ecef;
-  border-color: #dee2e6;
+  border-color: var(--primary-color);
 }
 
-.filter-item-filled ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper {
+.filter-item-filled ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field.mat-focused .mat-mdc-text-field-wrapper {
   background: #ffffff;
-  border-color: #dc3545;
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(200, 35, 51, 0.1);
 }
 
 /* ===== MODERN GRADIENT VARIANT ===== */
-.filter-item-gradient ::ng-deep .date-range-field .mat-mdc-text-field-wrapper {
+.filter-item-gradient ::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field .mat-mdc-text-field-wrapper {
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   border: 2px solid #e9ecef;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.filter-item-gradient ::ng-deep .date-range-field .mdc-notched-outline {
+.filter-item-gradient ::ng-deep .date-range-field .mdc-notched-outline,
+.filter-item-gradient ::ng-deep .filter-field .mdc-notched-outline {
   display: none;
 }
 
-.filter-item-gradient ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper {
-  border-color: #dc3545;
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+.filter-item-gradient ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field:hover .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color);
+  box-shadow: 0 4px 12px rgba(200, 35, 51, 0.1);
   transform: translateY(-1px);
 }
 
-.filter-item-gradient ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper {
-  border-color: #dc3545;
-  box-shadow: 0 6px 16px rgba(220, 53, 69, 0.15);
+.filter-item-gradient ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color);
+  box-shadow: 0 6px 16px rgba(200, 35, 51, 0.15);
   transform: translateY(-2px);
-}
-
-/* ===== ICON STYLE VARIANT ===== */
-.filter-item-icon {
-  position: relative;
-}
-
-.filter-item-icon::before {
-  content: "📅";
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.25rem;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.filter-item-icon ::ng-deep .date-range-field .mat-mdc-form-field-infix {
-  padding-left: 2.5rem;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
-  .filter-item {
+  .filter-item,
+  .filter-group {
     min-width: 100%;
   }
 
-  ::ng-deep .date-range-field.mat-mdc-form-field {
+  ::ng-deep .date-range-field.mat-mdc-form-field,
+  ::ng-deep .filter-field.mat-mdc-form-field,
+  ::ng-deep .white-bg.mat-mdc-form-field {
     width: 100%;
     max-width: 100%;
   }
 }
 
-/* ===== CALENDAR POPUP STYLES (MATCHING) ===== */
+/* ===== CALENDAR POPUP STYLES ===== */
 
 /* Calendar Container */
 ::ng-deep .mat-datepicker-content {
@@ -228,9 +293,9 @@
   background: #ffffff;
 }
 
-/* Calendar Header */
+/* Calendar Header - Primary Blue Gradient */
 ::ng-deep .mat-calendar-header {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
   color: white;
   padding: 1rem;
   border-radius: 16px 16px 0 0;
@@ -283,21 +348,21 @@
 ::ng-deep .mat-calendar-body-cell-content {
   border-radius: 8px;
   font-weight: 500;
-  color: #2c3e50;
+  color: var(--primary-color);
   border: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
-/* Hover State */
+/* Hover State - Secondary Red */
 ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
-  background: rgba(220, 53, 69, 0.1);
-  border-color: rgba(220, 53, 69, 0.3);
+  background: rgba(200, 35, 51, 0.1);
+  border-color: rgba(200, 35, 51, 0.3);
   transform: scale(1.05);
 }
 
-/* Selected Date */
+/* Selected Date - Secondary Red */
 ::ng-deep .mat-calendar-body-selected {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
   color: white;
   font-weight: 600;
 }
@@ -305,22 +370,22 @@
 /* Date Range */
 ::ng-deep .mat-calendar-body-range-start,
 ::ng-deep .mat-calendar-body-range-end {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
   color: white;
   font-weight: 600;
   border-radius: 8px;
 }
 
 ::ng-deep .mat-calendar-body-in-range::before {
-  background: rgba(220, 53, 69, 0.15);
+  background: rgba(200, 35, 51, 0.15);
   border-radius: 0;
 }
 
-/* Today's Date */
+/* Today's Date - Secondary Red */
 ::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) .mat-calendar-body-cell-content {
-  color: #dc3545;
+  color: var(--secondary-color);
   font-weight: 600;
-  border-color: #dc3545;
+  border-color: var(--secondary-color);
 }
 
 /* Disabled Dates */
@@ -342,4 +407,27 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ===== HEADER ACTIONS SPECIFIC STYLES ===== */
+.header-actions {
+  min-width: 300px;
+}
+
+/* Ensure fill appearance also gets the theme colors */
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-text-field-wrapper {
+  background-color: #ffffff;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill:hover .mat-mdc-text-field-wrapper {
+  background-color: #f8f9fa;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: #ffffff;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-form-field-focus-overlay {
+  background-color: var(--secondary-color);
+  opacity: 0.08;
 }

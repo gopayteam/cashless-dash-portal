@@ -19,12 +19,17 @@ import { ParcelStage } from '../../../../@core/models/parcels/parcel_stage.model
 import { ParcelStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { DialogModule } from 'primeng/dialog';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../../@core/services/auth.service';
 
 @Component({
   standalone: true,
   selector: 'app-parcel-destination-stages',
   templateUrl: './parcel-destination.html',
-  styleUrls: ['./parcel-destination.css'],
+  styleUrls: [
+    './parcel-destination.css',
+    '../../../../styles/modules/_filter_actions.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -40,6 +45,7 @@ import { DialogModule } from 'primeng/dialog';
   ],
 })
 export class ParcelDestinationComponent implements OnInit {
+  entityId: string | null = null;
   stages: ParcelStage[] = [];
 
   // Pagination
@@ -50,15 +56,23 @@ export class ParcelDestinationComponent implements OnInit {
   // Date filter
   dateRange: Date[] = [];
 
-  private readonly ENTITY_ID = 'GS000002';
-
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
+    public authService: AuthService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
   get loading() {
+     const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
     return this.loadingStore.loading;
   }
 
@@ -73,7 +87,7 @@ export class ParcelDestinationComponent implements OnInit {
     const [start, end] = this.dateRange || [];
 
     const params = {
-      entityId: this.ENTITY_ID,
+      entityId: this.entityId,
       page,
       size: event.rows,
       startDate: start ? start.toISOString().split('T')[0] : null,

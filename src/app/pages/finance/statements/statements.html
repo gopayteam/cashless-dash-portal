@@ -1,1 +1,372 @@
-<p>statements works!</p>
+<!-- pages/statements/statements.html -->
+<div class="statements-container">
+  <!-- ================= HEADER WITH DATE FILTER ================= -->
+  <div class="statements-header">
+    <div class="header-content">
+      <h1>Withdrawal Statements</h1>
+      <p class="text-muted">View and analyze all withdrawal transactions</p>
+    </div>
+
+    <div class="header-filters">
+      <div class="filter-item filter-item-gradient">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="date-range-field">
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SUMMARY STATS ================= -->
+  <!-- <div class="stats-grid summary-stats">
+    <div class="stat-content stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-arrow-down"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Credits</span>
+        <span class="stat-value positive">Ksh {{ totalCredits | number : '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="stat-content stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <i class="pi pi-arrow-up"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Debits</span>
+        <span class="stat-value negative">Ksh {{ totalDebits | number : '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="stat-content stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Net Balance</span>
+        <span class="stat-value" [class.positive]="netBalance > 0" [class.negative]="netBalance < 0">
+          Ksh {{ netBalance | number : '1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <div class=" stat-content stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Transactions</span>
+        <span class="stat-value">{{ transactionCount }}</span>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- ================= STATEMENTS TABLE ================= -->
+  <p-card styleClass="card-hover card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Statements List</h3>
+        <span class="record-count">{{ filteredStatements.length }} of {{ totalRecords }} statements</span>
+      </div>
+
+      <div class="table-header-right">
+        <div class="search-container">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search statements..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+              class="search-input"
+            />
+          </span>
+          <button
+            *ngIf="searchTerm"
+            pButton
+            icon="pi pi-times"
+            class="p-button-text p-button-sm clear-button"
+            (click)="clearSearch()"
+            pTooltip="Clear search"
+          ></button>
+        </div>
+
+        <p-select
+          [options]="transactionTypeOptions"
+          [(ngModel)]="selectedTransactionType"
+          (onChange)="onTransactionTypeChange()"
+          placeholder="Transaction Type"
+          styleClass="filter-dropdown"
+        ></p-select>
+
+        <p-select
+          [options]="categoryOptions"
+          [(ngModel)]="selectedCategory"
+          (onChange)="onCategoryChange()"
+          placeholder="Category"
+          styleClass="filter-dropdown"
+        ></p-select>
+
+        <button
+          *ngIf="searchTerm || selectedTransactionType || selectedCategory"
+          pButton
+          label="Clear"
+          icon="pi pi-filter-slash"
+          class="p-button-outlined p-button-sm"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </div>
+
+    <p-table
+      [value]="statements"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [loading]="loading()"
+      [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} statements"
+      styleClass="data-table"
+      (onLazyLoad)="loadStatements($event)"
+      [tableStyle]="{ 'min-width': '60rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Date & Time</th>
+          <th>Receipt Number</th>
+          <th>Category</th>
+          <th>Fleet Source</th>
+          <th>Transaction Type</th>
+          <th>Amount</th>
+          <th>Balance Before</th>
+          <th>Balance After</th>
+          <th>Change</th>
+          <!-- <th>Actions</th> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-statement>
+        <tr class="clickable-row" (click)="viewStatementDetails(statement)">
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ statement.createdOn | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ statement.createdOn | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="receipt-number">{{ statement.mpesaReceiptNumber }}</span>
+          </td>
+          <td>
+            <div class="category-cell">
+              <i [class]="'pi ' + getCategoryIcon(statement.category)"></i>
+              <span>{{ getCategoryDisplayName(statement.category) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="fleet-cell">
+              <i class="pi pi-car"></i>
+              <span>{{ statement.sourceFleet }}</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + getTransactionTypeClass(statement.transactionType)">
+              <i [class]="'pi ' + getTransactionTypeIcon(statement.transactionType)"></i>
+              {{ statement.transactionType }}
+            </span>
+          </td>
+          <td class="amount-cell">
+            <span class="amount" [class]="getTransactionTypeClass(statement.transactionType)">
+              Ksh {{ statement.amount | number : '1.2-2' }}
+            </span>
+          </td>
+          <td class="balance-cell">
+            <span class="balance">Ksh {{ statement.balanceBefore | number : '1.2-2' }}</span>
+          </td>
+          <td class="balance-cell">
+            <span class="balance">Ksh {{ statement.balanceAfter | number : '1.2-2' }}</span>
+          </td>
+          <td>
+            <div class="change-cell" [class]="getBalanceChangeClass(statement)">
+              <i [class]="getBalanceChange(statement) >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+              <span>{{ getBalanceChange(statement) | number : '1.2-2' }}</span>
+            </div>
+          </td>
+          <!-- <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewStatementDetails(statement); $event.stopPropagation()"
+            ></button>
+          </td> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No Statements Found</h3>
+              <p *ngIf="searchTerm || selectedTransactionType || selectedCategory">
+                Try adjusting your filters or date range
+              </p>
+              <p *ngIf="!searchTerm && !selectedTransactionType && !selectedCategory">
+                No withdrawal statements for this period
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= STATEMENT DETAILS DIALOG ================= -->
+  <p-dialog
+    [(visible)]="displayDetailDialog"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon" [class.credit]="selectedStatement?.transactionType === 'CREDIT'" [class.debit]="selectedStatement?.transactionType === 'DEBIT'">
+            <i [class]="'pi ' + getTransactionTypeIcon(selectedStatement?.transactionType || '')"></i>
+          </div>
+          <div class="dialog-title-section">
+            <h2>Transaction Details</h2>
+            <span class="receipt-large">{{ selectedStatement?.mpesaReceiptNumber }}</span>
+          </div>
+          <span
+            *ngIf="selectedStatement"
+            [class]="'badge badge-' + getTransactionTypeClass(selectedStatement.transactionType)"
+          >
+            <i [class]="'pi ' + getTransactionTypeIcon(selectedStatement.transactionType)"></i>
+            {{ selectedStatement.transactionType }}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedStatement">
+      <!-- Amount Section -->
+      <div class="amount-section">
+        <div class="amount-card" [class]="getTransactionTypeClass(selectedStatement.transactionType)">
+          <span class="amount-label">Transaction Amount</span>
+          <span class="amount-value">Ksh {{ selectedStatement.amount | number : '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Balance Change Section -->
+      <div class="balance-change-section">
+        <div class="balance-item">
+          <span class="balance-label">Balance Before</span>
+          <span class="balance-value">Ksh {{ selectedStatement.balanceBefore | number : '1.2-2' }}</span>
+        </div>
+        <div class="balance-arrow" [class]="getBalanceChangeClass(selectedStatement)">
+          <i [class]="getBalanceChange(selectedStatement) >= 0 ? 'pi pi-arrow-right' : 'pi pi-arrow-right'"></i>
+        </div>
+        <div class="balance-item">
+          <span class="balance-label">Balance After</span>
+          <span class="balance-value">Ksh {{ selectedStatement.balanceAfter | number : '1.2-2' }}</span>
+        </div>
+        <div class="balance-change-badge" [class]="getBalanceChangeClass(selectedStatement)">
+          <i [class]="getBalanceChange(selectedStatement) >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+          <span>{{ getBalanceChange(selectedStatement) | number : '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Receipt Number</label>
+            <span class="value code-value">{{ selectedStatement.mpesaReceiptNumber }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Transaction Date</label>
+            <span class="value">
+              {{ selectedStatement.createdOn | date : 'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Category</label>
+            <span class="value category-highlight">
+              <i [class]="'pi ' + getCategoryIcon(selectedStatement.category)"></i>
+              {{ getCategoryDisplayName(selectedStatement.category) }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Fleet Source</label>
+            <span class="value fleet-highlight">
+              <i class="pi pi-car"></i>
+              {{ selectedStatement.sourceFleet }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Wallet ID</label>
+            <span class="value code-value">{{ selectedStatement.walletId }}</span>
+          </div>
+
+          <div class="detail-item">
+            <label>Transaction Type</label>
+            <span [class]="'value badge badge-' + getTransactionTypeClass(selectedStatement.transactionType)">
+              <i [class]="'pi ' + getTransactionTypeIcon(selectedStatement.transactionType)"></i>
+              {{ selectedStatement.transactionType }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Amount</label>
+            <span class="value amount-highlight" [class]="getTransactionTypeClass(selectedStatement.transactionType)">
+              Ksh {{ selectedStatement.amount | number : '1.2-2' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <label>Balance Change</label>
+            <span class="value balance-change-value" [class]="getBalanceChangeClass(selectedStatement)">
+              <i [class]="getBalanceChange(selectedStatement) >= 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+              {{ getBalanceChange(selectedStatement) | number : '1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -145,7 +145,7 @@
   display: inline-block;
 }
 
-.p-input-icon-left > i {
+.p-input-icon-left>i {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -455,4 +455,39 @@
 ::ng-deep .parcel-detail-dialog .p-dialog-footer {
   padding: 1rem 2rem;
   border-top: 1px solid var(--border-color);
+}
+
+
+
+/* ====================== PrimeNG Overrides ====================== */
+
+/* Dropdown panel background (PrimeNG) */
+::ng-deep .p-dropdown-panel {
+  background-color: white !important;
+}
+
+/* Dropdown items background */
+::ng-deep .p-dropdown-item {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* ====================== Angular Material Overrides ====================== */
+
+/* mat-select dropdown panel */
+::ng-deep .mat-select-panel {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* mat-option items */
+::ng-deep .mat-option {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Optional: Hover effect */
+::ng-deep .mat-option:hover,
+::ng-deep .p-dropdown-item:hover {
+  background-color: #f0f0f0 !important;
 }
