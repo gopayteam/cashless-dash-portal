@@ -1,0 +1,18 @@
+# This Docker Compose file is set up for the Angular frontend application.
+# A production application typically consists of at least a frontend and a backend,
+# with the backend connecting to a database.
+
+# To add a backend and a database to this setup, you would:
+# 1. Create a Dockerfile for your backend application.
+# 2. Add a service for your backend in this file, similar to the 'frontend' service.
+# 3. Add a service for your database (e.g., postgres, mysql, mongodb).
+# 4. Configure the backend service to connect to the database service.
+# 5. Configure the frontend to communicate with the backend service.
+
+services:
+  frontend:
+    build: .
+    container_name: prime-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped

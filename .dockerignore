@@ -1,0 +1,30 @@
+# Node modules
+node_modules
+
+# Git
+.git
+.gitignore
+
+# Angular cache
+.angular
+
+# Build output
+dist
+
+# IDE
+.idea
+.vscode
+
+# Local environment files
+.env
+
+# Logs
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
+nginx.conf
