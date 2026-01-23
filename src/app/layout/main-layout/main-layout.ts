@@ -145,7 +145,7 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Admins', icon: 'pi pi-shield', route: '/users/admins', roles: ['CAN_VIEW_ADMINS'] },
       { label: 'Drivers', icon: 'pi pi-user', route: '/users/drivers', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
       { label: 'Conductors', icon: 'pi pi-user', route: '/users/conductors', roles: ['CAN_VIEW_TOUTS'] },
-      { label: 'Customers', icon: 'pi pi-shopping-cart', route: '/users/customers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
+      { label: 'Passangers', icon: 'pi pi-shopping-cart', route: '/users/customers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
       { label: 'Investors', icon: 'pi pi-money-bill', route: '/users/investors', roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] },
       { label: 'Marshals', icon: 'pi pi-flag', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
       { label: 'Deactivated', icon: 'pi pi-ban', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
@@ -201,7 +201,7 @@ export class MainLayoutComponent implements OnInit {
      ROLE-BASED ACCESS HELPERS
   ============================================= */
   hasTransactionAccess(): boolean {
-    return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONS', 'CAN_ADD', 'CAN_EDIT']);
+    return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONSR', 'CAN_ADDR', 'CAN_EDITR']);
   }
 
   hasParcelAccess(): boolean {
