@@ -1,5 +1,5 @@
 /* ============================================================
-   GOPAY SIGN IN STYLES - PASSWORD TOGGLE FIXED
+   GOPAY SIGN IN STYLES - ENHANCED PASSWORD TOGGLE & TOAST
    ============================================================ */
 
 /* Auth container with background */
@@ -159,56 +159,117 @@
   border-color: var(--danger-color);
 }
 
-/* Password field wrapper - CRITICAL FIX */
-::ng-deep .form-field .p-password {
-  width: 100%;
-  display: block;
-  position: relative;
+/* ============================================================
+   PASSWORD FIELD - ENHANCED TOGGLE INSIDE INPUT
+   ============================================================ */
+
+/* Password field wrapper - OVERRIDE FORM MODULE */
+::ng-deep .auth-card .form-field .p-password,
+::ng-deep .auth-container .form-field .p-password {
+  width: 100% !important;
+  display: block !important;
+  position: relative !important;
+}
+
+/* Remove any flex positioning that might push the button out */
+::ng-deep .auth-card .form-field .p-password>span,
+::ng-deep .auth-container .form-field .p-password>span {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
 }
 
 /* Password input - Add padding for the icon on the right */
-::ng-deep .form-field .p-password input.p-inputtext {
-  width: 100%;
-  padding-right: 2.75rem !important;  /* Space for toggle icon */
+::ng-deep .auth-card .form-field .p-password input.p-inputtext,
+::ng-deep .auth-container .form-field .p-password input.p-inputtext {
+  width: 100% !important;
+  padding-right: 3rem !important;
+  /* Space for toggle icon */
   padding-left: 1rem !important;
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  transition: all var(--transition) !important;
 }
 
-/* Password toggle button - Position INSIDE the input field */
-::ng-deep .form-field .p-password > button.p-password-toggle {
+/* Password input focus state */
+::ng-deep .auth-card .form-field .p-password input.p-inputtext:focus,
+::ng-deep .auth-container .form-field .p-password input.p-inputtext:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15) !important;
+}
+
+/* Password toggle button - Position INSIDE the input field - CRITICAL */
+::ng-deep .auth-card .form-field .p-password button.p-password-toggle,
+::ng-deep .auth-container .form-field .p-password button.p-password-toggle,
+::ng-deep .auth-card .form-field .p-password .p-password-toggle-icon,
+::ng-deep .auth-container .form-field .p-password .p-password-toggle-icon {
   position: absolute !important;
-  right: 0.5rem !important;           /* Distance from right edge of input */
+  right: 0.75rem !important;
+  /* Distance from right edge */
   top: 50% !important;
   transform: translateY(-50%) !important;
-  width: 2rem;
-  height: 2rem;
-  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0.375rem !important;
   margin: 0 !important;
   border: none !important;
   background: transparent !important;
   color: var(--medium-text) !important;
-  cursor: pointer;
-  z-index: 10;
+  cursor: pointer !important;
+  z-index: 10 !important;
   display: flex !important;
-  align-items: center;
-  justify-content: center;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
 }
 
-::ng-deep .form-field .p-password > button.p-password-toggle:hover {
-  background: transparent !important;
+/* Hover state - subtle highlight */
+::ng-deep .auth-card .form-field .p-password button.p-password-toggle:hover,
+::ng-deep .auth-container .form-field .p-password button.p-password-toggle:hover {
+  background: rgba(14, 44, 90, 0.08) !important;
   color: var(--primary-color) !important;
 }
 
-::ng-deep .form-field .p-password > button.p-password-toggle:focus {
-  outline: none !important;
+/* Focus state - remove default outline */
+::ng-deep .auth-card .form-field .p-password button.p-password-toggle:focus,
+::ng-deep .auth-container .form-field .p-password button.p-password-toggle:focus,
+::ng-deep .auth-card .form-field .p-password button.p-password-toggle:focus-visible,
+::ng-deep .auth-container .form-field .p-password button.p-password-toggle:focus-visible {
+  outline: 2px solid var(--primary-color) !important;
+  outline-offset: 2px !important;
   box-shadow: none !important;
-  background: transparent !important;
+  background: rgba(14, 44, 90, 0.08) !important;
+}
+
+/* Active state */
+::ng-deep .auth-card .form-field .p-password button.p-password-toggle:active,
+::ng-deep .auth-container .form-field .p-password button.p-password-toggle:active {
+  transform: translateY(-50%) scale(0.95) !important;
 }
 
 /* Toggle icon styling */
-::ng-deep .form-field .p-password .p-icon {
-  font-size: 1.1rem;
-  color: inherit;
+::ng-deep .auth-card .form-field .p-password .p-icon,
+::ng-deep .auth-container .form-field .p-password .p-icon,
+::ng-deep .auth-card .form-field .p-password .p-password-toggle-icon,
+::ng-deep .auth-container .form-field .p-password .p-password-toggle-icon {
+  font-size: 1.1rem !important;
+  color: inherit !important;
+  width: 1.1rem !important;
+  height: 1.1rem !important;
 }
+
+/* Ensure the icon SVG is properly centered */
+::ng-deep .auth-card .form-field .p-password .p-password-toggle-icon>svg,
+::ng-deep .auth-container .form-field .p-password .p-password-toggle-icon>svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* ============================================================ */
 
 /* Error messages */
 .p-error {
@@ -241,6 +302,10 @@
   text-decoration: underline;
 }
 
+.forgot-password-link i {
+  font-size: 0.875rem;
+}
+
 /* Form actions */
 .form-actions {
   display: block;
@@ -271,6 +336,15 @@
   transform: translateY(0);
 }
 
+::ng-deep .primary-button.p-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
+}
+
+/* Loading state for button */
+::ng-deep .primary-button.p-button .p-button-loading-icon {
+  margin-right: 0.5rem;
+}
+
 /* Auth footer - Inside Card */
 .auth-footer {
   text-align: center;
@@ -297,6 +371,15 @@
 .auth-link:hover {
   color: var(--primary-color-dark);
   text-decoration: underline;
+}
+
+.auth-link i {
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.auth-link:hover i {
+  transform: translateX(3px);
 }
 
 /* Powered by footer - Inside Card */
@@ -327,26 +410,191 @@
   color: var(--primary-color);
 }
 
-/* Toast customization */
+/* ============================================================
+   ENHANCED TOAST NOTIFICATIONS
+   ============================================================ */
+
+/* Toast container positioning */
+::ng-deep .p-toast {
+  opacity: 1;
+  z-index: 9999;
+}
+
+/* Toast message container */
 ::ng-deep .p-toast .p-toast-message {
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
+  margin: 0 0 1rem 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  backdrop-filter: blur(10px);
+  animation: slideInRight 0.3s ease-out;
+  overflow: hidden;
+  min-width: 320px;
+  max-width: 400px;
 }
 
+/* Toast message wrapper with padding */
+::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+/* Toast icon container */
+::ng-deep .p-toast .p-toast-message .p-toast-message-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* Toast text container */
+::ng-deep .p-toast .p-toast-message .p-toast-message-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Toast summary (title) */
+::ng-deep .p-toast .p-toast-message .p-toast-summary {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Toast detail (description) */
+::ng-deep .p-toast .p-toast-message .p-toast-detail {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.95;
+}
+
+/* Close button */
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close .p-icon {
+  font-size: 1rem;
+}
+
+/* Success Toast */
 ::ng-deep .p-toast .p-toast-message.p-toast-message-success {
-  background: var(--success-color);
-  border: none;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: var(--white);
+  border-left: 4px solid #34d399;
 }
 
+::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-icon-close {
+  color: var(--white);
+}
+
+/* Error Toast */
 ::ng-deep .p-toast .p-toast-message.p-toast-message-error {
-  background: var(--danger-color);
-  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: var(--white);
+  border-left: 4px solid #f87171;
 }
 
-::ng-deep .p-toast .p-toast-message.p-toast-message-info {
-  background: var(--info-color);
-  border: none;
+::ng-deep .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-error .p-toast-icon-close {
+  color: var(--white);
 }
+
+/* Info Toast */
+::ng-deep .p-toast .p-toast-message.p-toast-message-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: var(--white);
+  border-left: 4px solid #60a5fa;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close {
+  color: var(--white);
+}
+
+/* Warning Toast */
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: var(--white);
+  border-left: 4px solid #fbbf24;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn .p-toast-icon-close {
+  color: var(--white);
+}
+
+/* Toast animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toast exit animation */
+::ng-deep .p-toast .p-toast-message.p-toast-message-leave {
+  animation: slideOutRight 0.3s ease-in;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Progress bar at bottom of toast */
+::ng-deep .p-toast .p-toast-message::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  animation: toastProgress 4s linear;
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+/* ============================================================ */
 
 /* Animations */
 @keyframes fadeInUp {
@@ -354,6 +602,7 @@
     opacity: 0;
     transform: translateY(30px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -390,6 +639,17 @@
   ::ng-deep .auth-card .p-card-body {
     padding: 2.5rem 2rem;
   }
+
+  /* Responsive toast */
+  ::ng-deep .p-toast .p-toast-message {
+    min-width: 280px;
+    max-width: calc(100vw - 2rem);
+    margin: 0 0 0.75rem 0;
+  }
+
+  ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+    padding: 0.875rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -403,5 +663,16 @@
 
   .auth-header h2 {
     font-size: 1.25rem;
+  }
+
+  /* Mobile toast adjustments */
+  ::ng-deep .p-toast {
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+  ::ng-deep .p-toast .p-toast-message {
+    min-width: unset;
+    width: 100%;
   }
 }

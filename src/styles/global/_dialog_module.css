@@ -4,11 +4,9 @@
 /* ================= DIALOG HEADER STYLING ================= */
 /* These styles target overlay elements and MUST be global and specific. */
 body .p-dialog.custom-dialog .p-dialog-header {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color-dark) 0%,
-    var(--secondary-color) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color-dark) 0%,
+      var(--secondary-color) 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;
@@ -20,29 +18,77 @@ body .p-dialog.custom-dialog .p-dialog-header .p-dialog-title {
   font-weight: 600;
 }
 
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
+/* ================= CLOSE BUTTON - CLEAN X ICON ================= */
+/* Remove all backgrounds and borders from close button */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: white !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0.25rem !important;
 }
 
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+/* Hover state - subtle background */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:hover,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 4px !important;
 }
 
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus {
-  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.3);
+/* Focus state - accessibility */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus-visible,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+}
+
+/* Active/pressed state */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:active,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:active {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: scale(0.95);
+}
+
+/* Icon itself - ensure proper sizing */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon i,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon svg,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button i,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button svg {
+  color: white !important;
+  font-size: 1.25rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
 }
 
 /* ================= DIALOG CONTENT STYLING ================= */
 body .p-dialog.custom-dialog .p-dialog-content {
   padding: 2rem;
-  background: #f9f9f9;
+  background: white !important;
+  color: #2c3e50;
 }
 
 /* ================= DIALOG FOOTER STYLING ================= */
 body .p-dialog.custom-dialog .p-dialog-footer {
   padding: 1rem 2rem;
   border-top: 1px solid #e2e8f0;
-  background: white;
+  background: white !important;
+}
+
+/* ================= DIALOG CONTAINER ================= */
+body .p-dialog.custom-dialog {
+  background: white !important;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 /* ================= DIALOG HEADER COMPONENTS (used inside dialog) ================= */
@@ -411,65 +457,3 @@ body .p-dialog.dialog-info .p-dialog-header {
     font-size: 2rem;
   }
 }
-
-/* ================= FIX CLOSE ICON BACKGROUND ================= */
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon {
-  background: transparent !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-}
-
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
-  border-radius: 6px;
-}
-
-/* ================= DIALOG BACKGROUND ================= */
-
-/* Dialog container */
-body .p-dialog.custom-dialog {
-  background: white !important;
-}
-
-/* Dialog content */
-body .p-dialog.custom-dialog .p-dialog-content {
-  background: white !important;
-  color: #2c3e50;
-}
-
-/* Dialog footer */
-body .p-dialog.custom-dialog .p-dialog-footer {
-  background: white !important;
-  border-top: 1px solid #e2e8f0;
-}
-
-
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: white !important; /* icon color */
-}
-
-
-body .p-dialog.custom-dialog
-.p-dialog-header
-.p-dialog-header-icon:hover {
-  background: transparent !important;
-  opacity: 0.85;
-}
-
-
-body .p-dialog.custom-dialog
-.p-dialog-header
-.p-dialog-header-icon:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-

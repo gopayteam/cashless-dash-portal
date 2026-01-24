@@ -275,7 +275,8 @@
   font-weight: 600;
   color: #667eea;
   font-size: 1rem;
-  background-color: #f0f3ff;
+  /* background-color: #f0f3ff; */
+  background-color: white;
   padding: 0.35rem 0.7rem;
   border-radius: 6px;
   display: inline-block;

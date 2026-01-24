@@ -201,7 +201,7 @@ export class MainLayoutComponent implements OnInit {
      ROLE-BASED ACCESS HELPERS
   ============================================= */
   hasTransactionAccess(): boolean {
-    return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONSR', 'CAN_ADDR', 'CAN_EDITR']);
+    return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONS', 'CAN_ADD', 'CAN_EDIT']);
   }
 
   hasParcelAccess(): boolean {

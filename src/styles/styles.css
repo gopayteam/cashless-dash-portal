@@ -21,6 +21,7 @@
 @import './global/_dialog_module.css';
 @import './global/_paginator.css';
 @import './global/_tab_menu.css';
+@import './global/_toast.css';
 
 /* Import layout styles */
 @import './layout/_topbar.css';

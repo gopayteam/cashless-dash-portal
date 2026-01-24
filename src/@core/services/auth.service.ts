@@ -34,7 +34,7 @@ export class AuthService {
   constructor(
     private api: ApiService,
     private router: Router
-  ) {}
+  ) { }
 
   /* =======================
      AUTH ACTIONS
@@ -42,14 +42,26 @@ export class AuthService {
 
   /**
    * Sign in user
+   * FIXED: Now properly handles API status codes
    */
   signIn(payload: LoginRequest): Observable<AuthResponse> {
     return this.api
       .post<AuthResponse>(API_ENDPOINTS.AUTH_LOGIN, payload)
       .pipe(
         tap(res => {
+          // SUCCESS: status === 0 means login successful
           if (res.status === 0 && res.data) {
             this.setSession(res.data);
+          }
+          // FAILURE: status !== 0 means login failed
+          else {
+            // Throw error to trigger the error handler
+            throw {
+              error: {
+                message: res.message || 'Invalid login credentials',
+                status: res.status
+              }
+            };
           }
         }),
         catchError(err => {
@@ -61,12 +73,23 @@ export class AuthService {
 
   /**
    * Sign up new user
+   * FIXED: Now properly handles API status codes
    */
   signUp(userData: SignUpRequest): Observable<AuthResponse> {
     return this.api.post<AuthResponse>(API_ENDPOINTS.REGISTER, userData).pipe(
       tap(response => {
+        // SUCCESS: status === 0 means registration successful
         if (response.status === 0 && response.data) {
           this.setSession(response.data);
+        }
+        // FAILURE: status !== 0 means registration failed
+        else {
+          throw {
+            error: {
+              message: response.message || 'Registration failed',
+              status: response.status
+            }
+          };
         }
       }),
       catchError(error => {
@@ -87,9 +110,9 @@ export class AuthService {
      SESSION MANAGEMENT
   ======================= */
 
-   /**
-   * Set authentication session
-   */
+  /**
+  * Set authentication session
+  */
   private setSession(user: AuthUser): void {
     localStorage.setItem(this.TOKEN_KEY, user.token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
@@ -148,6 +171,13 @@ export class AuthService {
       tap(response => {
         if (response.status === 0 && response.data) {
           this.setSession(response.data);
+        } else {
+          throw {
+            error: {
+              message: response.message || 'Token refresh failed',
+              status: response.status
+            }
+          };
         }
       })
     );

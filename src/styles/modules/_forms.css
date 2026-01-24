@@ -105,6 +105,70 @@
 }
 
 /* ===========================
+   PASSWORD FIELD - FIXED FOR TOGGLE INSIDE
+   =========================== */
+
+/* Password wrapper - ensure it's block and full width */
+::ng-deep .form-field .p-password {
+  width: 100%;
+  display: block;
+  position: relative;
+}
+
+/* Password input wrapper - CRITICAL: Must be relative positioned */
+::ng-deep .form-field .p-password>span {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+/* Password input field - add right padding for toggle button */
+::ng-deep .form-field .p-password input.p-inputtext {
+  width: 100%;
+  padding-right: 2.75rem;
+  /* Space for the toggle button */
+}
+
+/* Password toggle button - position absolute inside the input */
+::ng-deep .form-field .p-password button.p-password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  height: auto;
+  padding: 0.25rem;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--medium-text);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+::ng-deep .form-field .p-password button.p-password-toggle:hover {
+  background: rgba(14, 44, 90, 0.08);
+  color: var(--primary-color);
+}
+
+::ng-deep .form-field .p-password button.p-password-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+::ng-deep .form-field .p-password .p-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ===========================
    Select (p-select) Styles - Replaces p-dropdown
    =========================== */
 ::ng-deep .p-select {
@@ -573,12 +637,10 @@
 }
 
 ::ng-deep .p-calendar .p-inputtext {
-  /* padding-right: 2.5rem; */
   background: var(--white);
 }
 
 ::ng-deep .p-calendar .p-datepicker-trigger {
-  /* width: 2.5rem; */
   color: var(--medium-text);
   transition: color 0.2s ease;
 }

@@ -32,7 +32,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
     MatFormFieldModule
 ],
   templateUrl: './signup.html',
-  styleUrls: ['./signup.css']
+  styleUrls: ['./signup.css', '../../../../styles/global/_toast.css']
 })
 export class SignUpComponent implements OnInit {
   signUpForm!: FormGroup;

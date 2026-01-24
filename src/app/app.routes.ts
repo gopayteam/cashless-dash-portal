@@ -49,7 +49,7 @@ import { AllInactiveDriverAssignmentsComponent } from './pages/driver-assignment
 import { DriverUserComponent } from './pages/users/driver/driver';
 import { UserAudits } from './pages/audits/user-audits/user-audits';
 import { SystemAudits } from './pages/audits/system-audits/system-audits';
-import { DeletedParcels } from './pages/parcels/deleted-parcels/deleted-parcels';
+import { DeletedParcelsComponent } from './pages/parcels/deleted-parcels/deleted-parcels';
 import { SignInComponent } from './pages/auth/signin/signin';
 import { SignUpComponent } from './pages/auth/signup/signup';
 import { AuthGuard } from '../@core/services/auth.guard';
@@ -89,359 +89,359 @@ export const routes: Routes = [
     children: [
 
       /* Dashboard */
-      { 
-        path: 'dashboard/home', 
+      {
+        path: 'dashboard/home',
         component: DashboardComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD'] }
       },
-      { 
-        path: 'dashboard/stats', 
+      {
+        path: 'dashboard/stats',
         component: StatsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD'] }
       },
-      { 
-        path: 'dashboard/reports', 
+      {
+        path: 'dashboard/reports',
         component: ReportsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD'] }
       },
 
       /* Transactions */
-      { 
-        path: 'transactions/all', 
+      {
+        path: 'transactions/all',
         component: AllTransactionsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'transactions/failed', 
+      {
+        path: 'transactions/failed',
         component: FailedTransactionsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'transactions/pending', 
+      {
+        path: 'transactions/pending',
         component: PendingTransactionsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
 
       /* Payments */
-      { 
-        path: 'deposits/all', 
+      {
+        path: 'deposits/all',
         component: DebitTransactionsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'withdrawals/all', 
+      {
+        path: 'withdrawals/all',
         component: CreditTransactionsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'transfer-payment/1', 
+      {
+        path: 'transfer-payment/1',
         component: CreditDriverComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
       },
-      { 
-        path: 'transfer-payment/2', 
+      {
+        path: 'transfer-payment/2',
         component: FundReassignmentComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
       },
 
       /* Parcels */
-      { 
-        path: 'parcels/all', 
+      {
+        path: 'parcels/all',
         component: ParcelsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS'] }
       },
-      { 
-        path: 'parcel-managers', 
+      {
+        path: 'parcel-managers',
         component: ParcelManagersComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS'] }
       },
-      { 
-        path: 'parcel-offices/parcel-source', 
+      {
+        path: 'parcel-offices/parcel-source',
         component: ParcelSourceComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS'] }
       },
-      { 
-        path: 'parcel-offices/parcel-destination', 
+      {
+        path: 'parcel-offices/parcel-destination',
         component: ParcelDestinationComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS'] }
       },
-      { 
-        path: 'deleted-parcels', 
-        component: DeletedParcels,
+      {
+        path: 'deleted-parcels',
+        component: DeletedParcelsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS', 'CAN_DELETE'] }
       },
 
       /* Drivers */
-      { 
-        path: 'drivers/all', 
+      {
+        path: 'drivers/all',
         component: AllDriversComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
       },
-      { 
-        path: 'drivers/active', 
+      {
+        path: 'drivers/active',
         component: ActiveDriversComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
       },
-      { 
-        path: 'drivers/inactive', 
+      {
+        path: 'drivers/inactive',
         component: InactiveDriversComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
       },
 
       /* Driver assignments */
-      { 
-        path: 'driver-assignments/all', 
+      {
+        path: 'driver-assignments/all',
         component: AllDriverAssignmentsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] }
       },
-      { 
-        path: 'driver-assignments/active', 
+      {
+        path: 'driver-assignments/active',
         component: AllActiveDriverAssignmentsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] }
       },
-      { 
-        path: 'driver-assignments/inactive', 
+      {
+        path: 'driver-assignments/inactive',
         component: AllInactiveDriverAssignmentsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] }
       },
-      { 
-        path: 'driver-assignments/rejected', 
+      {
+        path: 'driver-assignments/rejected',
         component: AllRejectedDriverAssignmentsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
       },
-      { 
-        path: 'driver-assignments/pending', 
+      {
+        path: 'driver-assignments/pending',
         component: AllPendingDriverAssignmentsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
       },
 
       /* Locations */
-      { 
-        path: 'locations/stages', 
+      {
+        path: 'locations/stages',
         component: LocationStagesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_STAGES', 'CAN_VIEW_STAGE', 'CAN_VIEW_LOCATIONS'] }
       },
-      { 
-        path: 'locations/routes', 
+      {
+        path: 'locations/routes',
         component: LocationRoutesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_ROUTES', 'CAN_VIEW_ROUTE', 'CAN_VIEW_LOCATIONS'] }
       },
 
       /* Vehicles */
-      { 
-        path: 'vehicles/all', 
+      {
+        path: 'vehicles/all',
         component: AllVehiclesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] }
       },
-      { 
-        path: 'vehicles/active', 
+      {
+        path: 'vehicles/active',
         component: ActiveVehiclesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] }
       },
-      { 
-        path: 'vehicles/inactive', 
+      {
+        path: 'vehicles/inactive',
         component: InactiveVehiclesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] }
       },
-      { 
-        path: 'vehicles/maintenance', 
+      {
+        path: 'vehicles/maintenance',
         component: MaintenanceVehiclesComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE', 'CAN_EDIT_VEHICLE'] }
       },
 
       /* Finance */
-      { 
-        path: 'wallet/organization', 
+      {
+        path: 'wallet/organization',
         component: OrganizationWalletComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] }
       },
-      { 
-        path: 'wallet/user', 
+      {
+        path: 'wallet/user',
         component: UserWallet,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW'] }
       },
-      { 
-        path: 'management-statements', 
+      {
+        path: 'management-statements',
         component: WithdrawalStatementsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS'] }
       },
-      { 
-        path: 'obligations', 
+      {
+        path: 'obligations',
         component: ObligationsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS'] }
       },
 
       /* Analysis */
-      { 
-        path: 'vehicle-analysis/daily', 
+      {
+        path: 'vehicle-analysis/daily',
         component: DailyAnalysisComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
       },
-      { 
-        path: 'vehicle-analysis/weekly', 
+      {
+        path: 'vehicle-analysis/weekly',
         component: WeeklyAnalysisComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
       },
-      { 
-        path: 'vehicle-analysis/monthly', 
+      {
+        path: 'vehicle-analysis/monthly',
         component: MonthlyAnalysisComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
       },
-      { 
-        path: 'vehicle-analysis/yearly', 
+      {
+        path: 'vehicle-analysis/yearly',
         component: YearlyAnalysisComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
       },
 
       /* Prediction */
-      { 
-        path: 'prediction/short-term', 
+      {
+        path: 'prediction/short-term',
         component: ShortTermPredictionComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'prediction/long-term', 
+      {
+        path: 'prediction/long-term',
         component: LongTermPredictionComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
       },
-      { 
-        path: 'prediction/trends', 
+      {
+        path: 'prediction/trends',
         component: PredictionTrendsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
       },
 
       /* Revenue */
-      { 
-        path: 'revenue/all', 
+      {
+        path: 'revenue/all',
         component: RevenueComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_DASHBOARD'] }
       },
-      { 
-        path: 'revenue/by-vehicle', 
+      {
+        path: 'revenue/by-vehicle',
         component: RevenueByVehicleComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] }
       },
-      { 
-        path: 'revenue/by-location', 
+      {
+        path: 'revenue/by-location',
         component: RevenueByLocationComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] }
       },
 
       /* Users */
-      { 
-        path: 'users/all', 
+      {
+        path: 'users/all',
         component: GeneralUserComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] }
       },
-      { 
-        path: 'users/admins', 
+      {
+        path: 'users/admins',
         component: AdminUserComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_ADMINS'] }
       },
-      { 
-        path: 'users/conductors', 
+      {
+        path: 'users/conductors',
         component: ConductorsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TOUTS'] }
       },
-      { 
-        path: 'users/drivers', 
+      {
+        path: 'users/drivers',
         component: DriverUserComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
       },
-      { 
-        path: 'users/customers', 
+      {
+        path: 'users/customers',
         component: CustomersComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_CUSTOMER', 'CAN_VIEW_PASSENGERS'] }
       },
-      { 
-        path: 'users/deactivated', 
+      {
+        path: 'users/deactivated',
         component: DeactivatedUsersComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
       },
-      { 
-        path: 'users/investors', 
+      {
+        path: 'users/investors',
         component: InvestorsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] }
       },
-      { 
-        path: 'users/marshals', 
+      {
+        path: 'users/marshals',
         component: MarshalsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_USERS'] }
       },
 
       /* Audits */
-      { 
-        path: 'audits/all', 
+      {
+        path: 'audits/all',
         component: SystemAudits,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD'] }
       },
-      { 
-        path: 'audits/user', 
+      {
+        path: 'audits/user',
         component: UserAudits,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_USERS', 'CAN_VIEW_ADMINS'] }
       },
 
       /* Profile - accessible to all authenticated users */
-      { 
-        path: 'dashboard/notifications', 
-        component: NotificationsComponent 
+      {
+        path: 'dashboard/notifications',
+        component: NotificationsComponent
       },
-      { 
-        path: 'dashboard/profile', 
-        component: SettingsComponent 
+      {
+        path: 'dashboard/profile',
+        component: SettingsComponent
       },
 
       /* Default protected redirect */

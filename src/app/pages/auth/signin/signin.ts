@@ -43,7 +43,7 @@ export class SignInComponent implements OnInit {
     private router: Router,
     public loadingStore: LoadingStore,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -98,11 +98,16 @@ export class SignInComponent implements OnInit {
         console.log('Sign in successful', response);
         this.loadingStore.stop();
 
+        // Get username from form or response
+        const username = response.data?.username ||
+          response.data?.name ||
+          this.signInForm.value.username;
+
         // Show success toast
         this.messageService.add({
           severity: 'success',
           summary: 'Sign In Successful',
-          detail: `Welcome back, ${this.signInForm.value.username}!`,
+          detail: `Welcome back, ${username}!`,
           life: 3000
         });
 
@@ -115,7 +120,13 @@ export class SignInComponent implements OnInit {
         console.error('Sign in failed', error);
         this.loadingStore.stop();
 
-        const errorMsg = error.error?.message || 'Invalid username or password. Please try again.';
+        // Extract error message from different possible locations
+        const errorMsg =
+          error?.error?.message ||           // From our thrown error in AuthService
+          error?.message ||                  // Direct error message
+          error?.error?.error?.message ||    // Nested error structure
+          'Invalid username or password. Please try again.'; // Fallback
+
         this.errorMessage = errorMsg;
 
         // Show error toast
@@ -125,6 +136,9 @@ export class SignInComponent implements OnInit {
           detail: errorMsg,
           life: 5000
         });
+
+        // Optional: Reset password field on error
+        // this.signInForm.patchValue({ password: '' });
       }
     });
   }
