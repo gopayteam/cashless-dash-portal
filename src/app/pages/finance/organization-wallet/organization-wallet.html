@@ -15,23 +15,11 @@
     <div class="search-container">
       <span class="p-input-icon-left">
         <i class="pi pi-search"></i>
-        <input
-          pInputText
-          type="text"
-          placeholder="Search wallets..."
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange()"
-          class="search-input"
-        />
+        <input pInputText type="text" placeholder="Search wallets..." [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" class="search-input" />
       </span>
-      <button
-        *ngIf="searchTerm"
-        pButton
-        icon="pi pi-times"
-        class="p-button-text p-button-sm clear-button"
-        (click)="clearSearch()"
-        pTooltip="Clear search"
-      ></button>
+      <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+        (click)="clearSearch()" pTooltip="Clear search"></button>
     </div>
   </div>
 
@@ -72,11 +60,7 @@
 
   <!-- ================= WALLETS GRID ================= -->
   <div class="wallets-grid">
-    <div
-      *ngFor="let wallet of filteredWallets"
-      class="wallet-card"
-      (click)="viewWalletDetails(wallet)"
-    >
+    <div *ngFor="let wallet of filteredWallets" class="wallet-card" (click)="viewWalletDetails(wallet)">
       <div class="wallet-card-header" [style.background]="getCategoryColor(wallet.category)">
         <div class="wallet-icon">
           <i [class]="'pi ' + getCategoryIcon(wallet.category)"></i>
@@ -125,13 +109,8 @@
       </div>
 
       <div class="wallet-card-footer">
-        <button
-          pButton
-          label="View Details"
-          icon="pi pi-arrow-right"
-          class="p-button-text p-button-sm"
-          (click)="viewWalletDetails(wallet); $event.stopPropagation()"
-        ></button>
+        <button pButton label="View Details" icon="pi pi-arrow-right" iconPos="right" class="p-button-text p-button-sm" style="gap: 1rem;"
+          (click)="viewWalletDetails(wallet); $event.stopPropagation()"></button>
       </div>
     </div>
   </div>
@@ -147,16 +126,9 @@
   </div>
 
   <!-- ================= WALLET DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '700px', background: '#fff' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '700px', background: '#fff' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -234,13 +206,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

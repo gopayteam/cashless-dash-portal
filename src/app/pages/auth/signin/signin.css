@@ -206,7 +206,7 @@
 ::ng-deep .auth-card .form-field .p-password .p-password-toggle-icon,
 ::ng-deep .auth-container .form-field .p-password .p-password-toggle-icon {
   position: absolute !important;
-  right: 0.75rem !important;
+  left: 0.75rem !important;
   /* Distance from right edge */
   top: 50% !important;
   transform: translateY(-50%) !important;

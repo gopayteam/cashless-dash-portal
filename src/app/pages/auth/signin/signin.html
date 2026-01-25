@@ -25,14 +25,8 @@
             Username <span class="required-indicator">*</span>
           </label>
           <span class="p-input-icon-left w-full">
-            <input
-              pInputText
-              id="username"
-              formControlName="username"
-              placeholder="Enter your username"
-              class="w-full"
-              [class.p-invalid]="isFieldInvalid('username')"
-            />
+            <input pInputText id="username" formControlName="username" placeholder="Enter your username" class="w-full"
+              [class.p-invalid]="isFieldInvalid('username')" />
           </span>
           <small class="p-error" *ngIf="isFieldInvalid('username')">
             {{ getErrorMessage('username') }}
@@ -44,14 +38,8 @@
           <label for="password" class="form-label">
             Password <span class="required-indicator">*</span>
           </label>
-          <p-password
-            id="password"
-            formControlName="password"
-            placeholder="Enter your password"
-            [toggleMask]="true"
-            [feedback]="false"
-            styleClass="w-full"
-            inputStyleClass="w-full"
+          <p-password id="password" formControlName="password" placeholder="Enter your password" [toggleMask]="true"
+            [feedback]="false" styleClass="w-full" inputStyleClass="w-full"
             [class.p-invalid]="isFieldInvalid('password')">
             <ng-template pTemplate="header"></ng-template>
             <ng-template pTemplate="footer"></ng-template>
@@ -70,15 +58,8 @@
 
         <!-- Submit Button -->
         <div class="form-actions">
-          <p-button
-            type="submit"
-            label="Sign In"
-            [loading]="loading()"
-            
-            iconPos="right"
-            styleClass="w-full p-button-lg primary-button"
-            [style]="{'--icon-margin-left': '0.5rem'}"
-          ></p-button>
+          <p-button type="submit" label="Sign In" [loading]="loading()" iconPos="right"
+            styleClass="w-full p-button-lg primary-button" [style]="{'--icon-margin-left': '0.5rem', 'gap': '1rem', 'margin-left': '10px'}"></p-button>
         </div>
 
         <!-- Sign Up Link -->
