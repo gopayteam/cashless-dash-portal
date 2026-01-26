@@ -59,6 +59,7 @@ import { InactiveDriversComponent } from './pages/drivers/inactive/drivers';
 import { NotificationsComponent } from './pages/profile/notifications/notifications';
 import { SettingsComponent } from './pages/profile/settings/settings';
 import { roleGuard } from '../@core/services/role.guard';
+import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -440,8 +441,12 @@ export const routes: Routes = [
         component: NotificationsComponent
       },
       {
-        path: 'dashboard/profile',
+        path: 'dashboard/settings',
         component: SettingsComponent
+      },
+      {
+        path: 'dashboard/profile',
+        component: UserProfileComponent
       },
 
       /* Default protected redirect */

@@ -416,6 +416,11 @@ export class MainLayoutComponent implements OnInit {
     this.router.navigate(['/dashboard/profile']);
   }
 
+  navigateToSettings() {
+    this.settingsDialogVisible = false;
+    this.router.navigate(['/dashboard/settings']);
+  }
+
   /* =============================================
      LOGOUT
   ============================================= */

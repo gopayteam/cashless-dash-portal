@@ -1,0 +1,137 @@
+<div class="container">
+      <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()" class="settings-form">
+
+        <!-- Password Settings Section -->
+        <section class="form-section">
+          <h2>Password Settings</h2>
+
+          <div class="form-group">
+            <label for="username">Username *</label>
+            <input
+              id="username"
+              type="text"
+              formControlName="username"
+              [class.error]="isFieldInvalid('username')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('username')">
+              Username is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="currentPassword">Current Password *</label>
+            <input
+              id="currentPassword"
+              type="password"
+              formControlName="currentPassword"
+              [class.error]="isFieldInvalid('currentPassword')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('currentPassword')">
+              Current password is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">New Password *</label>
+            <input
+              id="newPassword"
+              type="password"
+              formControlName="newPassword"
+              [class.error]="isFieldInvalid('newPassword')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('newPassword')">
+              New password is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password *</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              [class.error]="isFieldInvalid('confirmPassword') || passwordMismatch()"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+              Please confirm your password
+            </span>
+            <span class="error-message" *ngIf="passwordMismatch()">
+              Passwords do not match
+            </span>
+          </div>
+        </section>
+
+        <!-- Account Settings Section -->
+        <section class="form-section">
+          <h2>Account Settings</h2>
+
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              [class.error]="isFieldInvalid('firstName')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('firstName')">
+              First name is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              [class.error]="isFieldInvalid('lastName')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('lastName')">
+              Last name is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number * (+254)</label>
+            <input
+              id="phoneNumber"
+              type="tel"
+              formControlName="phoneNumber"
+              placeholder="+254"
+              [class.error]="isFieldInvalid('phoneNumber')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('phoneNumber')">
+              Phone number is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              [class.error]="isFieldInvalid('email')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('email')">
+              Valid email is required
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="userId">User ID *</label>
+            <input
+              id="userId"
+              type="text"
+              formControlName="userId"
+              [class.error]="isFieldInvalid('userId')"
+            />
+            <span class="error-message" *ngIf="isFieldInvalid('userId')">
+              User ID is required
+            </span>
+          </div>
+        </section>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>

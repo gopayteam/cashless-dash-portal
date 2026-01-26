@@ -291,8 +291,8 @@
                 <i class="pi pi-bell"></i>
                 Recent Notifications
               </h3>
-              <button pButton label="Mark all as read" class="p-button-text p-button-sm mark-read-btn" style="cursor: pointer;"
-                *ngIf="unreadCount > 0" (click)="markAllAsRead()">Mark all as read </button>
+              <button pButton label="Mark all as read" class="p-button-text p-button-sm mark-read-btn"
+                style="cursor: pointer;" *ngIf="unreadCount > 0" (click)="markAllAsRead()">Mark all as read </button>
             </div>
 
             <!-- Notification List -->
@@ -342,8 +342,10 @@
             <!-- Settings Header -->
             <div class="panel-header">
               <h3 class="panel-title">
-                <i class="pi pi-cog"></i>
-                Preferences
+                <button (click)="navigateToSettings()">
+                  <i class="pi pi-cog"></i>
+                  Preferences
+                </button>
               </h3>
             </div>
 
