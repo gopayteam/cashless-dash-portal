@@ -1,0 +1,19 @@
+<button
+  [class]="buttonClasses"
+  [disabled]="disabled || loading"
+  [pTooltip]="tooltip"
+  tooltipPosition="top"
+  (click)="onClick($event)"
+  type="button"
+>
+  <i
+    *ngIf="!loading"
+    [class]="'pi ' + icon"
+    class="btn-icon"
+  ></i>
+  <i
+    *ngIf="loading"
+    class="pi pi-spinner pi-spin btn-icon"
+  ></i>
+  <span *ngIf="label" class="btn-label">{{ label }}</span>
+</button>

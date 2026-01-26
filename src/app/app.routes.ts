@@ -60,6 +60,7 @@ import { NotificationsComponent } from './pages/profile/notifications/notificati
 import { SettingsComponent } from './pages/profile/settings/settings';
 import { roleGuard } from '../@core/services/role.guard';
 import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
+import { AddVehicleComponent } from './pages/forms/add-vehicle/add-vehicle';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -447,6 +448,14 @@ export const routes: Routes = [
       {
         path: 'dashboard/profile',
         component: UserProfileComponent
+      },
+
+      /* Forms */
+      {
+        path: 'forms/add-vehicle',
+        component: AddVehicleComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_VEHICLE', 'CAN_EDIT_VEHICLE'] }
       },
 
       /* Default protected redirect */

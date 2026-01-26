@@ -11,23 +11,11 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search vehicles..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search vehicles..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
 
       <!-- <p-dropdown
@@ -38,14 +26,8 @@
         styleClass="status-dropdown"
       ></p-dropdown> -->
 
-      <button
-        *ngIf="searchTerm || selectedStatus"
-        pButton
-        label="Clear Filters"
-        icon="pi pi-filter-slash"
-        class="p-button-outlined p-button-sm"
-        (click)="clearFilters()"
-      ></button>
+      <button *ngIf="searchTerm || selectedStatus" pButton label="Clear Filters" icon="pi pi-filter-slash"
+        class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
     </div>
   </div>
 
@@ -98,24 +80,18 @@
       <div class="table-header-left">
         <h3>Vehicles List</h3>
         <span class="record-count">{{ filteredVehicles.length }} of {{ totalRecords }} vehicles</span>
+        <app-action-button icon="pi-plus" tooltip="Add New Vehicle" variant="primary"
+          (clicked)="navigateToAddVehicle()"></app-action-button>
+        <app-action-button icon="pi-refresh" tooltip="Refresh Vehicles" variant="primary" (clicked)="refreshVehicles()">
+        </app-action-button>
+
       </div>
     </div>
 
-    <p-table
-      [value]="vehicles"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} vehicles"
-      styleClass="data-table"
-      (onLazyLoad)="loadVehicles($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="vehicles" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} vehicles" styleClass="data-table"
+      (onLazyLoad)="loadVehicles($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Fleet Number</th>
@@ -209,16 +185,8 @@
   </p-card>
 
   <!-- ================= VEHICLE DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '900px' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -229,10 +197,7 @@
             <h2>{{ selectedVehicle?.fleetNumber }}</h2>
             <span class="registration-large">{{ selectedVehicle?.registrationNumber }}</span>
           </div>
-          <span
-            *ngIf="selectedVehicle"
-            [class]="'badge badge-' + getStatusClass(selectedVehicle.status)"
-          >
+          <span *ngIf="selectedVehicle" [class]="'badge badge-' + getStatusClass(selectedVehicle.status)">
             <i [class]="'pi ' + getStatusIcon(selectedVehicle.status)"></i>
             {{ selectedVehicle.status }}
           </span>
@@ -366,13 +331,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

@@ -51,4 +51,7 @@ export const API_ENDPOINTS = {
   // #####################  AUDIT SUB-ENDPOINTS   #######################
   ALL_AUDIT_TRAILS: '/api/v1/org/view-audit-trails',
 
+  // #####################  FORMS SUB-ENDPOINTS   #######################
+  CREATE_VEHICLE: '/api/v1/ord/add-vehicle'
+
 };

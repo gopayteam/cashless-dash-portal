@@ -1,0 +1,169 @@
+<div class="add-vehicle-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-car"></i>
+        Add New Vehicle
+      </h1>
+      <p class="page-subtitle">Register a new vehicle in the system</p>
+    </div>
+  </div>
+
+  <p-card class="vehicle-form-card">
+    <div class="form-container">
+      <form (ngSubmit)="onSubmit()" #vehicleForm="ngForm">
+
+        <!-- Basic Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            Basic Information
+          </h3>
+          <div class="form-grid">
+
+            <!-- Investor -->
+            <div class="form-field">
+              <label for="investor" class="field-label required">Select Investor</label>
+              <p-select id="investor" [(ngModel)]="selectedInvestor" name="investor" [options]="investorOptions"
+                placeholder="Choose an investor" optionLabel="label" optionValue="value" [filter]="true"
+                filterPlaceholder="Search investors" [loading]="investorsLoading" [showClear]="true" styleClass="w-full"
+                required></p-select>
+            </div>
+
+            <!-- Fleet Number -->
+            <div class="form-field">
+              <label for="fleetNumber" class="field-label required">Fleet Number</label>
+              <input pInputText id="fleetNumber" [(ngModel)]="fleetNumber" name="fleetNumber"
+                placeholder="Enter fleet number" class="w-full" required />
+            </div>
+
+            <!-- Registration Number -->
+            <div class="form-field">
+              <label for="regNumber" class="field-label required">Registration Number</label>
+              <input pInputText id="regNumber" [(ngModel)]="regNumber" name="regNumber"
+                placeholder="Enter registration number" class="w-full" required />
+            </div>
+
+            <!-- Capacity -->
+            <div class="form-field">
+              <label for="capacity" class="field-label required">Capacity</label>
+              <input pInputText type="number" id="capacity" [(ngModel)]="capacity" name="capacity"
+                placeholder="Enter vehicle capacity" class="w-full" min="1" required />
+            </div>
+
+            <!-- Marshal -->
+            <div class="form-field">
+              <label for="marshal" class="field-label required">Select Marshal</label>
+              <p-select id="marshal" [(ngModel)]="selectedMarshal" name="marshal" [options]="marshalOptions"
+                placeholder="Choose a marshal" optionLabel="label" optionValue="value" [filter]="true"
+                filterPlaceholder="Search marshals" [loading]="marshalsLoading" [showClear]="true" styleClass="w-full"
+                required></p-select>
+            </div>
+
+            <!-- Store Number -->
+            <div class="form-field">
+              <label for="storeNumber" class="field-label">Store Number</label>
+              <input pInputText id="storeNumber" [(ngModel)]="storeNumber" name="storeNumber"
+                placeholder="Enter store number (optional)" class="w-full" />
+            </div>
+
+            <!-- Till Number -->
+            <div class="form-field">
+              <label for="tillNumber" class="field-label">Till Number</label>
+              <input pInputText id="tillNumber" [(ngModel)]="tillNumber" name="tillNumber"
+                placeholder="Enter till number (optional)" class="w-full" />
+            </div>
+
+            <!-- Stage -->
+            <div class="form-field">
+              <label for="stage" class="field-label required">Select Stage</label>
+              <p-select id="stage" [(ngModel)]="selectedStage" name="stage" [options]="stageOptions"
+                placeholder="Choose a stage" optionLabel="label" optionValue="value" [filter]="true"
+                filterPlaceholder="Search stages" [loading]="stagesLoading" [showClear]="true" styleClass="w-full"
+                required></p-select>
+            </div>
+
+            <!-- Vehicle Fees -->
+            <div class="form-field">
+              <label for="vehicleFees" class="field-label">Vehicle Fees</label>
+              <input pInputText type="number" disabled="true" id="vehicleFees" [(ngModel)]="vehicleFees" name="vehicleFees"
+                placeholder="Enter vehicle fees (optional)" class="w-full" min="0" step="0.01" />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Fee Structure Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-money-bill"></i>
+            Fee Structure
+          </h3>
+          <div class="form-grid">
+
+            <!-- System Fee -->
+            <div class="form-field">
+              <label for="systemFee" class="field-label required">System Fee Amount</label>
+              <input pInputText type="number" id="systemFee" [(ngModel)]="systemFeeAmount" name="systemFee"
+                placeholder="Enter system fee" class="w-full" min="0" step="0.01" required />
+            </div>
+
+            <!-- Management Fee -->
+            <div class="form-field">
+              <label for="managementFee" class="field-label required">Management Fee Amount</label>
+              <input pInputText type="number" id="managementFee" [(ngModel)]="managementFeeAmount" name="managementFee"
+                placeholder="Enter management fee" class="w-full" min="0" step="0.01" required />
+            </div>
+
+            <!-- SACCO Fee -->
+            <div class="form-field">
+              <label for="saccoFee" class="field-label required">SACCO Fee Amount</label>
+              <input pInputText type="number" id="saccoFee" [(ngModel)]="saccoFeeAmount" name="saccoFee"
+                placeholder="Enter SACCO fee" class="w-full" min="0" step="0.01" required />
+            </div>
+
+            <!-- Offload Weekday Fee -->
+            <div class="form-field">
+              <label for="offloadWeekday" class="field-label required">Offload (Weekday) Fee</label>
+              <input pInputText type="number" id="offloadWeekday" [(ngModel)]="offloadWeekdayFeeAmount"
+                name="offloadWeekday" placeholder="Enter weekday offload fee" class="w-full" min="0" step="0.01"
+                required />
+            </div>
+
+            <!-- Offload Saturday Fee -->
+            <div class="form-field">
+              <label for="offloadSaturday" class="field-label required">Offload (Saturday) Fee</label>
+              <input pInputText type="number" id="offloadSaturday" [(ngModel)]="offloadSaturdayFeeAmount"
+                name="offloadSaturday" placeholder="Enter Saturday offload fee" class="w-full" min="0" step="0.01"
+                required />
+            </div>
+
+            <!-- Offload Sunday Fee -->
+            <div class="form-field">
+              <label for="offloadSunday" class="field-label required">Offload (Sunday) Fee</label>
+              <input pInputText type="number" id="offloadSunday" [(ngModel)]="offloadSundayFeeAmount"
+                name="offloadSunday" placeholder="Enter Sunday offload fee" class="w-full" min="0" step="0.01"
+                required />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <p-button label="Cancel" icon="pi pi-times" iconPos="right" severity="secondary" [outlined]="true" [style]="{'gap':'1rem'}"
+            (onClick)="onCancel()" [disabled]="submitting"></p-button>
+
+          <p-button label="Submit" icon="pi pi-check" iconPos="right" type="submit"  [style]="{'gap':'1rem'}"
+            [disabled]="!isFormValid() || submitting" [loading]="submitting"></p-button>
+        </div>
+
+      </form>
+    </div>
+  </p-card>
+
+  <!-- Loading Overlay -->
+  <!-- <div class="loading-overlay" *ngIf="loading()">
+    <p-progressSpinner></p-progressSpinner>
+  </div> -->
+</div>

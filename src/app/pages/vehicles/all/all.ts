@@ -17,6 +17,7 @@ import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface StatusOption {
   label: string;
@@ -37,11 +38,13 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent
   ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
 })
 export class AllVehiclesComponent implements OnInit {
+
   entityId: string | null = null;
   vehicles: Vehicle[] = [];
   allVehicles: Vehicle[] = [];
@@ -78,7 +81,7 @@ export class AllVehiclesComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -219,5 +222,13 @@ export class AllVehiclesComponent implements OnInit {
       'MAINTENANCE': 'pi-wrench',
     };
     return iconMap[status] || 'pi-circle';
+  }
+
+  navigateToAddVehicle(): void {
+    this.router.navigate(['/forms/add-vehicle']);
+  }
+
+  refreshVehicles(): void {
+    this.loadVehicles();
   }
 }
