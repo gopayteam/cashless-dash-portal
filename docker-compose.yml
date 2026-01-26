@@ -12,7 +12,7 @@
 services:
   frontend:
     build: .
-    container_name: prime-frontend
+    container_name: gopay-cashless-dash-portal
     ports:
       - "4200:80"
     restart: unless-stopped
