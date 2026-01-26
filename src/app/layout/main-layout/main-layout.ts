@@ -113,6 +113,7 @@ export class MainLayoutComponent implements OnInit {
     //   { label: 'Inactive', icon: 'pi pi-ban', route: '/vehicles/inactive', roles: ['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE'] },
     //   { label: 'Maintenance', icon: 'pi pi-wrench', route: '/vehicles/maintenance', roles: ['CAN_VIEW_VEHICLES', 'CAN_EDIT_VEHICLE'] }
     // ],
+
     '/drivers': [
       { label: 'All Drivers', icon: 'pi pi-users', route: '/drivers/all', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
       { label: 'Active', icon: 'pi pi-check-circle', route: '/drivers/active', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
@@ -125,21 +126,26 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Pending', icon: 'pi pi-clock', route: '/driver-assignments/pending', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
       { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
     ],
+
     // '/parcels': [
     //   { label: 'All Parcels', icon: 'pi pi-box', route: '/parcels/all', roles: ['CAN_MANAGE_PARCELS'] }
     // ],
+
     '/parcel-offices': [
       { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
       { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] }
     ],
+
     '/locations': [
       { label: 'Stages', icon: 'pi pi-map', route: '/locations/stages', roles: ['CAN_VIEW_STAGES', 'CAN_VIEW_LOCATIONS'] },
       { label: 'Routes', icon: 'pi pi-directions', route: '/locations/routes', roles: ['CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS'] }
     ],
+
     '/wallet': [
       { label: 'Organization', icon: 'pi pi-building', route: '/wallet/organization', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
       { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] }
     ],
+
     '/users': [
       { label: 'All Users', icon: 'pi pi-users', route: '/users/all', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] },
       { label: 'Admins', icon: 'pi pi-shield', route: '/users/admins', roles: ['CAN_VIEW_ADMINS'] },
@@ -150,21 +156,25 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Marshals', icon: 'pi pi-flag', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
       { label: 'Deactivated', icon: 'pi pi-ban', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
     ],
+
     '/audits': [
       { label: 'System Audits', icon: 'pi pi-server', route: '/audits/all', roles: ['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD'] },
       { label: 'User Audits', icon: 'pi pi-users', route: '/audits/user', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_ADMINS'] }
     ],
+
     '/revenue': [
       { label: 'All Revenue', icon: 'pi pi-chart-line', route: '/revenue/all', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_DASHBOARD'] },
       { label: 'By Vehicle', icon: 'pi pi-car', route: '/revenue/by-vehicle', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] },
       { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] }
     ],
+
     '/vehicle-analysis': [
       { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
       { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
       { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
       { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
     ],
+
     '/prediction': [
       { label: 'Short Term', icon: 'pi pi-calendar', route: '/prediction/short-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
@@ -335,24 +345,25 @@ export class MainLayoutComponent implements OnInit {
   ============================================= */
   private loadNotifications() {
     // Mock notifications - replace with actual service call
-    this.notifications = [
-      {
-        id: '1',
-        title: 'New Driver Approved',
-        message: 'Driver John Doe has been approved',
-        time: '2 minutes ago',
-        type: 'success',
-        read: false
-      },
-      {
-        id: '2',
-        title: 'Vehicle Maintenance Due',
-        message: 'KBX 123A requires maintenance',
-        time: '1 hour ago',
-        type: 'warning',
-        read: false
-      }
-    ];
+    // this.notifications = [
+    //   {
+    //     id: '1',
+    //     title: 'New Driver Approved',
+    //     message: 'Driver John Doe has been approved',
+    //     time: '2 minutes ago',
+    //     type: 'success',
+    //     read: false
+    //   },
+    //   {
+    //     id: '2',
+    //     title: 'Vehicle Maintenance Due',
+    //     message: 'KBX 123A requires maintenance',
+    //     time: '1 hour ago',
+    //     type: 'warning',
+    //     read: false
+    //   }
+    // ];
+    this.notifications = []
     this.updateUnreadCount();
   }
 
