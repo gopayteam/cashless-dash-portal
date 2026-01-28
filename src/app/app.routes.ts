@@ -61,6 +61,8 @@ import { SettingsComponent } from './pages/profile/settings/settings';
 import { roleGuard } from '../@core/services/role.guard';
 import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
 import { AddVehicleComponent } from './pages/forms/add-vehicle/add-vehicle';
+import { RegisterParcelManagerComponent } from './pages/forms/register-parcel-manager/register-parcel-manager';
+import { UpdateParcelManagerComponent } from './pages/forms/update-parcel-manager/update-parcel-manager';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -456,6 +458,27 @@ export const routes: Routes = [
         component: AddVehicleComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD_VEHICLE', 'CAN_EDIT_VEHICLE'] }
+      },
+
+      {
+        path: 'forms/add-parcel-manager',
+        component: RegisterParcelManagerComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      // {
+      //   path: 'forms/update-parcel-manager',
+      //   component: UpdateParcelManagerComponent,
+      //   // canActivate: [roleGuard],
+      //   // data: { roles: ['CAN_EDIT_USER'] }
+      // },
+
+      {
+        path: 'forms/update-parcel-manager/:username',
+        component: UpdateParcelManagerComponent,
+        // canActivate: [roleGuard],
+        // data: { roles: ['CAN_EDIT_USER'] }
       },
 
       /* Default protected redirect */

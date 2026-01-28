@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   ALL_PARCEL_MANAGERS: '/api/parcels/filter/user/aggregates',
   ALL_PARCEL_SOURCES: '/api/parcels/report/summary/source',
   ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
+  ALL_PARCEL_STAGES: '/api/route/list/stages',
 
   // #####################  Driver SUB-ENDPOINTS   #######################
   ALL_DRIVERS: '/api/v1/org/view-activated-fleets',
@@ -52,6 +53,8 @@ export const API_ENDPOINTS = {
   ALL_AUDIT_TRAILS: '/api/v1/org/view-audit-trails',
 
   // #####################  FORMS SUB-ENDPOINTS   #######################
-  CREATE_VEHICLE: '/api/v1/ord/add-vehicle'
+  CREATE_VEHICLE: '/api/v1/ord/add-vehicle',
+  CREATE_PARCEL_MANAGER: '/api/v1/auth/register',
+  UPDATE_PARCEL_MANAGER: '/api/v1/org/users/update',
 
 };

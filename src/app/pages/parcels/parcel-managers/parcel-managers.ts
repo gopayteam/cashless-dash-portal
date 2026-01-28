@@ -19,6 +19,7 @@ import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parc
 import { DialogModule } from 'primeng/dialog';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   standalone: true,
@@ -40,6 +41,7 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
 })
 export class ParcelManagersComponent implements OnInit {
@@ -60,14 +62,14 @@ export class ParcelManagersComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
   }
 
   ngOnInit(): void {
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);
@@ -135,8 +137,25 @@ export class ParcelManagersComponent implements OnInit {
     this.selectedManager = manager;
     this.showManagerDialog = true;
   }
+
   closeManagerDialog(): void {
     this.showManagerDialog = false;
     this.selectedManager = null;
   }
+
+  navigateToCreateManager(): void {
+    this.router.navigate(['forms/add-parcel-manager'])
+  }
+
+  navigateToUpdateManager(manager: ParcelManager): void {
+    // Pass the manager username as route param and full manager object as state
+    this.router.navigate(['forms/update-parcel-manager', manager.username], {
+      state: { manager }
+    });
+  }
+
+  refresh(): void {
+    this.loadParcelManagers({ first: this.first, rows: this.rows });
+  }
+
 }

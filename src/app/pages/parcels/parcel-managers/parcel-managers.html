@@ -30,19 +30,10 @@
       </div>
 
       <div class="filter-actions">
-        <button
-          pButton
-          icon="pi pi-filter"
-          label="Apply"
-          class="filter-btn filter-btn--apply"
-          (click)="applyFilters()">
+        <button pButton icon="pi pi-filter" label="Apply" class="filter-btn filter-btn--apply" (click)="applyFilters()">
         </button>
 
-        <button
-          pButton
-          icon="pi pi-refresh"
-          label="Reset"
-          class="filter-btn filter-btn--reset"
+        <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset"
           (click)="resetFilters()">
         </button>
       </div>
@@ -53,26 +44,27 @@
   <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
-        <h3>Parcel Managers</h3>
-        <span class="record-count">{{ totalRecords }} managers</span>
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 1rem;">
+          <div>
+            <h3>Parcel Managers</h3>
+            <span class="record-count">{{ totalRecords }} managers</span>
+          </div>
+
+          <app-action-button icon="pi-plus" tooltip="Add Parcel Manager" variant="primary"
+            (clicked)="navigateToCreateManager()"></app-action-button>
+          <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+            (clicked)="refresh()"></app-action-button>
+
+        </div>
       </div>
+
+
     </div>
 
-    <p-table
-      [value]="parcelManagers"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [totalRecords]="totalRecords"
-      [loading]="loading()"
-      [rowsPerPageOptions]="[10, 20, 30, 50]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} managers"
-      (onLazyLoad)="loadParcelManagers($event)"
-      styleClass="data-table"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="parcelManagers" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+      [totalRecords]="totalRecords" [loading]="loading()" [rowsPerPageOptions]="[10, 20, 30, 50]"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} managers"
+      (onLazyLoad)="loadParcelManagers($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Manager</th>
@@ -125,76 +117,77 @@
   </p-card>
 
 
-  <p-dialog
-  header="Parcel Manager Details"
-  [(visible)]="showManagerDialog"
-  [modal]="true"
-  [style]="{ width: '720px', backgroundColor: '#f9f9f9' }"
-  [closable]="true"
-  styleClass="parcel-detail-dialog"
->
-  <div class="detail-content" *ngIf="selectedManager">
-    <div class="detail-grid">
-      <!-- LEFT COLUMN -->
-      <div class="detail-column">
-        <div class="detail-section">
-          <h4 class="section-title">Manager Info</h4>
+  <p-dialog header="Parcel Manager Details" [(visible)]="showManagerDialog" [modal]="true"
+    [style]="{ width: '720px', backgroundColor: '#f9f9f9' }" [closable]="true" styleClass="parcel-detail-dialog">
+    <div class="detail-content" *ngIf="selectedManager">
+      <div class="detail-grid">
+        <!-- LEFT COLUMN -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Manager Info</h4>
 
-          <div class="detail-item">
-            <label>Name</label>
-            <span class="value">{{ selectedManager.userName }}</span>
+            <div class="detail-item">
+              <label>Name</label>
+              <span class="value">{{ selectedManager.userName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Phone</label>
+              <span class="value">{{ selectedManager.userPhone }}</span>
+            </div>
           </div>
 
-          <div class="detail-item">
-            <label>Phone</label>
-            <span class="value">{{ selectedManager.userPhone }}</span>
+          <div class="detail-section">
+            <h4 class="section-title">Parcels</h4>
+
+            <div class="detail-item">
+              <label>Total Parcels</label>
+              <span class="value">{{ selectedManager.parcels }}</span>
+            </div>
           </div>
         </div>
 
-        <div class="detail-section">
-          <h4 class="section-title">Parcels</h4>
+        <!-- RIGHT COLUMN -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Financial Summary</h4>
 
-          <div class="detail-item">
-            <label>Total Parcels</label>
-            <span class="value">{{ selectedManager.parcels }}</span>
+            <div class="detail-item">
+              <label>Cash</label>
+              <span class="value">Ksh {{ selectedManager.cash | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Cashless</label>
+              <span class="value">Ksh {{ selectedManager.cashless | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Expenses</label>
+              <span class="value">Ksh {{ selectedManager.expense | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Net Amount</label>
+              <span class="amount-highlight">
+                Ksh {{ selectedManager.netAmount | number:'1.2-2' }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN -->
-      <div class="detail-column">
-        <div class="detail-section">
-          <h4 class="section-title">Financial Summary</h4>
-
-          <div class="detail-item">
-            <label>Cash</label>
-            <span class="value">Ksh {{ selectedManager.cash | number:'1.2-2' }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Cashless</label>
-            <span class="value">Ksh {{ selectedManager.cashless | number:'1.2-2' }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Expenses</label>
-            <span class="value">Ksh {{ selectedManager.expense | number:'1.2-2' }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Net Amount</label>
-            <span class="amount-highlight">
-              Ksh {{ selectedManager.netAmount | number:'1.2-2' }}
-            </span>
-          </div>
-        </div>
+      <!-- ACTION BUTTON -->
+      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+        <app-action-button icon="pi-pencil" tooltip="Edit Manager" variant="primary"
+          (clicked)="navigateToUpdateManager(selectedManager)">
+        </app-action-button>
       </div>
     </div>
-  </div>
 
-  <ng-template pTemplate="footer">
-    <button pButton label="Close" icon="pi pi-times" (click)="showManagerDialog = false"></button>
-  </ng-template>
-</p-dialog>
+    <ng-template pTemplate="footer">
+      <button pButton label="Close" icon="pi pi-times" (click)="showManagerDialog = false"></button>
+    </ng-template>
+  </p-dialog>
 
 </div>

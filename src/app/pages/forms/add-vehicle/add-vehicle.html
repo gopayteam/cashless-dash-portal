@@ -86,8 +86,8 @@
             <!-- Vehicle Fees -->
             <div class="form-field">
               <label for="vehicleFees" class="field-label">Vehicle Fees</label>
-              <input pInputText type="number" disabled="true" id="vehicleFees" [(ngModel)]="vehicleFees" name="vehicleFees"
-                placeholder="Enter vehicle fees (optional)" class="w-full" min="0" step="0.01" />
+              <input pInputText type="number" disabled="true" id="vehicleFees" [(ngModel)]="vehicleFees"
+                name="vehicleFees" placeholder="Enter vehicle fees (optional)" class="w-full" min="0" step="0.01" />
             </div>
 
           </div>
@@ -151,16 +151,19 @@
 
         <!-- Action Buttons -->
         <div class="form-actions">
-          <p-button label="Cancel" icon="pi pi-times" iconPos="right" severity="secondary" [outlined]="true" [style]="{'gap':'1rem'}"
-            (onClick)="onCancel()" [disabled]="submitting"></p-button>
+          <p-button label="Cancel" icon="pi pi-times" iconPos="right" severity="secondary" [outlined]="true"
+            [style]="{'gap':'1rem'}" (onClick)="onCancel()" [disabled]="submitting"></p-button>
 
-          <p-button label="Submit" icon="pi pi-check" iconPos="right" type="submit"  [style]="{'gap':'1rem'}"
+          <p-button label="Submit" icon="pi pi-check" iconPos="right" type="submit" [style]="{'gap':'1rem'}"
             [disabled]="!isFormValid() || submitting" [loading]="submitting"></p-button>
         </div>
 
       </form>
     </div>
   </p-card>
+
+  <!-- Toast for notifications -->
+  <p-toast position="top-right"></p-toast>
 
   <!-- Loading Overlay -->
   <!-- <div class="loading-overlay" *ngIf="loading()">

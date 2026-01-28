@@ -17,6 +17,9 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { User } from '../../../../@core/models/user/user.model';
 import { StagesResponse } from '../../../../@core/models/locations/state_response.model';
 import { Stage } from '../../../../@core/models/locations/stage.model';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 interface DropdownOption {
   label: string;
@@ -54,6 +57,8 @@ interface VehiclePayload {
     SelectModule,
     ProgressSpinnerModule,
     TooltipModule,
+    MessageModule,
+    ToastModule,
   ],
   templateUrl: './add-vehicle.html',
   styleUrls: ['./add-vehicle.css'],
@@ -93,6 +98,7 @@ export class AddVehicleComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     private authService: AuthService,
+    private messageService: MessageService,
     private router: Router
   ) { }
 
@@ -173,6 +179,7 @@ export class AddVehicleComponent implements OnInit {
   loadStages(): void {
     this.stagesLoading = true;
     const payload = {
+      entityId: this.entityId,
       page: 0,
       size: 100,
     };
@@ -256,12 +263,30 @@ export class AddVehicleComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('Vehicle created successfully', response);
+
+          // Show validation success toast
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Created Successfully',
+            detail: 'Vehicle created successfully',
+            life: 4000
+          });
+
           this.submitting = false;
           this.loadingStore.stop();
           this.router.navigate(['/vehicles/all']);
         },
         error: (err) => {
           console.error('Failed to create vehicle', err);
+
+          // Show validation error toast
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error Occurred',
+            detail: 'Failed to create vehicle',
+            life: 4000
+          });
+
           this.submitting = false;
           this.loadingStore.stop();
         },

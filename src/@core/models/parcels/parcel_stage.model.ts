@@ -8,4 +8,3 @@ export interface ParcelStage {
   stage: string;        // stage name
 }
 
-

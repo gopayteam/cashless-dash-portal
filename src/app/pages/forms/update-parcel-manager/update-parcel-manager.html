@@ -1,0 +1,124 @@
+<div class="update-parcel-user-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-user-edit"></i>
+        Update Parcel Manager
+      </h1>
+      <p class="page-subtitle">Modify parcel manager's information</p>
+    </div>
+  </div>
+
+  <!-- <div *ngIf="managerData" class="debug-box">
+    <pre>{{ managerData | json }}</pre>
+  </div> -->
+
+
+  <p-card class="parcel-user-form-card">
+    <div class="form-container">
+
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="loading-state">
+        <p-progressSpinner styleClass="spinner-small"></p-progressSpinner>
+        <p>Loading user data...</p>
+      </div>
+
+      <form *ngIf="!loading() && managerData" (ngSubmit)="onSubmit()" #parcelUserForm="ngForm">
+
+        <!-- User ID Display -->
+        <div class="user-id-badge">
+          <i class="pi pi-hashtag"></i>
+          <span>User ID: <strong>{{ managerUsername }}</strong></span>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-id-card"></i>
+            Personal Information
+          </h3>
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-field">
+              <label for="firstName" class="field-label required">First Name</label>
+              <input pInputText id="firstName" [(ngModel)]="firstName" name="firstName" placeholder="Enter first name"
+                class="w-full" required />
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-field">
+              <label for="lastName" class="field-label required">Last Name</label>
+              <input pInputText id="lastName" [(ngModel)]="lastName" name="lastName" placeholder="Enter last name"
+                class="w-full" required />
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-field">
+              <label for="phoneNumber" class="field-label required">Phone Number</label>
+              <input pInputText id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber"
+                placeholder="e.g., 0796020205" class="w-full" required maxlength="10" pattern="0[0-9]{9}" />
+              <small class="field-hint">Format: 10 digits starting with 0</small>
+            </div>
+
+            <!-- Email -->
+            <div class="form-field">
+              <label for="email" class="field-label required">Email Address</label>
+              <input pInputText type="email" id="email" [(ngModel)]="email" name="email"
+                placeholder="Enter email address" class="w-full" required />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Account Configuration Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-cog"></i>
+            Account Configuration
+          </h3>
+          <div class="form-grid">
+
+            <!-- Stage -->
+            <div class="form-field">
+              <label for="stage" class="field-label required">Select Stage</label>
+              <p-select id="stage" [(ngModel)]="selectedStage" name="stage" [options]="stageOptions"
+                placeholder="Choose a stage" optionLabel="label" optionValue="value" [filter]="true"
+                filterPlaceholder="Search stages" [loading]="stagesLoading" [showClear]="true" styleClass="w-full"
+                required></p-select>
+            </div>
+
+            <!-- Profile (Read-only) -->
+            <div class="form-field">
+              <label for="profile" class="field-label">Profile</label>
+              <input pInputText id="profile" [value]="PROFILE" name="profile" class="w-full" disabled readonly />
+            </div>
+
+            <!-- Agent (Read-only) -->
+            <div class="form-field">
+              <label for="agent" class="field-label">Agent Type</label>
+              <input pInputText id="agent" [value]="AGENT" name="agent" class="w-full" disabled readonly />
+            </div>
+
+            <!-- Channel (Read-only) -->
+            <div class="form-field">
+              <label for="channel" class="field-label">Channel</label>
+              <input pInputText id="channel" [value]="CHANNEL" name="channel" class="w-full" disabled readonly />
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <p-button label="Cancel" icon="pi pi-times" iconPos="right" severity="secondary" [outlined]="true"
+            [style]="{'gap':'1rem'}" (onClick)="onCancel()" [disabled]="submitting"></p-button>
+
+          <p-button label="Update User" icon="pi pi-check" iconPos="right" type="submit" [style]="{'gap':'1rem'}"
+            [disabled]="!isFormValid() || submitting" [loading]="submitting"></p-button>
+        </div>
+
+      </form>
+    </div>
+  </p-card>
+</div>

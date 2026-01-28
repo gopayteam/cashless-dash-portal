@@ -1,0 +1,330 @@
+.update-parcel-user-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.page-title i {
+  font-size: 1.75rem;
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: var(--medium-text);
+  margin: 0;
+  padding-left: 2.5rem;
+}
+
+/* Form Card */
+.parcel-user-form-card {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.form-container {
+  padding: 1.5rem;
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.loading-state p {
+  color: var(--medium-text);
+  font-size: 1rem;
+}
+
+.loading-state ::ng-deep .p-progress-spinner {
+  width: 50px;
+  height: 50px;
+}
+
+/* User ID Badge */
+.user-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  color: var(--white);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-id-badge i {
+  font-size: 1rem;
+}
+
+.user-id-badge strong {
+  font-weight: 700;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2.5rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-title i {
+  font-size: 1.1rem;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Form Fields */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.field-label.required::after {
+  content: '*';
+  color: var(--danger-color);
+  margin-left: 0.25rem;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--medium-text);
+  font-style: italic;
+  margin-top: -0.25rem;
+}
+
+/* Input Styling */
+.form-field input,
+.form-field ::ng-deep .p-select {
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.form-field input {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.1);
+}
+
+.form-field input:disabled,
+.form-field input:read-only {
+  background-color: var(--light-bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-field input::placeholder {
+  color: var(--light-text);
+}
+
+/* PrimeNG Select Customization */
+.form-field ::ng-deep .p-select {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.form-field ::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+.form-field ::ng-deep .p-select:not(.p-disabled).p-focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.1);
+}
+
+.form-field ::ng-deep .p-select .p-select-label {
+  padding: 0.75rem;
+}
+
+/* Action Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.form-actions ::ng-deep .p-button {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.form-actions ::ng-deep .p-button-outlined {
+  background-color: transparent;
+  color: var(--medium-text);
+  border-color: var(--border-color);
+}
+
+.form-actions ::ng-deep .p-button-outlined:hover {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  border-color: var(--medium-text);
+}
+
+.form-actions ::ng-deep .p-button:not(.p-button-outlined) {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+}
+
+.form-actions ::ng-deep .p-button:not(.p-button-outlined):hover:not(:disabled) {
+  background-color: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+}
+
+.form-actions ::ng-deep .p-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Utility Classes */
+.w-full {
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .update-parcel-user-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions ::ng-deep .p-button {
+    width: 100%;
+  }
+
+  .user-id-badge {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+}
+
+/* Focus States for Accessibility */
+.form-field input:focus-visible,
+.form-field ::ng-deep .p-select:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Error States */
+.form-field.error input,
+.form-field.error ::ng-deep .p-select {
+  border-color: var(--danger-color);
+}
+
+.form-field.error .field-label {
+  color: var(--danger-color);
+}
+
+/* Success States */
+.form-field.success input,
+.form-field.success ::ng-deep .p-select {
+  border-color: var(--success-color);
+}
