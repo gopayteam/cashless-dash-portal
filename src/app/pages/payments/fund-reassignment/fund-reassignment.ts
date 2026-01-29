@@ -43,6 +43,7 @@ interface VehicleOption {
   templateUrl: './fund-reassignment.html',
   styleUrls: [
     './fund-reassignment.css',
+    '../../../../styles/styles.css',
   ],
 })
 export class FundReassignmentComponent implements OnInit {

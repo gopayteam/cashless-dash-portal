@@ -53,8 +53,6 @@ interface StatusOption {
   templateUrl: './parcel-managers.html',
   styleUrls: [
     './parcel-managers.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
   ],
 })
 export class ParcelManagerUsersComponent implements OnInit {

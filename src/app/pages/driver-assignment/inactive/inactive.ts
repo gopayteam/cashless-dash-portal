@@ -45,7 +45,9 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './inactive.html',
-  styleUrls: ['./inactive.css'],
+  styleUrls: ['./inactive.css',
+    '../../../../styles/styles.css',
+  ],
 })
 export class AllInactiveDriverAssignmentsComponent implements OnInit {
   entityId: string | null = null;

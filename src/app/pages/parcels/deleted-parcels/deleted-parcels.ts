@@ -28,9 +28,7 @@ import { ApiResponse } from '../../../../@core/models/parcels/deleted-parcels/de
   templateUrl: './deleted-parcels.html',
   styleUrls: [
     './deleted-parcels.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/global/_grid_layout.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',  
   ],
   imports: [
     CommonModule,

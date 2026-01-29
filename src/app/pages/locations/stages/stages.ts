@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
   templateUrl: './stages.html',
   styleUrls: [
     './stages.css',
-    '../../../../styles/modules/_cards.css'
+
   ],
   imports: [
     CommonModule,

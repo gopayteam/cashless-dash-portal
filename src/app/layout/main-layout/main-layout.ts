@@ -403,24 +403,24 @@ export class MainLayoutComponent implements OnInit {
   ============================================= */
   private loadNotifications() {
     // Mock notifications - replace with actual service call
-    // this.notifications = [
-    //   {
-    //     id: '1',
-    //     title: 'New Driver Approved',
-    //     message: 'Driver John Doe has been approved',
-    //     time: '2 minutes ago',
-    //     type: 'success',
-    //     read: false
-    //   },
-    //   {
-    //     id: '2',
-    //     title: 'Vehicle Maintenance Due',
-    //     message: 'KBX 123A requires maintenance',
-    //     time: '1 hour ago',
-    //     type: 'warning',
-    //     read: false
-    //   }
-    // ];
+    this.notifications = [
+      {
+        id: '1',
+        title: 'New Driver Approved',
+        message: 'Driver John Doe has been approved',
+        time: '2 minutes ago',
+        type: 'success',
+        read: false
+      },
+      {
+        id: '2',
+        title: 'Vehicle Maintenance Due',
+        message: 'KBX 123A requires maintenance',
+        time: '1 hour ago',
+        type: 'warning',
+        read: false
+      }
+    ];
     this.notifications = []
     this.updateUnreadCount();
   }

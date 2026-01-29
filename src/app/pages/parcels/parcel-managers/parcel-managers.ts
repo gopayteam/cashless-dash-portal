@@ -27,7 +27,7 @@ import { ActionButtonComponent } from "../../../components/action-button/action-
   templateUrl: './parcel-managers.html',
   styleUrls: [
     './parcel-managers.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',
   ],
   imports: [
     CommonModule,

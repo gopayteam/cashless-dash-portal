@@ -59,7 +59,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './update-driver.html',
-  styleUrls: ['./update-driver.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./update-driver.css', ],
   providers: [MessageService]
 })
 export class UpdateDriverComponent implements OnInit {

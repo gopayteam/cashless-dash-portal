@@ -26,8 +26,7 @@ import { AuthService } from '../../../../@core/services/auth.service';
   templateUrl: './drivers.html',
   styleUrls: [
     './drivers.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',
   ],
   imports: [
     CommonModule,
@@ -77,7 +76,7 @@ export class AllDriversComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -229,7 +228,8 @@ export class AllDriversComponent implements OnInit {
     this.displayDetailDialog = true;
   }
 
-  closeDetailDialog(): void {
+  closeDetailDialog($event: Event): void {
+    $event.stopPropagation();
     this.displayDetailDialog = false;
     this.selectedDriver = null;
   }

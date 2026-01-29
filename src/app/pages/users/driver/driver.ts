@@ -53,8 +53,6 @@ interface StatusOption {
   templateUrl: './driver.html',
   styleUrls: [
     './driver.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
   ],
 })
 export class DriverUserComponent implements OnInit {

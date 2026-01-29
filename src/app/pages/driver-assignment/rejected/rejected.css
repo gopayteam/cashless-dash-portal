@@ -50,6 +50,27 @@
   font-size: 0.9rem;
 }
 
+.p-input-icon-left {
+  position: relative;
+  display: inline-block;
+}
+
+.p-input-icon-left>i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text);
+  pointer-events: none;
+  /* important */
+}
+
+/* THIS is what you were missing */
+.p-input-icon-left>.search-input {
+  padding-left: 2.25rem;
+  /* space for icon */
+}
+
 .search-input:focus {
   border-color: #4299e1;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);

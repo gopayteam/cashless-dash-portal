@@ -114,7 +114,8 @@
           </td>
           <td>
             <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm" pTooltip="View Details"
-              tooltipPosition="top" (click)="viewTransactionDetails(transaction); $event.stopPropagation()"></button>
+              style="background: transparent; color: #555; border: none; border-radius: 50%;" tooltipPosition="top"
+              (click)="viewTransactionDetails(transaction); $event.stopPropagation()"></button>
           </td>
         </tr>
       </ng-template>
@@ -253,7 +254,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times"  class="p-button-text" (click)="closeDetailDialog()"></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

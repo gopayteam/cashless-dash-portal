@@ -59,7 +59,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './update-admin.html',
-  styleUrls: ['./update-admin.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./update-admin.css', ],
   providers: [MessageService]
 })
 export class UpdateAdminComponent implements OnInit {

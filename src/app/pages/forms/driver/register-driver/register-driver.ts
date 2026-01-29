@@ -56,7 +56,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './register-driver.html',
-  styleUrls: ['./register-driver.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./register-driver.css',],
   providers: [MessageService]
 })
 export class RegisterDriverComponent implements OnInit {

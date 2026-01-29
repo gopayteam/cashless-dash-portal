@@ -53,8 +53,6 @@ interface StatusOption {
   templateUrl: './marshals.html',
   styleUrls: [
     './marshals.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
   ],
 })
 export class MarshalsComponent implements OnInit {

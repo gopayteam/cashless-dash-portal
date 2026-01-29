@@ -61,7 +61,7 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard.html',
   styleUrls: [
     './dashboard.css',
-    '../../../../styles/modules/_cards.css'
+    '../../../../styles/styles.css',
   ],
 })
 export class DashboardComponent implements OnInit {

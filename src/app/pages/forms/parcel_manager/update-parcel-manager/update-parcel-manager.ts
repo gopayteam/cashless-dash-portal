@@ -62,7 +62,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './update-parcel-manager.html',
-  styleUrls: ['./update-parcel-manager.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./update-parcel-manager.css', ],
   providers: [MessageService]
 })
 export class UpdateParcelManagerComponent implements OnInit {
@@ -113,7 +113,7 @@ export class UpdateParcelManagerComponent implements OnInit {
       return;
     }
     this.entityId = user.entityId;
-  
+
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (!id) {
@@ -126,18 +126,18 @@ export class UpdateParcelManagerComponent implements OnInit {
         this.router.navigate(['/users/parcel-managers']);
         return;
       }
-  
+
       this.managerId = +id;
       this.userId = +id;
       this.initializeUserData();
     });
-  
+
     this.loadStages();
   }
 
   private initializeUserData(): void {
     const stateUser = this.getUserFromState();
-  
+
     if (stateUser) {
       console.log('✓ Manager data loaded from navigation state');
       this.populateFormFromUser(stateUser);
@@ -148,7 +148,7 @@ export class UpdateParcelManagerComponent implements OnInit {
       this.dataLoadedFromState = false;
     }
   }
-  
+
   private getUserFromState(): User | null {
     try {
       const navigation = this.router.getCurrentNavigation();
@@ -158,14 +158,14 @@ export class UpdateParcelManagerComponent implements OnInit {
           return stateUser;
         }
       }
-  
+
       if (window.history.state?.manager) {
         const historyUser = window.history.state.manager as User;
         if (this.isValidUserObject(historyUser)) {
           return historyUser;
         }
       }
-  
+
       return null;
     } catch (error) {
       console.error('Error retrieving manager from state:', error);
@@ -197,7 +197,7 @@ export class UpdateParcelManagerComponent implements OnInit {
     this.phoneNumber = user.phoneNumber || '';
     this.email = user.email || '';
     this.selectedStage = null; // Or set to a default/existing value if available
-  
+
     // console.log('Form populated with manager data:', {
     //   id: this.userId,
     //   name: `${this.firstName} ${this.lastName}`,
@@ -216,24 +216,24 @@ export class UpdateParcelManagerComponent implements OnInit {
       this.router.navigate(['/users/parcel-managers']);
       return;
     }
-  
+
     this.userLoading = true;
     this.loadingStore.start();
-  
+
     const payload = {
       entityId: this.entityId,
       agent: this.AGENT,
       page: 0,
       size: 100
     };
-  
+
     this.dataService
       .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-parcel-managers')
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
             const user = response.data.find((u: User) => u.id === userId);
-  
+
             if (user) {
               console.log('✓ Manager data fetched successfully from API');
               this.populateFormFromUser(user);
@@ -243,7 +243,7 @@ export class UpdateParcelManagerComponent implements OnInit {
           } else {
             this.handleNoUsersAvailable();
           }
-  
+
           this.userLoading = false;
           this.loadingStore.stop();
         },

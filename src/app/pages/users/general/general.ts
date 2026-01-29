@@ -53,8 +53,6 @@ interface StatusOption {
   templateUrl: './general.html',
   styleUrls: [
     './general.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
   ],
 })
 export class GeneralUserComponent implements OnInit {

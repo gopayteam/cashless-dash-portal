@@ -27,7 +27,7 @@ import { Router } from '@angular/router';
   templateUrl: './routes.html',
   styleUrls: [
     './routes.css',
-    '../../../../styles/modules/_cards.css'
+  
   ],
   imports: [
     CommonModule,

@@ -44,7 +44,9 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './pending.html',
-  styleUrls: ['./pending.css'],
+  styleUrls: ['./pending.css',
+    '../../../../styles/styles.css',
+  ],
 })
 export class AllPendingDriverAssignmentsComponent implements OnInit {
   entityId: string | null = null;

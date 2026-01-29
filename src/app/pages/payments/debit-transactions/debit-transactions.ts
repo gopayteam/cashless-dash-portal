@@ -42,7 +42,7 @@ import { Router } from '@angular/router';
   templateUrl: './debit-transactions.html',
   styleUrls: [
     './debit-transactions.css',
-    '../../../../styles/modules/_transactions.css'
+    '../../../../styles/styles.css',
   ],
 })
 export class DebitTransactionsComponent implements OnInit {
@@ -69,14 +69,14 @@ export class DebitTransactionsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
   }
 
   ngOnInit(): void {
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);

@@ -1,0 +1,819 @@
+/* ============================================================
+   PRIMENG CUSTOMIZATIONS (Consolidated)
+   ============================================================ */
+.p-component {
+  font-family: inherit;
+}
+
+/* --- Cards (p-card) --- */
+.p-card.p-component {
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  border: none;
+  background: var(--white);
+}
+
+.p-card.p-component .p-card-header {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--dark-text);
+  padding: 1.5rem 1.5rem 0;
+}
+
+.p-card.p-component .p-card-body {
+  padding: 1.5rem;
+}
+
+.p-card.p-component .p-card-content {
+  padding: 0;
+}
+
+/* Opt-in hover effect */
+.p-card.card-hover {
+  transition: all 0.2s ease;
+}
+
+.p-card.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Stat cards */
+.p-card.stat-card {
+  border: none;
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.p-card.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* --- Form Inputs (p-inputtext) --- */
+.p-inputtext.p-component {
+  width: auto;
+  font-size: 0.875rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+  color: var(--dark-text);
+}
+
+.p-inputtext.p-component::placeholder {
+  color: var(--light-text);
+}
+
+.p-inputtext.p-component:enabled:hover {
+  border-color: var(--primary-color);
+}
+
+.p-inputtext.p-component:enabled:focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  border-color: var(--primary-color);
+}
+
+/* Invalid State */
+.p-inputtext.p-component.ng-invalid.ng-dirty,
+.p-inputtext.p-component.ng-invalid.ng-touched {
+  border-color: var(--danger-color);
+}
+
+/* --- Buttons (p-button) --- */
+.p-button.p-component {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Primary button */
+.p-button:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.p-button:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:active {
+  background: #072040;
+  border-color: #072040;
+}
+
+/* Secondary/Outlined button */
+.p-button.p-button-outlined,
+.p-button.p-button-secondary {
+  background: var(--white);
+  border-color: var(--border-color);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+
+.p-button.p-button-outlined:enabled:hover,
+.p-button.p-button-secondary:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+  color: var(--dark-text);
+}
+
+.p-button.p-button-outlined:enabled:active,
+.p-button.p-button-secondary:enabled:active {
+  background: var(--border-color);
+}
+
+/* Danger Button */
+.p-button.p-button-danger {
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.p-button.p-button-danger:enabled:hover {
+  background: var(--secondary-color-dark);
+  border-color: var(--secondary-color-dark);
+}
+
+/* Outlined Variants */
+.p-button.p-button-outlined.p-button-danger {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.p-button.p-button-outlined.p-button-danger:enabled:hover {
+  background: rgba(200, 35, 51, 0.04);
+  color: var(--secondary-color);
+}
+
+.p-button.p-button-outlined.p-button-primary {
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.p-button.p-button-outlined.p-button-primary:enabled:hover {
+  background: rgba(13, 110, 253, 0.04);
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Disabled state */
+.p-button.p-component:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Focus Visible (Accessibility) */
+.p-button.p-component:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* --- Dropdown (p-dropdown) and Select (p-select) --- */
+.p-dropdown {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  /* from modules/_dropdown.css */
+  background: var(--white);
+  /* from modules/_dropdown.css */
+  width: 100%;
+  /* from modules/_dropdown.css */
+  transition: all 0.2s ease;
+  /* from modules/_dropdown.css */
+}
+
+.p-dropdown:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  /* from modules/_forms.css and _dropdown.css */
+  outline: 0 none;
+  outline-offset: 0;
+}
+
+.p-dropdown .p-dropdown-label {
+  padding: 0.5rem 1rem;
+  /* from global/_paginator.css */
+  font-weight: 500;
+  /* from global/_paginator.css */
+  color: var(--medium-text);
+  /* from global/_paginator.css */
+  font-size: 0.875rem;
+  /* from modules/_dropdown.css */
+  background: var(--white);
+  /* from modules/_dropdown.css */
+}
+
+.p-dropdown .p-dropdown-label.p-placeholder {
+  color: var(--light-text);
+}
+
+.p-dropdown .p-dropdown-trigger {
+  color: #667eea;
+  /* from global/_paginator.css */
+  width: 2.5rem;
+  /* from modules/_dropdown.css */
+}
+
+::ng-deep .p-dropdown.p-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--light-bg);
+}
+
+::ng-deep .p-dropdown-panel {
+  background: var(--white) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+  box-shadow: var(--shadow-lg);
+  /* from modules/_dropdown.css */
+  border: 1px solid var(--border-color);
+  /* from modules/_dropdown.css */
+  border-radius: 4px;
+  /* from modules/_dropdown.css */
+}
+
+::ng-deep .p-dropdown-item {
+  padding: 0.625rem 0.75rem;
+  /* from modules/_dropdown.css */
+  font-size: 0.875rem;
+  /* from modules/_dropdown.css */
+  color: var(--dark-text) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+  background: var(--white) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+}
+
+::ng-deep .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+  background: var(--light-bg) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+}
+
+::ng-deep .p-dropdown-item.p-highlight {
+  background: var(--primary-color) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+  color: var(--white) !important;
+  /* from global/_primeng_overrides.css and modules/_dropdown.css */
+}
+
+.p-dropdown.invalid,
+.p-dropdown.p-invalid {
+  border-color: var(--danger-color);
+}
+
+/* --- Calendar (p-calendar) and Datepicker (p-datepicker) --- */
+.p-calendar .p-inputtext {
+  border: 1px solid var(--border-color);
+  background: var(--white);
+  /* from modules/_forms.css */
+}
+
+.p-calendar .p-inputtext:enabled:hover {
+  border-color: var(--primary-color);
+}
+
+.p-calendar .p-inputtext:enabled:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+  /* from global/_primeng_overrides.css */
+}
+
+.p-calendar.ng-invalid.ng-touched .p-inputtext {
+  border-color: var(--danger-color) !important;
+}
+
+body .p-datepicker .p-datepicker-header {
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+}
+
+body .p-datepicker .p-datepicker-header .p-datepicker-prev,
+body .p-datepicker .p-datepicker-header .p-datepicker-next {
+  color: white;
+}
+
+body .p-datepicker .p-datepicker-header .p-datepicker-prev:enabled:hover,
+body .p-datepicker .p-datepicker-header .p-datepicker-next:enabled:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body .p-datepicker table td>span.p-highlight {
+  background: var(--primary-color);
+  color: white;
+}
+
+body .p-datepicker table td>span:focus {
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
+}
+
+::ng-deep .p-datepicker {
+  width: 100%;
+  /* from modules/_forms.css */
+}
+
+::ng-deep .p-datepicker .p-inputtext {
+  padding-right: 2.5rem;
+  /* from modules/_forms.css */
+}
+
+::ng-deep .p-datepicker-dropdown {
+  color: var(--medium-text);
+  /* from modules/_forms.css */
+  transition: color 0.2s ease;
+  /* from modules/_forms.css */
+}
+
+::ng-deep .p-datepicker-dropdown:hover {
+  color: var(--primary-color);
+  /* from modules/_forms.css */
+}
+
+::ng-deep .p-datepicker-panel {
+  background: var(--white);
+  /* from modules/_forms.css */
+  border: 1px solid var(--border-color);
+  /* from modules/_forms.css */
+  box-shadow: var(--shadow-lg);
+  /* from modules/_forms.css */
+}
+
+::ng-deep .p-datepicker.p-invalid .p-inputtext {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-datepicker.p-invalid .p-inputtext:enabled:hover {
+  border-color: var(--danger-color);
+}
+
+::ng-deep .p-datepicker.p-invalid .p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color);
+}
+
+/* --- Data Table (p-datatable) --- */
+.p-datatable .p-datatable-thead>tr>th {
+  background: var(--light-bg);
+  color: var(--medium-text);
+  font-weight: 600;
+  border: none;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 0.75rem;
+  padding: 1rem;
+}
+
+.p-datatable .p-datatable-tbody>tr {
+  transition: background-color 0.2s ease;
+}
+
+.p-datatable .p-datatable-tbody>tr:hover {
+  background: #f8f9fa;
+}
+
+.p-datatable .p-datatable-tbody>tr>td {
+  border-color: var(--border-color);
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* --- Tab Menu (p-tabmenu) --- */
+.p-tabmenu .p-tabmenu-nav {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--light-text);
+  transition: all 0.2s ease;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link:not(.p-disabled):focus {
+  box-shadow: none;
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem:not(.p-highlight) .p-menuitem-link:hover {
+  background: transparent;
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem.p-highlight .p-menuitem-link {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* --- Menu (p-menu) --- */
+.p-menu {
+  border: none;
+  padding: 0.5rem;
+}
+
+.p-menu .p-menuitem-link {
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.p-menu .p-menuitem-link:hover {
+  background: var(--light-bg);
+}
+
+.p-menu .p-menuitem-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.p-menu .p-menuitem-link.p-menuitem-link-active {
+  background: linear-gradient(90deg, rgba(220, 53, 69, 0.1) 0%, rgba(13, 110, 253, 0.1) 100%);
+}
+
+.p-menu .p-menuitem-link.p-menuitem-link-active .p-menuitem-icon {
+  color: var(--primary-color);
+}
+
+.p-menu .p-menuitem-link.p-menuitem-link-active .p-menuitem-text {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* --- Toast (p-toast) --- */
+/* Toast Container */
+::ng-deep .p-toast {
+  opacity: 1;
+  z-index: 9999;
+}
+
+/* Position variants */
+::ng-deep .p-toast.p-toast-top-right {
+  top: 20px;
+  right: 20px;
+}
+
+::ng-deep .p-toast.p-toast-top-left {
+  top: 20px;
+  left: 20px;
+}
+
+::ng-deep .p-toast.p-toast-bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+::ng-deep .p-toast.p-toast-bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+::ng-deep .p-toast.p-toast-top-center {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+::ng-deep .p-toast.p-toast-bottom-center {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+::ng-deep .p-toast.p-toast-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Toast Message Container */
+::ng-deep .p-toast .p-toast-message {
+  margin: 0 0 1rem 0;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  min-width: 320px;
+  max-width: 400px;
+  position: relative;
+  animation: slideInRight 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Last message - remove bottom margin */
+::ng-deep .p-toast .p-toast-message:last-child {
+  margin-bottom: 0;
+}
+
+/* Toast Message Content */
+::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Toast Icon */
+::ng-deep .p-toast .p-toast-message .p-toast-message-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  line-height: 1;
+}
+
+/* Icon animations */
+::ng-deep .p-toast .p-toast-message-success .p-toast-message-icon {
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+::ng-deep .p-toast .p-toast-message-error .p-toast-message-icon {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.1s both;
+}
+
+::ng-deep .p-toast .p-toast-message-info .p-toast-message-icon {
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+::ng-deep .p-toast .p-toast-message-warn .p-toast-message-icon {
+  animation: pulse 0.6s ease-in-out 0.1s both;
+}
+
+/* Toast Text Container */
+::ng-deep .p-toast .p-toast-message .p-toast-message-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+/* Toast Summary (Title) */
+::ng-deep .p-toast .p-toast-message .p-toast-summary {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  margin: 0;
+  word-wrap: break-word;
+}
+
+/* Toast Detail (Description) */
+::ng-deep .p-toast .p-toast-message .p-toast-detail {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.95;
+  word-wrap: break-word;
+}
+
+/* Close Button */
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close:active {
+  transform: scale(0.95);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close .p-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* SUCCESS TOAST - Green */
+::ng-deep .p-toast .p-toast-message.p-toast-message-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: var(--white, #ffffff);
+  border-left: 4px solid #34d399;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-success .p-toast-icon-close {
+  color: var(--white, #ffffff);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-success::after {
+  background: rgba(52, 211, 153, 0.3);
+}
+
+/* ERROR TOAST - Red */
+::ng-deep .p-toast .p-toast-message.p-toast-message-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: var(--white, #ffffff);
+  border-left: 4px solid #f87171;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-error .p-toast-icon-close {
+  color: var(--white, #ffffff);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-error::after {
+  background: rgba(248, 113, 113, 0.3);
+}
+
+/* INFO TOAST - Blue */
+::ng-deep .p-toast .p-toast-message.p-toast-message-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: var(--white, #ffffff);
+  border-left: 4px solid #60a5fa;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-info .p-toast-icon-close {
+  color: var(--white, #ffffff);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-info::after {
+  background: rgba(96, 165, 250, 0.3);
+}
+
+/* WARNING TOAST - Orange */
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: var(--white, #ffffff);
+  border-left: 4px solid #fbbf24;
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon,
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn .p-toast-icon-close {
+  color: var(--white, #ffffff);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn::after {
+  background: rgba(251, 191, 36, 0.3);
+}
+
+/* Progress Bar (Life Indicator) */
+::ng-deep .p-toast .p-toast-message::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 1;
+}
+
+/* Animate progress bar based on life duration */
+::ng-deep .p-toast .p-toast-message[data-life="3000"]::after {
+  animation: toastProgress 3s linear;
+}
+
+::ng-deep .p-toast .p-toast-message[data-life="4000"]::after,
+::ng-deep .p-toast .p-toast-message::after {
+  animation: toastProgress 4s linear;
+}
+
+::ng-deep .p-toast .p-toast-message[data-life="5000"]::after {
+  animation: toastProgress 5s linear;
+}
+
+::ng-deep .p-toast .p-toast-message[data-life="6000"]::after {
+  animation: toastProgress 6s linear;
+}
+
+/* Exit Animations */
+::ng-deep .p-toast .p-toast-message.p-toast-message-leave {
+  animation: slideOutRight 0.3s ease-in both;
+}
+
+/* Left position exit animation */
+::ng-deep .p-toast.p-toast-top-left .p-toast-message.p-toast-message-leave,
+::ng-deep .p-toast.p-toast-bottom-left .p-toast-message.p-toast-message-leave {
+  animation: slideOutLeft 0.3s ease-in both;
+}
+
+/* Center position exit animation */
+::ng-deep .p-toast.p-toast-top-center .p-toast-message.p-toast-message-leave,
+::ng-deep .p-toast.p-toast-bottom-center .p-toast-message.p-toast-message-leave,
+::ng-deep .p-toast.p-toast-center .p-toast-message.p-toast-message-leave {
+  animation: fadeOut 0.3s ease-in both;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+  /* Adjust toast container positioning */
+  ::ng-deep .p-toast.p-toast-top-right,
+  ::ng-deep .p-toast.p-toast-top-left {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+  }
+
+  ::ng-deep .p-toast.p-toast-bottom-right,
+  ::ng-deep .p-toast.p-toast-bottom-left {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+  }
+
+  ::ng-deep .p-toast.p-toast-top-center {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+  }
+
+  ::ng-deep .p-toast.p-toast-bottom-center {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+  }
+
+  /* Adjust toast message size */
+  ::ng-deep .p-toast .p-toast-message {
+    min-width: unset;
+    max-width: 100%;
+    margin: 0 0 0.75rem 0;
+  }
+
+  ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+    padding: 0.875rem 1rem;
+  }
+
+  /* Adjust icon size */
+  ::ng-deep .p-toast .p-toast-message .p-toast-message-icon {
+    font-size: 1.25rem;
+  }
+
+  /* Adjust close button */
+  ::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Further reduce padding on very small screens */
+  ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+    padding: 0.75rem 0.875rem;
+    gap: 0.625rem;
+  }
+
+  /* Adjust text sizes */
+  ::ng-deep .p-toast .p-toast-message .p-toast-summary {
+    font-size: 0.875rem;
+  }
+
+  ::ng-deep .p-toast .p-toast-message .p-toast-detail {
+    font-size: 0.8125rem;
+  }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-contrast: high) {
+  ::ng-deep .p-toast .p-toast-message {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  ::ng-deep .p-toast .p-toast-message {
+    animation: fadeIn 0.2s ease;
+  }
+
+  ::ng-deep .p-toast .p-toast-message.p-toast-message-leave {
+    animation: fadeOut 0.2s ease;
+  }
+}

@@ -52,7 +52,7 @@ interface OSOption {
   templateUrl: './user-audits.html',
   styleUrls: [
     './user-audits.css',
-    '../../../../styles/modules/_audit_module.css',
+
   ],
 })
 export class UserAudits implements OnInit {

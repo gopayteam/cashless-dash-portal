@@ -28,7 +28,7 @@ import { AuthService } from '../../../../@core/services/auth.service';
   templateUrl: './parcel-destination.html',
   styleUrls: [
     './parcel-destination.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',
   ],
   imports: [
     CommonModule,

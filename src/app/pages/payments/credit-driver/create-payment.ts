@@ -49,6 +49,7 @@ interface DriverOption {
   templateUrl: './create-payment.html',
   styleUrls: [
     './create-payment.css',
+    '../../../../styles/styles.css',
   ],
 })
 export class CreditDriverComponent implements OnInit {

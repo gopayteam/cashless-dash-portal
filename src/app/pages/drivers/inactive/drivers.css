@@ -127,13 +127,20 @@
   display: inline-block;
 }
 
-.p-input-icon-left > i {
+.p-input-icon-left>i {
   position: absolute;
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--light-text);
-  z-index: 1;
+  pointer-events: none;
+  /* important */
+}
+
+/* THIS is what you were missing */
+.p-input-icon-left>.search-input {
+  padding-left: 2.25rem;
+  /* space for icon */
 }
 
 .clear-button {

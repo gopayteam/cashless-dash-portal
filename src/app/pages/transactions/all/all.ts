@@ -42,7 +42,7 @@ import { AuthService } from '../../../../@core/services/auth.service';
   templateUrl: './all.html',
   styleUrls: [
     './all.css',
-    '../../../../styles/modules/_transactions.css'
+    '../../../../styles/styles.css',
   ],
 })
 export class AllTransactionsComponent implements OnInit {

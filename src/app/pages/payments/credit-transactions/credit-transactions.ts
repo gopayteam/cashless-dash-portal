@@ -42,7 +42,7 @@ import { Router } from '@angular/router';
   templateUrl: './credit-transactions.html',
   styleUrls: [
     './credit-transactions.css',
-    '../../../../styles/modules/_transactions.css'
+    '../../../../styles/styles.css',
   ],
 })
 export class CreditTransactionsComponent implements OnInit {

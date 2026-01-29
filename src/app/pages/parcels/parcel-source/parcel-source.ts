@@ -28,7 +28,7 @@ import { Router } from '@angular/router';
   templateUrl: './parcel-source.html',
   styleUrls: [
     './parcel-source.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',
   ],
   imports: [
     CommonModule,

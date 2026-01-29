@@ -56,7 +56,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './register-passenger.html',
-  styleUrls: ['./register-passenger.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./register-passenger.css', ],
   providers: [MessageService]
 })
 export class RegisterPassengerComponent implements OnInit {

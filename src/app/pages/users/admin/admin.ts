@@ -53,8 +53,7 @@ interface StatusOption {
   templateUrl: './admin.html',
   styleUrls: [
     './admin.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
+
   ],
 })
 export class AdminUserComponent implements OnInit {

@@ -51,7 +51,7 @@ interface OSOption {
   templateUrl: './system-audits.html',
   styleUrls: [
     './system-audits.css',
-    '../../../../styles/modules/_audit_module.css',
+
   ],
 })
 export class SystemAudits implements OnInit {

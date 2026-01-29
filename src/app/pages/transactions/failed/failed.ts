@@ -42,7 +42,7 @@ import { Router } from '@angular/router';
   templateUrl: './failed.html',
   styleUrls: [
     './failed.css',
-    '../../../../styles/modules/_transactions.css'
+    '../../../../styles/styles.css',
   ],
 })
 export class FailedTransactionsComponent implements OnInit {
@@ -70,7 +70,7 @@ export class FailedTransactionsComponent implements OnInit {
     private router: Router,
     // private cdr: ChangeDetectorRef
     @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;

@@ -123,7 +123,7 @@
     [modal]="true"
     [style]="{ width: '650px', background: '#f9f9f9' }"
     [contentStyle]="{ overflow: 'visible' }"
-    styleClass="parcel-detail-dialog"
+    styleClass="custom-dialog"
     [dismissableMask]="true"
   >
     <ng-container *ngIf="selectedStage">
@@ -191,6 +191,7 @@
         label="Close"
         icon="pi pi-times"
         class="p-button-text"
+        iconPos="right" style="gap: 1rem;"
         (click)="showStageDialog = false"
       ></button>
     </ng-template>

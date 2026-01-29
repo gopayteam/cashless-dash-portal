@@ -45,7 +45,9 @@ interface ApprovalFilterOption {
     SelectModule,
   ],
   templateUrl: './rejected.html',
-  styleUrls: ['./rejected.css'],
+  styleUrls: ['./rejected.css',
+    '../../../../styles/styles.css',
+  ],
 })
 export class AllRejectedDriverAssignmentsComponent implements OnInit {
   entityId: string | null = null;

@@ -60,7 +60,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './register-parcel-manager.html',
-  styleUrls: ['./register-parcel-manager.css', '../../../../../styles/global/_toast.css'],
+  styleUrls: ['./register-parcel-manager.css', ],
 })
 export class RegisterParcelManagerComponent implements OnInit {
   entityId: string | null = null;

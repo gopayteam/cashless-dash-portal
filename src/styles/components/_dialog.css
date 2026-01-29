@@ -19,16 +19,9 @@ body .p-dialog.custom-dialog .p-dialog-header .p-dialog-title {
 }
 
 /* ================= CLOSE BUTTON - CLEAN X ICON ================= */
-/* ENHANCED: Remove all backgrounds and borders from close button */
-/* Target all possible close button selectors with maximum specificity */
-
-/* Base close button styling */
+/* Remove all backgrounds and borders from close button */
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon,
-body .p-dialog.custom-dialog .p-dialog-header-close,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"] {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -37,95 +30,44 @@ body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"] {
   color: white !important;
   width: auto !important;
   height: auto !important;
-  padding: 0.5rem !important;
-  transition: background-color 0.2s ease, transform 0.1s ease !important;
-}
-
-/* Remove any ripple effects */
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon .p-ink,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button .p-ink {
-  display: none !important;
+  padding: 0.25rem !important;
 }
 
 /* Hover state - subtle background */
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:hover,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:hover,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:hover,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon:hover,
-body .p-dialog.custom-dialog .p-dialog-header-close:hover,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"]:hover {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:hover {
   background: rgba(255, 255, 255, 0.15) !important;
-  background-color: rgba(255, 255, 255, 0.15) !important;
   border-radius: 4px !important;
-  transform: none !important;
 }
 
 /* Focus state - accessibility */
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus,
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus-visible,
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus-visible,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:focus,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:focus-visible,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon:focus,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon:focus-visible,
-body .p-dialog.custom-dialog .p-dialog-header-close:focus,
-body .p-dialog.custom-dialog .p-dialog-header-close:focus-visible,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"]:focus,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"]:focus-visible {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.5) !important;
   outline-offset: 2px !important;
   box-shadow: none !important;
   border-radius: 4px !important;
   background: transparent !important;
-  background-color: transparent !important;
 }
 
 /* Active/pressed state */
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:active,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:active,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:active,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon:active,
-body .p-dialog.custom-dialog .p-dialog-header-close:active,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"]:active {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:active {
   background: rgba(255, 255, 255, 0.25) !important;
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  transform: scale(0.95) !important;
+  transform: scale(0.95);
 }
 
-/* Icon itself - ensure proper sizing and WHITE color */
+/* Icon itself - ensure proper sizing */
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon i,
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon svg,
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button i,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button svg,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon i,
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon svg,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon i,
-body .p-dialog.custom-dialog .p-dialog-header-icons button.p-dialog-header-icon svg,
-body .p-dialog.custom-dialog .p-dialog-header-close i,
-body .p-dialog.custom-dialog .p-dialog-header-close svg,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"] i,
-body .p-dialog.custom-dialog .p-dialog-header button[aria-label="Close"] svg {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button svg {
   color: white !important;
-  fill: white !important;
   font-size: 1.25rem !important;
   width: 1.25rem !important;
   height: 1.25rem !important;
-}
-
-/* ADDITIONAL FIX: Target PrimeNG's specific close button class if it exists */
-body .p-dialog.custom-dialog .p-dialog-header .p-link,
-body .p-dialog.custom-dialog .p-dialog-header button.p-link {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-  color: white !important;
-}
-
-body .p-dialog.custom-dialog .p-dialog-header .p-link:hover,
-body .p-dialog.custom-dialog .p-dialog-header button.p-link:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ================= DIALOG CONTENT STYLING ================= */
@@ -191,14 +133,6 @@ body .p-dialog.custom-dialog {
   font-size: 1.5rem;
   font-weight: 600;
   color: white;
-}
-
-/* ================= DIALOG BADGES (used inside dialog header) ================= */
-.dialog-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 /* ================= LARGE IDENTIFIER STYLES ================= */
@@ -346,12 +280,6 @@ body .p-dialog.custom-dialog {
   font-size: 1.5rem;
 }
 
-/* ================= HIGH TRIALS VALUE STYLING ================= */
-.high-trials-value {
-  color: #ef4444 !important;
-  font-weight: 700 !important;
-}
-
 /* ================= RESPONSIVE DIALOG ================= */
 @media (max-width: 768px) {
   .detail-grid {
@@ -464,10 +392,6 @@ body .p-dialog.dialog-info .p-dialog-header {
 .status-card i {
   font-size: 2rem;
   opacity: 0.9;
-}
-
-.status-card.warning-card {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 .status-label {

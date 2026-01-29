@@ -31,9 +31,7 @@ import { Router } from '@angular/router';
   templateUrl: './parcels.html',
   styleUrls: [
     './parcels.css',
-    '../../../../styles/modules/_cards.css',
-    '../../../../styles/global/_grid_layout.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/styles.css',
 
   ],
   imports: [

@@ -24,7 +24,9 @@ import { Router } from '@angular/router';
   standalone: true,
   selector: 'app-inactive-drivers',
   templateUrl: './drivers.html',
-  styleUrls: ['./drivers.css'],
+  styleUrls: ['./drivers.css',
+    '../../../../styles/styles.css'
+  ],
   imports: [
     CommonModule,
     FormsModule,
