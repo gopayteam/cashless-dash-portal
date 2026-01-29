@@ -20,8 +20,8 @@
 .dashboard-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--dark-text);
-  margin: 0 0 0.5rem;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
 }
 
 .header-actions {
@@ -140,7 +140,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-
-
-
