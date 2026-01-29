@@ -7,6 +7,8 @@ import { AuthService } from '../../../@core/services/auth.service';
 import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
 import { Dialog } from "primeng/dialog";
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { DarkModeService } from '../../../@core/services/dark-mode.service';
+import { Subscription } from 'rxjs';
 
 interface TabConfig {
   label: string;
@@ -40,7 +42,6 @@ interface Notification {
   styleUrls: ['./main-layout.css']
 })
 export class MainLayoutComponent implements OnInit {
-
   // Sidebar state
   sidebarCollapsed = false;
   sidebarVisible = false;
@@ -63,6 +64,8 @@ export class MainLayoutComponent implements OnInit {
   emailNotificationsEnabled = true;
   autoLogoutEnabled = false;
 
+  private darkModeSubscription?: Subscription;
+
   // Tab navigation
   showTabs = false;
   currentTabs: TabConfig[] = [];
@@ -84,6 +87,7 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private darkModeService: DarkModeService
   ) { }
 
   /* =============================================
@@ -188,6 +192,59 @@ export class MainLayoutComponent implements OnInit {
     this.setupRouteListener();
     this.loadNotifications();
     this.initializeSettingsForm();
+
+    // Subscribe to dark mode changes
+    this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(
+      isDark => {
+        this.darkModeEnabled = isDark;
+      }
+    );
+
+    // Initialize from service
+    this.darkModeEnabled = this.darkModeService.isDarkMode;
+  }
+
+  ngOnDestroy(): void {
+    // Clean up subscription
+    if (this.darkModeSubscription) {
+      this.darkModeSubscription.unsubscribe();
+    }
+  }
+
+  /**
+ * Handle dark mode toggle change
+ */
+  onDarkModeChange(enabled: boolean): void {
+    this.darkModeService.setDarkMode(enabled);
+    console.log('Dark mode:', enabled ? 'enabled' : 'disabled');
+  }
+
+  /**
+   * Handle email notifications toggle change
+   */
+  onEmailNotificationsChange(enabled: boolean): void {
+    // Save to your backend/localStorage
+    localStorage.setItem('emailNotificationsEnabled', enabled.toString());
+    console.log('Email notifications:', enabled ? 'enabled' : 'disabled');
+
+    // TODO: Call your API to update user preferences
+    // this.userPreferencesService.updateEmailNotifications(enabled);
+  }
+
+  /**
+   * Handle auto logout toggle change
+   */
+  onAutoLogoutChange(enabled: boolean): void {
+    // Save to your backend/localStorage
+    localStorage.setItem('autoLogoutEnabled', enabled.toString());
+    console.log('Auto logout:', enabled ? 'enabled' : 'disabled');
+
+    // TODO: Implement auto logout logic
+    // if (enabled) {
+    //   this.authService.enableAutoLogout();
+    // } else {
+    //   this.authService.disableAutoLogout();
+    // }
   }
 
   /* =============================================

@@ -65,7 +65,7 @@
   --danger-color: #b71c1c;
   --info-color: #0dcaf0;
 
-  /* Neutrals */
+  /* Neutrals - Light Mode */
   --light-bg: #f8f9fa;
   --white: #ffffff;
   --dark-text: #212529;
@@ -86,6 +86,30 @@
 }
 
 /* ============================================================
+   DARK MODE VARIABLES
+   ============================================================ */
+body.dark-mode {
+  /* Override neutrals for dark mode */
+  --light-bg: #1a1d23;
+  --white: #2d3139;
+  --dark-text: #e8eaed;
+  --medium-text: #c4c7cc;
+  --light-text: #9aa0a6;
+  --border-color: #3c4049;
+
+  /* Adjust shadows for dark mode */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark mode background */
+body.dark-mode {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+}
+
+/* ============================================================
    RESET AND BASE STYLES
    ============================================================ */
 * {
@@ -103,36 +127,320 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--light-bg);
   color: var(--dark-text);
+  transition: background-color var(--transition), color var(--transition);
 }
 
+/* ============================================================
+   DARK MODE TRANSITIONS FOR COMMON ELEMENTS
+   ============================================================ */
+body.dark-mode .sidebar,
+body.dark-mode .topbar,
+body.dark-mode .content,
+body.dark-mode .p-card,
+body.dark-mode .p-datatable,
+body.dark-mode .p-dialog {
+  transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
 
 /* ============================================================
-   RESPONSIVE UTILITIES
+   DARK MODE - CARD STYLES
    ============================================================ */
-@media (max-width: 768px) {
-  .p-paginator {
-    justify-content: center;
-  }
+body.dark-mode .p-card {
+  background-color: var(--white);
+  border-color: var(--border-color);
+}
 
-  .p-paginator .p-paginator-current {
-    order: 4;
-    width: 100%;
-    text-align: center;
-    margin-left: 0;
-    margin-top: 1rem;
-  }
+body.dark-mode .p-card .p-card-title,
+body.dark-mode .p-card .p-card-subtitle,
+body.dark-mode .p-card .p-card-content {
+  color: var(--dark-text);
+}
 
-  .p-paginator .p-paginator-pages {
-    gap: 0.25rem;
-  }
+/* ============================================================
+   DARK MODE - TABLE STYLES
+   ============================================================ */
+body.dark-mode .p-datatable {
+  background-color: var(--white);
+  color: var(--dark-text);
+}
 
-  .p-paginator .p-paginator-page,
-  .p-paginator .p-paginator-first,
-  .p-paginator .p-paginator-prev,
-  .p-paginator .p-paginator-next,
-  .p-paginator .p-paginator-last {
-    min-width: 36px;
-    height: 36px;
-    font-size: 0.875rem;
-  }
+body.dark-mode .p-datatable .p-datatable-thead>tr>th {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .p-datatable .p-datatable-tbody>tr {
+  background-color: var(--white);
+  color: var(--dark-text);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .p-datatable .p-datatable-tbody>tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+body.dark-mode .p-datatable .p-datatable-tbody>tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   DARK MODE - DIALOG STYLES
+   ============================================================ */
+body.dark-mode .p-dialog {
+  background-color: var(--white);
+  color: var(--dark-text);
+}
+
+body.dark-mode .p-dialog .p-dialog-content {
+  background-color: var(--white);
+  color: var(--dark-text);
+}
+
+/* ============================================================
+   DARK MODE - INPUT STYLES
+   ============================================================ */
+body.dark-mode .p-inputtext,
+body.dark-mode .p-dropdown,
+body.dark-mode .p-calendar,
+body.dark-mode select,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode textarea {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  border-color: var(--border-color);
+}
+
+body.dark-mode .p-inputtext:focus,
+body.dark-mode .p-dropdown:focus,
+body.dark-mode select:focus,
+body.dark-mode input[type="text"]:focus,
+body.dark-mode input[type="email"]:focus,
+body.dark-mode input[type="password"]:focus,
+body.dark-mode textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.2);
+}
+
+/* ============================================================
+   DARK MODE - BUTTON STYLES
+   ============================================================ */
+body.dark-mode .p-button-outlined {
+  border-color: var(--border-color);
+  color: var(--dark-text);
+}
+
+body.dark-mode .p-button-text {
+  color: var(--dark-text);
+}
+
+/* ============================================================
+   DARK MODE - SIDEBAR SPECIFIC
+   ============================================================ */
+body.dark-mode .sidebar {
+  background: var(--light-bg);
+  border-right: 1px solid var(--border-color);
+}
+
+body.dark-mode .sidebar__header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .sidebar__user-name,
+body.dark-mode .menu-text {
+  color: var(--dark-text);
+}
+
+body.dark-mode .sidebar__user-email {
+  color: var(--light-text);
+}
+
+body.dark-mode .menu-category {
+  color: var(--light-text);
+}
+
+body.dark-mode .menu-link {
+  color: var(--medium-text);
+}
+
+body.dark-mode .menu-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .menu-link--active {
+  background-color: rgba(14, 44, 90, 0.15);
+  color: var(--dark-text);
+}
+
+/* ============================================================
+   DARK MODE - TOPBAR SPECIFIC
+   ============================================================ */
+body.dark-mode .topbar {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .topbar__icon-btn {
+  color: var(--dark-text);
+  background-color: transparent;
+}
+
+body.dark-mode .topbar__icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   DARK MODE - TAB NAVIGATION
+   ============================================================ */
+body.dark-mode .tab-nav {
+  background-color: var(--white);
+  border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .tab-nav__item {
+  color: var(--medium-text);
+}
+
+body.dark-mode .tab-nav__item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .tab-nav__item--active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+/* ============================================================
+   DARK MODE - CONTENT AREA
+   ============================================================ */
+body.dark-mode .content {
+  background-color: var(--light-bg);
+}
+
+/* ============================================================
+   DARK MODE - NOTIFICATION & SETTINGS PANELS
+   ============================================================ */
+body.dark-mode .notification-panel,
+body.dark-mode .settings-panel {
+  background-color: var(--white);
+}
+
+body.dark-mode .panel-header {
+  border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .panel-title {
+  color: var(--dark-text);
+}
+
+body.dark-mode .notification-item {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left-color: transparent;
+}
+
+body.dark-mode .notification-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .notification-item.unread {
+  background: linear-gradient(135deg, rgba(14, 44, 90, 0.15), rgba(14, 44, 90, 0.2));
+  border-left-color: var(--primary-color);
+}
+
+body.dark-mode .notification-title {
+  color: var(--dark-text);
+}
+
+body.dark-mode .notification-message {
+  color: var(--medium-text);
+}
+
+body.dark-mode .notification-time {
+  color: var(--light-text);
+}
+
+body.dark-mode .settings-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .settings-label {
+  color: var(--dark-text);
+}
+
+body.dark-mode .settings-description {
+  color: var(--light-text);
+}
+
+body.dark-mode .panel-footer {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-top-color: var(--border-color);
+}
+
+/* ============================================================
+   DARK MODE - EMPTY STATES
+   ============================================================ */
+body.dark-mode .empty-state {
+  color: var(--light-text);
+}
+
+body.dark-mode .empty-state i {
+  color: var(--border-color);
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+/* Light mode scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Dark mode scrollbar */
+body.dark-mode ::-webkit-scrollbar-track {
+  background: var(--light-bg);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #5a6678;
+}
+
+/* ============================================================
+   SMOOTH TRANSITIONS
+   ============================================================ */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Exclude elements that shouldn't transition */
+button,
+.p-button,
+.menu-link,
+.notification-item,
+.settings-item,
+input,
+select,
+textarea {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
