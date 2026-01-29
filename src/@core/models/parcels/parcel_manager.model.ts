@@ -11,3 +11,4 @@ export interface ParcelManager {
   netAmount: number;      // totalAmount - expense
 }
 
+// https://api.gopay.ke/api/parcels/filter/user/aggregates

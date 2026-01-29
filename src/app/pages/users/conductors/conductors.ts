@@ -158,7 +158,7 @@ export class ConductorsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
-          this.totalRecords = this.allUsers.length;
+          this.totalRecords = response.totalRecords;
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();

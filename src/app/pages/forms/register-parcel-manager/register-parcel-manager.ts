@@ -204,7 +204,7 @@ export class RegisterParcelManagerComponent implements OnInit {
             life: 4000
           });
           // Navigate to parcel users list page
-          this.router.navigate(['/parcel-users/all']);
+          this.router.navigate(['users/parcel-managers']);
         },
         error: (err) => {
           console.error('Failed to create parcel manger', err);
@@ -221,7 +221,7 @@ export class RegisterParcelManagerComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/parcel-users/all']);
+    this.router.navigate(['users/parcel-managers']);
   }
 
   resetForm(): void {

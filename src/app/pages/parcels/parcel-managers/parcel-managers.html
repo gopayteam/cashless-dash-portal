@@ -49,12 +49,6 @@
             <h3>Parcel Managers</h3>
             <span class="record-count">{{ totalRecords }} managers</span>
           </div>
-
-          <app-action-button icon="pi-plus" tooltip="Add Parcel Manager" variant="primary"
-            (clicked)="navigateToCreateManager()"></app-action-button>
-          <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
-            (clicked)="refresh()"></app-action-button>
-
         </div>
       </div>
 
@@ -177,12 +171,6 @@
         </div>
       </div>
 
-      <!-- ACTION BUTTON -->
-      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-        <app-action-button icon="pi-pencil" tooltip="Edit Manager" variant="primary"
-          (clicked)="navigateToUpdateManager(selectedManager)">
-        </app-action-button>
-      </div>
     </div>
 
     <ng-template pTemplate="footer">

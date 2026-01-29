@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -34,7 +35,7 @@ interface StatusOption {
 }
 
 @Component({
-  selector: 'app-all-deactivated-users',
+  selector: 'app-all-marshalls-users',
   standalone: true,
   imports: [
     CommonModule,
@@ -47,15 +48,16 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent
   ],
-  templateUrl: './deactivated.html',
+  templateUrl: './parcel-managers.html',
   styleUrls: [
-    './deactivated.css',
+    './parcel-managers.css',
     '../../../../styles/modules/_cards.css',
     '../../../../styles/modules/_user_module.css'
   ],
 })
-export class DeactivatedUsersComponent implements OnInit {
+export class ParcelManagerUsersComponent implements OnInit {
   entityId: string | null = null;
   users: User[] = [];
   allUsers: User[] = [];
@@ -110,14 +112,13 @@ export class DeactivatedUsersComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
   }
 
   ngOnInit(): void {
-
     const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
@@ -126,7 +127,6 @@ export class DeactivatedUsersComponent implements OnInit {
       this.router.navigate(['/login']);
       console.log('No user logged in');
     }
-
 
     this.loadUsers();
   }
@@ -147,6 +147,7 @@ export class DeactivatedUsersComponent implements OnInit {
 
     const payload = {
       entityId: this.entityId,
+      agent: "PARCEL",
       page,
       size: pageSize,
     };
@@ -154,7 +155,7 @@ export class DeactivatedUsersComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_DEACTIVATED_USERS, payload, 'deactivated-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-parcel-managers')
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
@@ -303,5 +304,28 @@ export class DeactivatedUsersComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateManager(): void {
+    this.router.navigate(['forms/add-parcel-manager'])
+  }
+
+  navigateToUpdateManager(manager: User, event?: Event): void {
+    event?.stopPropagation();
+    console.log('Navigating to:', manager.id);
+
+    if (!manager?.id) {
+      console.error('Manager ID missing', manager);
+      return;
+    }
+
+    // Pass the manager email as route param and full manager object as state
+    this.router.navigate(['/forms/update-parcel-manager', manager.id], {
+      state: { manager }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

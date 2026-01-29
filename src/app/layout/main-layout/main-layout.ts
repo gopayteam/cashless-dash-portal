@@ -153,7 +153,7 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Conductors', icon: 'pi pi-user', route: '/users/conductors', roles: ['CAN_VIEW_TOUTS'] },
       { label: 'Passangers', icon: 'pi pi-shopping-cart', route: '/users/customers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
       { label: 'Investors', icon: 'pi pi-money-bill', route: '/users/investors', roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] },
-      { label: 'Marshals', icon: 'pi pi-flag', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
+      { label: 'Parcel Managers', icon: 'pi pi-user', route: '/users/parcel-managers', roles: ['CAN_VIEW_USERS'] },
       { label: 'Deactivated', icon: 'pi pi-ban', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
     ],
 

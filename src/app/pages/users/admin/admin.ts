@@ -158,7 +158,7 @@ export class AdminUserComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
-          this.totalRecords = this.allUsers.length;
+          this.totalRecords = response.totalRecords;
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
@@ -172,7 +172,7 @@ export class AdminUserComponent implements OnInit {
   }
 
   calculateStats(): void {
-    this.totalUsers = this.allUsers.length;
+    this.totalUsers = this.totalRecords;
     this.activeUsers = this.allUsers.filter(u => !u.blocked).length;
     this.blockedUsers = this.allUsers.filter(u => u.blocked).length;
     this.firstLoginUsers = this.allUsers.filter(u => u.firstLogin).length;

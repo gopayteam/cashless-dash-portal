@@ -18,17 +18,17 @@
     <div class="form-container">
 
       <!-- Loading State -->
-      <div *ngIf="loading()" class="loading-state">
+      <!-- <div *ngIf="loading()" class="loading-state">
         <p-progressSpinner styleClass="spinner-small"></p-progressSpinner>
         <p>Loading user data...</p>
-      </div>
+      </div> -->
 
-      <form *ngIf="!loading() && managerData" (ngSubmit)="onSubmit()" #parcelUserForm="ngForm">
+      <form *ngIf="!loading() && userData" (ngSubmit)="onSubmit()" #parcelUserForm="ngForm">
 
         <!-- User ID Display -->
         <div class="user-id-badge">
           <i class="pi pi-hashtag"></i>
-          <span>User ID: <strong>{{ managerUsername }}</strong></span>
+          <span>User ID: <strong>{{ managerId }}</strong></span>
         </div>
 
         <!-- Personal Information Section -->
@@ -57,8 +57,8 @@
             <div class="form-field">
               <label for="phoneNumber" class="field-label required">Phone Number</label>
               <input pInputText id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber"
-                placeholder="e.g., 0796020205" class="w-full" required maxlength="10" pattern="0[0-9]{9}" />
-              <small class="field-hint">Format: 10 digits starting with 0</small>
+                placeholder="e.g., 254796020205" class="w-full" required maxlength="10" pattern="254[0-9]{9}" />
+              <small class="field-hint">Format: 9 digits starting with 254 (2547xxxxxxxxx)</small>
             </div>
 
             <!-- Email -->

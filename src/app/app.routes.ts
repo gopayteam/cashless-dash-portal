@@ -63,6 +63,7 @@ import { UserProfileComponent } from './pages/profile/update-profile/update-prof
 import { AddVehicleComponent } from './pages/forms/add-vehicle/add-vehicle';
 import { RegisterParcelManagerComponent } from './pages/forms/register-parcel-manager/register-parcel-manager';
 import { UpdateParcelManagerComponent } from './pages/forms/update-parcel-manager/update-parcel-manager';
+import { ParcelManagerUsersComponent } from './pages/users/parcel-managers/parcel-managers';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -423,6 +424,12 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_USERS'] }
       },
+      {
+        path: 'users/parcel-managers',
+        component: ParcelManagerUsersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_USERS'] }
+      },
 
       /* Audits */
       {
@@ -475,7 +482,7 @@ export const routes: Routes = [
       // },
 
       {
-        path: 'forms/update-parcel-manager/:username',
+        path: 'forms/update-parcel-manager/:id',
         component: UpdateParcelManagerComponent,
         // canActivate: [roleGuard],
         // data: { roles: ['CAN_EDIT_USER'] }

@@ -41,7 +41,6 @@ import { ActionButtonComponent } from "../../../components/action-button/action-
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
-    ActionButtonComponent
   ],
 })
 export class ParcelManagersComponent implements OnInit {

@@ -1,4 +1,4 @@
-// pages/parcel-managers/update-parcel-manager/update-parcel-manager.component.ts
+// pages/parcel-managers/update-parcel-manager/update-parcel-manager.component.ts (FIXED)
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,11 +14,12 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { Stage } from '../../../../@core/models/locations/stage.model';
-import { ParcelManager } from '../../../../@core/models/parcels/parcel_manager.model';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ParcelDetailsApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
+import { User } from '../../../../@core/models/user/user.model';
+import { UserApiResponse } from '../../../../@core/models/user/user_api_Response.mode';
 
 interface DropdownOption {
   label: string;
@@ -26,7 +27,7 @@ interface DropdownOption {
 }
 
 interface UpdateParcelManagerPayload {
-  username: string;
+  id: number;
   entityId: string;
   phoneNumber: string;
   firstName: string;
@@ -62,15 +63,16 @@ interface ApiResponse {
   ],
   templateUrl: './update-parcel-manager.html',
   styleUrls: ['./update-parcel-manager.css', '../../../../styles/global/_toast.css'],
+  providers: [MessageService]
 })
 export class UpdateParcelManagerComponent implements OnInit {
   entityId: string | null = null;
+  managerId: number | null = null; // FIXED: Changed from managerUsername to managerId
   managerUsername: string | null = null;
-  managerData: ParcelManager | null = null;
-
-  userId: string = '';
+  userData: User | null = null;
 
   // Form fields
+  userId: number | null = null;
   phoneNumber: string = '';
   firstName: string = '';
   lastName: string = '';
@@ -87,7 +89,7 @@ export class UpdateParcelManagerComponent implements OnInit {
 
   // Loading states
   stagesLoading: boolean = false;
-  managerLoading: boolean = false;
+  userLoading: boolean = false;
   submitting: boolean = false;
 
   constructor(
@@ -113,140 +115,124 @@ export class UpdateParcelManagerComponent implements OnInit {
     }
 
     const navigation = this.router.getCurrentNavigation();
-    const stateManager = navigation?.extras?.state?.['manager'] as ParcelManager;
+    const stateUser = navigation?.extras?.state?.['manager'] as User;
 
     this.route.params.subscribe(params => {
-      const username = params['username'];
-      this.managerUsername = username;
+      const id = params['id']; // FIXED: Get id from route params
+      this.managerId = +id; // FIXED: Convert to number and store
 
-      if (stateManager) {
-        // Came from navigation (best case)
-        this.populateFormFromManager(stateManager);
+      if (stateUser) {
+        // Came from navigation (best case) - state was passed
+        console.log('Loading from navigation state:', stateUser);
+        this.populateFormFromUser(stateUser);
       } else {
-        // Page refreshed or direct URL
-        this.loadManagerData(username);
+        // Page refreshed or direct URL - need to fetch data
+        console.log('No state found, loading user data for ID:', id);
+        this.loadUserData(+id); // FIXED: Pass id as number
       }
     });
-
-
 
     this.loadStages();
   }
 
-  populateFormFromManager(manager: ParcelManager): void {
-    this.managerData = manager;
+  populateFormFromUser(user: User): void {
+    this.userData = user;
+    this.userId = user.id;
+    this.firstName = user.firstName;
+    this.lastName = user.lastName;
+    this.phoneNumber = user.phoneNumber;
+    this.email = user.email;
 
-    // Split userName into firstName and lastName (assuming format: "FirstName LastName")
-    const nameParts = manager.userName.split(' ');
-    this.userId = manager.userName;
-    this.firstName = nameParts[0] || '';
-    this.lastName = nameParts.slice(1).join(' ') || '';
-
-    this.phoneNumber = manager.userPhone;
-    // Email might not be in ParcelManager model, so we'll leave it empty or fetch from API
-    this.email = '';
-
-    // Note: stageId is not in the ParcelManager model
-    // You'll need to either fetch it from API or add it to the model
+    // Note: stageId is not in the User model
+    // You'll need to either fetch it from another API or add it to the User model
     this.selectedStage = null;
 
     this.loadingStore.stop();
   }
 
-  loadManagerData(username: string): void {
-    this.managerLoading = true;
+  // FIXED: Changed parameter from username to userId
+  loadUserData(userId: number): void {
+    if (!this.entityId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Entity ID not found',
+        life: 4000
+      });
+      this.router.navigate(['users/parcel-managers']);
+      return;
+    }
+
+    this.userLoading = true;
     this.loadingStore.start();
 
     const payload = {
       entityId: this.entityId,
-      username: username,
+      agent: this.AGENT,
       page: 0,
-      size: 1,
-      transactionType: 'DEBIT',
-      paymentStatus: 'PAID',
+      size: 100 // FIXED: Increased size to ensure we get all users
     };
 
     this.dataService
-      .post<any>(API_ENDPOINTS.ALL_PARCEL_MANAGERS, payload, 'parcel-managers')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-parcel-managers')
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
-            const manager = response.data[0];
-            this.populateFormFromManager(manager);
+            // FIXED: Find the user with matching ID instead of username
+            const user = response.data.find((u: User) => u.id === userId);
 
-            this.messageService.add({
-              severity: 'info',
-              summary: 'fetched  successfully',
-              detail: 'Parcel manager data fetched successfully',
-              life: 4000
-            });
+            if (user) {
+              this.populateFormFromUser(user);
 
-            // If you have an endpoint to get full user details including email and stageId
-            // You should call it here to get complete information
-            this.loadFullManagerDetails(username);
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'User data fetched successfully',
+                life: 4000
+              });
+            } else {
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Warning',
+                detail: `User with ID ${userId} not found`,
+                life: 4000
+              });
+              console.error('User not found with ID:', userId);
+              this.router.navigate(['users/parcel-managers']);
+            }
           } else {
-
             this.messageService.add({
               severity: 'warn',
-              summary: 'Error occurred',
-              detail: 'Parcel manager data failed to fetch, please contact support',
+              summary: 'Warning',
+              detail: 'No user data available',
               life: 4000
             });
-            console.error('Manager not found');
-            this.router.navigate(['/parcel-managers']);
+            console.error('No users found');
+            this.router.navigate(['users/parcel-managers']);
           }
-          this.managerLoading = false;
+          this.userLoading = false;
           this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load manager data', err);
-          this.managerLoading = false;
-          this.loadingStore.stop();
-          // this.router.navigate(['/parcel-managers']);
-        },
-      });
-  }
-
-  loadFullManagerDetails(username: string): void {
-    // Add endpoint to fetch full user details including email and stageId
-    // This is a placeholder - adjust based on your actual API
-    const payload = {
-      username: username,
-      entityId: this.entityId,
-    };
-
-    // Example: Uncomment and adjust when you have the endpoint
-    /*
-    this.dataService
-      .post<any>(API_ENDPOINTS.GET_PARCEL_MANAGER_DETAILS, payload, 'manager-details')
-      .subscribe({
-        next: (response) => {
-          this.email = response.data.email;
-          this.selectedStage = response.data.stageId;
-
+          console.error('Failed to load user data', err);
           this.messageService.add({
-              severity: 'info',
-              summary: 'fetched  successfully',
-              detail: 'Parcel manager data fetched successfully',
-              life: 4000
-            });
-
-        },
-        error: (err) => {
-          console.error('Failed to load full manager details', err);
-
-          this.messageService.add({
-              severity: 'warn',
-              summary: 'Error occurred',
-              detail: 'Failed to load full manager details, please contact support',
-              life: 4000
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to fetch user data. Please try again.',
+            life: 4000
           });
+          this.userLoading = false;
+          this.loadingStore.stop();
+          this.router.navigate(['users/parcel-managers']);
         },
       });
-    */
   }
 
   loadStages(): void {
+    if (!this.entityId) {
+      return;
+    }
+
     this.stagesLoading = true;
     const params = {
       entityId: this.entityId,
@@ -268,6 +254,12 @@ export class UpdateParcelManagerComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to load stages', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load stages',
+            life: 4000
+          });
           this.stagesLoading = false;
         },
       });
@@ -280,7 +272,8 @@ export class UpdateParcelManagerComponent implements OnInit {
       this.lastName.trim() &&
       this.email.trim() &&
       this.isValidEmail(this.email) &&
-      this.selectedStage
+      this.selectedStage !== null &&
+      this.userId !== null
     );
   }
 
@@ -291,22 +284,33 @@ export class UpdateParcelManagerComponent implements OnInit {
 
   isValidPhoneNumber(phone: string): boolean {
     // Basic validation for phone number (adjust based on your requirements)
-    const phoneRegex = /^0\d{9}$/;
+    const phoneRegex = /^254\d{9}$/;
     return phoneRegex.test(phone);
   }
 
   onSubmit(): void {
-    if (!this.isFormValid() || !this.entityId || !this.managerUsername) {
+    if (!this.isFormValid() || !this.entityId || this.userId === null) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields correctly',
+        life: 4000
+      });
       return;
     }
 
     if (!this.isValidPhoneNumber(this.phoneNumber)) {
-      console.error('Invalid phone number format');
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Invalid phone number format. Must start with 254 and be 12 digits',
+        life: 4000
+      });
       return;
     }
 
     const payload: UpdateParcelManagerPayload = {
-      username: this.managerUsername,
+      id: this.userId,
       entityId: this.entityId,
       phoneNumber: this.phoneNumber.trim(),
       firstName: this.firstName.trim(),
@@ -331,20 +335,22 @@ export class UpdateParcelManagerComponent implements OnInit {
 
           this.messageService.add({
             severity: 'success',
-            summary: 'Updated successfully',
+            summary: 'Success',
             detail: 'Parcel manager updated successfully',
             life: 4000
           });
 
           // Navigate back to parcel managers list page
-          this.router.navigate(['/parcel-managers']);
+          setTimeout(() => {
+            this.router.navigate(['users/parcel-managers']);
+          }, 1500);
         },
         error: (err) => {
           console.error('Failed to update parcel manager', err);
           this.messageService.add({
             severity: 'error',
-            summary: 'Error Occurred',
-            detail: 'Failed to update parcel manager',
+            summary: 'Error',
+            detail: err?.error?.message || 'Failed to update parcel manager',
             life: 4000
           });
           this.submitting = false;
@@ -354,6 +360,6 @@ export class UpdateParcelManagerComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/parcel-managers']);
+    this.router.navigate(['users/parcel-managers']);
   }
 }
