@@ -198,11 +198,11 @@ export class UpdateParcelManagerComponent implements OnInit {
     this.email = user.email || '';
     this.selectedStage = null; // Or set to a default/existing value if available
   
-    console.log('Form populated with manager data:', {
-      id: this.userId,
-      name: `${this.firstName} ${this.lastName}`,
-      email: this.email
-    });
+    // console.log('Form populated with manager data:', {
+    //   id: this.userId,
+    //   name: `${this.firstName} ${this.lastName}`,
+    //   email: this.email
+    // });
   }
 
   private loadUserDataFromAPI(userId: number): void {

@@ -221,11 +221,11 @@ export class UpdateMarshalComponent implements OnInit {
     this.selectedAgent = user.agent || '';
     this.selectedChannel = user.channel || '';
 
-    console.log('Form populated with marshal data:', {
-      id: this.userId,
-      name: `${this.firstName} ${this.lastName}`,
-      email: this.email
-    });
+    // console.log('Form populated with marshal data:', {
+    //   id: this.userId,
+    //   name: `${this.firstName} ${this.lastName}`,
+    //   email: this.email
+    // });
   }
 
   private loadUserDataFromAPI(userId: number): void {
