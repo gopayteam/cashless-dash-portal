@@ -76,6 +76,8 @@ import { RegisterDriverComponent } from './pages/forms/driver/register-driver/re
 import { UpdateDriverComponent } from './pages/forms/driver/update-driver/update-driver';
 import { UpdateInvestorComponent } from './pages/forms/investor/update-investor/update-investor';
 import { RegisterInvestorComponent } from './pages/forms/investor/register-investor/register-investor';
+import { RegisterMarshalComponent } from './pages/forms/marshal/register-marshal/register-marshal';
+import { UpdateMarshalComponent } from './pages/forms/marshal/update-marshal/update-marshal';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -407,7 +409,7 @@ export const routes: Routes = [
         data: { roles: ['CAN_VIEW_TOUTS'] }
       },
       {
-        path: 'users/drivers',
+        path: 'users/super-drivers',
         component: DriverUserComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
@@ -553,6 +555,20 @@ export const routes: Routes = [
       {
         path: 'forms/update-investor/:id',
         component: UpdateInvestorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-marshal',
+        component: RegisterMarshalComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-marshal/:id',
+        component: UpdateMarshalComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_EDIT_USER'] }
       },

@@ -49,7 +49,7 @@ interface StatusOption {
     InputTextModule,
     SelectModule,
     ActionButtonComponent
-],
+  ],
   templateUrl: './general.html',
   styleUrls: [
     './general.css',
@@ -311,16 +311,23 @@ export class GeneralUserComponent implements OnInit {
 
   navigateToUpdateUser(user: User, event?: Event): void {
     event?.stopPropagation();
-    console.log('Navigating to:', user.id);
 
     if (!user?.id) {
       console.error('User ID missing', user);
       return;
     }
 
-    // Pass the user email as route param and full user object as state
+    console.log('Navigating to update user:', user.id);
+    console.log('User data being passed:', user);
+
+    // Pass the complete user object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-user', user.id], {
-      state: { user }
+      state: {
+        user: user,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

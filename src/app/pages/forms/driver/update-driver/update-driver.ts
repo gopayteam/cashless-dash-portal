@@ -240,7 +240,7 @@ export class UpdateDriverComponent implements OnInit {
           });
           this.userLoading = false;
           this.loadingStore.stop();
-          this.router.navigate(['/users/drivers']);
+          this.router.navigate(['/users/super-drivers']);
         },
       });
   }
@@ -354,7 +354,7 @@ export class UpdateDriverComponent implements OnInit {
 
           // Navigate back to users list
           setTimeout(() => {
-            this.router.navigate(['/users/drivers']);
+            this.router.navigate(['/users/super-drivers']);
           }, 1500);
         },
         error: (err) => {
@@ -390,6 +390,6 @@ export class UpdateDriverComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/users/drivers']);
+    this.router.navigate(['/users/super-drivers']);
   }
 }

@@ -225,7 +225,7 @@ export class RegisterDriverComponent implements OnInit {
 
           // Navigate to users list after a short delay
           setTimeout(() => {
-            this.router.navigate(['/users/drivers']);
+            this.router.navigate(['/users/super-drivers']);
           }, 2000);
         },
         error: (err) => {
@@ -270,6 +270,6 @@ export class RegisterDriverComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/users/drivers']);
+    this.router.navigate(['/users/super-drivers']);
   }
 }

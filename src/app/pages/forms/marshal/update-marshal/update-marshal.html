@@ -1,1 +1,196 @@
-<p>update-marshal works!</p>
+<div class="update-user-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-user-edit"></i>
+        Update Marshal
+      </h1>
+      <p class="page-subtitle">Modify marshal information</p>
+    </div>
+  </div>
+
+  <!-- <div *ngIf="userData" class="debug-box">
+    <pre>{{ userData | json }}</pre>
+  </div> -->
+
+  <p-toast position="top-right"></p-toast>
+
+  <p-card class="user-form-card">
+    <div class="form-container">
+
+      <!-- Loading State -->
+      <div *ngIf="loading()" class="loading-state">
+        <p-progressSpinner styleClass="spinner-small"></p-progressSpinner>
+        <p>Loading user data...</p>
+      </div>
+
+      <form *ngIf="!loading() && userData" (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+        <!-- User ID Display -->
+        <div class="user-id-badge">
+          <i class="pi pi-hashtag"></i>
+          <span>User ID: <strong>{{ userId }}</strong></span>
+          <span class="separator">|</span>
+          <i class="pi pi-user"></i>
+          <span>Username: <strong>{{ userData.username }}</strong></span>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-id-card"></i>
+            Personal Information
+          </h3>
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-field">
+              <label for="firstName" class="field-label required">First Name</label>
+              <input pInputText id="firstName" [(ngModel)]="firstName" name="firstName" placeholder="Enter first name"
+                class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">User's given name</small>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-field">
+              <label for="lastName" class="field-label required">Last Name</label>
+              <input pInputText id="lastName" [(ngModel)]="lastName" name="lastName" placeholder="Enter last name"
+                class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">User's surname</small>
+            </div>
+
+            <!-- Email -->
+            <div class="form-field">
+              <label for="email" class="field-label required">Email Address</label>
+              <input pInputText type="email" id="email" [(ngModel)]="email" name="email"
+                placeholder="e.g., user@example.com" class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">Must be a valid email address</small>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-field">
+              <label for="phoneNumber" class="field-label required">Phone Number</label>
+              <input pInputText id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber"
+                placeholder="e.g., 254712345678 or 0712345678" class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">Format: 254XXXXXXXXX or 07XXXXXXXX</small>
+            </div>
+
+            <!-- ID Number -->
+            <div class="form-field">
+              <label for="idNumber" class="field-label required">ID Number</label>
+              <input pInputText id="idNumber" [(ngModel)]="idNumber" name="idNumber" placeholder="e.g., 12345678"
+                class="w-full" required maxlength="8" [disabled]="submitting" />
+              <small class="field-hint">National ID number (7-8 digits)</small>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Account Configuration Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-cog"></i>
+            Account Configuration
+          </h3>
+          <div class="form-grid">
+
+            <!-- Profile -->
+            <div class="form-field">
+              <label for="profile" class="field-label required">Profile</label>
+              <p-select id="profile" [(ngModel)]="selectedProfile" name="profile" [options]="profileOptions"
+                placeholder="Select user profile" optionLabel="label" optionValue="value" [showClear]="true"
+                styleClass="w-full" required [disabled]="submitting">
+              </p-select>
+              <small class="field-hint">User's role and permissions level</small>
+            </div>
+
+            <!-- Agent -->
+            <div class="form-field">
+              <label for="agent" class="field-label required">Agent Type</label>
+              <p-select id="agent" [(ngModel)]="selectedAgent" name="agent" [options]="agentOptions"
+                placeholder="Select agent type" optionLabel="label" optionValue="value" [showClear]="true"
+                styleClass="w-full" required [disabled]="submitting">
+              </p-select>
+              <small class="field-hint">Type of agent for this user</small>
+            </div>
+
+            <!-- Channel -->
+            <div class="form-field">
+              <label for="channel" class="field-label required">Channel</label>
+              <p-select id="channel" [(ngModel)]="selectedChannel" name="channel" [options]="channelOptions"
+                placeholder="Select channel" optionLabel="label" optionValue="value" [showClear]="true"
+                styleClass="w-full" required [disabled]="submitting">
+              </p-select>
+              <small class="field-hint">Access channel for this user</small>
+            </div>
+
+            <!-- Entity ID (Read-only) -->
+            <!-- <div class="form-field">
+              <label for="entityId" class="field-label">Entity ID</label>
+              <input pInputText id="entityId" [value]="entityId || 'N/A'" name="entityId" class="w-full" disabled
+                readonly />
+              <small class="field-hint">Cannot be changed</small>
+            </div> -->
+
+          </div>
+        </div>
+
+        <!-- Account Status Information (Read-only) -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-info-circle"></i>
+            Account Status
+          </h3>
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label class="field-label">Account Status</label>
+              <div class="status-badge" [class.blocked]="userData.blocked">
+                <i [class]="userData.blocked ? 'pi pi-ban' : 'pi pi-check-circle'"></i>
+                <span>{{ userData.blocked ? 'Blocked' : 'Active' }}</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">First Login</label>
+              <div class="status-badge" [class.warning]="userData.firstLogin">
+                <i [class]="userData.firstLogin ? 'pi pi-exclamation-circle' : 'pi pi-check'"></i>
+                <span>{{ userData.firstLogin ? 'Pending' : 'Completed' }}</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Login Attempts</label>
+              <div class="info-display">
+                <i class="pi pi-sign-in"></i>
+                <span>{{ userData.loginTrials }} attempts</span>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Created On</label>
+              <div class="info-display">
+                <i class="pi pi-calendar"></i>
+                <span>{{ userData.createdOn | date: 'dd MMM yyyy, hh:mm a' }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="onCancel()"
+            iconPos="right" [style]="{'gap':'1rem'}" [disabled]="submitting">
+          </p-button>
+
+          <p-button label="Update User" [icon]="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-check'" type="submit"
+            iconPos="right" [style]="{'gap':'1rem'}" [disabled]="!isFormValid() || submitting" [loading]="submitting"
+            loadingIcon="pi pi-spin pi-spinner">
+          </p-button>
+        </div>
+
+      </form>
+    </div>
+  </p-card>
+</div>

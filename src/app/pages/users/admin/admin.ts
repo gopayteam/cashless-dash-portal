@@ -311,16 +311,25 @@ export class AdminUserComponent implements OnInit {
     this.router.navigate(['forms/register-admin'])
   }
 
-  navigateToUpdateAdmin(admin: User): void {
-    console.log('Navigating to:', admin.id);
+  navigateToUpdateAdmin(admin: User, event?: Event): void {
+    event?.stopPropagation();
 
     if (!admin?.id) {
       console.error('Admin ID missing', admin);
       return;
     }
 
+    console.log('Navigating to update admin:', admin.id);
+    console.log('Admin data being passed:', admin);
+
+    // Pass the complete user object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-admin', admin.id], {
-      state: { admin }
+      state: {
+        admin: admin,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

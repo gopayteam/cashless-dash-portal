@@ -138,7 +138,7 @@ export class UpdateConductorComponent implements OnInit {
     }
 
     const navigation = this.router.getCurrentNavigation();
-    const stateUser = navigation?.extras?.state?.['user'] as User;
+    const stateUser = navigation?.extras?.state?.['conductor'] as User;
 
     this.route.params.subscribe(params => {
       const id = params['id'];

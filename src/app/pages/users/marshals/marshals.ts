@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,6 +48,7 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent,
   ],
   templateUrl: './marshals.html',
   styleUrls: [
@@ -110,7 +112,7 @@ export class MarshalsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -302,5 +304,26 @@ export class MarshalsComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateMarshalls(): void {
+    this.router.navigate(['forms/register-marshal'])
+  }
+
+  navigateToUpdateMarshal(marshal: User): void {
+    console.log('Navigating to:', marshal.id);
+
+    if (!marshal?.id) {
+      console.error('Marshal ID missing', marshal);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-marshal', marshal.id], {
+      state: { marshal }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }
