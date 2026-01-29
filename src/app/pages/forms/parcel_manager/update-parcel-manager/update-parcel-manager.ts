@@ -91,6 +91,7 @@ export class UpdateParcelManagerComponent implements OnInit {
   stagesLoading: boolean = false;
   userLoading: boolean = false;
   submitting: boolean = false;
+  dataLoadedFromState: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -107,45 +108,104 @@ export class UpdateParcelManagerComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    if (user) {
-      this.entityId = user.entityId;
-    } else {
+    if (!user) {
       this.router.navigate(['/login']);
       return;
     }
-
-    const navigation = this.router.getCurrentNavigation();
-    const stateUser = navigation?.extras?.state?.['manager'] as User;
-
+    this.entityId = user.entityId;
+  
     this.route.params.subscribe(params => {
       const id = params['id'];
-      this.managerId = +id;
-
-      if (stateUser) {
-        console.log('Loading from navigation state:', stateUser);
-        this.populateFormFromUser(stateUser);
-      } else {
-        console.log('No state found, loading user data for ID:', id);
-        this.loadUserData(+id);
+      if (!id) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Manager ID not found in route',
+          life: 4000
+        });
+        this.router.navigate(['/users/parcel-managers']);
+        return;
       }
+  
+      this.managerId = +id;
+      this.userId = +id;
+      this.initializeUserData();
     });
-
+  
     this.loadStages();
   }
 
-  populateFormFromUser(user: User): void {
-    this.userData = user;
-    this.userId = user.id;
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
-    this.phoneNumber = user.phoneNumber;
-    this.email = user.email;
-    this.selectedStage = null;
-
-    this.loadingStore.stop();
+  private initializeUserData(): void {
+    const stateUser = this.getUserFromState();
+  
+    if (stateUser) {
+      console.log('✓ Manager data loaded from navigation state');
+      this.populateFormFromUser(stateUser);
+      this.dataLoadedFromState = true;
+    } else {
+      console.log('⚠ No state data found, fetching from API');
+      this.loadUserDataFromAPI(this.userId!);
+      this.dataLoadedFromState = false;
+    }
+  }
+  
+  private getUserFromState(): User | null {
+    try {
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras?.state?.['manager']) {
+        const stateUser = navigation.extras.state['manager'] as User;
+        if (this.isValidUserObject(stateUser)) {
+          return stateUser;
+        }
+      }
+  
+      if (window.history.state?.manager) {
+        const historyUser = window.history.state.manager as User;
+        if (this.isValidUserObject(historyUser)) {
+          return historyUser;
+        }
+      }
+  
+      return null;
+    } catch (error) {
+      console.error('Error retrieving manager from state:', error);
+      return null;
+    }
   }
 
-  loadUserData(userId: number): void {
+  private isValidUserObject(user: any): boolean {
+    return !!(
+      user &&
+      typeof user === 'object' &&
+      user.id &&
+      user.firstName &&
+      user.lastName &&
+      user.email &&
+      user.phoneNumber &&
+      user.profile &&
+      user.agent &&
+      user.channel
+    );
+  }
+
+  private populateFormFromUser(user: User): void {
+    this.userData = user;
+    this.userId = user.id;
+    this.managerId = user.id;
+    this.firstName = user.firstName || '';
+    this.lastName = user.lastName || '';
+    this.phoneNumber = user.phoneNumber || '';
+    this.email = user.email || '';
+    this.selectedStage = null; // Or set to a default/existing value if available
+  
+    console.log('Form populated with manager data:', {
+      id: this.userId,
+      name: `${this.firstName} ${this.lastName}`,
+      email: this.email
+    });
+  }
+
+  private loadUserDataFromAPI(userId: number): void {
     if (!this.entityId) {
       this.messageService.add({
         severity: 'error',
@@ -153,73 +213,81 @@ export class UpdateParcelManagerComponent implements OnInit {
         detail: 'Entity ID not found',
         life: 4000
       });
-      this.router.navigate(['users/parcel-managers']);
+      this.router.navigate(['/users/parcel-managers']);
       return;
     }
-
+  
     this.userLoading = true;
     this.loadingStore.start();
-
+  
     const payload = {
       entityId: this.entityId,
       agent: this.AGENT,
       page: 0,
       size: 100
     };
-
+  
     this.dataService
       .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-parcel-managers')
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
             const user = response.data.find((u: User) => u.id === userId);
-
+  
             if (user) {
+              console.log('✓ Manager data fetched successfully from API');
               this.populateFormFromUser(user);
-
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'User data fetched successfully',
-                life: 4000
-              });
             } else {
-              this.messageService.add({
-                severity: 'warn',
-                summary: 'Warning',
-                detail: `User with ID ${userId} not found`,
-                life: 4000
-              });
-              console.error('User not found with ID:', userId);
-              this.router.navigate(['users/parcel-managers']);
+              this.handleUserNotFound(userId);
             }
           } else {
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Warning',
-              detail: 'No user data available',
-              life: 4000
-            });
-            console.error('No users found');
-            this.router.navigate(['users/parcel-managers']);
+            this.handleNoUsersAvailable();
           }
+  
           this.userLoading = false;
           this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load user data', err);
+          console.error('Failed to load manager data from API:', err);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to fetch user data. Please try again.',
+            detail: 'Failed to fetch manager data. Please try again.',
             life: 4000
           });
           this.userLoading = false;
           this.loadingStore.stop();
-          this.router.navigate(['users/parcel-managers']);
+          this.router.navigate(['/users/parcel-managers']);
         },
       });
   }
+
+  private handleUserNotFound(userId: number): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: `User with ID ${userId} not found`,
+      life: 4000
+    });
+    console.error('User not found with ID:', userId);
+    setTimeout(() => {
+      this.router.navigate(['/users/parcel-managers']);
+    }, 2000);
+  }
+
+  private handleNoUsersAvailable(): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'No user data available',
+      life: 4000
+    });
+    console.error('No users found in API response');
+    setTimeout(() => {
+      this.router.navigate(['/users/parcel-managers']);
+    }, 2000);
+  }
+
 
   loadStages(): void {
     if (!this.entityId) {

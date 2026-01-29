@@ -311,15 +311,24 @@ export class MarshalsComponent implements OnInit {
   }
 
   navigateToUpdateMarshal(marshal: User): void {
-    console.log('Navigating to:', marshal.id);
+    event?.stopPropagation();
 
     if (!marshal?.id) {
       console.error('Marshal ID missing', marshal);
       return;
     }
 
+    console.log('Navigating to update marshal:', marshal.id);
+    console.log('Marshal data being passed:', marshal);
+
+    // Pass the complete marshal object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-marshal', marshal.id], {
-      state: { marshal }
+      state: {
+        marshal: marshal,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

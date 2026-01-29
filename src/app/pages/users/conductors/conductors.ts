@@ -49,7 +49,7 @@ interface StatusOption {
     InputTextModule,
     SelectModule,
     ActionButtonComponent
-],
+  ],
   templateUrl: './conductors.html',
   styleUrls: [
     './conductors.css',
@@ -112,7 +112,7 @@ export class ConductorsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -312,15 +312,24 @@ export class ConductorsComponent implements OnInit {
   }
 
   navigateToUpdateConductor(conductor: User): void {
-    console.log('Navigating to:', conductor.id);
+    event?.stopPropagation();
 
     if (!conductor?.id) {
       console.error('Conductor ID missing', conductor);
       return;
     }
 
+    console.log('Navigating to update conductor:', conductor.id);
+    console.log('Conductor data being passed:', conductor);
+
+    // Pass the complete user object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-conductor', conductor.id], {
-      state: { conductor }
+      state: {
+        conductor: conductor,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

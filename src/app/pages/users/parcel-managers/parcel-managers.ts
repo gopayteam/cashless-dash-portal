@@ -312,16 +312,23 @@ export class ParcelManagerUsersComponent implements OnInit {
 
   navigateToUpdateManager(manager: User, event?: Event): void {
     event?.stopPropagation();
-    console.log('Navigating to:', manager.id);
 
     if (!manager?.id) {
       console.error('Manager ID missing', manager);
       return;
     }
 
-    // Pass the manager email as route param and full manager object as state
+    console.log('Navigating to update manager:', manager.id);
+    console.log('Manager data being passed:', manager);
+
+    // Pass the complete manager object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-parcel-manager', manager.id], {
-      state: { manager }
+      state: {
+        manager: manager,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

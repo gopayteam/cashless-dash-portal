@@ -114,6 +114,7 @@ export class UpdatePassengerComponent implements OnInit {
   // Loading states
   userLoading: boolean = false;
   submitting: boolean = false;
+  dataLoadedFromState: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -130,46 +131,103 @@ export class UpdatePassengerComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    if (user) {
-      this.entityId = user.entityId;
-    } else {
+    if (!user) {
       this.router.navigate(['/login']);
       return;
     }
-
-    const navigation = this.router.getCurrentNavigation();
-    const stateUser = navigation?.extras?.state?.['user'] as User;
+    this.entityId = user.entityId;
 
     this.route.params.subscribe(params => {
       const id = params['id'];
-      this.userId = +id;
-
-      if (stateUser) {
-        console.log('Loading from navigation state:', stateUser);
-        this.populateFormFromUser(stateUser);
-      } else {
-        console.log('No state found, loading user data for ID:', id);
-        this.loadUserData(+id);
+      if (!id) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Passenger ID not found in route',
+          life: 4000
+        });
+        this.router.navigate(['/users/passengers']);
+        return;
       }
+
+      this.userId = +id;
+      this.initializeUserData();
     });
   }
 
-  populateFormFromUser(user: User): void {
-    this.userData = user;
-    this.userId = user.id;
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
-    this.phoneNumber = user.phoneNumber;
-    this.email = user.email;
-    this.idNumber = user.idNumber || '';
-    this.selectedProfile = user.profile;
-    this.selectedAgent = user.agent;
-    this.selectedChannel = user.channel;
+  private initializeUserData(): void {
+    const stateUser = this.getUserFromState();
 
-    this.loadingStore.stop();
+    if (stateUser) {
+      console.log('✓ Passenger data loaded from navigation state');
+      this.populateFormFromUser(stateUser);
+      this.dataLoadedFromState = true;
+    } else {
+      console.log('⚠ No state data found, fetching from API');
+      this.loadUserDataFromAPI(this.userId!);
+      this.dataLoadedFromState = false;
+    }
   }
 
-  loadUserData(userId: number): void {
+  private getUserFromState(): User | null {
+    try {
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras?.state?.['passenger']) {
+        const stateUser = navigation.extras.state['passenger'] as User;
+        if (this.isValidUserObject(stateUser)) {
+          return stateUser;
+        }
+      }
+
+      if (window.history.state?.passenger) {
+        const historyUser = window.history.state.passenger as User;
+        if (this.isValidUserObject(historyUser)) {
+          return historyUser;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error retrieving passenger from state:', error);
+      return null;
+    }
+  }
+
+  private isValidUserObject(user: any): boolean {
+    return !!(
+      user &&
+      typeof user === 'object' &&
+      user.id &&
+      user.firstName &&
+      user.lastName &&
+      user.email &&
+      user.phoneNumber &&
+      user.profile &&
+      user.agent &&
+      user.channel
+    );
+  }
+
+  private populateFormFromUser(user: User): void {
+    this.userData = user;
+    this.userId = user.id;
+    this.firstName = user.firstName || '';
+    this.lastName = user.lastName || '';
+    this.phoneNumber = user.phoneNumber || '';
+    this.email = user.email || '';
+    this.idNumber = user.idNumber || '';
+    this.selectedProfile = user.profile || '';
+    this.selectedAgent = user.agent || '';
+    this.selectedChannel = user.channel || '';
+
+    console.log('Form populated with passenger data:', {
+      id: this.userId,
+      name: `${this.firstName} ${this.lastName}`,
+      email: this.email
+    });
+  }
+
+  private loadUserDataFromAPI(userId: number): void {
     if (!this.entityId) {
       this.messageService.add({
         severity: 'error',
@@ -177,7 +235,7 @@ export class UpdatePassengerComponent implements OnInit {
         detail: 'Entity ID not found',
         life: 4000
       });
-      this.router.navigate(['/login']);
+      this.router.navigate(['/users/passengers']);
       return;
     }
 
@@ -186,63 +244,72 @@ export class UpdatePassengerComponent implements OnInit {
 
     const payload = {
       entityId: this.entityId,
-      agent: 'PASSENGER', // Fetch all types of users
+      agent: 'PASSENGER',
       page: 0,
       size: 100
     };
 
+    console.log('Fetching passenger data from API for ID:', userId);
+
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-passenger-users')
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
             const user = response.data.find((u: User) => u.id === userId);
 
             if (user) {
+              console.log('✓ Passenger data fetched successfully from API');
               this.populateFormFromUser(user);
-
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'User data fetched successfully',
-                life: 4000
-              });
             } else {
-              this.messageService.add({
-                severity: 'warn',
-                summary: 'Warning',
-                detail: `User with ID ${userId} not found`,
-                life: 4000
-              });
-              console.error('User not found with ID:', userId);
-              this.router.navigate(['/users/admins']);
+              this.handleUserNotFound(userId);
             }
           } else {
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Warning',
-              detail: 'No user data available',
-              life: 4000
-            });
-            console.error('No users found');
-            this.router.navigate(['/users/admins']);
+            this.handleNoUsersAvailable();
           }
+
           this.userLoading = false;
           this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load user data', err);
+          console.error('Failed to load passenger data from API:', err);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'Failed to fetch user data. Please try again.',
+            detail: 'Failed to fetch passenger data. Please try again.',
             life: 4000
           });
           this.userLoading = false;
           this.loadingStore.stop();
-          this.router.navigate(['/users/admins']);
+          this.router.navigate(['/users/passengers']);
         },
       });
+  }
+
+  private handleUserNotFound(userId: number): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: `User with ID ${userId} not found`,
+      life: 4000
+    });
+    console.error('User not found with ID:', userId);
+    setTimeout(() => {
+      this.router.navigate(['/users/passengers']);
+    }, 2000);
+  }
+
+  private handleNoUsersAvailable(): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'No user data available',
+      life: 4000
+    });
+    console.error('No users found in API response');
+    setTimeout(() => {
+      this.router.navigate(['/users/passengers']);
+    }, 2000);
   }
 
   isFormValid(): boolean {

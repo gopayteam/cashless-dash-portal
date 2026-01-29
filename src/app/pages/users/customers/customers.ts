@@ -311,15 +311,24 @@ export class CustomersComponent implements OnInit {
   }
 
   navigateToUpdatePassenger(passenger: User): void {
-    console.log('Navigating to:', passenger.id);
+    event?.stopPropagation();
 
     if (!passenger?.id) {
       console.error('Passenger ID missing', passenger);
       return;
     }
 
+    console.log('Navigating to update passenger:', passenger.id);
+    console.log('Passenger data being passed:', passenger);
+
+    // Pass the complete passenger object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-passenger', passenger.id], {
-      state: { passenger }
+      state: {
+        passenger: passenger,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

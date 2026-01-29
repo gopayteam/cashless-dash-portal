@@ -311,15 +311,24 @@ export class DriverUserComponent implements OnInit {
   }
 
   navigateToUpdateDriver(driver: User): void {
-    console.log('Navigating to:', driver.id);
+    event?.stopPropagation();
 
     if (!driver?.id) {
       console.error('Driver ID missing', driver);
       return;
     }
 
+    console.log('Navigating to update driver:', driver.id);
+    console.log('Driver data being passed:', driver);
+
+    // Pass the complete driver object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-driver', driver.id], {
-      state: { driver }
+      state: {
+        driver: driver,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 

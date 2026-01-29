@@ -311,15 +311,24 @@ export class InvestorsComponent implements OnInit {
   }
 
   navigateToUpdateInvestor(investor: User): void {
-    console.log('Navigating to:', investor.id);
+    event?.stopPropagation();
 
     if (!investor?.id) {
       console.error('Investor ID missing', investor);
       return;
     }
 
+    console.log('Navigating to update investor:', investor.id);
+    console.log('Investor data being passed:', investor);
+
+    // Pass the complete investor object through router state
+    // This ensures the data is immediately available in the update component
     this.router.navigate(['/forms/update-investor', investor.id], {
-      state: { investor }
+      state: {
+        investor: investor,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
     });
   }
 
