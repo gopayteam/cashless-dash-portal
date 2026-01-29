@@ -1,0 +1,281 @@
+.create-user-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.page-title i {
+  font-size: 1.75rem;
+}
+
+.page-subtitle {
+  color: var(--medium-text);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Form Card */
+.user-form-card {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.form-container {
+  padding: 1.5rem;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2.5rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.section-title i {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Form Fields */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  font-weight: 500;
+  color: #475569;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.field-label.required::after {
+  content: "*";
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.field-hint {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Input Styles */
+input[pInputText],
+p-select {
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+input[pInputText]:disabled {
+  background-color: var(--light-bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+input[pInputText]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.1);
+}
+
+input[pInputText]:disabled,
+input[pInputText]:read-only {
+  background-color: var(--light-bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+input[pInputText]::placeholder {
+  color: var(--light-text);
+}
+
+/* Action Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.form-actions ::ng-deep .p-button {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.form-actions ::ng-deep .p-button-outlined {
+  background-color: transparent;
+  color: var(--medium-text);
+  border-color: var(--border-color);
+}
+
+.form-actions ::ng-deep .p-button-outlined:hover {
+  background-color: var(--light-bg);
+  color: var(--dark-text);
+  border-color: var(--medium-text);
+}
+
+.form-actions ::ng-deep .p-button:not(.p-button-outlined) {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+}
+
+.form-actions ::ng-deep .p-button:not(.p-button-outlined):hover:not(:disabled) {
+  background-color: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+}
+
+.form-actions ::ng-deep .p-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* PrimeNG Select Customization */
+.form-field ::ng-deep .p-select {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.form-field ::ng-deep .p-select:not(.p-disabled):hover {
+  border-color: var(--primary-color);
+}
+
+.form-field ::ng-deep .p-select:not(.p-disabled).p-focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.1);
+}
+
+.form-field ::ng-deep .p-select .p-select-label {
+  padding: 0.75rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .create-user-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions p-button {
+    width: 100%;
+  }
+}
+
+/* Focus States */
+input[pInputText]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Validation States */
+input[pInputText].ng-invalid.ng-touched {
+  border-color: #ef4444;
+}
+
+input[pInputText].ng-valid.ng-touched {
+  border-color: #10b981;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: 0.5rem;
+}
+
+/* Focus States for Accessibility */
+.form-field input:focus-visible,
+.form-field ::ng-deep .p-select:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Error States */
+.form-field.error input,
+.form-field.error ::ng-deep .p-select {
+  border-color: var(--danger-color);
+}
+
+.form-field.error .field-label {
+  color: var(--danger-color);
+}
+
+/* Success States */
+.form-field.success input,
+.form-field.success ::ng-deep .p-select {
+  border-color: var(--success-color);
+}

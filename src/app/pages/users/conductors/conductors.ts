@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,7 +48,8 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-  ],
+    ActionButtonComponent
+],
   templateUrl: './conductors.html',
   styleUrls: [
     './conductors.css',
@@ -303,5 +305,26 @@ export class ConductorsComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateConductor(): void {
+    this.router.navigate(['forms/register-conductor'])
+  }
+
+  navigateToUpdateConductor(conductor: User): void {
+    console.log('Navigating to:', conductor.id);
+
+    if (!conductor?.id) {
+      console.error('Conductor ID missing', conductor);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-conductor', conductor.id], {
+      state: { conductor }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

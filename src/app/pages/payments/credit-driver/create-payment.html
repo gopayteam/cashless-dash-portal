@@ -9,20 +9,14 @@
       <!-- Loading State -->
       <ng-container *ngIf="loading() && fleets.length === 0">
         <div class="loading-container">
-          <p-progressSpinner
-            styleClass="w-4rem h-4rem"
-            strokeWidth="4"
-            animationDuration="1s">
+          <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4" animationDuration="1s">
           </p-progressSpinner>
           <p class="loading-text">Loading information...</p>
         </div>
       </ng-container>
 
       <!-- Form -->
-      <form
-        *ngIf="!loading() || fleets.length > 0"
-        [formGroup]="creditDriverForm"
-        (ngSubmit)="onSubmit()"
+      <form *ngIf="!loading() || fleets.length > 0" [formGroup]="creditDriverForm" (ngSubmit)="onSubmit()"
         class="form-container">
 
         <!-- Fleet Number Dropdown -->
@@ -30,18 +24,9 @@
           <label for="fleetNumber" class="form-label">
             Select Fleet Number <span class="required-indicator">*</span>
           </label>
-          <p-select
-            id="fleetNumber"
-            formControlName="fleetNumber"
-            [options]="fleets"
-            optionLabel="label"
-            optionValue="fleetNumber"
-            placeholder="Select a fleet"
-            [showClear]="true"
-            [filter]="true"
-            filterBy="label,fleetNumber"
-            class="w-full"
-            [invalid]="isFieldInvalid('fleetNumber')">
+          <p-select id="fleetNumber" formControlName="fleetNumber" [options]="fleets" optionLabel="label"
+            optionValue="fleetNumber" placeholder="Select a fleet" [showClear]="true" [filter]="true"
+            filterBy="label,fleetNumber" class="w-full" [invalid]="isFieldInvalid('fleetNumber')">
 
             <!-- Selected Item Template -->
             <ng-template pTemplate="selectedItem" let-option>
@@ -73,18 +58,9 @@
             Select Driver <span class="required-indicator">*</span>
           </label>
 
-          <p-select
-            id="driverId"
-            formControlName="driverId"
-            [options]="filteredDrivers"
-            optionLabel="label"
-            optionValue="driverId"
-            placeholder="Select a driver"
-            [showClear]="true"
-            [filter]="true"
-            filterBy="label,driverId"
-            class="w-full"
-            [invalid]="isFieldInvalid('driverId')"
+          <p-select id="driverId" formControlName="driverId" [options]="filteredDrivers" optionLabel="label"
+            optionValue="driverId" placeholder="Select a driver" [showClear]="true" [filter]="true"
+            filterBy="label,driverId" class="w-full" [invalid]="isFieldInvalid('driverId')"
             [disabled]="!creditDriverForm.get('fleetNumber')?.value">
 
             <!-- Selected Item Template -->
@@ -92,7 +68,7 @@
               <div class="flex align-items-center gap-2" *ngIf="option">
                 <i class="pi pi-user"></i>
                 <span> - </span>
-                <span>{{ option.label  }} </span>
+                <span>{{ option.label }} </span>
               </div>
             </ng-template>
 
@@ -119,15 +95,8 @@
           <label for="activityDate" class="form-label">
             Driver Activity Date <span class="required-indicator">*</span>
           </label>
-          <p-datepicker
-            id="activityDate"
-            formControlName="activityDate"
-            [showIcon]="true"
-            dateFormat="yy-mm-dd"
-            placeholder="Select date"
-            [maxDate]="maxDate"
-            class="w-full"
-            [invalid]="isFieldInvalid('activityDate')">
+          <p-datepicker id="activityDate" formControlName="activityDate" [showIcon]="true" dateFormat="yy-mm-dd"
+            placeholder="Select date" [maxDate]="maxDate" class="w-full" [invalid]="isFieldInvalid('activityDate')">
           </p-datepicker>
 
           <small class="form-error" *ngIf="isFieldInvalid('activityDate')">
@@ -137,18 +106,10 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <p-button
-            type="button"
-            label="Reset"
-            severity="secondary"
-            [outlined]="true"
-            (click)="resetForm()"
-            [disabled]="loading()">
+          <p-button type="button" label="Reset" severity="secondary" iconPos="right" [style]="{'gap':'1.5rem'}"
+            [outlined]="true" (click)="resetForm()" [disabled]="loading()">
           </p-button>
-          <p-button
-            type="submit"
-            label="Submit"
-            [loading]="loading()"
+          <p-button type="submit" label="Submit" [loading]="loading()" iconPos="right" [style]="{'gap':'1.5rem'}"
             icon="pi pi-check">
           </p-button>
         </div>

@@ -61,9 +61,21 @@ import { SettingsComponent } from './pages/profile/settings/settings';
 import { roleGuard } from '../@core/services/role.guard';
 import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
 import { AddVehicleComponent } from './pages/forms/add-vehicle/add-vehicle';
-import { RegisterParcelManagerComponent } from './pages/forms/register-parcel-manager/register-parcel-manager';
-import { UpdateParcelManagerComponent } from './pages/forms/update-parcel-manager/update-parcel-manager';
+import { RegisterParcelManagerComponent } from './pages/forms/parcel_manager/register-parcel-manager/register-parcel-manager';
+import { UpdateParcelManagerComponent } from './pages/forms/parcel_manager/update-parcel-manager/update-parcel-manager';
 import { ParcelManagerUsersComponent } from './pages/users/parcel-managers/parcel-managers';
+import { RegisterAdminComponent } from './pages/forms/admin/register-admin/register-admin';
+import { UpdateAdminComponent } from './pages/forms/admin/update-admin/update-admin';
+import { RegisterUserComponent } from './pages/forms/user/register-user/register-user';
+import { UpdateUserComponent } from './pages/forms/user/update-user/update-user';
+import { RegisterConductorComponent } from './pages/forms/conductor/register-conductor/register-conductor';
+import { UpdateConductorComponent } from './pages/forms/conductor/update-conductor/update-conductor';
+import { RegisterPassengerComponent } from './pages/forms/passenger/register-passenger/register-passenger';
+import { UpdatePassengerComponent } from './pages/forms/passenger/update-passenger/update-passenger';
+import { RegisterDriverComponent } from './pages/forms/driver/register-driver/register-driver';
+import { UpdateDriverComponent } from './pages/forms/driver/update-driver/update-driver';
+import { UpdateInvestorComponent } from './pages/forms/investor/update-investor/update-investor';
+import { RegisterInvestorComponent } from './pages/forms/investor/register-investor/register-investor';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -401,7 +413,7 @@ export const routes: Routes = [
         data: { roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
       },
       {
-        path: 'users/customers',
+        path: 'users/passengers',
         component: CustomersComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_CUSTOMER', 'CAN_VIEW_PASSENGERS'] }
@@ -460,6 +472,92 @@ export const routes: Routes = [
       },
 
       /* Forms */
+
+      {
+        path: 'forms/register-user',
+        component: RegisterUserComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-user/:id',
+        component: UpdateUserComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-admin',
+        component: RegisterAdminComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-admin/:id',
+        component: UpdateAdminComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-conductor',
+        component: RegisterConductorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-conductor/:id',
+        component: UpdateConductorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-passenger',
+        component: RegisterPassengerComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-passenger/:id',
+        component: UpdatePassengerComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-driver',
+        component: RegisterDriverComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-driver/:id',
+        component: UpdateDriverComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-investor',
+        component: RegisterInvestorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-investor/:id',
+        component: UpdateInvestorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+
       {
         path: 'forms/add-vehicle',
         component: AddVehicleComponent,
@@ -474,18 +572,11 @@ export const routes: Routes = [
         data: { roles: ['CAN_ADD_USER'] }
       },
 
-      // {
-      //   path: 'forms/update-parcel-manager',
-      //   component: UpdateParcelManagerComponent,
-      //   // canActivate: [roleGuard],
-      //   // data: { roles: ['CAN_EDIT_USER'] }
-      // },
-
       {
         path: 'forms/update-parcel-manager/:id',
         component: UpdateParcelManagerComponent,
-        // canActivate: [roleGuard],
-        // data: { roles: ['CAN_EDIT_USER'] }
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
       },
 
       /* Default protected redirect */

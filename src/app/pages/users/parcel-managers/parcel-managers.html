@@ -122,7 +122,7 @@
           <th>Login Trials</th>
           <th>First Login</th>
           <th>Created On</th>
-          <th>Actions</th>
+          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -190,11 +190,11 @@
               <span class="time">{{ user.createdOn | date : 'hh:mm a' }}</span>
             </div>
           </td>
-          <td>
+          <!-- <td>
             <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
               pTooltip="Update User" tooltipPosition="top"
               (click)="navigateToUpdateManager(user); $event.stopPropagation()"></button>
-          </td>
+          </td> -->
         </tr>
       </ng-template>
 
@@ -237,6 +237,10 @@
                 <i [class]="'pi ' + getStatusIcon(selectedUser.blocked)"></i>
                 {{ getStatusText(selectedUser.blocked) }}
               </span>
+
+              <button *ngIf="selectedUser" pButton icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm" pTooltip="Update User" tooltipPosition="top"
+                (click)="navigateToUpdateManager(selectedUser); $event.stopPropagation()"></button>
             </div>
           </div>
         </div>
@@ -244,6 +248,8 @@
     </ng-template>
 
     <div class="detail-content" *ngIf="selectedUser">
+
+
       <!-- User Status Cards -->
       <div class="status-cards">
         <div class="status-card">
@@ -310,15 +316,7 @@
             </div>
           </div>
 
-          <!-- ACTION BUTTON -->
-          <div style="margin-top: 1.5rem; display: flex; justify-content: flex-start;">
 
-            <app-action-button icon="pi-pencil" variant="primary"
-              (clicked)="navigateToUpdateManager(selectedUser); $event.stopPropagation()">
-            </app-action-button>
-
-            <span style="margin: auto 1rem;">Edit Manager</span>
-          </div>
         </div>
 
         <!-- Right Column -->

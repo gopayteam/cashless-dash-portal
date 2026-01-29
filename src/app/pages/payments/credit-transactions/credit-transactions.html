@@ -36,42 +36,19 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search transactions..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search transactions..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
     </div>
 
     <!-- Using global .data-table and .clickable-row classes -->
-    <p-table
-      [value]="transactions"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="apiTotalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
-      styleClass="data-table"
-      (onLazyLoad)="loadTransactions($event)"
-      [tableStyle]="{ 'min-width': '40rem' }"
-    >
+    <p-table [value]="transactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="apiTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions" styleClass="data-table"
+      (onLazyLoad)="loadTransactions($event)" [tableStyle]="{ 'min-width': '40rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Receipt Number</th>
@@ -116,38 +93,28 @@
           <td>
             <!-- Using global .badge classes -->
             <span [class]="'badge badge-' + transaction.transactionType.toLowerCase()">
-              <i
-                [class]="
+              <i [class]="
                   transaction.transactionType === 'CREDIT' ? 'pi pi-arrow-down' : 'pi pi-arrow-up'
-                "
-              ></i>
+                "></i>
               {{ transaction.transactionType }}
             </span>
           </td>
           <td>
             <!-- Using global .badge classes -->
             <span [class]="'badge badge-' + transaction.paymentStatus.toLowerCase()">
-              <i
-                [class]="
+              <i [class]="
                   transaction.paymentStatus === 'PAID'
                     ? 'pi pi-check-circle'
                     : transaction.paymentStatus === 'PENDING'
                       ? 'pi pi-clock'
                       : 'pi pi-times-circle'
-                "
-              ></i>
+                "></i>
               {{ transaction.paymentStatus }}
             </span>
           </td>
           <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-              (click)="viewTransactionDetails(transaction); $event.stopPropagation()"
-            ></button>
+            <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm" pTooltip="View Details"
+              tooltipPosition="top" (click)="viewTransactionDetails(transaction); $event.stopPropagation()"></button>
           </td>
         </tr>
       </ng-template>
@@ -168,16 +135,9 @@
   </p-card>
 
   <!-- ================= TRANSACTION DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="transaction-detail-dialog"
-    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="transaction-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <h2>Transaction Details</h2>
@@ -229,16 +189,12 @@
           <div class="detail-item">
             <label>Transaction Type</label>
             <!-- Using global .badge classes -->
-            <span
-              [class]="'value badge badge-' + selectedTransaction.transactionType.toLowerCase()"
-            >
-              <i
-                [class]="
+            <span [class]="'value badge badge-' + selectedTransaction.transactionType.toLowerCase()">
+              <i [class]="
                   selectedTransaction.transactionType === 'CREDIT'
                     ? 'pi pi-arrow-down'
                     : 'pi pi-arrow-up'
-                "
-              ></i>
+                "></i>
               {{ selectedTransaction.transactionType }}
             </span>
           </div>
@@ -249,18 +205,14 @@
           <div class="detail-item">
             <label>Payment Status</label>
             <!-- Using global .badge classes -->
-            <span
-              [class]="'value badge badge-' + selectedTransaction.paymentStatus.toLowerCase()"
-            >
-              <i
-                [class]="
+            <span [class]="'value badge badge-' + selectedTransaction.paymentStatus.toLowerCase()">
+              <i [class]="
                   selectedTransaction.paymentStatus === 'PAID'
                     ? 'pi pi-check-circle'
                     : selectedTransaction.paymentStatus === 'PENDING'
                       ? 'pi pi-clock'
                       : 'pi pi-times-circle'
-                "
-              ></i>
+                "></i>
               {{ selectedTransaction.paymentStatus }}
             </span>
           </div>
@@ -301,13 +253,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times"  class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

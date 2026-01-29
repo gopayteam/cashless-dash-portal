@@ -9,15 +9,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
-import { DataService } from '../../../../@core/api/data.service';
-import { LoadingStore } from '../../../../@core/state/loading.store';
-import { AuthService } from '../../../../@core/services/auth.service';
-import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { ParcelDetailsApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
+import { DataService } from '../../../../../@core/api/data.service';
+import { LoadingStore } from '../../../../../@core/state/loading.store';
+import { AuthService } from '../../../../../@core/services/auth.service';
+import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
+import { ParcelDetailsApiResponse } from '../../../../../@core/models/parcels/parcel_stage_response';
 import { ToastModule } from "primeng/toast";
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
-import { Stage } from '../../../../@core/models/locations/stage.model';
+import { Stage } from '../../../../../@core/models/locations/stage.model';
 
 interface DropdownOption {
   label: string;
@@ -60,7 +60,7 @@ interface ApiResponse {
     ToastModule,
   ],
   templateUrl: './register-parcel-manager.html',
-  styleUrls: ['./register-parcel-manager.css', '../../../../styles/global/_toast.css'],
+  styleUrls: ['./register-parcel-manager.css', '../../../../../styles/global/_toast.css'],
 })
 export class RegisterParcelManagerComponent implements OnInit {
   entityId: string | null = null;
@@ -207,11 +207,34 @@ export class RegisterParcelManagerComponent implements OnInit {
           this.router.navigate(['users/parcel-managers']);
         },
         error: (err) => {
-          console.error('Failed to create parcel manger', err);
+          console.error('Failed to update parcel manager - Full error:', err);
+          console.error('Error status:', err.status);
+          console.error('Error message:', err.error?.message);
+          console.error('Error details:', err.error);
+
+          // More detailed error message
+          let errorMessage = 'Failed to update parcel manager';
+
+          if (err.status === 500) {
+            errorMessage = 'Server error occurred. Please check if all required fields are correct.';
+          } else if (err.status === 400) {
+            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
+          } else if (err.status === 404) {
+            errorMessage = 'User or endpoint not found.';
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else {
+            errorMessage =
+              err?.error?.message ||
+              err?.error?.error ||
+              err?.message ||
+              'Unknown server error';
+          }
+
           this.messageService.add({
             severity: 'error',
             summary: 'Error Occurred',
-            detail: 'Failed to create parcel manager',
+            detail: errorMessage,
             life: 4000
           });
           this.submitting = false;

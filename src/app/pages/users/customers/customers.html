@@ -11,31 +11,15 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search users..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search users..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
 
-     <!-- Profile Filter -->
-      <select
-        [(ngModel)]="selectedProfile"
-        (change)="onProfileChange()"
-        class="filter-dropdown"
-      >
+      <!-- Profile Filter -->
+      <select [(ngModel)]="selectedProfile" (change)="onProfileChange()" class="filter-dropdown">
         <option value="" disabled selected>Filter by Profile</option>
         <option *ngFor="let option of profileOptions" [value]="option.value">
           {{ option.label }}
@@ -43,11 +27,7 @@
       </select>
 
       <!-- Channel Filter -->
-      <select
-        [(ngModel)]="selectedChannel"
-        (change)="onChannelChange()"
-        class="filter-dropdown"
-      >
+      <select [(ngModel)]="selectedChannel" (change)="onChannelChange()" class="filter-dropdown">
         <option value="" disabled selected>Filter by Channel</option>
         <option *ngFor="let option of channelOptions" [value]="option.value">
           {{ option.label }}
@@ -55,11 +35,7 @@
       </select>
 
       <!-- Status Filter -->
-      <select
-        [(ngModel)]="selectedStatus"
-        (change)="onStatusChange()"
-        class="filter-dropdown"
-      >
+      <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-dropdown">
         <option value="" disabled selected>Filter by Status</option>
         <option *ngFor="let option of statusOptions" [value]="option.value">
           {{ option.label }}
@@ -67,14 +43,8 @@
       </select>
 
 
-      <button
-        *ngIf="searchTerm || selectedProfile || selectedChannel || selectedStatus"
-        pButton
-        label="Clear All"
-        icon="pi pi-filter-slash"
-        class="p-button-outlined p-button-sm"
-        (click)="clearFilters()"
-      ></button>
+      <button *ngIf="searchTerm || selectedProfile || selectedChannel || selectedStatus" pButton label="Clear All"
+        icon="pi pi-filter-slash" class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
     </div>
   </div>
 
@@ -127,24 +97,20 @@
       <div class="table-header-left">
         <h3>Users List</h3>
         <span class="record-count">{{ filteredUsers.length }} of {{ totalRecords }} users</span>
+
+        <app-action-button icon="pi-plus" tooltip="Add Passenger" variant="primary"
+          (clicked)="navigateToCreatePassenger()"></app-action-button>
+
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="refresh()"></app-action-button>
+
       </div>
     </div>
 
-    <p-table
-      [value]="users"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users"
-      styleClass="data-table"
-      (onLazyLoad)="loadUsers($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="users" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users" styleClass="data-table"
+      (onLazyLoad)="loadUsers($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>User Info</th>
@@ -256,16 +222,8 @@
   </p-card>
 
   <!-- ================= USER DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '900px' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -275,20 +233,18 @@
           <div class="dialog-title-section">
             <h2>{{ getFullName(selectedUser!) }}</h2>
             <div class="dialog-badges">
-              <span
-                *ngIf="selectedUser"
-                [class]="'badge badge-' + getProfileClass(selectedUser.profile)"
-              >
+              <span *ngIf="selectedUser" [class]="'badge badge-' + getProfileClass(selectedUser.profile)">
                 <i [class]="'pi ' + getProfileIcon(selectedUser.profile)"></i>
                 {{ selectedUser.profile.replace('_', ' ') }}
               </span>
-              <span
-                *ngIf="selectedUser"
-                [class]="'badge badge-' + getStatusClass(selectedUser.blocked)"
-              >
+              <span *ngIf="selectedUser" [class]="'badge badge-' + getStatusClass(selectedUser.blocked)">
                 <i [class]="'pi ' + getStatusIcon(selectedUser.blocked)"></i>
                 {{ getStatusText(selectedUser.blocked) }}
               </span>
+
+              <button *ngIf="selectedUser" pButton icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit User" tooltipPosition="top"
+                (click)="navigateToUpdatePassenger(selectedUser); $event.stopPropagation()"></button>
             </div>
           </div>
         </div>

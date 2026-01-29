@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,7 +48,8 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-  ],
+    ActionButtonComponent
+],
   templateUrl: './customers.html',
   styleUrls: [
     './customers.css',
@@ -110,7 +112,7 @@ export class CustomersComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -302,5 +304,26 @@ export class CustomersComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreatePassenger(): void {
+    this.router.navigate(['forms/register-passenger'])
+  }
+
+  navigateToUpdatePassenger(passenger: User): void {
+    console.log('Navigating to:', passenger.id);
+
+    if (!passenger?.id) {
+      console.error('Passenger ID missing', passenger);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-passenger', passenger.id], {
+      state: { passenger }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

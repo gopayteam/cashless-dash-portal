@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,7 +48,8 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-  ],
+    ActionButtonComponent
+],
   templateUrl: './general.html',
   styleUrls: [
     './general.css',
@@ -110,7 +112,7 @@ export class GeneralUserComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -301,5 +303,28 @@ export class GeneralUserComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateUser(): void {
+    this.router.navigate(['forms/register-user'])
+  }
+
+  navigateToUpdateUser(user: User, event?: Event): void {
+    event?.stopPropagation();
+    console.log('Navigating to:', user.id);
+
+    if (!user?.id) {
+      console.error('User ID missing', user);
+      return;
+    }
+
+    // Pass the user email as route param and full user object as state
+    this.router.navigate(['/forms/update-user', user.id], {
+      state: { user }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

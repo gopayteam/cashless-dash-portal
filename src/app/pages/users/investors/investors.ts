@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,6 +48,7 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent,
   ],
   templateUrl: './investors.html',
   styleUrls: [
@@ -110,7 +112,7 @@ export class InvestorsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -302,5 +304,26 @@ export class InvestorsComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateInvestor(): void {
+    this.router.navigate(['forms/register-investor'])
+  }
+
+  navigateToUpdateInvestor(investor: User): void {
+    console.log('Navigating to:', investor.id);
+
+    if (!investor?.id) {
+      console.error('Investor ID missing', investor);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-investor', investor.id], {
+      state: { investor }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,6 +48,7 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent
   ],
   templateUrl: './admin.html',
   styleUrls: [
@@ -110,7 +112,7 @@ export class AdminUserComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -303,5 +305,26 @@ export class AdminUserComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateAdmin(): void {
+    this.router.navigate(['forms/register-admin'])
+  }
+
+  navigateToUpdateAdmin(admin: User): void {
+    console.log('Navigating to:', admin.id);
+
+    if (!admin?.id) {
+      console.error('Admin ID missing', admin);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-admin', admin.id], {
+      state: { admin }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

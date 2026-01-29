@@ -17,6 +17,7 @@ import { UserApiResponse } from '../../../../@core/models/user/user_api_Response
 import { SelectModule } from 'primeng/select';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface ProfileOption {
   label: string;
@@ -47,6 +48,7 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent,
   ],
   templateUrl: './driver.html',
   styleUrls: [
@@ -110,7 +112,7 @@ export class DriverUserComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -302,5 +304,26 @@ export class DriverUserComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  navigateToCreateDriver(): void {
+    this.router.navigate(['forms/register-driver'])
+  }
+
+  navigateToUpdateDriver(driver: User): void {
+    console.log('Navigating to:', driver.id);
+
+    if (!driver?.id) {
+      console.error('Driver ID missing', driver);
+      return;
+    }
+
+    this.router.navigate(['/forms/update-driver', driver.id], {
+      state: { driver }
+    });
+  }
+
+  refresh(): void {
+    this.loadUsers({ first: this.first, rows: this.rows });
   }
 }

@@ -5,6 +5,11 @@ export const API_ENDPOINTS = {
   AUTH_REFRESH: '/api/auth/refresh-token',
   REFRESH_TOKEN: '',
   REGISTER: '',
+  REGISTER_USER: '/api/v1/auth/register',
+  UPDATE_USER: '/api/v1/org/users/update',
+  CHANGE_PASSWORD: '/api/v1/auth/change-password',
+  RESET_PASSWORD: '/api/v1/auth/reset-password',
+  FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
 
   // #####################  DASHBOARD SUB-ENDPOINTS   #######################
   ALL_PAYMENTS: '/api/payment/passenger/manifest',

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddVehicle } from './add-vehicle';
+import { AddVehicleComponent as AddVehicle } from './add-vehicle';
 
 describe('AddVehicle', () => {
   let component: AddVehicle;
@@ -10,7 +10,7 @@ describe('AddVehicle', () => {
     await TestBed.configureTestingModule({
       imports: [AddVehicle]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(AddVehicle);
     component = fixture.componentInstance;

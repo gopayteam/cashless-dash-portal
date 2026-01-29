@@ -1,4 +1,4 @@
-<div >
+<div>
   <div class="page-header">
     <h1>Fund Reassignment</h1>
     <p class="page-description">Transfer funds between fleet accounts</p>
@@ -6,23 +6,17 @@
 
   <div class="page-container card-hover">
 
-    <p-card >
+    <p-card>
       <ng-container *ngIf="loading() && sourceFleetOptions.length === 0">
         <div class="loading-container">
-          <p-progressSpinner
-            styleClass="w-4rem h-4rem"
-            strokeWidth="4"
-            animationDuration="1s">
+          <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4" animationDuration="1s">
           </p-progressSpinner>
           <p class="loading-text">Loading fleet information...</p>
         </div>
       </ng-container>
 
-      <form
-        *ngIf="!loading() || sourceFleetOptions.length > 0"
-        [formGroup]="fundReassignmentForm"
-        (ngSubmit)="onSubmit()"
-        class="form-container">
+      <form *ngIf="!loading() || sourceFleetOptions.length > 0" [formGroup]="fundReassignmentForm"
+        (ngSubmit)="onSubmit()" class="form-container">
 
         <!-- Source Fleet Number Dropdown -->
         <div class="form-field">
@@ -30,24 +24,15 @@
             Source Fleet Number <span class="required-indicator">*</span>
           </label>
 
-          <p-select
-            id="sourceFleetNumber"
-            formControlName="sourceFleetNumber"
-            [options]="sourceFleetOptions"
-            optionLabel="label"
-            optionValue="fleetNumber"
-            placeholder="Select source fleet"
-            [showClear]="true"
-            [filter]="true"
-            filterBy="label,fleetNumber"
-            class="w-full custom-select"
-            [invalid]="isFieldInvalid('sourceFleetNumber')"
-          >
+          <p-select id="sourceFleetNumber" formControlName="sourceFleetNumber" [options]="sourceFleetOptions"
+            optionLabel="label" optionValue="fleetNumber" placeholder="Select source fleet" [showClear]="true"
+            [filter]="true" filterBy="label,fleetNumber" class="w-full custom-select"
+            [invalid]="isFieldInvalid('sourceFleetNumber')">
             <!-- Selected Item Template -->
             <ng-template pTemplate="selectedItem" let-option>
               <div class="flex align-items-center gap-2" *ngIf="option">
                 <i class="pi pi-car"></i>
-                <span>  -  </span>
+                <span> - </span>
                 <span>{{ option.label }}</span>
               </div>
             </ng-template>
@@ -56,7 +41,7 @@
             <ng-template pTemplate="item" let-option>
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-car"></i>
-                <span>  -  </span>
+                <span> - </span>
                 <span>{{ option.label }}</span>
               </div>
             </ng-template>
@@ -74,24 +59,15 @@
             Destination Fleet Number <span class="required-indicator">*</span>
           </label>
 
-          <p-select
-            id="destinationFleetNumber"
-            formControlName="destinationFleetNumber"
-            [options]="destinationFleetOptions"
-            optionLabel="label"
-            optionValue="fleetNumber"
-            placeholder="Select destination fleet"
-            [showClear]="true"
-            [filter]="true"
-            filterBy="label,fleetNumber"
-            class="w-full custom-select"
-            [invalid]="isFieldInvalid('destinationFleetNumber')"
-          >
+          <p-select id="destinationFleetNumber" formControlName="destinationFleetNumber"
+            [options]="destinationFleetOptions" optionLabel="label" optionValue="fleetNumber"
+            placeholder="Select destination fleet" [showClear]="true" [filter]="true" filterBy="label,fleetNumber"
+            class="w-full custom-select" [invalid]="isFieldInvalid('destinationFleetNumber')">
             <!-- Selected Item Template -->
             <ng-template pTemplate="selectedItem" let-option>
               <div class="flex align-items-center gap-2" *ngIf="option">
                 <i class="pi pi-car"></i>
-                <span>  -  </span>
+                <span> - </span>
                 <span>{{ option.label }}</span>
               </div>
             </ng-template>
@@ -100,7 +76,7 @@
             <ng-template pTemplate="item" let-option>
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-car"></i>
-                <span>  -  </span>
+                <span> - </span>
                 <span>{{ option.label }}</span>
               </div>
             </ng-template>
@@ -120,18 +96,9 @@
           <label for="amount" class="form-label">
             Enter Amount <span class="required-indicator">*</span>
           </label>
-          <p-inputNumber
-            id="amount"
-            formControlName="amount"
-            mode="currency"
-            currency="KES"
-            locale="en-KE"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            placeholder="0.00"
-            styleClass="w-full"
-            [class.invalid]="isFieldInvalid('amount')"
-          >
+          <p-inputNumber id="amount" formControlName="amount" mode="currency" currency="KES" locale="en-KE"
+            [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="0.00" styleClass="w-full"
+            [class.invalid]="isFieldInvalid('amount')">
           </p-inputNumber>
           <small class="form-error" *ngIf="isFieldInvalid('amount')">
             {{ getErrorMessage('amount') }}
@@ -142,9 +109,7 @@
         </div>
 
         <!-- Summary Section -->
-        <div
-          class="transfer-summary"
-          *ngIf="fundReassignmentForm.get('sourceFleetNumber')?.value &&
+        <div class="transfer-summary" *ngIf="fundReassignmentForm.get('sourceFleetNumber')?.value &&
                 fundReassignmentForm.get('destinationFleetNumber')?.value &&
                 fundReassignmentForm.get('amount')?.value">
           <div class="summary-header">
@@ -178,20 +143,10 @@
 
         <!-- Form Actions -->
         <div class="form-actions">
-          <p-button
-            type="button"
-            label="Reset"
-            severity="secondary"
-            [outlined]="true"
-            (click)="resetForm()"
-            [disabled]="loading()"
-          ></p-button>
-          <p-button
-            type="submit"
-            label="Transfer Funds"
-            [loading]="loading()"
-            icon="pi pi-arrow-right-arrow-left"
-          ></p-button>
+          <p-button type="button" label="Reset" iconPos="right" [style]="{'gap':'1.5rem'}" severity="secondary"
+            [outlined]="true" (click)="resetForm()" [disabled]="loading()"></p-button>
+          <p-button type="submit" label="Transfer Funds" iconPos="right" [style]="{'gap':'1.5rem'}"
+            [loading]="loading()" icon="pi pi-arrow-right-arrow-left"></p-button>
         </div>
       </form>
     </p-card>
