@@ -318,8 +318,8 @@ export class MarshalsComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update marshal:', marshal.id);
-    console.log('Marshal data being passed:', marshal);
+    // console.log('Navigating to update marshal:', marshal.id);
+    // console.log('Marshal data being passed:', marshal);
 
     // Pass the complete marshal object through router state
     // This ensures the data is immediately available in the update component

@@ -319,8 +319,8 @@ export class ConductorsComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update conductor:', conductor.id);
-    console.log('Conductor data being passed:', conductor);
+    // console.log('Navigating to update conductor:', conductor.id);
+    // console.log('Conductor data being passed:', conductor);
 
     // Pass the complete user object through router state
     // This ensures the data is immediately available in the update component

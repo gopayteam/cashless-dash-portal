@@ -319,8 +319,8 @@ export class AdminUserComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update admin:', admin.id);
-    console.log('Admin data being passed:', admin);
+    // console.log('Navigating to update admin:', admin.id);
+    // console.log('Admin data being passed:', admin);
 
     // Pass the complete user object through router state
     // This ensures the data is immediately available in the update component

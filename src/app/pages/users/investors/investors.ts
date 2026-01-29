@@ -318,8 +318,8 @@ export class InvestorsComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update investor:', investor.id);
-    console.log('Investor data being passed:', investor);
+    // console.log('Navigating to update investor:', investor.id);
+    // console.log('Investor data being passed:', investor);
 
     // Pass the complete investor object through router state
     // This ensures the data is immediately available in the update component

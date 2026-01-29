@@ -318,8 +318,8 @@ export class ParcelManagerUsersComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update manager:', manager.id);
-    console.log('Manager data being passed:', manager);
+    // console.log('Navigating to update manager:', manager.id);
+    // console.log('Manager data being passed:', manager);
 
     // Pass the complete manager object through router state
     // This ensures the data is immediately available in the update component

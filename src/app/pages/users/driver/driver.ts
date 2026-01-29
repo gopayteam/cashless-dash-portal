@@ -318,8 +318,8 @@ export class DriverUserComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update driver:', driver.id);
-    console.log('Driver data being passed:', driver);
+    // console.log('Navigating to update driver:', driver.id);
+    // console.log('Driver data being passed:', driver);
 
     // Pass the complete driver object through router state
     // This ensures the data is immediately available in the update component

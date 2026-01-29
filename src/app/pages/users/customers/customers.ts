@@ -318,8 +318,8 @@ export class CustomersComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update passenger:', passenger.id);
-    console.log('Passenger data being passed:', passenger);
+    // console.log('Navigating to update passenger:', passenger.id);
+    // console.log('Passenger data being passed:', passenger);
 
     // Pass the complete passenger object through router state
     // This ensures the data is immediately available in the update component

@@ -317,8 +317,8 @@ export class GeneralUserComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to update user:', user.id);
-    console.log('User data being passed:', user);
+    // console.log('Navigating to update user:', user.id);
+    // console.log('User data being passed:', user);
 
     // Pass the complete user object through router state
     // This ensures the data is immediately available in the update component
