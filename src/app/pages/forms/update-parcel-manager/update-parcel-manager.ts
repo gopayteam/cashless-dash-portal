@@ -1,4 +1,4 @@
-// pages/parcel-managers/update-parcel-manager/update-parcel-manager.component.ts (FIXED)
+// pages/parcel-managers/update-parcel-manager/update-parcel-manager.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +43,7 @@ interface ApiResponse {
   status: number;
   message: string;
   data: any[];
-  totalRecords: number;
+  totalRecords?: number;
 }
 
 @Component({
@@ -67,7 +67,7 @@ interface ApiResponse {
 })
 export class UpdateParcelManagerComponent implements OnInit {
   entityId: string | null = null;
-  managerId: number | null = null; // FIXED: Changed from managerUsername to managerId
+  managerId: number | null = null;
   managerUsername: string | null = null;
   userData: User | null = null;
 
@@ -118,17 +118,15 @@ export class UpdateParcelManagerComponent implements OnInit {
     const stateUser = navigation?.extras?.state?.['manager'] as User;
 
     this.route.params.subscribe(params => {
-      const id = params['id']; // FIXED: Get id from route params
-      this.managerId = +id; // FIXED: Convert to number and store
+      const id = params['id'];
+      this.managerId = +id;
 
       if (stateUser) {
-        // Came from navigation (best case) - state was passed
         console.log('Loading from navigation state:', stateUser);
         this.populateFormFromUser(stateUser);
       } else {
-        // Page refreshed or direct URL - need to fetch data
         console.log('No state found, loading user data for ID:', id);
-        this.loadUserData(+id); // FIXED: Pass id as number
+        this.loadUserData(+id);
       }
     });
 
@@ -142,15 +140,11 @@ export class UpdateParcelManagerComponent implements OnInit {
     this.lastName = user.lastName;
     this.phoneNumber = user.phoneNumber;
     this.email = user.email;
-
-    // Note: stageId is not in the User model
-    // You'll need to either fetch it from another API or add it to the User model
     this.selectedStage = null;
 
     this.loadingStore.stop();
   }
 
-  // FIXED: Changed parameter from username to userId
   loadUserData(userId: number): void {
     if (!this.entityId) {
       this.messageService.add({
@@ -170,7 +164,7 @@ export class UpdateParcelManagerComponent implements OnInit {
       entityId: this.entityId,
       agent: this.AGENT,
       page: 0,
-      size: 100 // FIXED: Increased size to ensure we get all users
+      size: 100
     };
 
     this.dataService
@@ -178,7 +172,6 @@ export class UpdateParcelManagerComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
-            // FIXED: Find the user with matching ID instead of username
             const user = response.data.find((u: User) => u.id === userId);
 
             if (user) {
@@ -322,6 +315,8 @@ export class UpdateParcelManagerComponent implements OnInit {
       stageId: this.selectedStage!,
     };
 
+    console.log('Submitting payload:', payload);
+
     this.submitting = true;
     this.loadingStore.start();
 
@@ -336,7 +331,7 @@ export class UpdateParcelManagerComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Parcel manager updated successfully',
+            detail: response.message || 'Parcel manager updated successfully',
             life: 4000
           });
 
@@ -346,13 +341,37 @@ export class UpdateParcelManagerComponent implements OnInit {
           }, 1500);
         },
         error: (err) => {
-          console.error('Failed to update parcel manager', err);
+          console.error('Failed to update parcel manager - Full error:', err);
+          console.error('Error status:', err.status);
+          console.error('Error message:', err.error?.message);
+          console.error('Error details:', err.error);
+
+          // More detailed error message
+          let errorMessage = 'Failed to update parcel manager';
+
+          if (err.status === 500) {
+            errorMessage = 'Server error occurred. Please check if all required fields are correct.';
+          } else if (err.status === 400) {
+            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
+          } else if (err.status === 404) {
+            errorMessage = 'User or endpoint not found.';
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          } else {
+            errorMessage =
+              err?.error?.message ||
+              err?.error?.error ||
+              err?.message ||
+              'Unknown server error';
+          }
+
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: err?.error?.message || 'Failed to update parcel manager',
-            life: 4000
+            summary: 'Error Occurred',
+            detail: errorMessage,
+            life: 5000
           });
+
           this.submitting = false;
           this.loadingStore.stop();
         },
