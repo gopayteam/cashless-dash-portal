@@ -76,7 +76,7 @@ export class AuthService {
    * FIXED: Now properly handles API status codes
    */
   signUp(userData: SignUpRequest): Observable<AuthResponse> {
-    return this.api.post<AuthResponse>(API_ENDPOINTS.REGISTER, userData).pipe(
+    return this.api.post<AuthResponse>(API_ENDPOINTS.REGISTER_USER, userData).pipe(
       tap(response => {
         // SUCCESS: status === 0 means registration successful
         if (response.status === 0 && response.data) {

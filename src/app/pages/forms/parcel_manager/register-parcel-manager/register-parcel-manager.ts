@@ -148,7 +148,7 @@ export class RegisterParcelManagerComponent implements OnInit {
       this.lastName.trim() &&
       this.email.trim() &&
       this.isValidEmail(this.email) &&
-      this.selectedStage &&
+      // this.selectedStage &&
       this.deviceId.trim()
     );
   }
@@ -191,7 +191,7 @@ export class RegisterParcelManagerComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.REGISTER, payload, 'register-parcel-user')
+      .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-parcel-user')
       .subscribe({
         next: (response) => {
           console.log('Parcel user created successfully', response);

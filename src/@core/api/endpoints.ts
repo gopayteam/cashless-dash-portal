@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   AUTH_LOGOUT: '/api/auth/logout',
   AUTH_REFRESH: '/api/auth/refresh-token',
   REFRESH_TOKEN: '',
-  REGISTER: '',
+  // REGISTER: '/api/v1/auth/register',
   REGISTER_USER: '/api/v1/auth/register',
   UPDATE_USER: '/api/v1/org/users/update',
   CHANGE_PASSWORD: '/api/v1/auth/change-password',
