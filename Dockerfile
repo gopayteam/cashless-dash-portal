@@ -1,32 +1,16 @@
-# ---------- Stage 1: Build Angular ----------
+# ---- build stage ----
 FROM node:20-alpine AS build
-
 WORKDIR /app
 
-# Copy dependency files first for better caching
 COPY package*.json ./
-
 RUN npm ci
 
-# Copy rest of the project
 COPY . .
-
-# Build for production
 RUN npm run build -- --configuration production
 
+# ---- runtime stage ----
+FROM nginx:stable-alpine
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# ---------- Stage 2: Serve with Nginx ----------
-FROM nginx:alpine
-
-# Remove default config
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy Angular build output
+# Angular output for project "prime" (common with the new application builder)
 COPY --from=build /app/dist/prime/browser /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
