@@ -121,7 +121,7 @@
           <th>Login Trials</th>
           <th>First Login</th>
           <th>Created On</th>
-          <!-- <th>Actions</th> -->
+          <th>Actions</th>
         </tr>
       </ng-template>
 
@@ -189,16 +189,11 @@
               <span class="time">{{ user.createdOn | date : 'hh:mm a' }}</span>
             </div>
           </td>
-          <!-- <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-              (click)="viewUserDetails(user); $event.stopPropagation()"
-            ></button>
-          </td> -->
+          <td>
+            <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="Send Recovery Pin" tooltipPosition="top"
+              (click)="sendResetPinPhone(user); $event.stopPropagation()"></button>
+          </td>
         </tr>
       </ng-template>
 
@@ -407,4 +402,6 @@
       ></button>
     </ng-template> -->
   </p-dialog>
+
+  <p-toast position="top-right"></p-toast>
 </div>

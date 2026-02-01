@@ -11,6 +11,8 @@ export const API_ENDPOINTS = {
   RESET_PASSWORD: '/api/v1/auth/reset-password',
   FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
 
+  SEND_RESET_PASSWORD: '/api/v1/auth/forgot-password',
+
   // #####################  DASHBOARD SUB-ENDPOINTS   #######################
   ALL_PAYMENTS: '/api/payment/passenger/manifest',
   TRANSACTION_STATS: '/api/payment/transactions/stats',

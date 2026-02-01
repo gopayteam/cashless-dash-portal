@@ -117,12 +117,13 @@
 
         <!-- Action Buttons -->
         <div class="form-actions">
-          <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="onCancel()" iconPos="right" [style]="{'gap':'1.5rem'}"
-            [disabled]="submitting">
+          <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="onCancel()"
+            iconPos="right" [style]="{'gap':'1.5rem'}" [disabled]="submitting">
           </p-button>
 
-          <p-button label="Create User" [icon]="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'" type="submit" iconPos="right" [style]="{'gap':'1.5rem'}"
-            [disabled]="!isFormValid() || submitting" [loading]="submitting" loadingIcon="pi pi-spin pi-spinner">
+          <p-button label="Create User" [icon]="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'" type="submit"
+            iconPos="right" [style]="{'gap':'1.5rem'}" [disabled]="!isFormValid() || submitting" [loading]="submitting"
+            loadingIcon="pi pi-spin pi-spinner">
           </p-button>
         </div>
 

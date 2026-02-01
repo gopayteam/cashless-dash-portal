@@ -18,6 +18,9 @@ import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { MessageService } from 'primeng/api';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 
 interface ProfileOption {
   label: string;
@@ -48,13 +51,16 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-    ActionButtonComponent
-],
+    ActionButtonComponent,
+    MessageModule,
+    ToastModule,
+  ],
   templateUrl: './customers.html',
   styleUrls: [
     './customers.css',
     '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
+    '../../../../styles/modules/_user_module.css',
+    '../../../../styles/global/_toast.css',
   ],
 })
 export class CustomersComponent implements OnInit {
@@ -111,6 +117,7 @@ export class CustomersComponent implements OnInit {
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
+    private messageService: MessageService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -335,4 +342,59 @@ export class CustomersComponent implements OnInit {
   refresh(): void {
     this.loadUsers({ first: this.first, rows: this.rows });
   }
+
+  sendResetPinPhone(user: User): void {
+    if (!user.phoneNumber) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Missing Data',
+        detail: 'User phone number is missing.'
+      });
+      return;
+    }
+
+    const payload = {
+      channel: 'APP',
+      entityId: this.entityId,
+      username: user.phoneNumber
+    };
+
+    interface PinResponse {
+      status: number,
+      message: string,
+      data: any[],
+      totalRecords: number
+    }
+
+    this.dataService.post<PinResponse>(API_ENDPOINTS.SEND_RESET_PASSWORD, payload).subscribe({
+      next: (response) => {
+
+        if (response.status === 0) {
+          // REAL success
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: response.message || 'Reset PIN sent successfully.'
+          });
+        } else {
+          // Business error from backend
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed',
+            detail: response.message || 'Request failed.'
+          });
+        }
+      },
+      error: (error) => {
+        // Network / server crash
+        console.error('HTTP Error:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'System Error',
+          detail: 'Server is unreachable. Try again later.'
+        });
+      }
+    });
+  }
+
 }
