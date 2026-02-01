@@ -148,7 +148,7 @@ export class RegisterParcelManagerComponent implements OnInit {
       this.lastName.trim() &&
       this.email.trim() &&
       this.isValidEmail(this.email) &&
-      // this.selectedStage &&
+      this.selectedStage &&
       this.deviceId.trim()
     );
   }
