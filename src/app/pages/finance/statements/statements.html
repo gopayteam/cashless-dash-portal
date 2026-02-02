@@ -3,8 +3,8 @@
   <!-- ================= HEADER WITH DATE FILTER ================= -->
   <div class="statements-header">
     <div class="header-content">
-      <h1>Withdrawal Statements</h1>
-      <p class="text-muted">View and analyze all withdrawal transactions</p>
+      <h1>Transaction Statements</h1>
+      <p class="text-muted">View and analyze all transaction statements</p>
     </div>
 
     <div class="header-filters">
@@ -79,67 +79,28 @@
         <div class="search-container">
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input
-              pInputText
-              type="text"
-              placeholder="Search statements..."
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-              class="search-input"
-            />
+            <input pInputText type="text" placeholder="Search statements..." [(ngModel)]="searchTerm"
+              (input)="onSearchChange()" class="search-input" />
           </span>
-          <button
-            *ngIf="searchTerm"
-            pButton
-            icon="pi pi-times"
-            class="p-button-text p-button-sm clear-button"
-            (click)="clearSearch()"
-            pTooltip="Clear search"
-          ></button>
+          <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+            (click)="clearSearch()" pTooltip="Clear search"></button>
         </div>
 
-        <p-select
-          [options]="transactionTypeOptions"
-          [(ngModel)]="selectedTransactionType"
-          (onChange)="onTransactionTypeChange()"
-          placeholder="Transaction Type"
-          styleClass="filter-dropdown"
-        ></p-select>
+        <p-select [options]="transactionTypeOptions" [(ngModel)]="selectedTransactionType"
+          (onChange)="onTransactionTypeChange()" placeholder="Transaction Type" styleClass="filter-dropdown"></p-select>
 
-        <p-select
-          [options]="categoryOptions"
-          [(ngModel)]="selectedCategory"
-          (onChange)="onCategoryChange()"
-          placeholder="Category"
-          styleClass="filter-dropdown"
-        ></p-select>
+        <p-select [options]="categoryOptions" [(ngModel)]="selectedCategory" (onChange)="onCategoryChange()"
+          placeholder="Category" styleClass="filter-dropdown"></p-select>
 
-        <button
-          *ngIf="searchTerm || selectedTransactionType || selectedCategory"
-          pButton
-          label="Clear"
-          icon="pi pi-filter-slash"
-          class="p-button-outlined p-button-sm"
-          (click)="clearFilters()"
-        ></button>
+        <button *ngIf="searchTerm || selectedTransactionType || selectedCategory" pButton label="Clear"
+          icon="pi pi-filter-slash" class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
       </div>
     </div>
 
-    <p-table
-      [value]="statements"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} statements"
-      styleClass="data-table"
-      (onLazyLoad)="loadStatements($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="statements" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} statements" styleClass="data-table"
+      (onLazyLoad)="loadStatements($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Date & Time</th>
@@ -234,30 +195,22 @@
   </p-card>
 
   <!-- ================= STATEMENT DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#fff' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
-          <div class="dialog-icon" [class.credit]="selectedStatement?.transactionType === 'CREDIT'" [class.debit]="selectedStatement?.transactionType === 'DEBIT'">
+          <div class="dialog-icon" [class.credit]="selectedStatement?.transactionType === 'CREDIT'"
+            [class.debit]="selectedStatement?.transactionType === 'DEBIT'">
             <i [class]="'pi ' + getTransactionTypeIcon(selectedStatement?.transactionType || '')"></i>
           </div>
           <div class="dialog-title-section">
             <h2>Transaction Details</h2>
             <span class="receipt-large">{{ selectedStatement?.mpesaReceiptNumber }}</span>
           </div>
-          <span
-            *ngIf="selectedStatement"
-            [class]="'badge badge-' + getTransactionTypeClass(selectedStatement.transactionType)"
-          >
+          <span *ngIf="selectedStatement"
+            [class]="'badge badge-' + getTransactionTypeClass(selectedStatement.transactionType)">
             <i [class]="'pi ' + getTransactionTypeIcon(selectedStatement.transactionType)"></i>
             {{ selectedStatement.transactionType }}
           </span>
@@ -360,13 +313,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

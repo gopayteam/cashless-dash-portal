@@ -8,8 +8,8 @@
   <!-- ================= HEADER ================= -->
   <div class="drivers-header">
     <div class="header-content">
-      <h1>Driver Management</h1>
-      <p class="text-muted">Manage and track all registered drivers</p>
+      <h1>Active Drivers</h1>
+      <p class="text-muted">Manage and track active drivers</p>
     </div>
   </div>
 
@@ -23,41 +23,18 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search drivers..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search drivers..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
     </div>
 
-    <p-table
-      [value]="drivers"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} drivers"
-      styleClass="data-table"
-      (onLazyLoad)="loadDrivers($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="drivers" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} drivers" styleClass="data-table"
+      (onLazyLoad)="loadDrivers($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Driver Name</th>
@@ -122,25 +99,21 @@
           </td>
           <td>
             <div class="days-remaining-cell" [class.warning]="getDaysRemaining(driver) <= 7">
-              <i
-                [class]="
+              <i [class]="
                   getDaysRemaining(driver) > 7
                     ? 'pi pi-check-circle'
                     : getDaysRemaining(driver) > 0
                       ? 'pi pi-exclamation-triangle'
                       : 'pi pi-times-circle'
-                "
-              ></i>
+                "></i>
               <span>{{ getDaysRemaining(driver) }} days</span>
             </div>
           </td>
           <td>
             <span [class]="'badge ' + getStatusClass(driver.status)">
-              <i
-                [class]="
+              <i [class]="
                   driver.status === 'ACTIVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'
-                "
-              ></i>
+                "></i>
               {{ driver.status }}
             </span>
           </td>
@@ -172,16 +145,9 @@
   </p-card>
 
   <!-- ================= DRIVER DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="driver-detail-dialog"
-    [style]="{ width: '90vw', maxWidth: '800px', background: '#f9f9f9' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="driver-detail-dialog"
+    [style]="{ width: '90vw', maxWidth: '800px', background: '#f9f9f9' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <h2>Driver Details</h2>
@@ -266,11 +232,9 @@
             <div class="detail-item">
               <label>Current Status</label>
               <span [class]="'value badge ' + getStatusClass(selectedDriver.status)">
-                <i
-                  [class]="
+                <i [class]="
                     selectedDriver.status === 'ACTIVE' ? 'pi pi-check-circle' : 'pi pi-times-circle'
-                  "
-                ></i>
+                  "></i>
                 {{ selectedDriver.status }}
               </span>
             </div>
@@ -292,20 +256,15 @@
 
             <div class="detail-item">
               <label>Days Remaining</label>
-              <span
-                class="value"
-                [class.warning-text]="getDaysRemaining(selectedDriver) <= 7"
-                [class.success-text]="getDaysRemaining(selectedDriver) > 7"
-              >
-                <i
-                  [class]="
+              <span class="value" [class.warning-text]="getDaysRemaining(selectedDriver) <= 7"
+                [class.success-text]="getDaysRemaining(selectedDriver) > 7">
+                <i [class]="
                     getDaysRemaining(selectedDriver) > 7
                       ? 'pi pi-check-circle'
                       : getDaysRemaining(selectedDriver) > 0
                         ? 'pi pi-exclamation-triangle'
                         : 'pi pi-times-circle'
-                  "
-                ></i>
+                  "></i>
                 {{ getDaysRemaining(selectedDriver) }} days
               </span>
             </div>
@@ -313,12 +272,9 @@
             <div class="detail-item">
               <label>Currently Active</label>
               <span class="value">
-                <i
-                  [class]="
+                <i [class]="
                     isDriverActive(selectedDriver) ? 'pi pi-check-circle' : 'pi pi-times-circle'
-                  "
-                  [style.color]="isDriverActive(selectedDriver) ? '#28a745' : '#dc3545'"
-                ></i>
+                  " [style.color]="isDriverActive(selectedDriver) ? '#28a745' : '#dc3545'"></i>
                 {{ isDriverActive(selectedDriver) ? 'Yes' : 'No' }}
               </span>
             </div>
@@ -357,13 +313,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

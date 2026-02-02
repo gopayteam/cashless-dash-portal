@@ -78,22 +78,29 @@ export class RegisterUserComponent implements OnInit {
   profileOptions: DropdownOption[] = [
     { label: 'Super Admin', value: 'SUPER_ADMIN' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
+    { label: 'Manager', value: 'MANAGER' },
     { label: 'Admin', value: 'ADMIN' },
     { label: 'User', value: 'USER' },
-    { label: 'Manager', value: 'MANAGER' },
     { label: 'Parcel', value: 'PARCEL' },
-    { label: 'Driver', value: 'DRIVER' },
-    { label: 'Conductor', value: 'CONDUCTOR' },
-  ];
-
-  agentOptions: DropdownOption[] = [
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Parcel', value: 'PARCEL' },
-    { label: 'Passenger', value: 'PASSENGER' },
     { label: 'Marshal', value: 'MARSHAL' },
     { label: 'Driver', value: 'DRIVER' },
     { label: 'Conductor', value: 'CONDUCTOR' },
     { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
+  ];
+
+  agentOptions: DropdownOption[] = [
+    { label: 'Dashmaster', value: 'DASHMASTER' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Passenger', value: 'PASSENGER' },
+    { label: 'Parcel', value: 'PARCEL' },
+    { label: 'Marshal', value: 'MARSHAL' },
+    { label: 'Driver', value: 'DRIVER' },
+    { label: 'Conductor', value: 'CONDUCTOR' },
+    { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
   ];
 
   channelOptions: DropdownOption[] = [

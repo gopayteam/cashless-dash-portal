@@ -94,15 +94,21 @@
               <small class="field-hint">Type of agent for this user</small>
             </div>
 
-            <!-- Channel -->
+            <!-- Channel (Read-only) -->
             <div class="form-field">
+              <label for="channel" class="field-label">Channel</label>
+              <input pInputText id="channel" [value]="CHANNEL" name="channel" class="w-full" disabled readonly />
+            </div>
+
+            <!-- Channel -->
+            <!-- <div class="form-field">
               <label for="channel" class="field-label required">Channel</label>
               <p-select id="channel" [(ngModel)]="selectedChannel" name="channel" [options]="channelOptions"
                 placeholder="Select channel" optionLabel="label" optionValue="value" [showClear]="true"
                 styleClass="w-full" required [disabled]="submitting">
               </p-select>
               <small class="field-hint">Access channel for this user</small>
-            </div>
+            </div> -->
 
             <!-- Entity ID (Read-only) -->
             <!-- <div class="form-field">
