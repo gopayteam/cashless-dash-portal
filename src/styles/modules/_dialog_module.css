@@ -3,11 +3,9 @@
 
 /* ================= DIALOG HEADER STYLING ================= */
 ::ng-deep .custom-dialog .p-dialog-header {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color-dark) 0%,
-    var(--secondary-color) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color-dark) 0%,
+      var(--secondary-color) 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;
@@ -19,13 +17,12 @@
   font-weight: 600;
 }
 
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
+
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon,
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: transparent !important;
 }
 
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
 
 ::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:focus {
   box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.3);

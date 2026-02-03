@@ -229,7 +229,7 @@ export class InactiveDriversComponent implements OnInit {
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
-    this.selectedDriver = null;
+    // this.selectedDriver = null;
   }
 
   getStatusClass(status: DriverStatus): string {

@@ -469,9 +469,9 @@
   color: white;
 }
 
-::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-header-icon {
+/* ::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-header-icon {
   color: white;
-}
+} */
 
 ::ng-deep .driver-detail-dialog .p-dialog-content {
   padding: 2rem;

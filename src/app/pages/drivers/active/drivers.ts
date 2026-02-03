@@ -73,7 +73,7 @@ export class ActiveDriversComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -228,7 +228,7 @@ export class ActiveDriversComponent implements OnInit {
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
-    this.selectedDriver = null;
+    // this.selectedDriver = null;
   }
 
   getStatusClass(status: DriverStatus): string {

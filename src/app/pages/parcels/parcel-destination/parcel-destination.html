@@ -30,19 +30,10 @@
       </div>
 
       <div class="filter-actions">
-        <button
-          pButton
-          icon="pi pi-filter"
-          label="Apply"
-          class="filter-btn filter-btn--apply"
-          (click)="applyFilters()">
+        <button pButton icon="pi pi-filter" label="Apply" class="filter-btn filter-btn--apply" (click)="applyFilters()">
         </button>
 
-        <button
-          pButton
-          icon="pi pi-refresh"
-          label="Reset"
-          class="filter-btn filter-btn--reset"
+        <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset"
           (click)="resetFilters()">
         </button>
       </div>
@@ -54,26 +45,16 @@
   <p-card styleClass="card-hover card">
     <div class="table-header">
       <div class="table-header-left">
-        <h3>Source Stages</h3>
+        <h3>Destination Stages</h3>
         <span class="record-count">{{ totalRecords }} records</span>
       </div>
     </div>
 
-    <p-table
-      [value]="stages"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [totalRecords]="totalRecords"
-      [loading]="loading()"
-      [rowsPerPageOptions]="[10, 20, 30, 50]"
-      (onLazyLoad)="loadStages($event)"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} destinations"
-      styleClass="data-table"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="stages" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+      [totalRecords]="totalRecords" [loading]="loading()" [rowsPerPageOptions]="[10, 20, 30, 50]"
+      (onLazyLoad)="loadStages($event)" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} destinations" styleClass="data-table"
+      [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Date</th>
@@ -117,15 +98,9 @@
     </p-table>
   </p-card>
 
-  <p-dialog
-    header="Parcel Stage Details"
-    [(visible)]="showStageDialog"
-    [modal]="true"
-    [style]="{ width: '650px', background: '#f9f9f9' }"
-    [contentStyle]="{ overflow: 'visible' }"
-    styleClass="parcel-detail-dialog"
-    [dismissableMask]="true"
-  >
+  <p-dialog header="Parcel Stage Details" [(visible)]="showStageDialog" [modal]="true"
+    [style]="{ width: '650px', background: '#f9f9f9' }" [contentStyle]="{ overflow: 'visible' }"
+    styleClass="parcel-detail-dialog" [dismissableMask]="true">
     <ng-container *ngIf="selectedStage">
       <div class="detail-content">
         <div class="detail-grid">
@@ -186,13 +161,7 @@
     </ng-container>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="showStageDialog = false"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="showStageDialog = false"></button>
     </ng-template>
   </p-dialog>
 

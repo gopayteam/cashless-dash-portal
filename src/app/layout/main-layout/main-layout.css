@@ -2,8 +2,13 @@
    1. ANIMATIONS
 ===================================================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromTop {
@@ -11,6 +16,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -79,7 +85,8 @@
 ===================================================== */
 @media (max-width: 1024px) {
   .sidebar {
-    transform: translateX(-100%);
+    /* transform: translateX(-100%); */
+    transform: translateX(-280px);
   }
 
   .sidebar--mobile-visible {
@@ -157,6 +164,7 @@
 }
 
 @media (max-width: 768px) {
+
   ::ng-deep .p-dialog.notification-dialog,
   ::ng-deep .p-dialog.settings-dialog {
     top: 10px !important;
@@ -188,7 +196,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-width: 0; /* Prevent flex overflow */
+  min-width: 0;
+  /* Prevent flex overflow */
 }
 
 /* Logo image
@@ -272,17 +281,25 @@
   gap: 0.5rem;
 }
 
-::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
+/* Make close icon background transparent */
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon {
+  background: transparent !important;
+  border: none !important;
+  color: white !important;
 }
 
-::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background: rgba(255, 255, 255, 0.15);
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon,
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: transparent !important;
 }
+
+
+
+/* Remove focus ring if you don't want it */
+::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:focus {
+  box-shadow: none !important;
+}
+
 
 /* Dialog Border Radius */
 ::ng-deep .p-dialog .p-dialog-content {
@@ -398,8 +415,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* Notification Content */
@@ -486,7 +510,7 @@
   background: #f8f9fa;
 }
 
-.settings-item + .settings-item {
+.settings-item+.settings-item {
   border-top: 1px solid #f0f0f0;
 }
 
@@ -497,7 +521,7 @@
   flex: 1;
 }
 
-.settings-item-info > i {
+.settings-item-info>i {
   font-size: 1.25rem;
   color: var(--primary-color);
   width: 40px;
@@ -509,7 +533,7 @@
   border-radius: 10px;
 }
 
-.settings-item-info > div {
+.settings-item-info>div {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -625,14 +649,22 @@
 }
 
 @keyframes badgePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* =====================================================
    RESPONSIVE DESIGN
 ===================================================== */
 @media (max-width: 768px) {
+
   ::ng-deep .p-dialog.notification-dialog,
   ::ng-deep .p-dialog.settings-dialog {
     top: 70px !important;
@@ -665,7 +697,7 @@
     padding: 0.875rem;
   }
 
-  .settings-item-info > i {
+  .settings-item-info>i {
     width: 36px;
     height: 36px;
     font-size: 1.1rem;
