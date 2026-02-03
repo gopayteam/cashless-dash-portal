@@ -166,7 +166,7 @@
     [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
-    styleClass="transaction-detail-dialog"
+    styleClass="custom-dialog"
     [style]="{ width: '90vw', maxWidth: '700px', backgroundColor: '#f9f9f9' }"
   >
     <ng-template pTemplate="header">
@@ -221,6 +221,7 @@
           pButton
           label="View on Google Maps"
           icon="pi pi-map"
+          iconPos="right" style="gap: 0.5rem;" 
           class="p-button-outlined"
           (click)="openInMaps(selectedStage)"
         ></button>
@@ -233,6 +234,7 @@
         label="Close"
         icon="pi pi-times"
         class="p-button-text"
+        iconPos="right" style="gap: 0.5rem;"
         (click)="closeStageDialog()"
       ></button>
     </ng-template>

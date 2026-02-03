@@ -109,8 +109,8 @@
       </div>
 
       <div class="wallet-card-footer">
-        <button pButton label="View Details" icon="pi pi-arrow-right" iconPos="right" class="p-button-text p-button-sm" style="gap: 1rem;"
-          (click)="viewWalletDetails(wallet); $event.stopPropagation()"></button>
+        <button pButton label="View Details" icon="pi pi-arrow-right" iconPos="right" class="p-button-text p-button-sm"
+          style="gap: 1rem;" (click)="viewWalletDetails(wallet); $event.stopPropagation()"></button>
       </div>
     </div>
   </div>
@@ -206,7 +206,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+        (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

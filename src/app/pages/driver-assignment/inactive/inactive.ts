@@ -219,7 +219,7 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
-    this.selectedAssignment = null;
+    // this.selectedAssignment = null;
   }
 
   getApprovalStatusClass(status: string): string {

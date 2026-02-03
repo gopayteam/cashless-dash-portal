@@ -2,7 +2,8 @@
 /* Reusable Dialog Styles Module */
 
 /* ================= DIALOG HEADER STYLING ================= */
-::ng-deep .custom-dialog .p-dialog-header {
+/* These styles target overlay elements and MUST be global and specific. */
+body .p-dialog.custom-dialog .p-dialog-header {
   background: linear-gradient(135deg,
       var(--primary-color-dark) 0%,
       var(--secondary-color) 100%);
@@ -11,37 +12,86 @@
   border-radius: 6px 6px 0 0;
 }
 
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-title {
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-title {
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
 }
 
+/* ================= CLOSE BUTTON - CLEAN X ICON ================= */
+/* Remove all backgrounds and borders from close button */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: white !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0.25rem !important;
+}
 
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon,
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
+/* Hover state - subtle background */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:hover,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-radius: 4px !important;
+}
+
+/* Focus state - accessibility */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:focus-visible,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
   background: transparent !important;
 }
 
+/* Active/pressed state */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon:active,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button:active {
+  background: rgba(255, 255, 255, 0.25) !important;
+  transform: scale(0.95);
+}
 
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:focus {
-  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.3);
+/* Icon itself - ensure proper sizing */
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon i,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon svg,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button i,
+body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button svg {
+  color: white !important;
+  font-size: 1.25rem !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
 }
 
 /* ================= DIALOG CONTENT STYLING ================= */
-::ng-deep .custom-dialog .p-dialog-content {
+body .p-dialog.custom-dialog .p-dialog-content {
   padding: 2rem;
-  background: #f9f9f9;
+  background: white !important;
+  color: #2c3e50;
 }
 
 /* ================= DIALOG FOOTER STYLING ================= */
-::ng-deep .custom-dialog .p-dialog-footer {
+body .p-dialog.custom-dialog .p-dialog-footer {
   padding: 1rem 2rem;
   border-top: 1px solid #e2e8f0;
-  background: white;
+  background: white !important;
 }
 
-/* ================= DIALOG HEADER COMPONENTS ================= */
+/* ================= DIALOG CONTAINER ================= */
+body .p-dialog.custom-dialog {
+  background: white !important;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ================= DIALOG HEADER COMPONENTS (used inside dialog) ================= */
 .dialog-header {
   display: flex;
   flex-direction: column;
@@ -255,33 +305,33 @@
     font-size: 1.25rem;
   }
 
-  ::ng-deep .custom-dialog .p-dialog-content {
+  body .p-dialog.custom-dialog .p-dialog-content {
     padding: 1.5rem;
   }
 
-  ::ng-deep .custom-dialog .p-dialog-footer {
+  body .p-dialog.custom-dialog .p-dialog-footer {
     padding: 1rem 1.5rem;
   }
 }
 
 /* ================= DIALOG VARIANTS ================= */
 /* Success/Approved Dialog */
-::ng-deep .dialog-success .p-dialog-header {
+body .p-dialog.dialog-success .p-dialog-header {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 /* Warning/Pending Dialog */
-::ng-deep .dialog-warning .p-dialog-header {
+body .p-dialog.dialog-warning .p-dialog-header {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 /* Error/Rejected Dialog */
-::ng-deep .dialog-error .p-dialog-header {
+body .p-dialog.dialog-error .p-dialog-header {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
 /* Info Dialog */
-::ng-deep .dialog-info .p-dialog-header {
+body .p-dialog.dialog-info .p-dialog-header {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
 }
 

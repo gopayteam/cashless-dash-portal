@@ -146,7 +146,7 @@
 
   <!-- ================= DRIVER DETAILS DIALOG ================= -->
   <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
-    [draggable]="false" [resizable]="false" styleClass="driver-detail-dialog"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
     [style]="{ width: '90vw', maxWidth: '800px', background: '#f9f9f9' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
@@ -313,7 +313,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+        (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

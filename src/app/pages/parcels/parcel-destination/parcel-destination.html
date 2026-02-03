@@ -100,7 +100,7 @@
 
   <p-dialog header="Parcel Stage Details" [(visible)]="showStageDialog" [modal]="true"
     [style]="{ width: '650px', background: '#f9f9f9' }" [contentStyle]="{ overflow: 'visible' }"
-    styleClass="parcel-detail-dialog" [dismissableMask]="true">
+    styleClass="custom-dialog" [dismissableMask]="true">
     <ng-container *ngIf="selectedStage">
       <div class="detail-content">
         <div class="detail-grid">
@@ -161,7 +161,7 @@
     </ng-container>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="showStageDialog = false"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  class="p-button-text" (click)="showStageDialog = false"></button>
     </ng-template>
   </p-dialog>
 

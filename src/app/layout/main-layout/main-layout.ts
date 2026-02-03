@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -327,7 +327,20 @@ export class MainLayoutComponent implements OnInit {
   }
 
   isMobile(): boolean {
-    return window.innerWidth < 768;
+    return window.innerWidth <= 768;  // Changed < to <= for consistency
+  }
+
+  // Add this to handle window resize
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    // Close mobile sidebar if window is resized to desktop
+    if (!this.isMobile() && this.sidebarVisible) {
+      this.sidebarVisible = false;
+    }
+    // Expand sidebar if window is resized to desktop while collapsed
+    if (!this.isMobile() && this.sidebarCollapsed) {
+      this.sidebarCollapsed = false;
+    }
   }
 
   isRouteActive(route: string): boolean {

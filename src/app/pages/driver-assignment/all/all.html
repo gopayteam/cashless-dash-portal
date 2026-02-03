@@ -11,50 +11,22 @@
       <div class="search-container">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search by name, phone, fleet..."
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            class="search-input"
-          />
+          <input pInputText type="text" placeholder="Search by name, phone, fleet..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
         </span>
-        <button
-          *ngIf="searchTerm"
-          pButton
-          icon="pi pi-times"
-          class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()"
-          pTooltip="Clear search"
-        ></button>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
 
-      <p-select
-        [options]="approvalStatusOptions"
-        [(ngModel)]="selectedApprovalStatus"
-        (onChange)="onApprovalStatusChange()"
-        placeholder="Approval Status"
-        styleClass="filter-dropdown"
-      ></p-select>
+      <p-select [options]="approvalStatusOptions" [(ngModel)]="selectedApprovalStatus"
+        (onChange)="onApprovalStatusChange()" placeholder="Approval Status" styleClass="filter-dropdown"></p-select>
 
-      <p-select
-        [options]="approvalFilterOptions"
-        [(ngModel)]="selectedApprovalFilter"
-        (onChange)="onApprovalFilterChange()"
-        placeholder="Approval Filter"
-        styleClass="filter-dropdown"
-      ></p-select>
+      <p-select [options]="approvalFilterOptions" [(ngModel)]="selectedApprovalFilter"
+        (onChange)="onApprovalFilterChange()" placeholder="Approval Filter" styleClass="filter-dropdown"></p-select>
 
 
-      <button
-        *ngIf="searchTerm || selectedApprovalStatus || selectedApprovalFilter"
-        pButton
-        label="Clear All"
-        icon="pi pi-filter-slash"
-        class="p-button-outlined p-button-sm"
-        (click)="clearFilters()"
-      ></button>
+      <button *ngIf="searchTerm || selectedApprovalStatus || selectedApprovalFilter" pButton label="Clear All"
+        icon="pi pi-filter-slash" class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
     </div>
   </div>
 
@@ -110,21 +82,10 @@
       </div>
     </div>
 
-    <p-table
-      [value]="assignments"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} assignments"
-      styleClass="data-table"
-      (onLazyLoad)="loadAssignments($event)"
-      [tableStyle]="{ 'min-width': '60rem' }"
-    >
+    <p-table [value]="assignments" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} assignments" styleClass="data-table"
+      (onLazyLoad)="loadAssignments($event)" [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Driver Name</th>
@@ -222,16 +183,9 @@
   </p-card>
 
   <!-- ================= ASSIGNMENT DETAILS DIALOG ================= -->
-  <p-dialog
-    [(visible)]="displayDetailDialog"
-    [modal]="true"
-    [closable]="true"
-    [dismissableMask]="true"
-    [draggable]="false"
-    [resizable]="false"
-    styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px', background: '#fff' }"
-  >
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '900px', background: '#fff' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -242,17 +196,13 @@
             <h2>{{ getFullName(selectedAssignment!) }}</h2>
 
             <!-- <div class="dialog-badges">
-              <span
-                *ngIf="selectedAssignment"
-                [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus)"
-              >
+              <span *ngIf="selectedAssignment"
+                [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus)">
                 <i [class]="'pi ' + getApprovalStatusIcon(selectedAssignment.approvalStatus)"></i>
                 {{ selectedAssignment.approvalStatus }}
               </span>
-              <span
-                *ngIf="selectedAssignment"
-                [class]="'badge badge-' + (selectedAssignment.approved ? 'active' : 'inactive')"
-              >
+              <span *ngIf="selectedAssignment"
+                [class]="'badge badge-' + (selectedAssignment.approved ? 'active' : 'inactive')">
                 <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
                 {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
               </span>
@@ -380,13 +330,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button
-        pButton
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDetailDialog()"
-      ></button>
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" iconPos="right" style="gap: 0.5rem;"
+        (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

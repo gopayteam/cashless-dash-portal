@@ -358,13 +358,6 @@
   color: white;
 }
 
-.dialog-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a202c;
-}
-
 .wallet-id-large {
   font-family: 'Monaco', 'Courier New', monospace;
   font-size: 0.9rem;

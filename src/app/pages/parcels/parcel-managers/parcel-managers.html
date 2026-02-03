@@ -112,7 +112,7 @@
 
 
   <p-dialog header="Parcel Manager Details" [(visible)]="showManagerDialog" [modal]="true"
-    [style]="{ width: '720px', backgroundColor: '#f9f9f9' }" [closable]="true" styleClass="parcel-detail-dialog">
+    [style]="{ width: '720px', backgroundColor: '#f9f9f9' }" [closable]="true" styleClass="custom-dialog">
     <div class="detail-content" *ngIf="selectedManager">
       <div class="detail-grid">
         <!-- LEFT COLUMN -->
@@ -174,7 +174,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" (click)="showManagerDialog = false"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  (click)="showManagerDialog = false"></button>
     </ng-template>
   </p-dialog>
 

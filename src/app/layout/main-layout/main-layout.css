@@ -30,8 +30,11 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  z-index: 999;
+  z-index: 1000;
+  /* Added explicit z-index, below sidebar */
   animation: fadeIn 0.3s ease-out;
+  /* Add touch-action to prevent scroll issues on mobile */
+  touch-action: none;
 }
 
 /* =====================================================
@@ -43,7 +46,6 @@
   left: 0;
   bottom: 0;
   width: 280px;
-  /* background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%); */
   background: var(--light-bg);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -55,7 +57,9 @@
 /* =====================================================
    4. DESKTOP SIDEBAR BEHAVIOR
 ===================================================== */
-@media (min-width: 1025px) {
+@media (min-width: 769px) {
+
+  /* Changed from 1025px to match TypeScript */
   .sidebar {
     transform: translateX(0);
   }
@@ -83,10 +87,12 @@
 /* =====================================================
    5. MOBILE SIDEBAR BEHAVIOR
 ===================================================== */
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
+
+  /* Changed from 1024px to match TypeScript */
   .sidebar {
-    /* transform: translateX(-100%); */
-    transform: translateX(-280px);
+    transform: translateX(-100%);
+    /* Changed from -280px for better compatibility */
   }
 
   .sidebar--mobile-visible {
@@ -95,6 +101,12 @@
 
   .main-content {
     margin-left: 0 !important;
+  }
+
+  /* Ensure sidebar is above other content on mobile */
+  .sidebar {
+    z-index: 1001;
+    /* Higher than before */
   }
 }
 
@@ -279,25 +291,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-/* Make close icon background transparent */
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon {
-  background: transparent !important;
-  border: none !important;
-  color: white !important;
-}
-
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon,
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:hover {
-  background: transparent !important;
-}
-
-
-
-/* Remove focus ring if you don't want it */
-::ng-deep .custom-dialog .p-dialog-header .p-dialog-header-icon:focus {
-  box-shadow: none !important;
 }
 
 
