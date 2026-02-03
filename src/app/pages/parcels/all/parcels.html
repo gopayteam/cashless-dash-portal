@@ -143,6 +143,7 @@
           <th>Amount</th>
           <th>Payment Method</th>
           <th>Parcel Status</th>
+          <th>Receipt</th>
         </tr>
       </ng-template>
 
@@ -151,13 +152,6 @@
           <td>
             <span class="receipt-number">{{ parcel.parcelNumber }}</span>
           </td>
-
-          <!-- <td>
-            <div class="date-cell">
-              <span class="date">{{ parcel.createdAt | date : 'dd MMM yyyy' }}</span>
-              <span class="time">{{ parcel.createdAt | date : 'hh:mm a' }}</span>
-            </div>
-          </td> -->
 
           <td>
             <div class="customer-cell">
@@ -206,21 +200,6 @@
             </span>
           </td>
 
-          <!-- <td>
-            <span [class]="'badge ' + getPaymentStatusClass(parcel.paymentStatus)">
-              <i
-                [class]="
-                  parcel.paymentStatus === 'PAID'
-                    ? 'pi pi-check-circle'
-                    : parcel.paymentStatus === 'PENDING'
-                      ? 'pi pi-clock'
-                      : 'pi pi-times-circle'
-                "
-              ></i>
-              {{ parcel.paymentStatus }}
-            </span>
-          </td> -->
-
           <td>
             <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
               <i [class]="
@@ -238,16 +217,12 @@
             </span>
           </td>
 
-          <!-- <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-              (click)="viewParcelDetails(parcel); $event.stopPropagation()"
-            ></button>
-          </td> -->
+          <td>
+            <button pButton icon="pi pi-file-pdf" class="p-button-rounded p-button-text"
+              (click)="openReceipt(parcel); $event.stopPropagation()">
+            </button>
+          </td>
+
 
         </tr>
       </ng-template>
@@ -272,8 +247,15 @@
     [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
-        <h2>Parcel Details</h2>
-        <span class="receipt-number-large">{{ selectedParcel?.parcelNumber }}</span>
+        <div class="dialog-header-top">
+          <div class="dialog-icon">
+            <i class="pi pi-box"></i>
+          </div>
+          <div class="dialog-title-section">
+            <h2>Parcel Details</h2>
+            <span class="receipt-number-large">{{ selectedParcel?.parcelNumber }}</span>
+          </div>
+        </div>
       </div>
     </ng-template>
 
@@ -439,7 +421,64 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  class="p-button-text" (click)="closeDetailDialog()"></button>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
+          class="p-button-success" [loading]="isDownloading" [disabled]="isDownloading" (click)="downloadReceipt()"
+          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
+        </button>
+
+        <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+          (click)="closeDetailDialog()">
+        </button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ================= PARCEL RECEIPT DIALOG ================= -->
+  <p-dialog [(visible)]="displayReceiptDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }">
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon">
+            <i class="pi pi-box"></i>
+          </div>
+          <div class="dialog-title-section">
+            <h2>Parcel Receipt</h2>
+            <span class="receipt-number-large">{{ selectedParcel?.parcelNumber }}</span>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <app-parcel-receipt *ngIf="selectedParcel" [parcel]="selectedParcel">
+    </app-parcel-receipt>
+    <ng-template pTemplate="footer">
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+
+        <button pButton label="Download Simple Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
+          class="p-button-success" *ngIf="selectedParcel" [loading]="isSimpleReceiptDownloading"
+          [disabled]="isSimpleReceiptDownloading" (click)="generateSimpleReceipt()"
+          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
+        </button>
+
+        <button pButton label="Download Thermal Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
+          class="p-button-success" *ngIf="selectedParcel" [loading]="isThermalReceiptDownloading"
+          [disabled]="isThermalReceiptDownloading" (click)="generateThermalReceipt()"
+          pTooltip="Download thermal parcel receipt as PDF" tooltipPosition="top">
+        </button>
+
+        <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
+          class="p-button-success" *ngIf="selectedParcel" [loading]="isReceiptDownloading"
+          [disabled]="isReceiptDownloading" (click)="downloadReceipt2(selectedParcel)"
+          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
+        </button>
+
+        <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+          (click)="closeReceiptDialog()">
+        </button>
+      </div>
     </ng-template>
   </p-dialog>
 </div>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parcel Receipt Preview</title>
+</head>
+
+<body>
+  <div class="receipt-container">
+    <!-- Header -->
+    <div class="receipt-header">
+      <div class="logo-wrapper">
+        <img src="/logo_2.png" alt="Gopay Logo" class="logo-img" />
+      </div>
+
+      <div class="receipt-title">Parcel Receipt</div>
+      <div class="receipt-number">{{ parcel.parcelNumber || 'N/A'}}</div>
+      <div class="receipt-date">
+        Issued: {{ parcel.createdAt | date: 'dd MMM yyyy, hh:mm a' }}
+      </div>
+    </div>
+
+    <!-- Amount Section -->
+    <div class="amount-section">
+      <div class="amount-label">Total Amount</div>
+      <div class="amount-value">
+        Ksh {{ (parcel.amount | number:'1.2-2') || '0.00' }}
+      </div>
+    </div>
+
+    <!-- Status Cards -->
+    <div class="status-grid">
+      <div class="status-card">
+        <div class="status-label">Parcel Status</div>
+        <div class="status-value">
+          <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
+            <!-- <i [class]="
+                  parcel.parcelStatus === 'COLLECTED'
+                    ? 'pi pi-check-circle'
+                    : parcel.parcelStatus === 'IN_TRANSIT'
+                      ? 'pi pi-truck'
+                      : parcel.parcelStatus === 'ARRIVED'
+                        ? 'pi pi-inbox'
+                        : parcel.parcelStatus === 'CANCELLED'
+                          ? 'pi pi-times-circle'
+                          : 'pi pi-box'
+                "></i> -->
+            {{ parcel.parcelStatus.replace('_', ' ') || 'N/A'}}
+          </span>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Payment Status</div>
+        <div class="status-value">
+          <span [class]="'badge ' + getPaymentStatusClass(parcel.paymentStatus)">
+            {{ parcel.paymentStatus || 'N/A'}}
+          </span>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="status-label">Payment Method</div>
+        <div class="status-value">
+          <span [class]="'badge ' + getPaymentMethodClass(parcel.paymentMethod)">
+            <!-- <i [class]="parcel.paymentMethod === 'CASH' ? 'pi pi-money-bill' : 'pi pi-credit-card'"></i> -->
+            {{ parcel.paymentMethod || 'N/A'}}
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Parcel Information -->
+    <div class="section">
+      <div class="section-title">Parcel Information</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-item">
+            <div class="info-label">Parcel Number</div>
+            <div class="info-value">{{ parcel.parcelNumber || 'N/A' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Description</div>
+            <div class="info-value">{{ parcel.description || 'N/A' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Parcel Value</div>
+            <div class="info-value">Ksh {{ (parcel.amount | number:'1.2-2') || '0.00' }}</div>
+          </div>
+        </div>
+        <div>
+          <div class="info-item">
+            <div class="info-label">Service Charge</div>
+            <div class="info-value">Ksh {{ (parcel.serviceCharge | number:'1.2-2') || '0.00' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Fleet Number</div>
+            <div class="info-value">{{ parcel.fleetNo || 'N/A' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">M-Pesa Receipt</div>
+            <div class="info-value">{{ parcel.mpesaReceiptNumber || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sender Information -->
+    <div class="section">
+      <div class="section-title">Sender Information</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-item">
+            <div class="info-label">Sender Name</div>
+            <div class="info-value">{{ parcel.senderName || 'N/A' }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Sender Phone</div>
+            <div class="info-value">{{ parcel.senderPhoneNumber || 'N/A' }}</div>
+          </div>
+        </div>
+        <div>
+          <div class="info-item">
+            <div class="info-label">Source Location</div>
+            <div class="info-value">{{ parcel.sourceName || 'N/A'}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Receiver Information -->
+    <div class="section">
+      <div class="section-title">Receiver Information</div>
+      <div class="info-grid">
+        <div>
+          <div class="info-item">
+            <div class="info-label">Receiver Name</div>
+            <div class="info-value">{{ parcel.receiverName || 'N/A'}}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Receiver Phone</div>
+            <div class="info-value">{{ parcel.receiverPhoneNumber || 'N/A'}}</div>
+          </div>
+        </div>
+        <div>
+          <div class="info-item">
+            <div class="info-label">Destination</div>
+            <div class="info-value">{{ parcel.destinationName || 'N/A'}}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Mile</div>
+            <div class="info-value">{{ parcel.lastMile || 'N/A'}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parcel Timeline -->
+    <div class="section">
+      <div class="section-title">Parcel Timeline</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Dispatched At</div>
+          <div class="info-value">{{ parcel.dispatchedAt ? (parcel.dispatchedAt | date:'medium') : 'N/A' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Arrived At</div>
+          <div class="info-value">{{ parcel.arrivedAt ? (parcel.arrivedAt | date:'medium') : 'N/A'}}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Picked At</div>
+          <div class="info-value">{{ parcel.pickedAt ? (parcel.pickedAt | date:'medium') : 'N/A' }}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Picked By</div>
+          <div class="info-value">{{ parcel.pickedBy || 'N/A'}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div>This is a computer-generated receipt and does not require a signature.</div>
+      <div class="footer-note">
+        For any queries regarding this parcel, please contact customer support
+        with your parcel number: PCL-2024-001234
+      </div>
+      <div style="margin-top: 15px; font-size: 11px;">
+        Generated on: {{ today | date:'dd MMM yyyy, hh:mm a' }}
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

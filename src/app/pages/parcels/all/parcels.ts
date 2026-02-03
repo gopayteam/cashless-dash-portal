@@ -23,7 +23,13 @@ import { Parcel } from '../../../../@core/models/parcels/parcel.model';
 import { ParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
 import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mapper';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { ParcelReceiptService } from '../../../../@core/services/parcel-receipt.service';
 import { Router } from '@angular/router';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { ParcelReceiptComponent } from "../../../components/parcel-receipt/parcel-receipt";
+import { ParcelReceiptGenerationService } from '../../../../@core/services/parcel-receipts.service';
 
 @Component({
   standalone: true,
@@ -51,6 +57,9 @@ import { Router } from '@angular/router';
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    MessageModule,
+    ToastModule,
+    ParcelReceiptComponent
   ],
 })
 export class ParcelsComponent implements OnInit {
@@ -81,7 +90,14 @@ export class ParcelsComponent implements OnInit {
 
   // Dialog
   displayDetailDialog = false;
+  displayReceiptDialog = false;
   selectedParcel: Parcel | null = null;
+
+  // Download state
+  isDownloading = false;
+  isSimpleReceiptDownloading = false;
+  isThermalReceiptDownloading = false;
+  isColorReceiptDownloading = false;
 
   // Dropdown options
   paymentMethods: Parcel['paymentMethod'][] = ['CASH', 'CASHLESS'];
@@ -97,6 +113,9 @@ export class ParcelsComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private receiptService: ParcelReceiptService,
+    private receiptGenerationService: ParcelReceiptGenerationService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -223,6 +242,129 @@ export class ParcelsComponent implements OnInit {
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
     this.selectedParcel = null;
+  }
+
+  openReceipt(parcel: Parcel) {
+    this.selectedParcel = parcel;
+    if (this.displayDetailDialog == true) {
+      this.displayDetailDialog = false;
+    }
+    this.displayReceiptDialog = true;
+  }
+
+  closeReceiptDialog(): void {
+    this.displayReceiptDialog = false;
+    this.selectedParcel = null;
+  }
+
+
+  /**
+   * Download receipt as PDF
+   */
+  async downloadReceipt(): Promise<void> {
+    if (!this.selectedParcel) {
+      return;
+    }
+
+    try {
+      this.isDownloading = true;
+      await this.receiptService.generateReceipt(this.selectedParcel);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Receipt downloaded successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to download receipt:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to download receipt',
+        life: 4000
+      });
+    } finally {
+      this.isDownloading = false;
+    }
+  }
+
+  async generateThermalReceipt(): Promise<void> {
+    if (!this.selectedParcel) {
+      return;
+    }
+
+    try {
+      this.isThermalReceiptDownloading = true;
+      await this.receiptGenerationService.generateThermalReceipt(this.selectedParcel);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Thermal receipt downloaded successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to download thermal receipt:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to download thermal receipt',
+        life: 4000
+      });
+    } finally {
+      this.isThermalReceiptDownloading = false;
+    }
+  }
+
+
+  async generateSimpleReceipt(): Promise<void> {
+    if (!this.selectedParcel) {
+      return;
+    }
+
+    try {
+      this.isSimpleReceiptDownloading = true;
+      await this.receiptGenerationService.generateSimpleReceipt(this.selectedParcel);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Receipt downloaded successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to download simple receipt:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to download simple receipt',
+        life: 4000
+      });
+    } finally {
+      this.isSimpleReceiptDownloading = false;
+    }
+  }
+
+  async downloadReceipt2(parcel: Parcel): Promise<void> {
+
+    try {
+      this.isColorReceiptDownloading = true;
+      await this.receiptService.generateReceipt(parcel);
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Color receipt downloaded successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to download color receipt:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to download color receipt',
+        life: 4000
+      });
+    } finally {
+      this.isColorReceiptDownloading = false;
+    }
   }
 
   getStatusClass(status: Parcel['parcelStatus']): string {
