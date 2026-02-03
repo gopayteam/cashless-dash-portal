@@ -194,8 +194,8 @@ export class UpdateAdminComponent implements OnInit {
       }
 
       // Second attempt: Check history state (for page refresh scenarios)
-      if (window.history.state?.user) {
-        const historyUser = window.history.state.user as User;
+      if (window.history.state?.admin) {
+        const historyUser = window.history.state.admin as User;
         if (this.isValidUserObject(historyUser)) {
           return historyUser;
         }

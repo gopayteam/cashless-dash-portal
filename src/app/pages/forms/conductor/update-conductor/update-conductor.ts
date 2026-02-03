@@ -68,9 +68,9 @@ export class UpdateConductorComponent implements OnInit {
   userData: User | null = null;
 
   // Constants
-  readonly PROFILE = 'ADMIN';
+  readonly PROFILE = 'CONDUCTOR';
   readonly CHANNEL = 'PORTAL';
-  readonly AGENT = 'ADMIN';
+  readonly AGENT = 'CONDUCTOR';
 
   // Form fields
   firstName: string = '';
@@ -136,7 +136,7 @@ export class UpdateConductorComponent implements OnInit {
       return;
     }
     this.entityId = user.entityId;
-  
+
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (!id) {
@@ -149,7 +149,7 @@ export class UpdateConductorComponent implements OnInit {
         this.router.navigate(['/users/conductors']);
         return;
       }
-  
+
       this.userId = +id;
       this.initializeUserData();
     });
@@ -157,7 +157,7 @@ export class UpdateConductorComponent implements OnInit {
 
   private initializeUserData(): void {
     const stateUser = this.getUserFromState();
-  
+
     if (stateUser) {
       console.log('✓ Conductor data loaded from navigation state');
       this.populateFormFromUser(stateUser);
@@ -178,14 +178,14 @@ export class UpdateConductorComponent implements OnInit {
           return stateUser;
         }
       }
-  
+
       if (window.history.state?.conductor) {
         const historyUser = window.history.state.conductor as User;
         if (this.isValidUserObject(historyUser)) {
           return historyUser;
         }
       }
-  
+
       return null;
     } catch (error) {
       console.error('Error retrieving conductor from state:', error);
@@ -219,7 +219,7 @@ export class UpdateConductorComponent implements OnInit {
     this.selectedProfile = user.profile || '';
     this.selectedAgent = user.agent || '';
     this.selectedChannel = user.channel || '';
-  
+
     // console.log('Form populated with conductor data:', {
     //   id: this.userId,
     //   name: `${this.firstName} ${this.lastName}`,
@@ -238,26 +238,26 @@ export class UpdateConductorComponent implements OnInit {
       this.router.navigate(['/users/conductors']);
       return;
     }
-  
+
     this.userLoading = true;
     this.loadingStore.start();
-  
+
     const payload = {
       entityId: this.entityId,
       agent: 'CONDUCTOR',
       page: 0,
       size: 100
     };
-  
+
     console.log('Fetching conductor data from API for ID:', userId);
-  
+
     this.dataService
       .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-conductor-users')
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
             const user = response.data.find((u: User) => u.id === userId);
-  
+
             if (user) {
               console.log('✓ Conductor data fetched successfully from API');
               this.populateFormFromUser(user);
@@ -267,7 +267,7 @@ export class UpdateConductorComponent implements OnInit {
           } else {
             this.handleNoUsersAvailable();
           }
-  
+
           this.userLoading = false;
           this.loadingStore.stop();
         },
@@ -388,8 +388,8 @@ export class UpdateConductorComponent implements OnInit {
 
     const payload: UpdateUserPayload = {
       id: this.userId,
-      agent: this.selectedAgent,
-      channel: this.selectedChannel,
+      agent: this.AGENT,
+      channel: this.CHANNEL,
       email: this.email.trim().toLowerCase(),
       entityId: this.entityId,
       firstName: this.firstName.trim(),

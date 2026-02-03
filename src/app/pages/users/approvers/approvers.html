@@ -1,0 +1,411 @@
+<!-- pages/users/all-users.component.html -->
+<div class="users-container">
+  <!-- ================= HEADER ================= -->
+  <div class="users-header">
+    <div class="header-content">
+      <h1>All Approvers</h1>
+      <p class="text-muted">Manage approver and access controls</p>
+    </div>
+
+    <div class="header-filters">
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search users..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
+        </span>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
+      </div>
+
+      <!-- Profile Filter -->
+      <select [(ngModel)]="selectedProfile" (change)="onProfileChange()" class="filter-dropdown">
+        <option value="" disabled selected>Filter by Profile</option>
+        <option *ngFor="let option of profileOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+
+      <!-- Channel Filter -->
+      <select [(ngModel)]="selectedChannel" (change)="onChannelChange()" class="filter-dropdown">
+        <option value="" disabled selected>Filter by Channel</option>
+        <option *ngFor="let option of channelOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+
+      <!-- Status Filter -->
+      <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-dropdown">
+        <option value="" disabled selected>Filter by Status</option>
+        <option *ngFor="let option of statusOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+
+
+      <button *ngIf="searchTerm || selectedProfile || selectedChannel || selectedStatus" pButton label="Clear All"
+        icon="pi pi-filter-slash" iconPos="right" class="filter-btn filter-btn--apply"
+        (click)="clearFilters()"></button>
+    </div>
+  </div>
+
+  <!-- ================= SUMMARY STATS ================= -->
+  <!-- <div class="summary-stats">
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Users</span>
+        <span class="stat-value">{{ totalUsers }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Active Users</span>
+        <span class="stat-value">{{ activeUsers }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+        <i class="pi pi-ban"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Blocked Users</span>
+        <span class="stat-value">{{ blockedUsers }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card summary-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-sign-in"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">First Login</span>
+        <span class="stat-value">{{ firstLoginUsers }}</span>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- ================= USERS TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Users List</h3>
+        <span class="record-count">{{ filteredUsers.length }} of {{ totalRecords }} users</span>
+
+        <app-action-button icon="pi-plus" tooltip="Add Approver" variant="primary"
+          (clicked)="navigateToCreateApprover()"></app-action-button>
+
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="refresh()"></app-action-button>
+
+      </div>
+    </div>
+
+    <p-table [value]="users" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users" styleClass="data-table"
+      (onLazyLoad)="loadUsers($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>User Info</th>
+          <th>Contact</th>
+          <th>Profile</th>
+          <th>Channel</th>
+          <th>Status</th>
+          <th>Login Trials</th>
+          <th>First Login</th>
+          <th>Created On</th>
+          <!-- <th>Actions</th> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr class="clickable-row" (click)="viewUserDetails(user)">
+          <td>
+            <div class="user-cell">
+              <div class="user-avatar">
+                <i class="pi pi-user"></i>
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ getFullName(user) }}</span>
+                <span class="user-username">@{{ user.username }}</span>
+                <span class="user-email">{{ user.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="pi pi-phone"></i>
+                <span>{{ user.phoneNumber }}</span>
+              </div>
+              <div class="contact-item" *ngIf="user.idNumber">
+                <i class="pi pi-id-card"></i>
+                <span>{{ user.idNumber }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + getProfileClass(user.profile)">
+              <i [class]="'pi ' + getProfileIcon(user.profile)"></i>
+              {{ user.profile.replace('_', ' ') }}
+            </span>
+          </td>
+          <td>
+            <div class="channel-cell">
+              <i [class]="'pi ' + getChannelIcon(user.channel)"></i>
+              <span>{{ user.channel }}</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + getStatusClass(user.blocked)">
+              <i [class]="'pi ' + getStatusIcon(user.blocked)"></i>
+              {{ getStatusText(user.blocked) }}
+            </span>
+          </td>
+          <td>
+            <div class="trials-cell">
+              <span class="trials-count" [class.high-trials]="user.loginTrials > 3">
+                {{ user.loginTrials }}
+              </span>
+              <span class="trials-label">attempts</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge badge-' + (user.firstLogin ? 'warning' : 'success')">
+              <i [class]="user.firstLogin ? 'pi pi-exclamation-circle' : 'pi pi-check'"></i>
+              {{ user.firstLogin ? 'Yes' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <div class="date-cell">
+              <span class="date">{{ user.createdOn | date : 'dd MMM yyyy' }}</span>
+              <span class="time">{{ user.createdOn | date : 'hh:mm a' }}</span>
+            </div>
+          </td>
+          <!-- <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-sm"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              (click)="viewUserDetails(user); $event.stopPropagation()"
+            ></button>
+          </td> -->
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <h3>No Users Found</h3>
+              <p *ngIf="searchTerm || selectedProfile || selectedChannel || selectedStatus">
+                Try adjusting your filters
+              </p>
+              <p *ngIf="!searchTerm && !selectedProfile && !selectedChannel && !selectedStatus">
+                No users available
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ================= USER DETAILS DIALOG ================= -->
+  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '900px' }">
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon">
+            <i class="pi pi-user"></i>
+          </div>
+          <div class="dialog-title-section">
+            <h2>{{ getFullName(selectedUser!) }}</h2>
+            <div class="dialog-badges">
+              <span *ngIf="selectedUser" [class]="'badge badge-' + getProfileClass(selectedUser.profile)">
+                <i [class]="'pi ' + getProfileIcon(selectedUser.profile)"></i>
+                {{ selectedUser.profile.replace('_', ' ') }}
+              </span>
+              <span *ngIf="selectedUser" [class]="'badge badge-' + getStatusClass(selectedUser.blocked)">
+                <i [class]="'pi ' + getStatusIcon(selectedUser.blocked)"></i>
+                {{ getStatusText(selectedUser.blocked) }}
+              </span>
+
+              <button *ngIf="selectedUser" pButton icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit User" tooltipPosition="top"
+                (click)="navigateToUpdateApprover(selectedUser); $event.stopPropagation()"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedUser">
+      <!-- User Status Cards -->
+      <div class="status-cards">
+        <div class="status-card">
+          <i class="pi pi-sign-in"></i>
+          <span class="status-label">Login Trials</span>
+          <span class="status-value">{{ selectedUser.loginTrials }}</span>
+        </div>
+        <div class="status-card" [class.warning-card]="selectedUser.firstLogin">
+          <i [class]="selectedUser.firstLogin ? 'pi pi-exclamation-circle' : 'pi pi-check'"></i>
+          <span class="status-label">First Login</span>
+          <span class="status-value">{{ selectedUser.firstLogin ? 'Yes' : 'No' }}</span>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="detail-grid">
+        <!-- Left Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Personal Information</h4>
+
+            <div class="detail-item">
+              <label>Full Name</label>
+              <span class="value driver-name-highlight">
+                <i class="pi pi-user"></i>
+                {{ getFullName(selectedUser) }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Username</label>
+              <span class="value">{{ selectedUser.username }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Email Address</label>
+              <span class="value contact-value">
+                <i class="pi pi-envelope"></i>
+                {{ selectedUser.email }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Phone Number</label>
+              <span class="value contact-value">
+                <i class="pi pi-phone"></i>
+                {{ selectedUser.phoneNumber }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>ID Number</label>
+              <span class="value code-value">{{ selectedUser.idNumber || 'N/A' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>First Name</label>
+              <span class="value">{{ selectedUser.firstName }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Last Name</label>
+              <span class="value">{{ selectedUser.lastName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="detail-column">
+          <div class="detail-section">
+            <h4 class="section-title">Account Details</h4>
+
+            <div class="detail-item">
+              <label>User ID</label>
+              <span class="value">{{ selectedUser.id }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Profile</label>
+              <span [class]="'value badge badge-' + getProfileClass(selectedUser.profile)">
+                <i [class]="'pi ' + getProfileIcon(selectedUser.profile)"></i>
+                {{ selectedUser.profile.replace('_', ' ') }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Agent Type</label>
+              <span class="value">{{ selectedUser.agent }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Channel</label>
+              <span class="value category-highlight">
+                <i [class]="'pi ' + getChannelIcon(selectedUser.channel)"></i>
+                {{ selectedUser.channel }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Account Status</label>
+              <span [class]="'value badge badge-' + getStatusClass(selectedUser.blocked)">
+                <i [class]="'pi ' + getStatusIcon(selectedUser.blocked)"></i>
+                {{ getStatusText(selectedUser.blocked) }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Entity ID</label>
+              <span class="value code-value">{{ selectedUser.entityId }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>Login Trials</label>
+              <span class="value" [class.high-trials-value]="selectedUser.loginTrials > 3">
+                {{ selectedUser.loginTrials }} attempts
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>First Login Status</label>
+              <span [class]="'value badge badge-' + (selectedUser.firstLogin ? 'warning' : 'success')">
+                <i [class]="selectedUser.firstLogin ? 'pi pi-exclamation-circle' : 'pi pi-check'"></i>
+                {{ selectedUser.firstLogin ? 'Pending' : 'Completed' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Soft Delete</label>
+              <span [class]="'value badge badge-' + (selectedUser.softDelete ? 'inactive' : 'active')">
+                <i [class]="selectedUser.softDelete ? 'pi pi-trash' : 'pi pi-check'"></i>
+                {{ selectedUser.softDelete ? 'Yes' : 'No' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <label>Created On</label>
+              <span class="value">
+                {{ selectedUser.createdOn | date : 'dd MMM yyyy, hh:mm a' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <ng-template pTemplate="footer">
+      <button
+        pButton
+        label="Close"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="closeDetailDialog()"
+      ></button>
+    </ng-template> -->
+  </p-dialog>
+</div>

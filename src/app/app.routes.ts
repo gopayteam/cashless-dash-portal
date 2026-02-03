@@ -78,6 +78,15 @@ import { UpdateInvestorComponent } from './pages/forms/investor/update-investor/
 import { RegisterInvestorComponent } from './pages/forms/investor/register-investor/register-investor';
 import { RegisterMarshalComponent } from './pages/forms/marshal/register-marshal/register-marshal';
 import { UpdateMarshalComponent } from './pages/forms/marshal/update-marshal/update-marshal';
+import { ApproversComponent } from './pages/users/approvers/approvers';
+import { InspectorsComponent } from './pages/users/inspectors/inspectors';
+import { DashmastersComponent } from './pages/users/dashmasters/dashmasters';
+import { UpdateDashmasterComponent } from './pages/forms/dashmaster/update-dashmaster/update-dashmaster';
+import { RegisterDashmasterComponent } from './pages/forms/dashmaster/register-dashmaster/register-dashmaster';
+import { UpdateApproverComponent } from './pages/forms/approver/update-approver/update-approver';
+import { RegisterApproverComponent } from './pages/forms/approver/register-approver/register-approver';
+import { RegisterInspectorComponent } from './pages/forms/inspector/register-inspector/register-inspector';
+import { UpdateInspectorComponent } from './pages/forms/inspector/update-inspector/update-inspector';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -445,6 +454,27 @@ export const routes: Routes = [
         data: { roles: ['CAN_VIEW_USERS'] }
       },
 
+      {
+        path: 'users/inspectors',
+        component: InspectorsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_USERS'] }
+      },
+
+      {
+        path: 'users/dashmasters',
+        component: DashmastersComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_USERS'] }
+      },
+
+      {
+        path: 'users/approvers',
+        component: ApproversComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_USERS'] }
+      },
+
       /* Audits */
       {
         path: 'audits/all',
@@ -591,6 +621,48 @@ export const routes: Routes = [
       {
         path: 'forms/update-parcel-manager/:id',
         component: UpdateParcelManagerComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-dashmaster',
+        component: RegisterDashmasterComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-dashmaster/:id',
+        component: UpdateDashmasterComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-approver',
+        component: RegisterApproverComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-approver/:id',
+        component: UpdateApproverComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'forms/register-inspector',
+        component: RegisterInspectorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_USER'] }
+      },
+
+      {
+        path: 'forms/update-inspector/:id',
+        component: UpdateInspectorComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_EDIT_USER'] }
       },

@@ -19,10 +19,10 @@
     <div class="form-container">
 
       <!-- Loading State -->
-      <div *ngIf="loading()" class="loading-state">
+      <!-- <div *ngIf="loading()" class="loading-state">
         <p-progressSpinner styleClass="spinner-small"></p-progressSpinner>
         <p>Loading user data...</p>
-      </div>
+      </div> -->
 
       <form *ngIf="!loading() && userData" (ngSubmit)="onSubmit()" #userForm="ngForm">
 
@@ -94,34 +94,22 @@
           </h3>
           <div class="form-grid">
 
-            <!-- Profile -->
+            <!-- Profile (Read-only) -->
             <div class="form-field">
-              <label for="profile" class="field-label required">Profile</label>
-              <p-select id="profile" [(ngModel)]="selectedProfile" name="profile" [options]="profileOptions"
-                placeholder="Select user profile" optionLabel="label" optionValue="value" [showClear]="true"
-                styleClass="w-full" required [disabled]="submitting">
-              </p-select>
-              <small class="field-hint">User's role and permissions level</small>
+              <label for="profile" class="field-label">Profile</label>
+              <input pInputText id="profile" [value]="PROFILE" name="profile" class="w-full" disabled readonly />
             </div>
 
-            <!-- Agent -->
+            <!-- Agent (Read-only) -->
             <div class="form-field">
-              <label for="agent" class="field-label required">Agent Type</label>
-              <p-select id="agent" [(ngModel)]="selectedAgent" name="agent" [options]="agentOptions"
-                placeholder="Select agent type" optionLabel="label" optionValue="value" [showClear]="true"
-                styleClass="w-full" required [disabled]="submitting">
-              </p-select>
-              <small class="field-hint">Type of agent for this user</small>
+              <label for="agent" class="field-label">Agent Type</label>
+              <input pInputText id="agent" [value]="AGENT" name="agent" class="w-full" disabled readonly />
             </div>
 
-            <!-- Channel -->
+            <!-- Channel (Read-only) -->
             <div class="form-field">
-              <label for="channel" class="field-label required">Channel</label>
-              <p-select id="channel" [(ngModel)]="selectedChannel" name="channel" [options]="channelOptions"
-                placeholder="Select channel" optionLabel="label" optionValue="value" [showClear]="true"
-                styleClass="w-full" required [disabled]="submitting">
-              </p-select>
-              <small class="field-hint">Access channel for this user</small>
+              <label for="channel" class="field-label">Channel</label>
+              <input pInputText id="channel" [value]="CHANNEL" name="channel" class="w-full" disabled readonly />
             </div>
 
             <!-- Entity ID (Read-only) -->

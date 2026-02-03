@@ -61,7 +61,7 @@ interface VehiclePayload {
     ToastModule,
   ],
   templateUrl: './add-vehicle.html',
-  styleUrls: ['./add-vehicle.css'],
+  styleUrls: ['./add-vehicle.css', '../../../../styles/global/_toast.css'],
 })
 export class AddVehicleComponent implements OnInit {
   entityId: string | null = null;

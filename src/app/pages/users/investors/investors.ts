@@ -54,7 +54,8 @@ interface StatusOption {
   styleUrls: [
     './investors.css',
     '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
+    '../../../../styles/modules/_user_module.css',
+    '../../../../styles/modules/_filter_actions.css'
   ],
 })
 export class InvestorsComponent implements OnInit {

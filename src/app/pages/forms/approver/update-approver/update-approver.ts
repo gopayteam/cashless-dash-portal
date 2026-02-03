@@ -1,0 +1,465 @@
+// pages/users/update-user/update-user.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { DataService } from '../../../../../@core/api/data.service';
+import { LoadingStore } from '../../../../../@core/state/loading.store';
+import { AuthService } from '../../../../../@core/services/auth.service';
+import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
+import { User } from '../../../../../@core/models/user/user.model';
+import { UserApiResponse } from '../../../../../@core/models/user/user_api_Response.mode';
+
+interface DropdownOption {
+  label: string;
+  value: string;
+}
+
+interface UpdateUserPayload {
+  id: number;
+  agent: string;
+  channel: string;
+  email: string;
+  entityId: string;
+  firstName: string;
+  idNumber: string;
+  lastName: string;
+  phoneNumber: string;
+  profile: string;
+}
+
+interface ApiResponse {
+  status: number;
+  message: string;
+  data: any;
+}
+
+@Component({
+  selector: 'app-update-approver',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    CardModule,
+    ButtonModule,
+    InputTextModule,
+    SelectModule,
+    ProgressSpinnerModule,
+    TooltipModule,
+    MessageModule,
+    ToastModule,
+  ],
+  templateUrl: './update-approver.html',
+  styleUrls: ['./update-approver.css', '../../../../../styles/global/_toast.css'],
+  providers: [MessageService]
+})
+export class UpdateApproverComponent implements OnInit {
+  entityId: string | null = null;
+  userId: number | null = null;
+  userData: User | null = null;
+
+  // Constants
+  readonly PROFILE = 'APPROVER';
+  readonly CHANNEL = 'PORTAL';
+  readonly AGENT = 'APPROVER';
+
+  // Form fields
+  firstName: string = '';
+  lastName: string = '';
+  email: string = '';
+  phoneNumber: string = '';
+  idNumber: string = '';
+  selectedProfile: string = '';
+  selectedAgent: string = '';
+  selectedChannel: string = '';
+
+  // Dropdown options
+  profileOptions: DropdownOption[] = [
+    // { label: 'Super Admin', value: 'SUPER_ADMIN' },
+    { label: 'Dashmaster', value: 'DASHMASTER' },
+    // { label: 'Admin', value: 'ADMIN' },
+    // { label: 'User', value: 'USER' },
+    // { label: 'Manager', value: 'MANAGER' },
+    // { label: 'Parcel', value: 'PARCEL' },
+    // { label: 'Driver', value: 'DRIVER' },
+    // { label: 'Conductor', value: 'CONDUCTOR' },
+  ];
+
+  agentOptions: DropdownOption[] = [
+    { label: 'Super Admin', value: 'SUPER_ADMIN' },
+    { label: 'Dashmaster', value: 'DASHMASTER' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Parcel', value: 'PARCEL' },
+    { label: 'Passenger', value: 'PASSENGER' },
+    { label: 'Marshal', value: 'MARSHAL' },
+    { label: 'Driver', value: 'DRIVER' },
+    { label: 'Conductor', value: 'CONDUCTOR' },
+    { label: 'Investor', value: 'INVESTOR' },
+  ];
+
+
+  channelOptions: DropdownOption[] = [
+    { label: 'Portal', value: 'PORTAL' },
+    { label: 'App', value: 'APP' },
+    { label: 'Web', value: 'WEB' },
+  ];
+
+  // Loading states
+  userLoading: boolean = false;
+  submitting: boolean = false;
+  dataLoadedFromState: boolean = false;
+
+  constructor(
+    private dataService: DataService,
+    public loadingStore: LoadingStore,
+    private authService: AuthService,
+    private messageService: MessageService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
+
+  get loading() {
+    return this.loadingStore.loading;
+  }
+
+  ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.entityId = user.entityId;
+
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (!id) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Approver ID not found in route',
+          life: 4000
+        });
+        this.router.navigate(['/users/approvers']);
+        return;
+      }
+
+      this.userId = +id;
+      this.initializeUserData();
+    });
+  }
+
+  private initializeUserData(): void {
+    const stateUser = this.getUserFromState();
+
+    if (stateUser) {
+      console.log('✓ Investor data loaded from navigation state');
+      this.populateFormFromUser(stateUser);
+      this.dataLoadedFromState = true;
+    } else {
+      console.log('⚠ No state data found, fetching from API');
+      this.loadUserDataFromAPI(this.userId!);
+      this.dataLoadedFromState = false;
+    }
+  }
+
+  private getUserFromState(): User | null {
+    try {
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras?.state?.['approver']) {
+        const stateUser = navigation.extras.state['approver'] as User;
+        if (this.isValidUserObject(stateUser)) {
+          return stateUser;
+        }
+      }
+
+      if (window.history.state?.approver) {
+        const historyUser = window.history.state.approver as User;
+        if (this.isValidUserObject(historyUser)) {
+          return historyUser;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error retrieving approver from state:', error);
+      return null;
+    }
+  }
+
+  private isValidUserObject(user: any): boolean {
+    return !!(
+      user &&
+      typeof user === 'object' &&
+      user.id &&
+      user.firstName &&
+      user.lastName &&
+      user.email &&
+      user.phoneNumber &&
+      user.profile &&
+      user.agent &&
+      user.channel
+    );
+  }
+
+  private populateFormFromUser(user: User): void {
+    this.userData = user;
+    this.userId = user.id;
+    this.firstName = user.firstName || '';
+    this.lastName = user.lastName || '';
+    this.phoneNumber = user.phoneNumber || '';
+    this.email = user.email || '';
+    this.idNumber = user.idNumber || '';
+    this.selectedProfile = user.profile || '';
+    this.selectedAgent = user.agent || '';
+    this.selectedChannel = user.channel || '';
+
+    // console.log('Form populated with investor data:', {
+    //   id: this.userId,
+    //   name: `${this.firstName} ${this.lastName}`,
+    //   email: this.email
+    // });
+  }
+
+  private loadUserDataFromAPI(userId: number): void {
+    if (!this.entityId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Entity ID not found',
+        life: 4000
+      });
+      this.router.navigate(['/users/approvers']);
+      return;
+    }
+
+    this.userLoading = true;
+    this.loadingStore.start();
+
+    const payload = {
+      entityId: this.entityId,
+      agent: 'APPROVER',
+      page: 0,
+      size: 100
+    };
+
+    console.log('Fetching approver data from API for ID:', userId);
+
+    this.dataService
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'get-approver-users')
+      .subscribe({
+        next: (response) => {
+          if (response.data && response.data.length > 0) {
+            const user = response.data.find((u: User) => u.id === userId);
+
+            if (user) {
+              console.log('✓ Approver data fetched successfully from API');
+              this.populateFormFromUser(user);
+            } else {
+              this.handleUserNotFound(userId);
+            }
+          } else {
+            this.handleNoUsersAvailable();
+          }
+
+          this.userLoading = false;
+          this.loadingStore.stop();
+        },
+        error: (err) => {
+          console.error('Failed to load approver data from API:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to fetch approver data. Please try again.',
+            life: 4000
+          });
+          this.userLoading = false;
+          this.loadingStore.stop();
+          this.router.navigate(['/users/approvers']);
+        },
+      });
+  }
+
+  private handleUserNotFound(userId: number): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: `User with ID ${userId} not found`,
+      life: 4000
+    });
+    console.error('User not found with ID:', userId);
+    setTimeout(() => {
+      this.router.navigate(['/users/approvers']);
+    }, 2000);
+  }
+
+  private handleNoUsersAvailable(): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'No user data available',
+      life: 4000
+    });
+    console.error('No users found in API response');
+    setTimeout(() => {
+      this.router.navigate(['/users/approvers']);
+    }, 2000);
+  }
+
+
+  isFormValid(): boolean {
+    return !!(
+      this.firstName.trim() &&
+      this.lastName.trim() &&
+      this.email.trim() &&
+      this.isValidEmail(this.email) &&
+      this.phoneNumber.trim() &&
+      this.idNumber.trim() &&
+      // this.selectedProfile &&
+      // this.selectedAgent &&
+      // this.selectedChannel &&
+      this.userId !== null
+    );
+  }
+
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  isValidPhoneNumber(phone: string): boolean {
+    // Accepts both formats: 254XXXXXXXXX or 07XXXXXXXX
+    const phoneRegex1 = /^254\d{9}$/;
+    const phoneRegex2 = /^0[17]\d{8}$/;
+    return phoneRegex1.test(phone) || phoneRegex2.test(phone);
+  }
+
+  isValidIdNumber(idNumber: string): boolean {
+    // Kenyan ID numbers are typically 7-8 digits
+    const idRegex = /^\d{7,8}$/;
+    return idRegex.test(idNumber);
+  }
+
+  normalizePhoneNumber(phone: string): string {
+    // Convert 07XXXXXXXX to 254XXXXXXXXX
+    if (phone.startsWith('0')) {
+      return '254' + phone.substring(1);
+    }
+    return phone;
+  }
+
+  onSubmit(): void {
+    if (!this.isFormValid() || !this.entityId || this.userId === null) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields correctly',
+        life: 4000
+      });
+      return;
+    }
+
+    if (!this.isValidPhoneNumber(this.phoneNumber)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Invalid phone number format. Use 254XXXXXXXXX or 07XXXXXXXX',
+        life: 4000
+      });
+      return;
+    }
+
+    if (!this.isValidIdNumber(this.idNumber)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Invalid ID number. Must be 7-8 digits',
+        life: 4000
+      });
+      return;
+    }
+
+    const normalizedPhone = this.normalizePhoneNumber(this.phoneNumber.trim());
+
+    const payload: UpdateUserPayload = {
+      id: this.userId,
+      agent: this.AGENT,
+      channel: this.CHANNEL,
+      email: this.email.trim().toLowerCase(),
+      entityId: this.entityId,
+      firstName: this.firstName.trim(),
+      idNumber: this.idNumber.trim(),
+      lastName: this.lastName.trim(),
+      phoneNumber: normalizedPhone,
+      profile: this.selectedProfile,
+    };
+
+    console.log('Updating user with payload:', payload);
+
+    this.submitting = true;
+    this.loadingStore.start();
+
+    this.dataService
+      .post<ApiResponse>(API_ENDPOINTS.UPDATE_USER, payload, 'update-approver-user')
+      .subscribe({
+        next: (response) => {
+          console.log('approver updated successfully', response);
+          this.submitting = false;
+          this.loadingStore.stop();
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: response.message || 'User updated successfully',
+            life: 4000
+          });
+
+          // Navigate back to users list
+          setTimeout(() => {
+            this.router.navigate(['/users/approvers']);
+          }, 1500);
+        },
+        error: (err) => {
+          console.error('Failed to update user - Full error:', err);
+          console.error('Error status:', err.status);
+          console.error('Error details:', err.error);
+
+          let errorMessage = 'Failed to update user';
+
+          if (err.status === 409) {
+            errorMessage = 'User with this email or phone number already exists';
+          } else if (err.status === 400) {
+            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
+          } else if (err.status === 404) {
+            errorMessage = 'User not found';
+          } else if (err.status === 500) {
+            errorMessage = 'Server error occurred. Please try again later.';
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          }
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error Occurred',
+            detail: errorMessage,
+            life: 5000
+          });
+
+          this.submitting = false;
+          this.loadingStore.stop();
+        },
+      });
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/users/approvers']);
+  }
+}

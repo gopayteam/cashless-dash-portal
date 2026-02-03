@@ -20,10 +20,10 @@
     <div class="form-container">
 
       <!-- Loading State -->
-      <div *ngIf="loading()" class="loading-state">
+      <!-- <div *ngIf="loading()" class="loading-state">
         <p-progressSpinner styleClass="spinner-small"></p-progressSpinner>
         <p>Loading user data...</p>
-      </div>
+      </div> -->
 
       <form *ngIf="userData" (ngSubmit)="onSubmit()" #parcelUserForm="ngForm">
 
@@ -88,6 +88,14 @@
                 placeholder="Choose a stage" optionLabel="label" optionValue="value" [filter]="true"
                 filterPlaceholder="Search stages" [loading]="stagesLoading" [showClear]="true" styleClass="w-full"
                 required></p-select>
+            </div>
+
+            <!-- Device ID -->
+            <div class="form-field">
+              <label for="deviceId" class="field-label required">Device ID</label>
+              <input pInputText id="deviceId" [(ngModel)]="deviceId" name="deviceId"
+                placeholder="e.g., 897867556457-698" class="w-full" required />
+              <small class="field-hint">Unique device identifier</small>
             </div>
 
             <!-- Profile (Read-only) -->

@@ -52,7 +52,8 @@ interface StatusOption {
   styleUrls: [
     './deactivated.css',
     '../../../../styles/modules/_cards.css',
-    '../../../../styles/modules/_user_module.css'
+    '../../../../styles/modules/_user_module.css',
+    '../../../../styles/modules/_filter_actions.css'
   ],
 })
 export class DeactivatedUsersComponent implements OnInit {
@@ -110,7 +111,7 @@ export class DeactivatedUsersComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;

@@ -60,6 +60,7 @@ interface StatusOption {
     './customers.css',
     '../../../../styles/modules/_cards.css',
     '../../../../styles/modules/_user_module.css',
+    '../../../../styles/modules/_filter_actions.css',
     '../../../../styles/global/_toast.css',
   ],
 })

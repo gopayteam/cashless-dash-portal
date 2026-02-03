@@ -68,9 +68,9 @@ export class UpdatePassengerComponent implements OnInit {
   userData: User | null = null;
 
   // Constants
-  readonly PROFILE = 'ADMIN';
+  readonly PROFILE = 'USER';
   readonly CHANNEL = 'PORTAL';
-  readonly AGENT = 'ADMIN';
+  readonly AGENT = 'PASSENGER';
 
   // Form fields
   firstName: string = '';
@@ -388,8 +388,8 @@ export class UpdatePassengerComponent implements OnInit {
 
     const payload: UpdateUserPayload = {
       id: this.userId,
-      agent: this.selectedAgent,
-      channel: this.selectedChannel,
+      agent: this.AGENT,
+      channel: this.CHANNEL,
       email: this.email.trim().toLowerCase(),
       entityId: this.entityId,
       firstName: this.firstName.trim(),

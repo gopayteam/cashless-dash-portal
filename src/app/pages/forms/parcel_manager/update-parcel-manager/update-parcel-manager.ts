@@ -37,6 +37,7 @@ interface UpdateParcelManagerPayload {
   channel: string;
   agent: string;
   stageId: number;
+  deviceId?: string
 }
 
 interface ApiResponse {
@@ -68,6 +69,7 @@ interface ApiResponse {
 export class UpdateParcelManagerComponent implements OnInit {
   entityId: string | null = null;
   managerId: number | null = null;
+  userStageID: string | null = null;
   managerUsername: string | null = null;
   userData: User | null = null;
 
@@ -78,6 +80,7 @@ export class UpdateParcelManagerComponent implements OnInit {
   lastName: string = '';
   email: string = '';
   selectedStage: number | null = null;
+  deviceId: string = '';
 
   // Constants
   readonly PROFILE = 'PARCEL';
@@ -184,7 +187,8 @@ export class UpdateParcelManagerComponent implements OnInit {
       user.phoneNumber &&
       user.profile &&
       user.agent &&
-      user.channel
+      user.channel &&
+      user.deviceId
     );
   }
 
@@ -381,6 +385,7 @@ export class UpdateParcelManagerComponent implements OnInit {
       channel: this.CHANNEL,
       agent: this.AGENT,
       stageId: this.selectedStage!,
+      deviceId: this.deviceId.trim(),
     };
 
     console.log('Submitting payload:', payload);

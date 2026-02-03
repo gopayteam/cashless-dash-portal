@@ -148,15 +148,30 @@ export class MainLayoutComponent implements OnInit {
 
     '/users': [
       { label: 'All Users', icon: 'pi pi-users', route: '/users/all', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] },
+
       { label: 'Admins', icon: 'pi pi-shield', route: '/users/admins', roles: ['CAN_VIEW_ADMINS'] },
-      { label: 'Drivers', icon: 'pi pi-user', route: '/users/super-drivers', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
-      { label: 'Conductors', icon: 'pi pi-user', route: '/users/conductors', roles: ['CAN_VIEW_TOUTS'] },
-      { label: 'Passengers', icon: 'pi pi-shopping-cart', route: '/users/passengers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
-      { label: 'Investors', icon: 'pi pi-money-bill', route: '/users/investors', roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] },
-      { label: 'Marshalls', icon: 'pi pi-user', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
-      { label: 'Parcel Managers', icon: 'pi pi-user', route: '/users/parcel-managers', roles: ['CAN_VIEW_USERS'] },
-      { label: 'Deactivated', icon: 'pi pi-ban', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] }
+
+      { label: 'Drivers', icon: 'pi pi-car', route: '/users/super-drivers', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
+
+      { label: 'Conductors', icon: 'pi pi-ticket', route: '/users/conductors', roles: ['CAN_VIEW_TOUTS'] },
+
+      { label: 'Passengers', icon: 'pi pi-users', route: '/users/passengers', roles: ['CAN_VIEW_CUSTOMERS', 'CAN_VIEW_PASSENGERS'] },
+
+      { label: 'Investors', icon: 'pi pi-wallet', route: '/users/investors', roles: ['CAN_VIEW_INVESTORS', 'CAN_VIEW_INVESTOR'] },
+
+      { label: 'Marshalls', icon: 'pi pi-flag', route: '/users/marshals', roles: ['CAN_VIEW_USERS'] },
+
+      { label: 'Parcel Managers', icon: 'pi pi-box', route: '/users/parcel-managers', roles: ['CAN_VIEW_USERS'] },
+
+      { label: 'Deactivated', icon: 'pi pi-user-minus', route: '/users/deactivated', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] },
+
+      { label: 'Dashmasters', icon: 'pi pi-cog', route: '/users/dashmasters', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] },
+
+      { label: 'Approvers', icon: 'pi pi-check-circle', route: '/users/approvers', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] },
+
+      { label: 'Inspectors', icon: 'pi pi-search', route: '/users/inspectors', roles: ['CAN_VIEW_USERS', 'CAN_DELETE_USER'] },
     ],
+
 
     '/audits': [
       { label: 'System Audits', icon: 'pi pi-server', route: '/audits/all', roles: ['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD'] },

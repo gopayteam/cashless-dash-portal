@@ -1,0 +1,124 @@
+<div class="create-user-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-user-plus"></i>
+        Create Dashmaster
+      </h1>
+      <p class="page-subtitle">Add a new dashmaster to the system</p>
+    </div>
+  </div>
+
+  <p-toast></p-toast>
+
+  <p-card class="user-form-card">
+    <div class="form-container">
+      <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+        <!-- Personal Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-id-card"></i>
+            Personal Information
+          </h3>
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-field">
+              <label for="firstName" class="field-label required">First Name</label>
+              <input pInputText id="firstName" [(ngModel)]="firstName" name="firstName" placeholder="Enter first name"
+                class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">User's given name</small>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-field">
+              <label for="lastName" class="field-label required">Last Name</label>
+              <input pInputText id="lastName" [(ngModel)]="lastName" name="lastName" placeholder="Enter last name"
+                class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">User's surname</small>
+            </div>
+
+            <!-- Email -->
+            <div class="form-field">
+              <label for="email" class="field-label required">Email Address</label>
+              <input pInputText type="email" id="email" [(ngModel)]="email" name="email"
+                placeholder="e.g., user@example.com" class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">Must be a valid email address</small>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-field">
+              <label for="phoneNumber" class="field-label required">Phone Number</label>
+              <input pInputText id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber"
+                placeholder="e.g., 254712345678 or 0712345678" class="w-full" required [disabled]="submitting" />
+              <small class="field-hint">Format: 254XXXXXXXXX or 07XXXXXXXX</small>
+            </div>
+
+            <!-- ID Number -->
+            <div class="form-field">
+              <label for="idNumber" class="field-label required">ID Number</label>
+              <input pInputText id="idNumber" [(ngModel)]="idNumber" name="idNumber" placeholder="e.g., 12345678"
+                class="w-full" required maxlength="8" [disabled]="submitting" />
+              <small class="field-hint">National ID number (7-8 digits)</small>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Account Configuration Section -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="pi pi-cog"></i>
+            Account Configuration
+          </h3>
+          <div class="form-grid">
+
+            <!-- Profile (Read-only) -->
+            <div class="form-field">
+              <label for="profile" class="field-label">Profile</label>
+              <input pInputText id="profile" [value]="PROFILE" name="profile" class="w-full" disabled readonly />
+            </div>
+
+            <!-- Agent (Read-only) -->
+            <div class="form-field">
+              <label for="agent" class="field-label">Agent Type</label>
+              <input pInputText id="agent" [value]="AGENT" name="agent" class="w-full" disabled readonly />
+            </div>
+
+            <!-- Channel (Read-only) -->
+            <div class="form-field">
+              <label for="channel" class="field-label">Channel</label>
+              <input pInputText id="channel" [value]="CHANNEL" name="channel" class="w-full" disabled readonly />
+            </div>
+
+
+            <!-- Entity ID (Read-only) -->
+            <!-- <div class="form-field">
+              <label for="entityId" class="field-label">Entity ID</label>
+              <input pInputText id="entityId" [value]="entityId || 'N/A'" name="entityId" class="w-full" disabled
+                readonly />
+              <small class="field-hint">Auto-assigned from your account</small>
+            </div> -->
+
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="onCancel()"
+            iconPos="right" [style]="{'gap':'1rem'}" [disabled]="submitting">
+          </p-button>
+
+          <p-button label="Create Dashmaster" [icon]="submitting ? 'pi pi-spin pi-spinner' : 'pi pi-user-plus'"
+            type="submit" iconPos="right" [style]="{'gap':'1rem'}" [disabled]="!isFormValid() || submitting"
+            [loading]="submitting" loadingIcon="pi pi-spin pi-spinner">
+          </p-button>
+        </div>
+
+      </form>
+    </div>
+  </p-card>
+
+  <p-toast position="top-right"></p-toast>
+</div>
