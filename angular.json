@@ -53,6 +53,7 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {"allowedHosts": ["capital-obviously-terrier.ngrok-free.app"]},
           "configurations": {
             "production": {
               "buildTarget": "prime:build:production"

@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "proxy": "ngrok http 4200 --domain capital-obviously-terrier.ngrok-free.app",
     "test": "ng test"
   },
   "prettier": {

@@ -39,6 +39,7 @@ import { ParcelReceiptGenerationService } from '../../../../@core/services/parce
     './parcels.css',
     '../../../../styles/modules/_cards.css',
     '../../../../styles/global/_grid_layout.css',
+    '../../../../styles/global/_toast.css',
     '../../../../styles/modules/_filter_actions.css'
 
   ],

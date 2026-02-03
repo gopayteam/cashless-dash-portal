@@ -10,7 +10,7 @@ export class ParcelReceiptGenerationService {
   /**
    * Generates and downloads a colorful thermal-style PDF receipt
    */
-  async generateThermalReceipt(parcel: Parcel): Promise<void> {
+  async generateThermalReceipt(parcel: Parcel): Promise<string> {
     try {
       const { default: jsPDF } = await import('jspdf');
       const html2canvas = (await import('html2canvas')).default;
@@ -45,7 +45,8 @@ export class ParcelReceiptGenerationService {
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 5, receiptWidth, imgHeight);
 
-      pdf.save(`Parcel_Receipt_${parcel.parcelNumber}.pdf`);
+      pdf.save(`Parcel_Receipt_Thermal${parcel.parcelNumber}.pdf`);
+      return 'done';
     } catch (error) {
       console.error('Error generating thermal receipt:', error);
       throw error;
@@ -55,7 +56,7 @@ export class ParcelReceiptGenerationService {
   /**
    * Generates and downloads a simple monochrome supermarket-style PDF receipt
    */
-  async generateSimpleReceipt(parcel: Parcel): Promise<void> {
+  async generateSimpleReceipt(parcel: Parcel): Promise<string> {
     try {
       const { default: jsPDF } = await import('jspdf');
       const html2canvas = (await import('html2canvas')).default;
@@ -91,6 +92,7 @@ export class ParcelReceiptGenerationService {
       pdf.addImage(imgData, 'PNG', 0, 5, receiptWidth, imgHeight);
 
       pdf.save(`Parcel_Receipt_Simple_${parcel.parcelNumber}.pdf`);
+      return 'done';
     } catch (error) {
       console.error('Error generating simple receipt:', error);
       throw error;

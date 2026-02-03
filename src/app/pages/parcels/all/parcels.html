@@ -470,8 +470,8 @@
         </button>
 
         <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
-          class="p-button-success" *ngIf="selectedParcel" [loading]="isReceiptDownloading"
-          [disabled]="isReceiptDownloading" (click)="downloadReceipt2(selectedParcel)"
+          class="p-button-success" *ngIf="selectedParcel" [loading]="isColorReceiptDownloading"
+          [disabled]="isColorReceiptDownloading" (click)="downloadReceipt2(selectedParcel)"
           pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
         </button>
 
@@ -481,4 +481,6 @@
       </div>
     </ng-template>
   </p-dialog>
+
+  <p-toast position="top-right"></p-toast>
 </div>

@@ -73,7 +73,7 @@ export class ParcelReceiptService {
     }
   }
 
-  async generateReceipt(parcel: Parcel): Promise<void> {
+  async generateReceipt(parcel: Parcel): Promise<string> {
     try {
       const { default: jsPDF } = await import('jspdf');
       const html2canvas = (await import('html2canvas')).default;
@@ -108,7 +108,9 @@ export class ParcelReceiptService {
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 5, receiptWidth, imgHeight);
 
-      pdf.save(`Parcel_Receipt_${parcel.parcelNumber}.pdf`);
+      pdf.save(`Parcel_Receipt_Colorful${parcel.parcelNumber}.pdf`);
+
+      return 'done';
     } catch (error) {
       console.error('Error generating receipt:', error);
       throw error;
