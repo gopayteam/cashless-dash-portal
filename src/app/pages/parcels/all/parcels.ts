@@ -65,18 +65,20 @@ import { ParcelReceiptGenerationService } from '../../../../@core/services/parce
 })
 export class ParcelsComponent implements OnInit {
   entityId: string | null = null;
-  parcels: Parcel[] = [];
+  parcels: Parcel[] = []; // All parcels from server
+  filteredParcels: Parcel[] = []; // Parcels after client-side filtering
   dateRange: Date[] = [];
 
   // Pagination
   totalRecords = 0;
+  filteredTotalRecords = 0;
   rows = 10;
   first = 0;
 
   // Stats Cards
   statsCards: any[] = [];
 
-  // Server-side Filters
+  // Client-side Filters
   filters = {
     parcelNumber: '',
     sourceName: '',
@@ -134,6 +136,7 @@ export class ParcelsComponent implements OnInit {
     } else {
       this.router.navigate(['/login']);
       console.log('No user logged in');
+      return;
     }
 
     this.setDefaultDateRange();
@@ -147,6 +150,10 @@ export class ParcelsComponent implements OnInit {
     this.filters.dateRange = [lastWeek, today];
   }
 
+  /**
+   * Load parcels from server with ONLY required payload fields
+   * All other filtering happens client-side
+   */
   loadParcels($event: any): void {
     const [start, end] = this.filters.dateRange;
     const event = $event;
@@ -162,19 +169,12 @@ export class ParcelsComponent implements OnInit {
     this.first = event?.first ?? 0;
     this.rows = size;
 
+    // ✅ ONLY send required fields to server
     const payload = {
       entityId: this.entityId,
       page: page,
       size: size,
-      // transactionType: 'DEBIT',
       paymentStatus: 'PAID',
-
-      // ✅ Server-side filters
-      parcelNumber: this.filters.parcelNumber || null,
-      sourceName: this.filters.sourceName || null,
-      destinationName: this.filters.destinationName || null,
-      paymentMethod: this.filters.paymentMethod || null,
-      parcelStatus: this.filters.parcelStatus || null,
       startDate: start ? start.toISOString().split('T')[0] : null,
       endDate: end ? end.toISOString().split('T')[0] : null,
       sort: 'createdAt,DESC',
@@ -192,6 +192,9 @@ export class ParcelsComponent implements OnInit {
           // Stats always come from API
           this.statsCards = mapParcelStatsToCards(response);
 
+          // Apply client-side filters immediately after loading
+          this.applyClientSideFilters();
+
           this.rows = event.rows;
           this.first = event.first;
 
@@ -204,10 +207,57 @@ export class ParcelsComponent implements OnInit {
       });
   }
 
-  /** Triggered by filter form */
+  /**
+   * Apply client-side filtering on already fetched data
+   */
+  applyClientSideFilters(): void {
+    let filtered = [...this.parcels];
+
+    // Filter by parcel number (search term)
+    if (this.filters.parcelNumber?.trim()) {
+      const searchLower = this.filters.parcelNumber.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.parcelNumber?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filter by source name
+    if (this.filters.sourceName?.trim()) {
+      const sourceLower = this.filters.sourceName.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.sourceName?.toLowerCase().includes(sourceLower)
+      );
+    }
+
+    // Filter by destination name
+    if (this.filters.destinationName?.trim()) {
+      const destLower = this.filters.destinationName.toLowerCase().trim();
+      filtered = filtered.filter(p =>
+        p.destinationName?.toLowerCase().includes(destLower)
+      );
+    }
+
+    // Filter by payment method
+    if (this.filters.paymentMethod) {
+      filtered = filtered.filter(p =>
+        p.paymentMethod === this.filters.paymentMethod
+      );
+    }
+
+    // Filter by parcel status
+    if (this.filters.parcelStatus) {
+      filtered = filtered.filter(p =>
+        p.parcelStatus === this.filters.parcelStatus
+      );
+    }
+
+    this.filteredParcels = filtered;
+    this.filteredTotalRecords = filtered.length;
+  }
+
+  /** Triggered by filter form - apply client-side filters only */
   applyFilters(): void {
-    this.first = 0;
-    this.loadParcels({ first: 0, rows: this.rows });
+    this.applyClientSideFilters();
   }
 
   resetFilters(): void {
@@ -221,18 +271,21 @@ export class ParcelsComponent implements OnInit {
     };
     this.setDefaultDateRange();
     this.searchTerm = '';
-    this.applyFilters();
+
+    // Reload data from server with new date range
+    this.first = 0;
+    this.loadParcels({ first: 0, rows: this.rows });
   }
 
   onSearchChange(): void {
     this.filters.parcelNumber = this.searchTerm;
-    this.applyFilters();
+    this.applyClientSideFilters();
   }
 
   clearSearch(): void {
     this.searchTerm = '';
     this.filters.parcelNumber = '';
-    this.applyFilters();
+    this.applyClientSideFilters();
   }
 
   viewParcelDetails(parcel: Parcel): void {

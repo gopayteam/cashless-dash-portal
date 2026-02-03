@@ -48,24 +48,26 @@
       <div class="filter-group">
         <label class="filter-label">Parcel Number</label>
         <input pInputText placeholder="Search by parcel number..." [(ngModel)]="filters.parcelNumber"
-          class="form-input" />
+          (input)="applyFilters()" class="form-input" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label">Source</label>
-        <input pInputText placeholder="Source location..." [(ngModel)]="filters.sourceName" class="form-input" />
+        <input pInputText placeholder="Source location..." [(ngModel)]="filters.sourceName" (input)="applyFilters()"
+          class="form-input" />
       </div>
 
       <div class="filter-group">
         <label class="filter-label">Destination</label>
         <input pInputText placeholder="Destination location..." [(ngModel)]="filters.destinationName"
-          class="form-input" />
+          (input)="applyFilters()" class="form-input" />
       </div>
 
       <div class="filter-item filter-item-filled">
         <label class="filter-label">Payment Method</label>
         <mat-form-field appearance="outline" class="filter-field">
-          <mat-select placeholder="Select Payment Method" [(ngModel)]="filters.paymentMethod">
+          <mat-select placeholder="Select Payment Method" [(ngModel)]="filters.paymentMethod"
+            (selectionChange)="applyFilters()">
             <mat-option [value]="null">All Methods</mat-option>
             <mat-option *ngFor="let method of paymentMethods" [value]="method">
               {{ method }}
@@ -77,7 +79,8 @@
       <div class="filter-item filter-item-filled">
         <label class="filter-label">Parcel Status</label>
         <mat-form-field appearance="outline" class="filter-field" style="background-color: white;">
-          <mat-select placeholder="Select Parcel Status" [(ngModel)]="filters.parcelStatus">
+          <mat-select placeholder="Select Parcel Status" [(ngModel)]="filters.parcelStatus"
+            (selectionChange)="applyFilters()">
             <mat-option [value]="null">All Statuses</mat-option>
             <mat-option *ngFor="let status of parcelStatuses" [value]="status">
               {{ status.replace('_', ' ') }}
@@ -87,14 +90,14 @@
       </div>
 
       <div class="filter-item filter-item-filled">
-        <label class="filter-label">Date Range</label>
+        <label class="filter-label">Date Range (Server Filter)</label>
         <mat-form-field appearance="outline" class="date-range-field">
           <mat-date-range-input [rangePicker]="picker">
             <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
             <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
+          <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker>
         </mat-form-field>
       </div>
 
@@ -116,7 +119,7 @@
     <div class="table-header">
       <div class="table-header-left">
         <h3>Parcels List</h3>
-        <span class="record-count">{{ totalRecords }} total parcels</span>
+        <span class="record-count">{{ filteredTotalRecords }} of {{ totalRecords }} parcels</span>
       </div>
       <div class="search-container">
         <span class="p-input-icon-left">
@@ -129,10 +132,10 @@
       </div>
     </div>
 
-    <p-table [value]="parcels" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
-      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+    <p-table [value]="filteredParcels" [paginator]="true" [rows]="rows" [loading]="loading()"
+      [totalRecords]="filteredTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels" styleClass="data-table"
-      (onLazyLoad)="loadParcels($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      [tableStyle]="{ 'min-width': '60rem' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Parcel Number</th>
@@ -422,10 +425,10 @@
 
     <ng-template pTemplate="footer">
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-        <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
+        <!-- <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
           class="p-button-success" [loading]="isDownloading" [disabled]="isDownloading" (click)="downloadReceipt()"
           pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
-        </button>
+        </button> -->
 
         <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
           (click)="closeDetailDialog()">
