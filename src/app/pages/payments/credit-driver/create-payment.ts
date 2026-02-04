@@ -18,6 +18,11 @@ import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+
 
 interface FleetOption {
   fleetNumber: string;
@@ -43,6 +48,10 @@ interface DriverOption {
     DatePickerModule,
     MessageModule,
     ProgressSpinnerModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
   ],
   standalone: true,
   selector: 'app-credit-driver',

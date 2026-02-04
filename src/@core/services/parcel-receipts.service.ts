@@ -140,7 +140,7 @@ export class ParcelReceiptGenerationService {
 
         .logo-img {
           height: 40px;
-          transform: scale(3.15);
+          transform: scale(1.55);
           transform-origin: center;
         }
 
@@ -283,14 +283,14 @@ export class ParcelReceiptGenerationService {
       <div class="thermal-receipt">
         <!-- Logo and Header -->
         <div class="logo-section">
-          <img src="/logo_2.png" alt="Gopay Logo" class="logo-img" />
+          <img src="/super_metro_logo.png" alt="Gopay Logo" class="logo-img" />
         </div>
-        
+
         <div class="header-title">Parcel Receipt</div>
-        
+
         <div class="receipt-number">${parcel.parcelNumber || 'N/A'}</div>
         <div class="receipt-date">Issued: ${this.formatDate(parcel.createdAt)}</div>
-        
+
         <div class="divider-solid"></div>
 
         <!-- Amount Highlight -->
@@ -462,7 +462,7 @@ export class ParcelReceiptGenerationService {
 
         .simple-logo img {
           height: 40px;
-          transform: scale(3.15);
+          transform: scale(1.55);
           transform-origin: center;
         }
 
@@ -546,7 +546,7 @@ export class ParcelReceiptGenerationService {
       <div class="simple-receipt">
         <!-- Logo -->
         <div class="simple-logo">
-          <img src="/logo_2.png" alt="Logo" />
+          <img src="/super_metro_logo.png" alt="Logo" />
         </div>
 
         <!-- Header -->

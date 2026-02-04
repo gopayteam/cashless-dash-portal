@@ -151,7 +151,7 @@ export class ParcelReceiptService {
 
         .logo-img {
           height: 40px;
-          transform: scale(7.15);
+          transform: scale(3.15);
           transform-origin: center;
         }
 
@@ -360,7 +360,7 @@ export class ParcelReceiptService {
           <!-- Header -->
           <div class="receipt-header">
             <div class="logo-wrapper">
-              <img src="/logo_2.png" alt="Gopay Logo" class="logo-img" />
+              <img src="/super_metro_logo.png" alt="Gopay Logo" class="logo-img" />
             </div>
             <div class="receipt-title">Parcel Receipt</div>
             <div class="receipt-number">${parcel.parcelNumber || 'N/A'}</div>

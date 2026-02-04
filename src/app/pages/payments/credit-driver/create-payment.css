@@ -410,3 +410,15 @@
 .transfer-summary {
   animation: slideDown 0.3s ease-out;
 }
+
+/* Input padding */
+.prime-like input {
+  padding: 5px 6px !important;
+  font-size: 0.9rem;
+}
+
+/* Calendar icon alignment */
+.prime-like .mat-mdc-icon-button {
+  width: 36px;
+  height: 36px;
+}

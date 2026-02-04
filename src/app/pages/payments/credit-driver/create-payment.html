@@ -91,7 +91,7 @@
         </div>
 
         <!-- Activity Date Calendar -->
-        <div class="form-field">
+        <!-- <div class="form-field">
           <label for="activityDate" class="form-label">
             Driver Activity Date <span class="required-indicator">*</span>
           </label>
@@ -102,6 +102,24 @@
           <small class="form-error" *ngIf="isFieldInvalid('activityDate')">
             {{ getErrorMessage('activityDate') }}
           </small>
+        </div> -->
+
+        <div class="form-field">
+          <label for="activityDate" class="form-label">
+            Driver Activity Date <span class="required-indicator">*</span>
+          </label>
+
+          <mat-form-field appearance="outline" class="w-full prime-like">
+            <input matInput [matDatepicker]="picker" id="activityDate" formControlName="activityDate"
+              placeholder="Select date" [max]="maxDate" />
+
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+
+            <mat-error *ngIf="isFieldInvalid('activityDate')">
+              {{ getErrorMessage('activityDate') }}
+            </mat-error>
+          </mat-form-field>
         </div>
 
         <!-- Form Actions -->
