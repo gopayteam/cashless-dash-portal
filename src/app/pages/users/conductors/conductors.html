@@ -8,43 +8,35 @@
     </div>
 
     <div class="header-filters">
-      <div class="search-container">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input pInputText type="text" placeholder="Search users..." [(ngModel)]="searchTerm"
-            (input)="onSearchChange()" class="search-input" />
-        </span>
-        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()" pTooltip="Clear search"></button>
-      </div>
-
-      <!-- Profile Filter -->
-      <select [(ngModel)]="selectedProfile" (change)="onProfileChange()" class="filter-dropdown">
-        <option value="" disabled selected>Filter by Profile</option>
-        <option *ngFor="let option of profileOptions" [value]="option.value">
-          {{ option.label }}
-        </option>
-      </select>
-
-      <!-- Channel Filter -->
-      <select [(ngModel)]="selectedChannel" (change)="onChannelChange()" class="filter-dropdown">
-        <option value="" disabled selected>Filter by Channel</option>
-        <option *ngFor="let option of channelOptions" [value]="option.value">
-          {{ option.label }}
-        </option>
-      </select>
-
-      <!-- Status Filter -->
-      <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-dropdown">
-        <option value="" disabled selected>Filter by Status</option>
-        <option *ngFor="let option of statusOptions" [value]="option.value">
-          {{ option.label }}
-        </option>
-      </select>
-
-
       <button *ngIf="searchTerm || selectedProfile || selectedChannel || selectedStatus" pButton label="Clear All"
-        icon="pi pi-filter-slash" iconPos="right" class="filter-btn filter-btn--apply"  (click)="clearFilters()"></button>
+        icon="pi pi-filter-slash" iconPos="right" class="filter-btn filter-btn--apply"
+        (click)="clearFilters()"></button>
+      <div class="filters-row">
+
+        <!-- Profile Filter -->
+        <select [(ngModel)]="selectedProfile" (change)="onProfileChange()" class="filter-dropdown">
+          <option value="" disabled selected>Filter by Profile</option>
+          <option *ngFor="let option of profileOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+
+        <!-- Channel Filter -->
+        <select [(ngModel)]="selectedChannel" (change)="onChannelChange()" class="filter-dropdown">
+          <option value="" disabled selected>Filter by Channel</option>
+          <option *ngFor="let option of channelOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+
+        <!-- Status Filter -->
+        <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-dropdown">
+          <option value="" disabled selected>Filter by Status</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -104,6 +96,16 @@
         <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
           (clicked)="refresh()"></app-action-button>
 
+      </div>
+
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search users..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
+        </span>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
     </div>
 
