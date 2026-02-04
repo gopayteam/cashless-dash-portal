@@ -14,3 +14,11 @@ export interface ParcelsAPiResponse {
   totalExpenses: number;
   netAmount: number;
 }
+
+export interface SingleParcelsAPiResponse {
+  data: Parcel | null;
+  message: string;
+  status: number;
+  totalRecords: number;
+}
+

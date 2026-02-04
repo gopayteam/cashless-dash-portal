@@ -1,75 +1,136 @@
 <!-- pages/parcels/parcels.component.html -->
 <div class="parcels-container">
-  <!-- ================= LOADING OVERLAY ================= -->
-  <!-- <div class="loading-overlay" *ngIf="loading()">
-    <p-progressSpinner style="width: 120px; height: 120px" strokeWidth="4" />
-  </div> -->
-
   <!-- ================= HEADER ================= -->
   <div class="parcels-header">
     <div class="header-content">
       <h1>Parcel Management</h1>
       <p class="text-muted">Track and manage all parcel shipments</p>
     </div>
-  </div>
 
+    <div class="filter-item-gradient filter-item-filled">
+      <label class="filter-label">Date Range (Server Filter)</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
 
   <!-- ================= FILTER SECTION ================= -->
   <p-card styleClass="stat-card card filter-card">
-    <div class="filters-grid grid-3">
-      <div class="filter-item filter-item-filled">
-        <label class="filter-label">Payment Method</label>
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-select placeholder="Select Payment Method" [(ngModel)]="filters.paymentMethod"
-            (selectionChange)="applyFilters()">
-            <mat-option [value]="null">All Methods</mat-option>
-            <mat-option *ngFor="let method of paymentMethods" [value]="method">
-              {{ method }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+    <div class="filters-section">
+      <!-- Primary Filters Row -->
+      <div class="filters-grid">
+        <div class="filter-item">
+          <label class="filter-label">Source Stage</label>
+          <p-select [options]="sourceStages" [(ngModel)]="filters.sourceId" optionLabel="name" optionValue="id"
+            placeholder="Select Source" [showClear]="true" (onChange)="applyFilters()" styleClass="filter-dropdown">
+
+            <ng-template pTemplate="selectedItem" let-option>
+              <div class="flex align-items-center gap-2" *ngIf="option">
+                <i class="pi pi-map-marker"></i>
+                <span> {{ option.name }}</span>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-map-marker"></i>
+                <span> {{ option.name }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+        </div>
+
+        <div class="filter-item">
+          <label class="filter-label">Destination Stage</label>
+          <p-select [options]="destinationStages" [(ngModel)]="filters.destinationId" optionLabel="name"
+            optionValue="id" placeholder="Select Destination" [showClear]="true" (onChange)="applyFilters()"
+            styleClass="filter-dropdown">
+          </p-select>
+
+        </div>
+
+        <div class="filter-item">
+          <label class="filter-label">Payment Method</label>
+          <p-select [options]="paymentMethodOptions" [(ngModel)]="filters.paymentMethod" optionLabel="label"
+            optionValue="value" placeholder="Select Payment Method" [showClear]="true" (onChange)="applyFilters()"
+            styleClass="filter-dropdown">
+
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i [class]="option.value === 'CASH' ? 'pi pi-money-bill' : 'pi pi-credit-card'"></i>
+                <span> {{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+        </div>
+
+        <div class="filter-item">
+          <label class="filter-label">Parcel Status</label>
+          <p-select [options]="parcelStatusOptions" [(ngModel)]="filters.parcelStatus" optionLabel="label"
+            optionValue="value" placeholder="Select Parcel Status" [showClear]="true" (onChange)="applyFilters()"
+            styleClass="filter-dropdown">
+
+            <ng-template pTemplate="item" let-option>
+              <div class="flex align-items-center gap-2">
+                <i [class]="option.icon"></i>
+                <span> {{ option.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+
+        </div>
+
+        <!-- <div class="filter-item filter-item-filled">
+          <label class="filter-label">Date Range (Server Filter)</label>
+          <mat-form-field appearance="outline" class="date-range-field">
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
+              <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker>
+          </mat-form-field>
+        </div> -->
       </div>
 
-      <div class="filter-item filter-item-filled">
-        <label class="filter-label">Parcel Status</label>
-        <mat-form-field appearance="outline" class="filter-field" style="background-color: white;">
-          <mat-select placeholder="Select Parcel Status" [(ngModel)]="filters.parcelStatus"
-            (selectionChange)="applyFilters()">
-            <mat-option [value]="null">All Statuses</mat-option>
-            <mat-option *ngFor="let status of parcelStatuses" [value]="status">
-              {{ status.replace('_', ' ') }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="filter-item filter-item-filled">
-        <label class="filter-label">Date Range (Server Filter)</label>
-        <mat-form-field appearance="outline" class="date-range-field">
-          <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
-            <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker>
-        </mat-form-field>
-      </div>
 
 
-      <div class="filter-actions">
-        <button pButton icon="pi pi-filter" label="Apply" class="filter-btn filter-btn--apply" (click)="applyFilters()">
-        </button>
+      <!-- Action Buttons Row -->
+      <div class="filter-actions-row">
 
-        <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset"
-          (click)="resetFilters()">
-        </button>
+        <div class="filter-buttons-group">
+          <button pButton icon="pi pi-filter" label="Apply Filters" class="p-button-primary filter-action-btn"
+            (click)="applyFilters()">
+          </button>
+          <button pButton icon="pi pi-refresh" label="Reset" class="p-button-outlined filter-action-btn"
+            (click)="resetFilters()">
+          </button>
+        </div>
+
+        <div class="export-buttons-group">
+          <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
+            [disabled]="parcels.length === 0 || isExporting" [loading]="isExporting" (click)="exportToExcel()"
+            pTooltip="Export to Excel" tooltipPosition="bottom">
+          </button>
+          <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn"
+            [disabled]="parcels.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
+            pTooltip="Export to CSV" tooltipPosition="bottom">
+          </button>
+        </div>
       </div>
     </div>
   </p-card>
 
   <!-- ================= STATS CARDS ================= -->
-  <div class="stats-grid grid-4">
-    <p-card *ngFor="let card of statsCards" styleClass="card-hover">
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="card-hover stat-card-item">
       <div class="stat-content">
         <div class="stat-info">
           <span class="stat-title">{{ card.title }}</span>
@@ -101,45 +162,34 @@
     <div class="table-header">
       <div class="table-header-left">
         <h3>Parcels List</h3>
-        <span class="record-count">{{ filteredTotalRecords }} of {{ totalRecords }} parcels</span>
+        <span class="record-count">{{ totalRecords }} parcels</span>
       </div>
 
-      <div class="table-header-filters">
-        <div class="filter-group">
-          <label class="filter-label">Parcel Number</label>
-          <input pInputText placeholder="e.g. SMP0000000xxxx" [(ngModel)]="filters.parcelNumber"
-            (input)="applyFilters()" class="form-input" />
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Source</label>
-          <input pInputText placeholder="From..." [(ngModel)]="filters.sourceName" (input)="applyFilters()"
-            class="form-input" />
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Destination</label>
-          <input pInputText placeholder="To..." [(ngModel)]="filters.destinationName" (input)="applyFilters()"
-            class="form-input" />
-        </div>
+      <div class="table-search">
+        <span class="p-input-icon-left search-wrapper">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search by Parcel Number" [(ngModel)]="filters.parcelNumber"
+            (input)="onParcelNumberChange()" class="search-input" />
+          <i class="pi pi-times clear-icon" *ngIf="filters.parcelNumber" (click)="clearSearch()"></i>
+        </span>
       </div>
     </div>
 
-
-    <p-table [value]="filteredParcels" [paginator]="true" [rows]="rows" [loading]="loading()"
-      [totalRecords]="filteredTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+    <p-table [value]="parcels" [paginator]="true" [rows]="rows" [loading]="loading()" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels" styleClass="data-table"
-      [tableStyle]="{ 'min-width': '60rem' }">
+      [tableStyle]="{ 'min-width': '60rem' }" [lazy]="true" (onLazyLoad)="loadParcels($event)"
+      responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Parcel Number</th>
           <th>Sender</th>
           <th>Receiver</th>
           <th>Route</th>
-          <th>Fleet No</th>
+          <th class="hide-mobile">Fleet No</th>
           <th>Amount</th>
-          <th>Payment Method</th>
-          <th>Parcel Status</th>
+          <th class="hide-mobile">Payment Method</th>
+          <th>Status</th>
           <th>Receipt</th>
         </tr>
       </ng-template>
@@ -159,6 +209,7 @@
               </div>
             </div>
           </td>
+
           <td>
             <div class="customer-cell">
               <i class="pi pi-user"></i>
@@ -168,29 +219,33 @@
               </div>
             </div>
           </td>
+
           <td>
             <div class="route-cell">
               <span class="route-point">
                 <i class="pi pi-map-marker"></i>
-                {{ parcel.sourceName }}
+                <span class="route-text">{{ parcel.sourceName }}</span>
               </span>
               <i class="pi pi-arrow-right route-arrow"></i>
               <span class="route-point">
                 <i class="pi pi-map-marker"></i>
-                {{ parcel.destinationName }}
+                <span class="route-text">{{ parcel.destinationName }}</span>
               </span>
             </div>
           </td>
-          <td>
+
+          <td class="hide-mobile">
             <span class="fleet-badge">
               <i class="pi pi-car"></i>
-              - {{ parcel.fleetNo ?? 'N/A' }}
+              {{ parcel.fleetNo ?? 'N/A' }}
             </span>
           </td>
+
           <td class="amount-cell">
             <span class="amount">Ksh {{ parcel.amount | number : '1.2-2' }}</span>
           </td>
-          <td>
+
+          <td class="hide-mobile">
             <span [class]="'badge ' + getPaymentMethodClass(parcel.paymentMethod)">
               <i [class]="parcel.paymentMethod === 'CASH' ? 'pi pi-money-bill' : 'pi pi-credit-card'"></i>
               {{ parcel.paymentMethod }}
@@ -210,23 +265,21 @@
                           ? 'pi pi-times-circle'
                           : 'pi pi-box'
                 "></i>
-              {{ parcel.parcelStatus.replace('_', ' ') }}
+              <span class="badge-text">{{ parcel.parcelStatus.replace('_', ' ') }}</span>
             </span>
           </td>
 
           <td>
-            <button pButton icon="pi pi-file-pdf" class="p-button-rounded p-button-text"
-              (click)="openReceipt(parcel); $event.stopPropagation()">
+            <button pButton icon="pi pi-file-pdf" class="p-button-rounded p-button-text receipt-btn"
+              (click)="openReceipt(parcel); $event.stopPropagation()" pTooltip="View Receipt" tooltipPosition="left">
             </button>
           </td>
-
-
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="11" class="empty-message">
+          <td colspan="9" class="empty-message">
             <div class="empty-state">
               <i class="pi pi-inbox"></i>
               <h3>No Parcels Found</h3>
@@ -241,7 +294,7 @@
   <!-- ================= PARCEL DETAILS DIALOG ================= -->
   <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
     [draggable]="false" [resizable]="false" styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }">
+    [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '90vw', maxWidth: '900px' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -418,14 +471,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-        <!-- <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
-          class="p-button-success" [loading]="isDownloading" [disabled]="isDownloading" (click)="downloadReceipt()"
-          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
-        </button> -->
-
-        <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
-          (click)="closeDetailDialog()">
+      <div class="dialog-footer">
+        <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()">
         </button>
       </div>
     </ng-template>
@@ -434,7 +481,7 @@
   <!-- ================= PARCEL RECEIPT DIALOG ================= -->
   <p-dialog [(visible)]="displayReceiptDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
     [draggable]="false" [resizable]="false" styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px', background: '#f9f9f9' }">
+    [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '90vw', maxWidth: '900px' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -451,28 +498,28 @@
 
     <app-parcel-receipt *ngIf="selectedParcel" [parcel]="selectedParcel">
     </app-parcel-receipt>
+
     <ng-template pTemplate="footer">
-      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-
-        <button pButton label="Download Simple Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
-          class="p-button-success" *ngIf="selectedParcel" [loading]="isSimpleReceiptDownloading"
-          [disabled]="isSimpleReceiptDownloading" (click)="generateSimpleReceipt()"
-          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
+      <div class="dialog-footer receipt-footer">
+        <button pButton label="Simple" icon="pi pi-download" class="p-button-success receipt-download-btn"
+          *ngIf="selectedParcel" [loading]="isSimpleReceiptDownloading" [disabled]="isSimpleReceiptDownloading"
+          iconPos="right" style="gap: 0.5rem" (click)="generateSimpleReceipt()" pTooltip="Download simple receipt"
+          tooltipPosition="top">
         </button>
 
-        <button pButton label="Download Thermal Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
-          class="p-button-success" *ngIf="selectedParcel" [loading]="isThermalReceiptDownloading"
-          [disabled]="isThermalReceiptDownloading" (click)="generateThermalReceipt()"
-          pTooltip="Download thermal parcel receipt as PDF" tooltipPosition="top">
+        <button pButton label="Thermal" icon="pi pi-download" class="p-button-success receipt-download-btn"
+          *ngIf="selectedParcel" [loading]="isThermalReceiptDownloading" [disabled]="isThermalReceiptDownloading"
+          iconPos="right" style="gap: 0.5rem" (click)="generateThermalReceipt()" pTooltip="Download thermal receipt"
+          tooltipPosition="top">
         </button>
 
-        <button pButton label="Download Receipt" icon="pi pi-download" iconPos="right" style="gap: 0.5rem;"
-          class="p-button-success" *ngIf="selectedParcel" [loading]="isColorReceiptDownloading"
-          [disabled]="isColorReceiptDownloading" (click)="downloadReceipt2(selectedParcel)"
-          pTooltip="Download parcel receipt as PDF" tooltipPosition="top">
+        <button pButton label="Color" icon="pi pi-download" class="p-button-success receipt-download-btn"
+          *ngIf="selectedParcel" [loading]="isColorReceiptDownloading" [disabled]="isColorReceiptDownloading"
+          iconPos="right" style="gap: 0.5rem" (click)="downloadReceipt2(selectedParcel)"
+          pTooltip="Download color receipt" tooltipPosition="top">
         </button>
 
-        <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+        <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"
           (click)="closeReceiptDialog()">
         </button>
       </div>

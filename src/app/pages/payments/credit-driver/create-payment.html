@@ -60,7 +60,7 @@
 
           <p-select id="driverId" formControlName="driverId" [options]="filteredDrivers" optionLabel="label"
             optionValue="driverId" placeholder="Select a driver" [showClear]="true" [filter]="true"
-            filterBy="label,driverId" class="w-full" [invalid]="isFieldInvalid('driverId')"
+            filterBy="label, driverId" class="w-full" [invalid]="isFieldInvalid('driverId')"
             [disabled]="!creditDriverForm.get('fleetNumber')?.value">
 
             <!-- Selected Item Template -->

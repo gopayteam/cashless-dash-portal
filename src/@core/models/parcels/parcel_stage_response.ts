@@ -14,3 +14,9 @@ export interface ParcelDetailsApiResponse {
   message: string;
   code: number;
 }
+
+export interface ParcelSelectedStageApiResponse {
+  code: number;              // e.g. 0
+  message: string;             // e.g. "Success!"
+  data: Stage[];               // list of parcel stages
+}

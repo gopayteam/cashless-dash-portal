@@ -10,10 +10,22 @@
       <h1>Parcel Managers</h1>
       <p class="text-muted">Performance summary per parcel manager</p>
     </div>
+
+    <div class="filter-item-gradient filter-item-filled">
+      <label class="filter-label">Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
   </div>
 
   <!-- ================= FILTERS ================= -->
-  <p-card styleClass="card-hover card filter-card">
+  <!-- <p-card styleClass="card-hover card filter-card">
     <div class="filters-grid">
 
 
@@ -38,7 +50,7 @@
         </button>
       </div>
     </div>
-  </p-card>
+  </p-card> -->
 
   <!-- ================= TABLE ================= -->
   <p-card styleClass="card-hover card">
@@ -52,7 +64,8 @@
         </div>
       </div>
 
-
+      <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset" (click)="resetFilters()">
+      </button>
     </div>
 
     <p-table [value]="parcelManagers" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
@@ -174,7 +187,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  (click)="showManagerDialog = false"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"
+        (click)="showManagerDialog = false"></button>
     </ng-template>
   </p-dialog>
 

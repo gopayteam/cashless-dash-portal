@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   private baseUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   get<T>(endpoint: string, params?: Record<string, any>): Observable<T> {
     let httpParams = new HttpParams();
@@ -26,6 +26,27 @@ export class ApiService {
   post<T>(endpoint: string, payload: any): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}${endpoint}`, payload);
   }
+
+  postWithParams<T>(
+    endpoint: string,
+    payload: any,
+    params?: Record<string, any>
+  ): Observable<T> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== null && params[key] !== undefined) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+
+    return this.http.post<T>(`${this.baseUrl}${endpoint}`, payload, {
+      params: httpParams,
+    });
+  }
+
 
   put<T>(endpoint: string, payload: any): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}${endpoint}`, payload);

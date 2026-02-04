@@ -10,10 +10,22 @@
       <h1>Parcel Source Stages</h1>
       <p class="text-muted">Daily parcel summary by source stage</p>
     </div>
+
+    <div class="filter-item-gradient filter-item-filled">
+      <label class="filter-label">Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
   </div>
 
   <!-- ================= FILTER ================= -->
-  <p-card styleClass="card-hover filter-card">
+  <!-- <p-card styleClass="card-hover filter-card">
     <div class="filters-grid">
 
 
@@ -38,7 +50,7 @@
         </button>
       </div>
     </div>
-  </p-card>
+  </p-card> -->
 
   <!-- ================= TABLE ================= -->
   <p-card styleClass="card-hover card">
@@ -47,6 +59,9 @@
         <h3>Source Stages</h3>
         <span class="record-count">{{ totalRecords }} records</span>
       </div>
+
+      <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset" (click)="resetFilters()">
+      </button>
     </div>
 
     <p-table [value]="stages" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
@@ -160,7 +175,8 @@
     </ng-container>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  class="p-button-text" (click)="showStageDialog = false"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+        (click)="showStageDialog = false"></button>
     </ng-template>
   </p-dialog>
 </div>

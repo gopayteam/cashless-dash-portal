@@ -11,7 +11,7 @@ export class DataService {
     private api: ApiService,
     private mockApi: MockApiService,
     private cache: CacheService
-  ) {}
+  ) { }
 
   /**
    * GET with optional params + cache
@@ -46,4 +46,24 @@ export class DataService {
 
     return this.cache.get(key, request$);
   }
+
+  /**
+ * POST with payload + params + cache
+ */
+  postWithParams<T>(
+    endpoint: string,
+    payload: any,
+    params?: Record<string, any>,
+    context?: string
+  ): Observable<T> {
+    const key = `${endpoint}:POST_PARAMS:${JSON.stringify(payload)}:${JSON.stringify(params)}:${context ?? 'default'}`;
+
+    const request$ = environment.useMockApi
+      ? this.mockApi.post(endpoint, payload) // or create mock version too
+      : this.api.postWithParams<T>(endpoint, payload, params);
+
+    return this.cache.get(key, request$);
+  }
+
+
 }

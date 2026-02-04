@@ -29,3 +29,4 @@ export interface Parcel {
   serviceCharge: number;
   mpesaReceiptNumber: string | null;
 }
+

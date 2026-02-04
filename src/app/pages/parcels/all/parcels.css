@@ -1,7 +1,13 @@
-/* ================= PARCELS SPECIFIC STYLES ================= */
-/* Only styles unique to the parcels component */
+/* ================= CSS VARIABLES ================= */
+:root {
+  --primary-color: #667eea;
+  --light-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --light-text: #94a3b8;
+  --medium-text: #64748b;
+}
 
-/* Parcels Container */
+/* ================= MAIN CONTAINER ================= */
 .parcels-container {
   padding: 1rem;
   background-color: var(--light-bg);
@@ -27,64 +33,246 @@
   margin: 0 0 0.5rem 0;
 }
 
-/* ================= FILTER CARD ================= */
+.text-muted {
+  color: var(--medium-text);
+  font-size: 0.95rem;
+}
+
+/* ================= FILTER SECTION ================= */
 .filter-card {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
   align-items: end;
 }
 
-.filter-group {
+.filter-item {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.filter-group input {
-  width: 100%;
-  border: 1px solid var(--border-color);
-  margin: auto;
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.25rem;
+}
+
+.date-filter-item {
+  grid-column: span 1;
+}
+
+/* ================= FILTER ACTIONS ROW ================= */
+.filter-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-buttons-group,
+.export-buttons-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ================= ACTION BUTTON STYLES WITH COLORS ================= */
+.filter-action-btn,
+.export-action-btn {
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  justify-content: center;
+}
+
+/* Primary Filter Button (Apply Filters) */
+.filter-action-btn.p-button-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.filter-action-btn.p-button-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.filter-action-btn.p-button-primary .pi-filter {
+  color: white !important;
+}
+
+/* Outlined Filter Button (Reset) */
+.filter-action-btn.p-button-outlined {
+  background: white !important;
+  color: #6b7280 !important;
+  border: 2px solid #d1d5db !important;
+}
+
+.filter-action-btn.p-button-outlined:hover:not(:disabled) {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.filter-action-btn.p-button-outlined .pi-refresh {
+  color: #6b7280 !important;
+}
+
+/* Success Export Button (Excel) */
+.export-action-btn.p-button-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.export-action-btn.p-button-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-action-btn.p-button-success .pi-file-excel {
+  color: white !important;
+}
+
+/* Help Export Button (CSV) */
+.export-action-btn.p-button-help {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.export-action-btn.p-button-help:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-action-btn.p-button-help .pi-file {
+  color: white !important;
+}
+
+/* Disabled State */
+.filter-action-btn:disabled,
+.export-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Loading State */
+.filter-action-btn[loading="true"],
+.export-action-btn[loading="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ================= STATS CARDS ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stat-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
 }
 
-.filter-label {
-  font-weight: 600;
-  color: var(--medium-text);
+.stat-info {
+  flex: 1;
+}
+
+.stat-title {
   font-size: 0.875rem;
+  color: #64748b;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.filter-field {
-  width: 100%;
-}
-
-.filter-actions {
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  align-items: baseline;
+  gap: 0.25rem;
 }
 
-/* ================= STATS GRID ================= */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-/* Currency Display in Stats */
 .stat-value .currency {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-right: 0.25rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .stat-value .amount {
   font-size: 1.75rem;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-change {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.stat-change.positive {
+  color: #10b981;
 }
 
 /* ================= TABLE HEADER ================= */
@@ -119,15 +307,14 @@
 }
 
 /* ================= SEARCH CONTAINER ================= */
-.search-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.search-wrapper {
+  position: relative;
+  display: inline-block;
 }
 
 .search-input {
   width: 300px;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  padding: 0.5rem 2.5rem 0.5rem 2.5rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.9rem;
@@ -145,7 +332,7 @@
   display: inline-block;
 }
 
-.p-input-icon-left>i {
+.p-input-icon-left>i:first-child {
   position: absolute;
   left: 0.75rem;
   top: 50%;
@@ -154,12 +341,19 @@
   z-index: 1;
 }
 
-.clear-button {
-  color: var(--light-text) !important;
+.clear-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text);
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.2s;
 }
 
-.clear-button:hover {
-  color: var(--medium-text) !important;
+.clear-icon:hover {
+  color: var(--medium-text);
 }
 
 /* ================= CELL CONTENT STYLING ================= */
@@ -217,7 +411,6 @@
   color: var(--light-text);
 }
 
-/* Route Cell */
 .route-cell {
   display: flex;
   align-items: center;
@@ -242,8 +435,7 @@
   font-size: 0.75rem;
 }
 
-/* Fleet Badge - Parcels Specific */
-.parcels-container .fleet-badge {
+.fleet-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -255,11 +447,10 @@
   font-size: 0.85rem;
 }
 
-.parcels-container .fleet-badge i {
+.fleet-badge i {
   font-size: 0.9rem;
 }
 
-/* Amount Cell */
 .amount-cell {
   font-weight: 700;
   color: #2c3e50;
@@ -269,13 +460,27 @@
   font-size: 1rem;
 }
 
+/* ================= BADGES ================= */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge i {
+  font-size: 0.85rem;
+}
+
 /* ================= PARCEL DETAIL DIALOG ================= */
 .receipt-number-large {
   font-family: 'Courier New', monospace;
   font-weight: 600;
-  color: #667eea;
+  color: #ef4444;
   font-size: 1rem;
-  /* background-color: #f0f3ff; */
   background-color: white;
   padding: 0.35rem 0.7rem;
   border-radius: 6px;
@@ -283,7 +488,7 @@
 }
 
 .detail-content {
-  padding: 1rem 0;
+  padding: 2rem;
 }
 
 .detail-grid {
@@ -339,6 +544,7 @@
   padding: 0.5rem;
   border-radius: 4px;
   font-size: 0.9rem;
+  border: 1px solid var(--border-color);
 }
 
 .fleet-highlight {
@@ -359,10 +565,284 @@
   font-size: 1.25rem !important;
 }
 
+/* ================= CLICKABLE ROW ================= */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #f8fafc !important;
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--medium-text);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: var(--light-text);
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  margin: 1rem 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+/* ================= ANGULAR MATERIAL OVERRIDES ================= */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+::ng-deep .mat-date-range-input-container {
+  width: 100%;
+}
+
+::ng-deep .mat-select-panel {
+  background-color: white !important;
+  color: black !important;
+}
+
+::ng-deep .mat-option {
+  background-color: white !important;
+  color: black !important;
+}
+
+::ng-deep .mat-option:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* ================= PRIMENG OVERRIDES ================= */
+::ng-deep .filter-dropdown,
+::ng-deep .filter-calendar {
+  width: 100%;
+}
+
+::ng-deep .filter-dropdown .p-dropdown {
+  width: 100%;
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  min-height: 42px;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .filter-dropdown .p-dropdown:hover {
+  border-color: #667eea;
+}
+
+::ng-deep .filter-dropdown .p-dropdown.p-focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+::ng-deep .p-dropdown-panel {
+  background: white !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+}
+
+::ng-deep .p-dropdown-items-wrapper {
+  background: white !important;
+}
+
+::ng-deep .p-dropdown-item {
+  background: white !important;
+  color: #2d3748 !important;
+  padding: 0.75rem 1rem;
+  transition: all 0.15s ease;
+}
+
+::ng-deep .p-dropdown-item:hover {
+  background: #f7fafc !important;
+  color: #667eea !important;
+}
+
+::ng-deep .p-dropdown-item.p-highlight {
+  background: #edf2f7 !important;
+  color: #667eea !important;
+}
+
+::ng-deep .p-dropdown .p-dropdown-label {
+  color: #2d3748;
+  padding: 0.625rem 0.75rem;
+}
+
+::ng-deep .p-dropdown .p-dropdown-label.p-placeholder {
+  color: #a0aec0;
+}
+
+::ng-deep .p-dropdown-clear-icon {
+  color: #718096;
+  right: 2.5rem;
+}
+
+::ng-deep .p-dropdown-clear-icon:hover {
+  color: #e53e3e;
+}
+
+::ng-deep .p-dropdown-trigger {
+  color: #718096;
+  width: 2.5rem;
+}
+
+::ng-deep .p-dropdown-empty-message {
+  padding: 0.75rem 1rem;
+  color: #718096;
+  background: white !important;
+}
+
+::ng-deep .filter-calendar .p-calendar {
+  width: 100%;
+}
+
+::ng-deep .filter-calendar .p-inputtext {
+  width: 100%;
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  min-height: 42px;
+  padding: 0.625rem 0.75rem;
+  color: #2d3748;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .filter-calendar .p-inputtext:hover {
+  border-color: #667eea;
+}
+
+::ng-deep .filter-calendar .p-inputtext:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+::ng-deep .filter-calendar .p-inputtext::placeholder {
+  color: #a0aec0;
+}
+
+::ng-deep .p-datepicker {
+  background: white !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .p-datepicker table td {
+  background: white !important;
+}
+
+::ng-deep .p-datepicker table td>span {
+  background: transparent !important;
+  color: #2d3748 !important;
+}
+
+::ng-deep .p-datepicker table td>span:hover {
+  background: #f7fafc !important;
+  color: #667eea !important;
+}
+
+::ng-deep .p-datepicker table td.p-datepicker-today>span {
+  background: #edf2f7 !important;
+  color: #667eea !important;
+}
+
+::ng-deep .p-datepicker table td>span.p-highlight {
+  background: #667eea !important;
+  color: white !important;
+}
+
+::ng-deep .filter-calendar .p-datepicker-trigger {
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-left: none;
+  color: #718096;
+  border-radius: 0 6px 6px 0;
+}
+
+::ng-deep .filter-calendar .p-datepicker-trigger:hover {
+  background: #f7fafc;
+  border-color: #667eea;
+  color: #667eea;
+}
+
+::ng-deep .parcel-detail-dialog .p-dialog-content {
+  background: white !important;
+}
+
+/* ================= DIALOG STYLING ================= */
+.dialog-header {
+  width: 100%;
+}
+
+.dialog-header-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dialog-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.dialog-title-section h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.receipt-footer {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.receipt-download-btn {
+  min-width: 100px;
+}
+
 /* ================= RESPONSIVE DESIGN ================= */
-@media (max-width: 768px) {
+@media screen and (max-width: 1200px) {
+  .filters-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .filters-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .date-filter-item {
+    grid-column: span 2;
+  }
+}
+
+@media screen and (max-width: 768px) {
   .parcels-container {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .parcels-header {
@@ -378,17 +858,13 @@
     grid-template-columns: 1fr;
   }
 
+  .date-filter-item {
+    grid-column: span 1;
+  }
+
   .table-header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .table-header-left {
-    width: 100%;
-  }
-
-  .search-container {
-    width: 100%;
   }
 
   .search-input {
@@ -400,19 +876,19 @@
     gap: 1.5rem;
   }
 
-  .filter-actions {
-    width: 100%;
+  .filter-actions-row {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .filter-actions button {
+  .filter-buttons-group,
+  .export-buttons-group {
     width: 100%;
   }
-}
 
-@media (max-width: 480px) {
-  .amount {
-    font-size: 0.9rem;
+  .filter-action-btn,
+  .export-action-btn {
+    flex: 1;
   }
 
   .stats-grid {
@@ -420,138 +896,48 @@
   }
 }
 
-/* ================= MATERIAL FORM FIELD OVERRIDES ================= */
-::ng-deep .mat-mdc-form-field {
-  width: 100%;
-}
+@media screen and (max-width: 576px) {
 
-::ng-deep .mat-mdc-text-field-wrapper {
-  background-color: white;
-}
-
-::ng-deep .mat-date-range-input-container {
-  width: 100%;
-}
-
-/* ================= DIALOG STYLING ================= */
-::ng-deep .parcel-detail-dialog .p-dialog-header {
-  background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--secondary-color-dark) 100%);
-  color: white;
-  padding: 1.5rem;
-  border-radius: 6px 6px 0 0;
-}
-
-::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-title {
-  color: white;
-}
-
-::ng-deep .parcel-detail-dialog .p-dialog-header .p-dialog-header-icon {
-  color: white;
-}
-
-::ng-deep .parcel-detail-dialog .p-dialog-content {
-  padding: 2rem;
-}
-
-::ng-deep .parcel-detail-dialog .p-dialog-footer {
-  padding: 1rem 2rem;
-  border-top: 1px solid var(--border-color);
-}
-
-
-
-/* ====================== PrimeNG Overrides ====================== */
-
-/* Dropdown panel background (PrimeNG) */
-::ng-deep .p-dropdown-panel {
-  background-color: white !important;
-}
-
-/* Dropdown items background */
-::ng-deep .p-dropdown-item {
-  background-color: white !important;
-  color: black !important;
-}
-
-/* ====================== Angular Material Overrides ====================== */
-
-/* mat-select dropdown panel */
-::ng-deep .mat-select-panel {
-  background-color: white !important;
-  color: black !important;
-}
-
-/* mat-option items */
-::ng-deep .mat-option {
-  background-color: white !important;
-  color: black !important;
-}
-
-/* Optional: Hover effect */
-::ng-deep .mat-option:hover,
-::ng-deep .p-dropdown-item:hover {
-  background-color: #f0f0f0 !important;
-}
-
-/* ############################################################################ */
-
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 1.5rem;
-  padding: 0.75rem 0;
-}
-
-/* Left section */
-.table-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-/* Right filters */
-.table-header-filters {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-end;
-}
-
-/* Individual filter */
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  min-width: 180px;
-}
-
-.filter-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.form-input {
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  font-size: 0.85rem;
-}
-
-/* ================= MOBILE ================= */
-
-@media (max-width: 768px) {
-  .table-header {
+  .filter-buttons-group,
+  .export-buttons-group {
     flex-direction: column;
-    align-items: stretch;
   }
 
-  .table-header-filters {
-    flex-direction: column;
+  .filter-action-btn,
+  .export-action-btn {
     width: 100%;
   }
 
-  .filter-group {
-    width: 100%;
+  .filter-label {
+    font-size: 0.8rem;
+  }
+
+  ::ng-deep .filter-dropdown .p-dropdown,
+  ::ng-deep .filter-calendar .p-inputtext {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+
+  ::ng-deep .p-dropdown-item {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .amount {
+    font-size: 0.9rem;
+  }
+}
+
+/* ================= ACCESSIBILITY ================= */
+.filter-action-btn:focus-visible,
+.export-action-btn:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* ================= HIDE ON MOBILE ================= */
+@media screen and (max-width: 768px) {
+  .hide-mobile {
+    display: none;
   }
 }

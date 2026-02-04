@@ -269,10 +269,24 @@ export class CreditDriverComponent implements OnInit {
 
     const payload = {
       fleetNumber: formValue.fleetNumber,
-      driverId: formValue.driverId,
-      activityDate: activityDate,
+      activeDriver: formValue.driverId,
+      currentDate: activityDate,
       entityId: this.entityId,
     };
+
+    // api/payment/wallets/assign/driver
+    // activeDriver
+    // : 
+    // "254722157126"
+    // currentDate
+    // : 
+    // "2026-02-03"
+    // entityId
+    // : 
+    // "GS000002"
+    // fleetNumber
+    // : 
+    // "SM368"
 
     // TODO: Replace with actual API endpoint for credit driver
     console.log('Submitting credit driver data:', payload);

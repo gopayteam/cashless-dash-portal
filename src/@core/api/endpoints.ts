@@ -64,4 +64,9 @@ export const API_ENDPOINTS = {
   CREATE_PARCEL_MANAGER: '/api/v1/auth/register',
   UPDATE_PARCEL_MANAGER: '/api/v1/org/users/update',
 
+
+  CREDIT_DRIVER: '/api/payment/wallets/assign/driver',
+
+  ENTITY_STAGES: '/api/route/view/entity-stages',
+  FIND_PARCEL_BY_NUMBER: '/api/parcels/find/parcel-number'
 };
