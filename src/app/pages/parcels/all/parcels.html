@@ -13,56 +13,10 @@
     </div>
   </div>
 
-  <!-- ================= STATS CARDS ================= -->
-  <div class="stats-grid grid-3">
-    <p-card *ngFor="let card of statsCards" styleClass="card-hover">
-      <div class="stat-content">
-        <div class="stat-info">
-          <span class="stat-title">{{ card.title }}</span>
-          <h2 class="stat-value">
-            <ng-container *ngIf="card.amount !== undefined; else countValue">
-              <span class="currency">{{ card.currency }}</span>
-              <span class="amount">{{ card.amount | number : '1.0-2' }}</span>
-            </ng-container>
-
-            <ng-template #countValue>
-              <span class="amount">{{ card.count | number }}</span>
-            </ng-template>
-          </h2>
-
-          <span class="stat-change positive" *ngIf="card.change">
-            <i class="pi pi-arrow-up"></i> {{ card.change }}
-          </span>
-        </div>
-
-        <div class="stat-icon" [style.background-color]="card.color + '20'">
-          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
-        </div>
-      </div>
-    </p-card>
-  </div>
 
   <!-- ================= FILTER SECTION ================= -->
   <p-card styleClass="stat-card card filter-card">
     <div class="filters-grid grid-3">
-      <div class="filter-group">
-        <label class="filter-label">Parcel Number</label>
-        <input pInputText placeholder="Search by parcel number..." [(ngModel)]="filters.parcelNumber"
-          (input)="applyFilters()" class="form-input" />
-      </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Source</label>
-        <input pInputText placeholder="Source location..." [(ngModel)]="filters.sourceName" (input)="applyFilters()"
-          class="form-input" />
-      </div>
-
-      <div class="filter-group">
-        <label class="filter-label">Destination</label>
-        <input pInputText placeholder="Destination location..." [(ngModel)]="filters.destinationName"
-          (input)="applyFilters()" class="form-input" />
-      </div>
-
       <div class="filter-item filter-item-filled">
         <label class="filter-label">Payment Method</label>
         <mat-form-field appearance="outline" class="filter-field">
@@ -113,6 +67,34 @@
     </div>
   </p-card>
 
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid grid-4">
+    <p-card *ngFor="let card of statsCards" styleClass="card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <ng-container *ngIf="card.amount !== undefined; else countValue">
+              <span class="currency">{{ card.currency }}</span>
+              <span class="amount">{{ card.amount | number : '1.0-2' }}</span>
+            </ng-container>
+
+            <ng-template #countValue>
+              <span class="amount">{{ card.count | number }}</span>
+            </ng-template>
+          </h2>
+
+          <span class="stat-change positive" *ngIf="card.change">
+            <i class="pi pi-arrow-up"></i> {{ card.change }}
+          </span>
+        </div>
+
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
 
   <!-- ================= PARCELS TABLE ================= -->
   <p-card styleClass="stat-card card">
@@ -121,16 +103,28 @@
         <h3>Parcels List</h3>
         <span class="record-count">{{ filteredTotalRecords }} of {{ totalRecords }} parcels</span>
       </div>
-      <div class="search-container">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input pInputText type="text" placeholder="Search parcels..." [(ngModel)]="searchTerm"
-            (input)="onSearchChange()" class="search-input" />
-        </span>
-        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()" pTooltip="Clear search"></button>
+
+      <div class="table-header-filters">
+        <div class="filter-group">
+          <label class="filter-label">Parcel Number</label>
+          <input pInputText placeholder="e.g. SMP0000000xxxx" [(ngModel)]="filters.parcelNumber"
+            (input)="applyFilters()" class="form-input" />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Source</label>
+          <input pInputText placeholder="From..." [(ngModel)]="filters.sourceName" (input)="applyFilters()"
+            class="form-input" />
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Destination</label>
+          <input pInputText placeholder="To..." [(ngModel)]="filters.destinationName" (input)="applyFilters()"
+            class="form-input" />
+        </div>
       </div>
     </div>
+
 
     <p-table [value]="filteredParcels" [paginator]="true" [rows]="rows" [loading]="loading()"
       [totalRecords]="filteredTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
