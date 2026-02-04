@@ -60,7 +60,7 @@ import { NotificationsComponent } from './pages/profile/notifications/notificati
 import { SettingsComponent } from './pages/profile/settings/settings';
 import { roleGuard } from '../@core/services/role.guard';
 import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
-import { AddVehicleComponent } from './pages/forms/add-vehicle/add-vehicle';
+import { AddVehicleComponent } from './pages/forms/vehicle/add-vehicle/add-vehicle';
 import { RegisterParcelManagerComponent } from './pages/forms/parcel_manager/register-parcel-manager/register-parcel-manager';
 import { UpdateParcelManagerComponent } from './pages/forms/parcel_manager/update-parcel-manager/update-parcel-manager';
 import { ParcelManagerUsersComponent } from './pages/users/parcel-managers/parcel-managers';

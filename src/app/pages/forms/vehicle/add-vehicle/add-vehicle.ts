@@ -9,14 +9,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TooltipModule } from 'primeng/tooltip';
-import { DataService } from '../../../../@core/api/data.service';
-import { LoadingStore } from '../../../../@core/state/loading.store';
-import { AuthService } from '../../../../@core/services/auth.service';
-import { UserApiResponse } from '../../../../@core/models/user/user_api_Response.mode';
-import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { User } from '../../../../@core/models/user/user.model';
-import { StagesResponse } from '../../../../@core/models/locations/state_response.model';
-import { Stage } from '../../../../@core/models/locations/stage.model';
+import { DataService } from '../../../../../@core/api/data.service';
+import { LoadingStore } from '../../../../../@core/state/loading.store';
+import { AuthService } from '../../../../../@core/services/auth.service';
+import { UserApiResponse } from '../../../../../@core/models/user/user_api_Response.mode';
+import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
+import { User } from '../../../../../@core/models/user/user.model';
+import { StagesResponse } from '../../../../../@core/models/locations/state_response.model';
+import { Stage } from '../../../../../@core/models/locations/stage.model';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
@@ -61,7 +61,7 @@ interface VehiclePayload {
     ToastModule,
   ],
   templateUrl: './add-vehicle.html',
-  styleUrls: ['./add-vehicle.css', '../../../../styles/global/_toast.css'],
+  styleUrls: ['./add-vehicle.css', '../../../../../styles/global/_toast.css'],
 })
 export class AddVehicleComponent implements OnInit {
   entityId: string | null = null;

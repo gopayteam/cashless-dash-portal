@@ -415,12 +415,22 @@ export class UpdateDashmasterComponent implements OnInit {
           this.submitting = false;
           this.loadingStore.stop();
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: response.message || 'User updated successfully',
-            life: 4000
-          });
+          if (response.status == 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'Dashmaster updated successfully',
+              life: 4000
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message,
+              life: 5000
+            });
+
+          }
 
           // Navigate back to users list
           setTimeout(() => {

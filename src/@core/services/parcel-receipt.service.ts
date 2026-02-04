@@ -10,7 +10,7 @@ export class ParcelReceiptService {
   /**
    * Generates and downloads a PDF receipt for a parcel
    */
-  async generateReceipt1(parcel: Parcel): Promise<void> {
+  async generateReceipt(parcel: Parcel): Promise<void> {
     try {
       // Dynamically import jsPDF and html2canvas
       const { default: jsPDF } = await import('jspdf');
@@ -73,7 +73,7 @@ export class ParcelReceiptService {
     }
   }
 
-  async generateReceipt(parcel: Parcel): Promise<string> {
+  async generateColorReceipt(parcel: Parcel): Promise<string> {
     try {
       const { default: jsPDF } = await import('jspdf');
       const html2canvas = (await import('html2canvas')).default;

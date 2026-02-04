@@ -76,11 +76,9 @@ export class RegisterUserComponent implements OnInit {
 
   // Dropdown options
   profileOptions: DropdownOption[] = [
-    { label: 'Super Admin', value: 'SUPER_ADMIN' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
-    { label: 'Manager', value: 'MANAGER' },
     { label: 'Admin', value: 'ADMIN' },
-    { label: 'User', value: 'USER' },
+    { label: 'Passenger', value: 'USER' },
     { label: 'Parcel', value: 'PARCEL' },
     { label: 'Marshal', value: 'MARSHAL' },
     { label: 'Driver', value: 'DRIVER' },
@@ -225,19 +223,29 @@ export class RegisterUserComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-admin-user')
+      .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-any-user')
       .subscribe({
         next: (response) => {
-          console.log('Admin created successfully', response);
+          console.log('User created successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: response.message || 'Admin created successfully',
-            life: 4000
-          });
+          if (response.status == 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'User created successfully',
+              life: 4000
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message,
+              life: 5000
+            });
+
+          }
 
           // Reset form
           this.resetForm();

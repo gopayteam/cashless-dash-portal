@@ -471,7 +471,7 @@ export class ParcelsComponent implements OnInit {
       this.messageService.add({
         severity: 'success',
         summary: 'Success',
-        detail: 'Receipt downloaded successfully',
+        detail: 'Simple Receipt downloaded successfully',
         life: 4000
       });
     } catch (error) {
@@ -487,10 +487,10 @@ export class ParcelsComponent implements OnInit {
     }
   }
 
-  async downloadReceipt2(parcel: Parcel): Promise<void> {
+  async downloadColorReceipt(parcel: Parcel): Promise<void> {
     try {
       this.isColorReceiptDownloading = true;
-      await this.receiptService.generateReceipt(parcel);
+      await this.receiptService.generateColorReceipt(parcel);
       this.messageService.add({
         severity: 'success',
         summary: 'Success',

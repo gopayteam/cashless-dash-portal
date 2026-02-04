@@ -45,7 +45,7 @@ export class ParcelReceiptGenerationService {
       const imgData = canvas.toDataURL('image/png');
       pdf.addImage(imgData, 'PNG', 0, 5, receiptWidth, imgHeight);
 
-      pdf.save(`Parcel_Receipt_Thermal${parcel.parcelNumber}.pdf`);
+      pdf.save(`Parcel_Receipt_Thermal_${parcel.parcelNumber}.pdf`);
       return 'done';
     } catch (error) {
       console.error('Error generating thermal receipt:', error);

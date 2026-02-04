@@ -408,16 +408,26 @@ export class UpdatePassengerComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.UPDATE_USER, payload, 'update-passenger-user')
       .subscribe({
         next: (response) => {
-          console.log('User updated successfully', response);
+          console.log('Passenger updated successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: response.message || 'User updated successfully',
-            life: 4000
-          });
+          if (response.status == 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'Passenger updated successfully',
+              life: 4000
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message,
+              life: 5000
+            });
+
+          }
 
           // Navigate back to users list
           setTimeout(() => {

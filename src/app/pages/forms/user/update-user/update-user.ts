@@ -84,24 +84,29 @@ export class UpdateUserComponent implements OnInit {
 
   // Dropdown options
   profileOptions: DropdownOption[] = [
-    { label: 'Super Admin', value: 'SUPER_ADMIN' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
     { label: 'Admin', value: 'ADMIN' },
-    { label: 'User', value: 'USER' },
-    { label: 'Manager', value: 'MANAGER' },
+    { label: 'Passenger', value: 'USER' },
     { label: 'Parcel', value: 'PARCEL' },
-    { label: 'Driver', value: 'DRIVER' },
-    { label: 'Conductor', value: 'CONDUCTOR' },
-  ];
-
-  agentOptions: DropdownOption[] = [
-    { label: 'Admin', value: 'ADMIN' },
-    { label: 'Parcel', value: 'PARCEL' },
-    { label: 'Passenger', value: 'PASSENGER' },
     { label: 'Marshal', value: 'MARSHAL' },
     { label: 'Driver', value: 'DRIVER' },
     { label: 'Conductor', value: 'CONDUCTOR' },
     { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
+  ];
+
+  agentOptions: DropdownOption[] = [
+    { label: 'Dashmaster', value: 'DASHMASTER' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Passenger', value: 'PASSENGER' },
+    { label: 'Parcel', value: 'PARCEL' },
+    { label: 'Marshal', value: 'MARSHAL' },
+    { label: 'Driver', value: 'DRIVER' },
+    { label: 'Conductor', value: 'CONDUCTOR' },
+    { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
   ];
 
   channelOptions: DropdownOption[] = [
@@ -442,12 +447,22 @@ export class UpdateUserComponent implements OnInit {
           this.submitting = false;
           this.loadingStore.stop();
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: response.message || 'User updated successfully',
-            life: 4000
-          });
+          if (response.status == 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'User updated successfully',
+              life: 4000
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message,
+              life: 5000
+            });
+
+          }
 
           // Navigate back to users list after a short delay
           setTimeout(() => {

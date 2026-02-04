@@ -194,15 +194,27 @@ export class RegisterParcelManagerComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-parcel-user')
       .subscribe({
         next: (response) => {
-          console.log('Parcel user created successfully', response);
+          console.log('Parcel manager created successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'created  successfully',
-            detail: 'Parcel user created successfully',
-            life: 4000
-          });
+
+          if (response.status == 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'Parcel manager created successfully',
+              life: 4000
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message,
+              life: 5000
+            });
+
+          }
+
           // Navigate to parcel users list page
           this.router.navigate(['users/parcel-managers']);
         },

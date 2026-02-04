@@ -24,6 +24,11 @@ interface ProfileOption {
   value: string;
 }
 
+interface AgentOption {
+  label: string;
+  value: string;
+}
+
 interface ChannelOption {
   label: string;
   value: string;
@@ -86,6 +91,15 @@ export class GeneralUserComponent implements OnInit {
 
   // Filter options
   profileOptions: ProfileOption[] = [
+    { label: 'All Profiles', value: '' },
+    { label: 'Super Admin', value: 'SUPER_ADMIN' },
+    { label: 'Dashmaster', value: 'DASHMASTER' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'User', value: 'USER' },
+    { label: 'Manager', value: 'MANAGER' },
+  ];
+
+  agentOptions: AgentOption[] = [
     { label: 'All Profiles', value: '' },
     { label: 'Super Admin', value: 'SUPER_ADMIN' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
