@@ -133,6 +133,11 @@ export class MarshalsComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
+    this.fetchUsers(false, $event)
+  }
+
+
+  fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -156,7 +161,7 @@ export class MarshalsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'marshall-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'marshall-users', bypassCache)
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
@@ -334,6 +339,6 @@ export class MarshalsComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loadUsers({ first: this.first, rows: this.rows });
+    this.fetchUsers(true);
   }
 }

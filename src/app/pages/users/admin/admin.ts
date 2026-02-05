@@ -130,10 +130,15 @@ export class AdminUserComponent implements OnInit {
       console.log('No user logged in');
     }
 
-    this.loadUsers();
+    this.loadUsers()
   }
 
   loadUsers($event?: any): void {
+    this.fetchUsers(false, $event)
+  }
+
+
+  fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -157,7 +162,7 @@ export class AdminUserComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'admin-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'admin-users', bypassCache)
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
@@ -335,6 +340,6 @@ export class AdminUserComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loadUsers({ first: this.first, rows: this.rows });
+    this.fetchUsers(true);
   }
 }

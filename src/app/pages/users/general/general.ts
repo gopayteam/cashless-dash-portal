@@ -147,6 +147,10 @@ export class GeneralUserComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
+    this.fetchUsers(false, $event)
+  }
+
+  fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -169,7 +173,7 @@ export class GeneralUserComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'general-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'general-users', bypassCache)
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
@@ -347,6 +351,6 @@ export class GeneralUserComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loadUsers({ first: this.first, rows: this.rows });
+    this.fetchUsers(true);
   }
 }

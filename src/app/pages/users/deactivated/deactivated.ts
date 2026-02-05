@@ -133,6 +133,10 @@ export class DeactivatedUsersComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
+    this.fetchUsers(false, $event)
+  }
+
+  fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -155,7 +159,7 @@ export class DeactivatedUsersComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_DEACTIVATED_USERS, payload, 'deactivated-users')
+      .post<UserApiResponse>(API_ENDPOINTS.ALL_DEACTIVATED_USERS, payload, 'deactivated-users', bypassCache)
       .subscribe({
         next: (response) => {
           this.allUsers = response.data;
@@ -304,5 +308,9 @@ export class DeactivatedUsersComponent implements OnInit {
 
   getStatusText(blocked: boolean): string {
     return blocked ? 'Blocked' : 'Active';
+  }
+
+  refresh() {
+    this.fetchUsers(true)
   }
 }

@@ -20,6 +20,7 @@ import { PaymentRecord } from '../../../../@core/models/transactions/transaction
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   selector: 'app-credit-transactions',
@@ -38,6 +39,7 @@ import { Router } from '@angular/router';
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
   templateUrl: './credit-transactions.html',
   styleUrls: [
@@ -69,14 +71,14 @@ export class CreditTransactionsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
   }
 
   ngOnInit(): void {
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);
@@ -96,8 +98,12 @@ export class CreditTransactionsComponent implements OnInit {
     this.dateRange = [lastWeek, today];
   }
 
-
   loadTransactions($event?: any): void {
+    this.fetchTransactions(false, $event);
+  }
+
+
+  fetchTransactions(bypassCache: boolean, $event?: any): void {
     const [start, end] = this.dateRange;
     const event = $event;
 
@@ -131,7 +137,7 @@ export class CreditTransactionsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
+      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', bypassCache)
       .subscribe({
         next: (response) => {
           this.allTransactions = response.data.manifest;
@@ -195,5 +201,9 @@ export class CreditTransactionsComponent implements OnInit {
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
     this.selectedTransaction = null;
+  }
+
+  refresh(): void {
+    this.fetchTransactions(true); // real HTTP
   }
 }

@@ -16,6 +16,10 @@ import { PendingDriverAssignment } from '../../../../@core/models/driver_assignm
 import { DriverAssignmentApiResponse, PendingDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { MessageService } from 'primeng/api';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 
 interface ApprovalStatusOption {
@@ -42,9 +46,12 @@ interface ApprovalFilterOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    MessageModule,
+    ToastModule,
+    ActionButtonComponent
   ],
   templateUrl: './pending.html',
-  styleUrls: ['./pending.css'],
+  styleUrls: ['./pending.css', '../../../../styles/global/_toast.css'],
 })
 export class AllPendingDriverAssignmentsComponent implements OnInit {
   entityId: string | null = null;
@@ -89,9 +96,10 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -137,7 +145,8 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
       .post<PendingDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_PENDING_REQUESTS,
         payload,
-        'driver-assignments'
+        'driver-assignments',
+        true
       )
       .subscribe({
         next: (response) => {
@@ -244,22 +253,77 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
   getApprovalStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
       'PENDING': 'warning',
-      'APPROVED': 'active',
-      'REJECTED': 'inactive',
+      'ACTIVE': 'active',
+      'INACTIVE': 'inactive',
+      'REJECTED': 'rejected',
     };
     return statusMap[status] || 'default';
   }
 
   getApprovalStatusIcon(status: string): string {
     const iconMap: { [key: string]: string } = {
-      'PENDING': 'pi-clock',
-      'APPROVED': 'pi-check-circle',
-      'REJECTED': 'pi-times-circle',
+      'PENDING': 'pi pi-clock',
+      'ACTIVE': 'pi pi-check-circle',
+      'INACTIVE': 'pi pi-times-circle',
+      'REJECTED': 'pi pi-ban',
     };
-    return iconMap[status] || 'pi-circle';
+    return iconMap[status] || 'pi pi-circle';
   }
+
 
   getFullName(assignment: PendingDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
+
+  submitApproval(action: ApprovalAction): void {
+    if (!this.selectedAssignment) return;
+
+    const assignment = this.selectedAssignment;
+    const payload = {
+      entityId: assignment.entityId,
+      id: assignment.id,
+      status: action
+    };
+
+    this.dataService
+      .post<ApprovalResponse>(API_ENDPOINTS.ACTIVATE_DRIVER_ASSIGNMENT, payload)
+      .subscribe({
+        next: (response) => {
+          if (response.status === 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || `Request ${action.toLowerCase()} successfully.`
+            });
+
+            // Update UI immediately
+            assignment.approvalStatus = action as any;
+            (assignment as any).approvalStatus = action === 'APPROVED';
+
+            this.closeDetailDialog();
+            this.loadAssignments(); // reload table
+
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: response.message || 'Request failed.'
+            });
+          }
+        },
+        error: (error) => {
+          console.error('HTTP Error:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'System Error',
+            detail: 'Server is unreachable. Try again later.'
+          });
+        }
+      });
+  }
+
+  refresh(): void {
+    this.loadAssignments();
+  }
+
 }

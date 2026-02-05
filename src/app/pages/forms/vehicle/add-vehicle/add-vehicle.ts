@@ -26,23 +26,29 @@ interface DropdownOption {
   value: any;
 }
 
-interface VehiclePayload {
+interface VehicleFee {
+  id: string;
+  feeName: string;
+  dayType: string;
+  feeAmount: number;
+  username: string;
   entityId: string;
-  investorId: number;
+}
+
+interface VehiclePayload {
+  id: string;
+  entityId: string;
+  investorNumber: string;
+  marshalNumber: string;
   fleetNumber: string;
-  regNumber: string;
+  registrationNumber: string;
   capacity: number;
-  marshalId: number;
   storeNumber?: string;
   tillNumber?: string;
   stageId: number;
-  vehicleFees?: number;
-  systemFeeAmount: number;
-  managementFeeAmount: number;
-  saccoFeeAmount: number;
-  offloadWeekdayFeeAmount: number;
-  offloadSaturdayFeeAmount: number;
-  offloadSundayFeeAmount: number;
+  maintainFees: boolean;
+  vehicleFees: VehicleFee[];
+  username: string;
 }
 
 @Component({
@@ -65,23 +71,27 @@ interface VehiclePayload {
 })
 export class AddVehicleComponent implements OnInit {
   entityId: string | null = null;
+  username: string | null = null;
 
   // Form fields
-  selectedInvestor: number | null = null;
+  investorNumber: string = '';
+  marshalNumber: string = '';
   fleetNumber: string = '';
-  regNumber: string = '';
+  registrationNumber: string = '';
   capacity: number | null = null;
-  selectedMarshal: number | null = null;
   storeNumber: string = '';
   tillNumber: string = '';
   selectedStage: number | null = null;
-  vehicleFees: number | null = null;
+  maintainFees: boolean = false;
+
+  // Fee amounts
   systemFeeAmount: number | null = null;
   managementFeeAmount: number | null = null;
   saccoFeeAmount: number | null = null;
   offloadWeekdayFeeAmount: number | null = null;
   offloadSaturdayFeeAmount: number | null = null;
   offloadSundayFeeAmount: number | null = null;
+  driverFeeAmount: number | null = null;
 
   // Dropdown options
   investorOptions: DropdownOption[] = [];
@@ -110,6 +120,7 @@ export class AddVehicleComponent implements OnInit {
     const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId;
+      this.username = user.username || user.email;
     } else {
       this.router.navigate(['/login']);
       return;
@@ -137,7 +148,7 @@ export class AddVehicleComponent implements OnInit {
         next: (response) => {
           this.investorOptions = response.data.map((user: User) => ({
             label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.id,
+            value: user.phoneNumber,
           }));
           this.investorsLoading = false;
         },
@@ -165,7 +176,7 @@ export class AddVehicleComponent implements OnInit {
         next: (response) => {
           this.marshalOptions = response.data.map((user: User) => ({
             label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.id,
+            value: user.phoneNumber,
           }));
           this.marshalsLoading = false;
         },
@@ -203,12 +214,12 @@ export class AddVehicleComponent implements OnInit {
 
   isFormValid(): boolean {
     return !!(
-      this.selectedInvestor &&
+      this.investorNumber.trim() &&
+      this.marshalNumber.trim() &&
       this.fleetNumber.trim() &&
-      this.regNumber.trim() &&
+      this.registrationNumber.trim() &&
       this.capacity &&
       this.capacity > 0 &&
-      this.selectedMarshal &&
       this.selectedStage &&
       this.systemFeeAmount !== null &&
       this.systemFeeAmount >= 0 &&
@@ -221,30 +232,89 @@ export class AddVehicleComponent implements OnInit {
       this.offloadSaturdayFeeAmount !== null &&
       this.offloadSaturdayFeeAmount >= 0 &&
       this.offloadSundayFeeAmount !== null &&
-      this.offloadSundayFeeAmount >= 0
+      this.offloadSundayFeeAmount >= 0 &&
+      this.driverFeeAmount !== null &&
+      this.driverFeeAmount >= 0
     );
   }
 
   onSubmit(): void {
-    if (!this.isFormValid() || !this.entityId) {
+    if (!this.isFormValid() || !this.entityId || !this.username) {
       return;
     }
 
+    // Build vehicleFees array
+    const vehicleFees: VehicleFee[] = [
+      {
+        id: '',
+        feeName: 'SYSTEM',
+        dayType: 'ALL',
+        feeAmount: this.systemFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'MANAGEMENT',
+        dayType: 'ALL',
+        feeAmount: this.managementFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'SACCO',
+        dayType: 'ALL',
+        feeAmount: this.saccoFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'OFFLOAD',
+        dayType: 'WEEKDAY',
+        feeAmount: this.offloadWeekdayFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'OFFLOAD',
+        dayType: 'SATURDAY',
+        feeAmount: this.offloadSaturdayFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'OFFLOAD',
+        dayType: 'SUNDAY',
+        feeAmount: this.offloadSundayFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      },
+      {
+        id: '',
+        feeName: 'DRIVER',
+        dayType: 'ALL',
+        feeAmount: this.driverFeeAmount!,
+        username: this.username,
+        entityId: this.entityId
+      }
+    ];
+
     const payload: VehiclePayload = {
+      id: '',
       entityId: this.entityId,
-      investorId: this.selectedInvestor!,
+      investorNumber: this.investorNumber.trim(),
+      marshalNumber: this.marshalNumber.trim(),
       fleetNumber: this.fleetNumber.trim(),
-      regNumber: this.regNumber.trim(),
+      registrationNumber: this.registrationNumber.trim(),
       capacity: this.capacity!,
-      marshalId: this.selectedMarshal!,
       stageId: this.selectedStage!,
-      vehicleFees: this.vehicleFees || 0,
-      systemFeeAmount: this.systemFeeAmount!,
-      managementFeeAmount: this.managementFeeAmount!,
-      saccoFeeAmount: this.saccoFeeAmount!,
-      offloadWeekdayFeeAmount: this.offloadWeekdayFeeAmount!,
-      offloadSaturdayFeeAmount: this.offloadSaturdayFeeAmount!,
-      offloadSundayFeeAmount: this.offloadSundayFeeAmount!,
+      maintainFees: this.maintainFees,
+      vehicleFees: vehicleFees,
+      username: this.username
     };
 
     // Add optional fields only if they have values
@@ -298,20 +368,21 @@ export class AddVehicleComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.selectedInvestor = null;
+    this.investorNumber = '';
+    this.marshalNumber = '';
     this.fleetNumber = '';
-    this.regNumber = '';
+    this.registrationNumber = '';
     this.capacity = null;
-    this.selectedMarshal = null;
     this.storeNumber = '';
     this.tillNumber = '';
     this.selectedStage = null;
-    this.vehicleFees = null;
+    this.maintainFees = false;
     this.systemFeeAmount = null;
     this.managementFeeAmount = null;
     this.saccoFeeAmount = null;
     this.offloadWeekdayFeeAmount = null;
     this.offloadSaturdayFeeAmount = null;
     this.offloadSundayFeeAmount = null;
+    this.driverFeeAmount = null;
   }
 }

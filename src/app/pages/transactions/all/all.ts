@@ -20,6 +20,7 @@ import { PaymentRecord } from '../../../../@core/models/transactions/transaction
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   selector: 'app-all-transactions',
@@ -38,6 +39,7 @@ import { AuthService } from '../../../../@core/services/auth.service';
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
   templateUrl: './all.html',
   styleUrls: [
@@ -69,7 +71,7 @@ export class AllTransactionsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -96,8 +98,11 @@ export class AllTransactionsComponent implements OnInit {
     this.dateRange = [lastWeek, today];
   }
 
-
   loadTransactions($event?: any): void {
+    this.fetchTransactions(false, $event);
+  }
+
+  fetchTransactions(bypassCache: boolean, $event?: any): void {
     const [start, end] = this.dateRange;
     const event = $event;
 
@@ -132,7 +137,7 @@ export class AllTransactionsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
+      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', bypassCache)
       .subscribe({
         next: (response) => {
           this.allTransactions = response.data.manifest;
@@ -196,5 +201,9 @@ export class AllTransactionsComponent implements OnInit {
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
     this.selectedTransaction = null;
+  }
+
+  refresh(): void {
+    this.fetchTransactions(true);
   }
 }

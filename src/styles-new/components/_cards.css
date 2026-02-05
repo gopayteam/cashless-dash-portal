@@ -1,0 +1,186 @@
+/* ============================================================
+   REUSABLE CARD STYLES
+   ============================================================ */
+
+/* Base PrimeNG Card Styling - This applies to ALL p-card components */
+.p-card {
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  border: none;
+  background: var(--white);
+}
+
+/* ============================================================
+   CARD CONTAINER (NO HOVER, NO MOTION)
+   ============================================================ */
+.card-container {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid #e31e24;
+}
+
+/* ============================================================
+   INTERACTIVE CARD (OPT-IN)
+   ============================================================ */
+.card-interactive {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Generic card class for custom styling */
+.card {
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  border: none;
+  background: var(--white);
+}
+
+/* Card with hover effect */
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Apply to PrimeNG cards with card-hover class */
+.p-card.card-hover {
+  transition: all 0.2s ease;
+}
+
+.p-card.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   REUSABLE STAT CARDS
+   ============================================================ */
+
+/* Stat card styling - works with PrimeNG */
+.p-card.stat-card {
+  border: none;
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.p-card.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Stat card content */
+.stat-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-title {
+  font-size: 0.875rem;
+  color: var(--light-text);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin: 0 0 0.5rem;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.stat-change.positive {
+  color: var(--success-color);
+}
+
+.stat-change.negative {
+  color: #e31e24;
+}
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon i {
+  font-size: 2rem;
+}
+
+/* ============================================================
+   REUSABLE STAT CARDS
+   ============================================================ */
+.stat-card {
+  border: none;
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-title {
+  font-size: 0.875rem;
+  color: var(--light-text);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark-text);
+  margin: 0 0 0.5rem;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.stat-change.positive {
+  color: var(--success-color);
+}
+
+.stat-change.negative {
+  color: #e31e24;
+}
+
+.stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon i {
+  font-size: 2rem;
+}

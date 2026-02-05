@@ -16,6 +16,7 @@ import { ActiveDriverAssignment } from '../../../../@core/models/driver_assignme
 import { ActiveDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 
 interface ApprovalStatusOption {
@@ -42,6 +43,7 @@ interface ApprovalFilterOption {
     DialogModule,
     InputTextModule,
     SelectModule,
+    ActionButtonComponent
   ],
   templateUrl: './active.html',
   styleUrls: ['./active.css'],
@@ -91,7 +93,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -137,7 +139,8 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
       .post<ActiveDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_ACTIVE_DRIVERS,
         payload,
-        'driver-assignments'
+        'driver-assignments',
+        true
       )
       .subscribe({
         next: (response) => {
@@ -223,22 +226,29 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
   getApprovalStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
       'PENDING': 'warning',
-      'APPROVED': 'active',
-      'REJECTED': 'inactive',
+      'ACTIVE': 'active',
+      'INACTIVE': 'inactive',
+      'REJECTED': 'rejected',
     };
     return statusMap[status] || 'default';
   }
 
   getApprovalStatusIcon(status: string): string {
     const iconMap: { [key: string]: string } = {
-      'PENDING': 'pi-clock',
-      'APPROVED': 'pi-check-circle',
-      'REJECTED': 'pi-times-circle',
+      'PENDING': 'pi pi-clock',
+      'ACTIVE': 'pi pi-check-circle',
+      'INACTIVE': 'pi pi-times-circle',
+      'REJECTED': 'pi pi-ban',
     };
-    return iconMap[status] || 'pi-circle';
+    return iconMap[status] || 'pi pi-circle';
   }
+
 
   getFullName(assignment: ActiveDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
+  }
+
+  refresh(): void {
+    this.loadAssignments();
   }
 }

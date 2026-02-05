@@ -1,0 +1,428 @@
+/* ============================================================
+   ANGULAR MATERIAL CUSTOMIZATIONS (Consolidated)
+   ============================================================ */
+
+/* --- Date Picker (mat-datepicker) and Form Fields (mat-mdc-form-field) --- */
+
+/* Main Form Field - Works for all appearances */
+::ng-deep .date-range-field.mat-mdc-form-field,
+::ng-deep .filter-field.mat-mdc-form-field,
+::ng-deep .white-bg.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Outline Container */
+::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+::ng-deep .filter-field .mat-mdc-text-field-wrapper,
+::ng-deep .white-bg .mat-mdc-text-field-wrapper {
+  background: #ffffff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+::ng-deep .date-range-field .mdc-notched-outline,
+::ng-deep .filter-field .mdc-notched-outline,
+::ng-deep .white-bg .mdc-notched-outline {
+  border-color: #dee2e6;
+  border-width: 2px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Hover State - Primary Blue */
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .date-range-field:hover .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .filter-field:hover .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .white-bg:hover .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--primary-color);
+}
+
+/* Focus State - Secondary Red */
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .date-range-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .filter-field.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .white-bg.mat-focused .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-color: var(--secondary-color) !important;
+  border-width: 2px !important;
+}
+
+/* Default outline colors */
+::ng-deep .date-range-field .mdc-notched-outline__leading,
+::ng-deep .date-range-field .mdc-notched-outline__notch,
+::ng-deep .date-range-field .mdc-notched-outline__trailing,
+::ng-deep .filter-field .mdc-notched-outline__leading,
+::ng-deep .filter-field .mdc-notched-outline__notch,
+::ng-deep .filter-field .mdc-notched-outline__trailing,
+::ng-deep .white-bg .mdc-notched-outline__leading,
+::ng-deep .white-bg .mdc-notched-outline__notch,
+::ng-deep .white-bg .mdc-notched-outline__trailing {
+  border-color: #dee2e6;
+  transition: border-color 0.3s ease;
+}
+
+/* Input Container */
+::ng-deep .date-range-field .mat-mdc-form-field-infix,
+::ng-deep .filter-field .mat-mdc-form-field-infix,
+::ng-deep .white-bg .mat-mdc-form-field-infix {
+  padding: 0.875rem 0;
+  min-height: auto;
+}
+
+/* Input Fields */
+::ng-deep .date-range-field .mat-mdc-input-element,
+::ng-deep .filter-field .mat-mdc-input-element,
+::ng-deep .white-bg .mat-mdc-input-element {
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+}
+
+::ng-deep .date-range-field .mat-mdc-input-element::placeholder,
+::ng-deep .filter-field .mat-mdc-input-element::placeholder,
+::ng-deep .white-bg .mat-mdc-input-element::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+/* Date Range Separator (dash between dates) */
+::ng-deep .date-range-field .mat-date-range-input-separator,
+::ng-deep .filter-field .mat-date-range-input-separator,
+::ng-deep .white-bg .mat-date-range-input-separator {
+  color: #6c757d;
+  margin: 0 0.25rem;
+  font-weight: 500;
+}
+
+/* Datepicker Toggle Icon - Secondary Red */
+::ng-deep .date-range-field .mat-datepicker-toggle,
+::ng-deep .filter-field .mat-datepicker-toggle,
+::ng-deep .white-bg .mat-datepicker-toggle {
+  color: var(--secondary-color);
+  margin-right: 0.5rem;
+}
+
+::ng-deep .date-range-field .mat-datepicker-toggle-default-icon,
+::ng-deep .filter-field .mat-datepicker-toggle-default-icon,
+::ng-deep .white-bg .mat-datepicker-toggle-default-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+::ng-deep .date-range-field .mat-mdc-icon-button,
+::ng-deep .filter-field .mat-mdc-icon-button,
+::ng-deep .white-bg .mat-mdc-icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+}
+
+::ng-deep .date-range-field .mat-mdc-icon-button:hover,
+::ng-deep .filter-field .mat-mdc-icon-button:hover,
+::ng-deep .white-bg .mat-mdc-icon-button:hover {
+  background: rgba(200, 35, 51, 0.08);
+  border-radius: 8px;
+}
+
+/* Material Label (for fill appearance) */
+::ng-deep .white-bg .mdc-floating-label {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+::ng-deep .white-bg.mat-focused .mdc-floating-label {
+  color: var(--secondary-color);
+}
+
+/* Hide label for outline appearance (since we use external label) */
+::ng-deep .date-range-field .mdc-floating-label,
+::ng-deep .filter-field .mdc-floating-label {
+  display: none;
+}
+
+/* Subscript wrapper (error messages) */
+::ng-deep .date-range-field .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .filter-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+/* COMPACT VARIANT */
+::ng-deep .date-picker-compact.date-range-field,
+::ng-deep .date-picker-compact.filter-field {
+  max-width: 320px;
+}
+
+::ng-deep .date-picker-compact .mat-mdc-input-element {
+  font-size: 0.85rem;
+  padding: 0.375rem 0.5rem;
+}
+
+::ng-deep .date-picker-compact .mat-mdc-form-field-infix {
+  padding: 0.75rem 0;
+}
+
+/* FILLED VARIANT (Alternative Style) */
+.filter-item-filled ::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field .mat-mdc-text-field-wrapper {
+  background: #f8f9fa;
+  border: 2px solid transparent;
+  border-radius: 10px;
+}
+
+.filter-item-filled ::ng-deep .date-range-field .mdc-notched-outline,
+.filter-item-filled ::ng-deep .filter-field .mdc-notched-outline {
+  display: none;
+}
+
+.filter-item-filled ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field:hover .mat-mdc-text-field-wrapper {
+  background: #e9ecef;
+  border-color: var(--primary-color);
+}
+
+.filter-item-filled ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper,
+.filter-item-filled ::ng-deep .filter-field.mat-focused .mat-mdc-text-field-wrapper {
+  background: #ffffff;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(200, 35, 51, 0.1);
+}
+
+/* MODERN GRADIENT VARIANT */
+.filter-item-gradient ::ng-deep .date-range-field .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field .mat-mdc-text-field-wrapper {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-item-gradient ::ng-deep .date-range-field .mdc-notched-outline,
+.filter-item-gradient ::ng-deep .filter-field .mdc-notched-outline {
+  display: none;
+}
+
+.filter-item-gradient ::ng-deep .date-range-field:hover .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field:hover .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color);
+  box-shadow: 0 4px 12px rgba(200, 35, 51, 0.1);
+  transform: translateY(-1px);
+}
+
+.filter-item-gradient ::ng-deep .date-range-field.mat-focused .mat-mdc-text-field-wrapper,
+.filter-item-gradient ::ng-deep .filter-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color);
+  box-shadow: 0 6px 16px rgba(200, 35, 51, 0.15);
+  transform: translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .filter-item,
+  .filter-group {
+    min-width: 100%;
+  }
+
+  ::ng-deep .date-range-field.mat-mdc-form-field,
+  ::ng-deep .filter-field.mat-mdc-form-field,
+  ::ng-deep .white-bg.mat-mdc-form-field {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* CALENDAR POPUP STYLES */
+
+/* Calendar Container */
+::ng-deep .mat-datepicker-content {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+}
+
+::ng-deep .mat-calendar {
+  font-family: inherit;
+  background: #ffffff;
+}
+
+/* Calendar Header - Primary Blue Gradient */
+::ng-deep .mat-calendar-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 16px 16px 0 0;
+}
+
+::ng-deep .mat-calendar-controls {
+  margin: 0;
+}
+
+::ng-deep .mat-calendar-period-button {
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+::ng-deep .mat-calendar-arrow {
+  fill: white;
+}
+
+::ng-deep .mat-calendar-previous-button,
+::ng-deep .mat-calendar-next-button {
+  color: white;
+}
+
+::ng-deep .mat-calendar-previous-button:hover,
+::ng-deep .mat-calendar-next-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Calendar Body */
+::ng-deep .mat-calendar-body {
+  padding: 0.5rem;
+}
+
+/* Day Names */
+::ng-deep .mat-calendar-table-header th {
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 0.5rem 0;
+}
+
+/* Date Cells */
+::ng-deep .mat-calendar-body-cell {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+::ng-deep .mat-calendar-body-cell-content {
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--primary-color);
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Hover State - Secondary Red */
+::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover .mat-calendar-body-cell-content {
+  background: rgba(200, 35, 51, 0.1);
+  border-color: rgba(200, 35, 51, 0.3);
+  transform: scale(1.05);
+}
+
+/* Selected Date - Secondary Red */
+::ng-deep .mat-calendar-body-selected {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
+  color: white;
+  font-weight: 600;
+}
+
+/* Date Range */
+::ng-deep .mat-calendar-body-range-start,
+::ng-deep .mat-calendar-body-range-end {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--secondary-color-dark) 100%);
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+::ng-deep .mat-calendar-body-in-range::before {
+  background: rgba(200, 35, 51, 0.15);
+  border-radius: 0;
+}
+
+/* Today's Date - Secondary Red */
+::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected) .mat-calendar-body-cell-content {
+  color: var(--secondary-color);
+  font-weight: 600;
+  border-color: var(--secondary-color);
+}
+
+/* Disabled Dates */
+::ng-deep .mat-calendar-body-disabled {
+  opacity: 0.3;
+}
+
+/* Animation */
+::ng-deep .mat-datepicker-content {
+  animation: slideUpFadeIn 0.3s ease-out;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* HEADER ACTIONS SPECIFIC STYLES */
+.header-actions {
+  min-width: 300px;
+}
+
+/* Ensure fill appearance also gets the theme colors */
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-text-field-wrapper {
+  background-color: #ffffff;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill:hover .mat-mdc-text-field-wrapper {
+  background-color: #f8f9fa;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill.mat-focused .mat-mdc-text-field-wrapper {
+  background-color: #ffffff;
+}
+
+::ng-deep .mat-mdc-form-field.mat-form-field-appearance-fill .mat-mdc-form-field-focus-overlay {
+  background-color: var(--secondary-color);
+  opacity: 0.08;
+}
+
+/* Angular Material overrides from global/_primeng_overrides.css */
+/* mat-select dropdown panel */
+::ng-deep .mat-select-panel {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* mat-option items */
+::ng-deep .mat-option {
+  background-color: white !important;
+  color: black !important;
+}
+
+/* Optional: Hover effect */
+::ng-deep .mat-option:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* Material Form Field overrides from modules/_drivers.css, _parcels.css, _transactions.css */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+::ng-deep .mat-date-range-input-container {
+  width: 100%;
+}

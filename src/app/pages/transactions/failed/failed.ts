@@ -20,6 +20,7 @@ import { PaymentRecord } from '../../../../@core/models/transactions/transaction
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   selector: 'app-failed',
@@ -38,6 +39,7 @@ import { Router } from '@angular/router';
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
   templateUrl: './failed.html',
   styleUrls: [
@@ -70,7 +72,7 @@ export class FailedTransactionsComponent implements OnInit {
     private router: Router,
     // private cdr: ChangeDetectorRef
     @Inject(ChangeDetectorRef) private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -97,8 +99,11 @@ export class FailedTransactionsComponent implements OnInit {
     this.dateRange = [lastWeek, today];
   }
 
-
   loadTransactions($event?: any): void {
+    this.fetchTransactions(false, $event);
+  }
+
+  fetchTransactions(bypassCache: boolean, $event?: any): void {
     const [start, end] = this.dateRange;
     const event = $event;
 
@@ -133,7 +138,7 @@ export class FailedTransactionsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
+      .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', bypassCache)
       .subscribe({
         next: (response) => {
           this.allTransactions = response.data.manifest;
@@ -197,5 +202,9 @@ export class FailedTransactionsComponent implements OnInit {
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
     this.selectedTransaction = null;
+  }
+
+  refresh(): void {
+    this.fetchTransactions(true);
   }
 }

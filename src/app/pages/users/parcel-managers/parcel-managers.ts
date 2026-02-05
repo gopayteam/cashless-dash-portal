@@ -133,6 +133,11 @@ export class ParcelManagerUsersComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
+    this.fetchUsers(false, $event)
+  }
+
+
+  fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -334,6 +339,6 @@ export class ParcelManagerUsersComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loadUsers({ first: this.first, rows: this.rows });
+    this.fetchUsers(true);
   }
 }

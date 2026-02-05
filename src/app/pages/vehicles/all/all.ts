@@ -228,6 +228,28 @@ export class AllVehiclesComponent implements OnInit {
     this.router.navigate(['/forms/add-vehicle']);
   }
 
+  navigateToUpdateVehicle(vehicle: Vehicle, event?: Event): void {
+    event?.stopPropagation();
+
+    if (!vehicle?.id) {
+      console.error('Vehicle ID missing', vehicle);
+      return;
+    }
+
+    // console.log('Navigating to update vehicle:', vehicle.id);
+    // console.log('Vehicle data being passed:', vehicle);
+
+    // Pass the complete user object through router state
+    // This ensures the data is immediately available in the update component
+    this.router.navigate(['/forms/update-vehicle', vehicle.id], {
+      state: {
+        vehicle: vehicle,
+        // Add timestamp to ensure fresh state
+        timestamp: Date.now()
+      }
+    });
+  }
+
   refreshVehicles(): void {
     this.loadVehicles();
   }

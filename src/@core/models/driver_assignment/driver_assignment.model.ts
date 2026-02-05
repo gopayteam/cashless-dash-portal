@@ -1,6 +1,9 @@
-export type DriverAssignment = PendingDriverAssignment | ActiveDriverAssignment | InactiveDriverAssignment | DormantDriverAssignment | GeneralDriverAssignment;
-
-
+export type DriverAssignment =
+  | PendingDriverAssignment
+  | RejectedDriverAssignment
+  | ActiveDriverAssignment
+  | InactiveDriverAssignment
+  | DormantDriverAssignment;
 
 export interface BaseDriverAssignment {
   id: number;
@@ -23,36 +26,40 @@ export interface BaseDriverAssignment {
   stageId?: number | null;
 }
 
-// Fetch all driver assignments that are pending approval
+/* ---------------- PENDING ---------------- */
+
 export interface PendingDriverAssignment extends BaseDriverAssignment {
-  approved: boolean;
+  approved: false;
   approvalCount: number;
-  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+  approvalStatus: "PENDING";
 }
 
-// Fetch all driver assignments that are active
+/* ---------------- REJECTED ---------------- */
+
+export interface RejectedDriverAssignment extends BaseDriverAssignment {
+  approved: true;
+  approvalCount: number;
+  approvalStatus: "REJECTED";
+}
+
+/* ---------------- ACTIVE ---------------- */
+
 export interface ActiveDriverAssignment extends BaseDriverAssignment {
   status: "ACTIVE";
-  approved: boolean;
   startDate: string;
   endDate: string;
 }
 
-// Fetch all driver assignments that are inactive
+/* ---------------- INACTIVE ---------------- */
+
 export interface InactiveDriverAssignment extends BaseDriverAssignment {
   status: "INACTIVE";
-  approved: boolean;
+  startDate: string;
   endDate: string;
 }
 
-// Fetch all driver assignments that are rejected
-export interface RejectedDriverAssignment extends BaseDriverAssignment {
-  status: "REJECTED";
-  approved: boolean;
-  endDate: string;
-}
+/* ---------------- DORMANT (future-proof) ---------------- */
 
-// Fetch all driver assignments that are neither active nor inactive
 export interface DormantDriverAssignment extends BaseDriverAssignment {
   status: "DORMANT";
   endDate?: string;
@@ -60,7 +67,7 @@ export interface DormantDriverAssignment extends BaseDriverAssignment {
 
 // Fetch all driver assignments
 export interface GeneralDriverAssignment extends BaseDriverAssignment {
-  status: "ACTIVE" | "INACTIVE" | "PENDING";
+  status: "ACTIVE" | "INACTIVE" | "PENDING" | "REJECTED";
   startDate?: string;
   endDate?: string;
 }

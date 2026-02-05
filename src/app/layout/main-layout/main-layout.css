@@ -277,7 +277,8 @@
 }
 
 /* Dialog Header Styling */
-::ng-deep .p-dialog .p-dialog-header {
+::ng-deep .p-dialog.notification-dialog .p-dialog-header,
+::ng-deep .p-dialog.settings-dialog .p-dialog-header {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color-dark));
   color: white;
   border-radius: 12px 12px 0 0;

@@ -87,6 +87,7 @@ import { UpdateApproverComponent } from './pages/forms/approver/update-approver/
 import { RegisterApproverComponent } from './pages/forms/approver/register-approver/register-approver';
 import { RegisterInspectorComponent } from './pages/forms/inspector/register-inspector/register-inspector';
 import { UpdateInspectorComponent } from './pages/forms/inspector/update-inspector/update-inspector';
+import { UpdateVehicleComponent } from './pages/forms/vehicle/update-vehicle/update-vehicle';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -607,6 +608,13 @@ export const routes: Routes = [
       {
         path: 'forms/add-vehicle',
         component: AddVehicleComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD_VEHICLE', 'CAN_EDIT_VEHICLE'] }
+      },
+
+      {
+        path: 'forms/update-vehicle/:id',
+        component: UpdateVehicleComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD_VEHICLE', 'CAN_EDIT_VEHICLE'] }
       },

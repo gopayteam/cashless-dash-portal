@@ -6,6 +6,18 @@
       <h1>Deleted Parcels</h1>
       <p class="text-muted">View and manage deleted parcel records</p>
     </div>
+
+    <div class="filter-item-gradient filter-item-filled">
+      <label class="filter-label">Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
   </div>
 
   <!-- ================= STATS CARDS ================= -->
@@ -72,18 +84,6 @@
       <div class="filter-group">
         <label class="filter-label">Receiver Name</label>
         <input pInputText placeholder="Receiver name..." [(ngModel)]="filters.receiverName" class="form-input" />
-      </div>
-
-      <div class="filter-item filter-item-filled">
-        <label class="filter-label">Date Range</label>
-        <mat-form-field appearance="outline" class="date-range-field">
-          <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate placeholder="Start date" [(ngModel)]="filters.dateRange[0]" />
-            <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker #picker (closed)="applyFilters()"></mat-date-range-picker>
-        </mat-form-field>
       </div>
 
       <div class="filter-actions">
@@ -434,7 +434,8 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;"  class="p-button-text" (click)="closeDetailDialog()"></button>
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
+        (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
 </div>

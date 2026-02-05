@@ -60,14 +60,22 @@ export const API_ENDPOINTS = {
   ALL_AUDIT_TRAILS: '/api/v1/org/view-audit-trails',
 
   // #####################  FORMS SUB-ENDPOINTS   #######################
-  CREATE_VEHICLE: '/api/v1/ord/add-vehicle',
+  CREATE_VEHICLE: '/api/v1/org/vehicles/add',
   CREATE_PARCEL_MANAGER: '/api/v1/auth/register',
   UPDATE_PARCEL_MANAGER: '/api/v1/org/users/update',
+  UPDATE_VEHICLE: '/api/v1/org/vehicles/update',
 
-
+  // #####################  INITIATE TRANSFER SUB-ENDPOINTS   #######################
   CREDIT_DRIVER: '/api/payment/wallets/assign/driver',
+  INITIATE_REASSIGNMENT: 'api/payment/wallets/initiate/reassignment',
+  CONFIRM_REASSIGNMENT: 'api/payment/wallets/reassign/funds',
 
+  // #####################  FORMS-extra SUB-ENDPOINTS   #######################
   ENTITY_STAGES: '/api/route/view/entity-stages',
   FIND_PARCEL_BY_NUMBER: '/api/parcels/find/parcel-number',
-  RETRIEVE_STATEMENTS: '/api/statements/retrieve'
+  RETRIEVE_STATEMENTS: '/api/statements/retrieve',
+
+  ACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/driver/fleets/approve',
+  DEACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/activated-deactivate-fleet',
+
 };

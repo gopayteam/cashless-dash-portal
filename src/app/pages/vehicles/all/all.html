@@ -201,6 +201,10 @@
             <i [class]="'pi ' + getStatusIcon(selectedVehicle.status)"></i>
             {{ selectedVehicle.status }}
           </span>
+
+          <button *ngIf="selectedVehicle" pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+            pTooltip="Edit Vehicle" tooltipPosition="top"
+            (click)="navigateToUpdateVehicle(selectedVehicle); $event.stopPropagation()"></button>
         </div>
       </div>
     </ng-template>

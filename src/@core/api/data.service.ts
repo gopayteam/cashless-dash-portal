@@ -36,13 +36,18 @@ export class DataService {
   post<T>(
     endpoint: string,
     payload: any,
-    context?: string
+    context?: string,
+    bypassCache: boolean = false
   ): Observable<T> {
     const key = `${endpoint}:POST:${JSON.stringify(payload)}:${context ?? 'default'}`;
 
     const request$ = environment.useMockApi
       ? this.mockApi.post(endpoint, payload)
       : this.api.post<T>(endpoint, payload);
+
+    if (bypassCache) {
+      return request$; // real HTTP every time
+    }
 
     return this.cache.get(key, request$);
   }

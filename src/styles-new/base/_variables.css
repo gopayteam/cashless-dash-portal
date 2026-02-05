@@ -1,0 +1,56 @@
+/* ============================================================
+   GLOBAL COLOR VARIABLES (Light Mode)
+   ============================================================ */
+:root {
+  /* Primary – Blue 900 */
+  --primary-color: #0e2c5a;
+  --primary-color-dark: #093170;
+  --primary-hover: #c82333; /* This seems to be a red color, might be a typo for primary-hover-dark or secondary-color */
+
+  /* Secondary – Red 900 */
+  --secondary-color: #c82333;
+  --secondary-color-dark: #7f0000;
+
+  /* Status colors */
+  --success-color: #198754;
+  --warning-color: #ffc107;
+  --danger-color: #b71c1c;
+  --info-color: #0dcaf0;
+
+  /* Neutrals - Light Mode */
+  --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --dark-text: #212529;
+  --medium-text: #495057;
+  --light-text: #6c757d;
+  --border-color: #e9ecef;
+
+  /* Layout dimensions */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 80px;
+  --topbar-height: 70px;
+
+  /* Effects */
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 44px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================
+   DARK MODE VARIABLES
+   ============================================================ */
+body.dark-mode {
+  /* Override neutrals for dark mode */
+  --light-bg: #1a1d23;
+  --white: #2d3139;
+  --dark-text: #e8eaed;
+  --medium-text: #c4c7cc;
+  --light-text: #9aa0a6;
+  --border-color: #3c4049;
+
+  /* Adjust shadows for dark mode */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}

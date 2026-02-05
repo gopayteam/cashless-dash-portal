@@ -107,6 +107,23 @@ body {
 
 
 /* ============================================================
+   FORCE DIALOG CLOSE BUTTON TRANSPARENCY (GLOBAL OVERRIDE)
+   ============================================================ */
+/* This rule is intentionally specific to override module-level or
+   component-level styles that might be adding a background to the
+   dialog's close button. */
+/* body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+} */
+
+
+/* ============================================================
    RESPONSIVE UTILITIES
    ============================================================ */
 @media (max-width: 768px) {

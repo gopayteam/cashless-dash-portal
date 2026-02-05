@@ -31,7 +31,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { SelectModule } from 'primeng/select';
-
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   standalone: true,
@@ -61,7 +61,8 @@ import { SelectModule } from 'primeng/select';
     MessageModule,
     ToastModule,
     ParcelReceiptComponent,
-    SelectModule
+    SelectModule,
+    ActionButtonComponent
   ],
 })
 export class ParcelsComponent implements OnInit {
@@ -209,6 +210,10 @@ export class ParcelsComponent implements OnInit {
    * Load parcels from server with server-side filtering
    */
   loadParcels($event: any): void {
+    this.fetchParcels(false, $event);
+  }
+
+  fetchParcels(bypassCache: boolean, $event?: any): void {
     const [start, end] = this.filters.dateRange;
 
     if (!start || !end) {
@@ -250,7 +255,7 @@ export class ParcelsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<ParcelsAPiResponse>(API_ENDPOINTS.ALL_PARCELS, payload, 'parcels')
+      .post<ParcelsAPiResponse>(API_ENDPOINTS.ALL_PARCELS, payload, 'parcels', bypassCache)
       .subscribe({
         next: (response) => {
           this.parcels = response.parcels;
@@ -718,5 +723,9 @@ export class ParcelsComponent implements OnInit {
 
   getPaymentMethodClass(method: Parcel['paymentMethod']): string {
     return method === 'CASH' ? 'badge-debit' : 'badge-credit';
+  }
+
+  refreshParcels(): void {
+    this.fetchParcels(true);
   }
 }

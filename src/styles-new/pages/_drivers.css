@@ -1,0 +1,455 @@
+/* ================= DRIVERS SPECIFIC STYLES ================= */
+/* Only styles unique to the drivers component */
+
+/* Drivers Container */
+.drivers-container {
+  padding: 1rem;
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ================= HEADER ================= */
+.drivers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.drivers-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+/* ================= FILTER CARD ================= */
+.filter-card {
+  margin-bottom: 2rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: var(--medium-text);
+  font-size: 0.875rem;
+}
+
+.filter-field {
+  width: 100%;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ================= STATS GRID ================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* ================= TABLE HEADER ================= */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.table-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.record-count {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ================= SEARCH CONTAINER ================= */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-input {
+  width: 300px;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  outline: none;
+}
+
+.p-input-icon-left {
+  position: relative;
+  display: inline-block;
+}
+
+.p-input-icon-left > i {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text);
+  z-index: 1;
+}
+
+.clear-button {
+  color: var(--light-text) !important;
+}
+
+.clear-button:hover {
+  color: var(--medium-text) !important;
+}
+
+/* ================= CELL CONTENT STYLING ================= */
+
+/* Driver Cell with Avatar */
+.driver-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.driver-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.driver-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.driver-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+.driver-meta {
+  font-size: 0.75rem;
+  color: var(--light-text);
+}
+
+/* Username Cell */
+.username-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  color: var(--medium-text);
+  font-size: 0.9rem;
+}
+
+/* Phone Cell */
+.phone-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.phone-cell i {
+  color: var(--light-text);
+  font-size: 0.85rem;
+}
+
+/* Code Badge */
+.code-badge {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--medium-text);
+  background-color: var(--border-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Date Range Cell */
+.date-range-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.date-item i {
+  color: var(--primary-color);
+  font-size: 0.75rem;
+}
+
+.date-arrow {
+  color: var(--light-text);
+  font-size: 0.7rem;
+}
+
+/* Days Remaining Cell */
+.days-remaining-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.days-remaining-cell.warning {
+  color: #ffc107;
+}
+
+.days-remaining-cell i {
+  font-size: 1rem;
+}
+
+/* ================= DRIVER DETAIL DIALOG ================= */
+.driver-name-large {
+  font-weight: 700;
+  color: white;
+  font-size: 1.2rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.detail-content {
+  padding: 1rem 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detail-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--light-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item .value {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-item .code-value {
+  font-family: 'Courier New', monospace;
+  background-color: var(--light-bg);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.fleet-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea !important;
+  font-weight: 600 !important;
+}
+
+.fleet-highlight i {
+  font-size: 1.1rem;
+}
+
+.warning-text {
+  color: #ffc107 !important;
+  font-weight: 600 !important;
+}
+
+.success-text {
+  color: #28a745 !important;
+  font-weight: 600 !important;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 768px) {
+  .drivers-container {
+    padding: 1rem;
+  }
+
+  .drivers-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .drivers-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-header-left {
+    width: 100%;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .filter-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .filter-actions button {
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .driver-avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 0.8rem;
+  }
+
+  .date-range-cell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ================= MATERIAL FORM FIELD OVERRIDES ================= */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white;
+}
+
+/* ================= DIALOG STYLING ================= */
+::ng-deep .driver-detail-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 6px 6px 0 0;
+}
+
+::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-title {
+  color: white;
+}
+
+::ng-deep .driver-detail-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+}
+
+::ng-deep .driver-detail-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+::ng-deep .driver-detail-dialog .p-dialog-footer {
+  padding: 1rem 2rem;
+  border-top: 1px solid var(--border-color);
+}
