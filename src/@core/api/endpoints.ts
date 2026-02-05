@@ -68,5 +68,6 @@ export const API_ENDPOINTS = {
   CREDIT_DRIVER: '/api/payment/wallets/assign/driver',
 
   ENTITY_STAGES: '/api/route/view/entity-stages',
-  FIND_PARCEL_BY_NUMBER: '/api/parcels/find/parcel-number'
+  FIND_PARCEL_BY_NUMBER: '/api/parcels/find/parcel-number',
+  RETRIEVE_STATEMENTS: '/api/statements/retrieve'
 };

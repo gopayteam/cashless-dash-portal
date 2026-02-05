@@ -82,6 +82,11 @@ export class WithdrawalStatementsComponent implements OnInit {
   netBalance: number = 0;
   transactionCount: number = 0;
 
+  // Server-side wallet search
+  walletSearchTerm: string = '';
+  isSearching = false;
+  searchDebounceTimer: any;
+
   // Filter options
   transactionTypeOptions: TransactionTypeOption[] = [
     { label: 'All Types', value: '' },
@@ -104,7 +109,7 @@ export class WithdrawalStatementsComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -113,8 +118,7 @@ export class WithdrawalStatementsComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUser();
     if (user) {
-      this.entityId = user.entityId
-      // console.log('Logged in as:', user.username);
+      this.entityId = user.entityId;
     } else {
       this.router.navigate(['/login']);
       console.log('No user logged in');
@@ -133,7 +137,6 @@ export class WithdrawalStatementsComponent implements OnInit {
 
   loadStatements($event?: any): void {
     const [start, end] = this.dateRange;
-    const event = $event;
 
     if (!start || !end) {
       console.error('Invalid date range');
@@ -144,20 +147,25 @@ export class WithdrawalStatementsComponent implements OnInit {
     let page = 0;
     let pageSize = this.rows;
 
-    if (event) {
-      page = event.first / event.rows;
-      pageSize = event.rows;
-      this.first = event.first;
-      this.rows = event.rows;
+    if ($event) {
+      page = $event.first / $event.rows;
+      pageSize = $event.rows;
+      this.first = $event.first;
+      this.rows = $event.rows;
     }
 
-    const payload = {
+    const payload: any = {
       entityId: this.entityId,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
       page,
       size: pageSize,
     };
+
+    // Add wallet filter if searching
+    if (this.walletSearchTerm && this.walletSearchTerm.trim()) {
+      payload.walletId = this.walletSearchTerm.trim();
+    }
 
     this.loadingStore.start();
 
@@ -168,17 +176,48 @@ export class WithdrawalStatementsComponent implements OnInit {
           this.allStatements = response.data;
           this.totalRecords = response.totalRecords;
           this.calculateStats();
-          this.applyClientSideFilter();
+          this.applyClientSideFilters();
           this.cdr.detectChanges();
           this.loadingStore.stop();
         },
         error: (err) => {
           console.error('Failed to load withdrawal statements', err);
+          this.allStatements = [];
+          this.statements = [];
+          this.filteredStatements = [];
+          this.totalRecords = 0;
           this.loadingStore.stop();
         },
       });
   }
 
+  /**
+   * Server-side wallet search with debouncing
+   */
+  searchByWalletId(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    this.searchDebounceTimer = setTimeout(() => {
+      // Reset pagination when searching
+      this.first = 0;
+      this.loadStatements({ first: 0, rows: this.rows });
+    }, 500);
+  }
+
+  /**
+   * Clear wallet search and reload all statements
+   */
+  clearWalletSearch(): void {
+    this.walletSearchTerm = '';
+    this.first = 0;
+    this.loadStatements({ first: 0, rows: this.rows });
+  }
+
+  /**
+   * Calculate summary statistics from server data
+   */
   calculateStats(): void {
     this.totalCredits = this.allStatements
       .filter(s => s.transactionType === 'CREDIT')
@@ -192,17 +231,19 @@ export class WithdrawalStatementsComponent implements OnInit {
     this.transactionCount = this.allStatements.length;
   }
 
-  applyClientSideFilter(): void {
+  /**
+   * Apply client-side filters (transaction type, category, general search)
+   */
+  applyClientSideFilters(): void {
     let filtered = [...this.allStatements];
 
-    // Apply search filter
+    // Apply general search filter (for other fields like receipt number, fleet, etc.)
     if (this.searchTerm && this.searchTerm.trim() !== '') {
       const searchLower = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter((statement) => {
         return (
           statement.mpesaReceiptNumber?.toLowerCase().includes(searchLower) ||
           statement.sourceFleet?.toLowerCase().includes(searchLower) ||
-          statement.walletId?.toLowerCase().includes(searchLower) ||
           statement.category?.toLowerCase().includes(searchLower) ||
           statement.amount?.toString().includes(searchLower)
         );
@@ -227,35 +268,44 @@ export class WithdrawalStatementsComponent implements OnInit {
     this.statements = filtered;
   }
 
+  /**
+   * Client-side filter handlers
+   */
   onSearchChange(): void {
-    this.applyClientSideFilter();
+    this.applyClientSideFilters();
   }
 
   onTransactionTypeChange(): void {
-    this.applyClientSideFilter();
+    this.applyClientSideFilters();
   }
 
   onCategoryChange(): void {
-    this.applyClientSideFilter();
+    this.applyClientSideFilters();
   }
 
   clearSearch(): void {
     this.searchTerm = '';
-    this.applyClientSideFilter();
+    this.applyClientSideFilters();
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedTransactionType = '';
     this.selectedCategory = '';
-    this.applyClientSideFilter();
+    this.applyClientSideFilters();
   }
 
+  /**
+   * Date range change triggers server reload
+   */
   onDateRangeChange(): void {
     this.first = 0;
     this.loadStatements();
   }
 
+  /**
+   * Dialog and UI helper methods
+   */
   viewStatementDetails(statement: Statement): void {
     this.selectedStatement = statement;
     this.displayDetailDialog = true;
