@@ -7,6 +7,8 @@
   background-color: var(--light-bg);
   min-height: 100vh;
   position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* ================= HEADER ================= */
@@ -46,10 +48,13 @@
 
 .filters-grid {
   display: flex;
-  align-items: center;        /* vertical centering */
-  justify-content: space-between; /* push actions to the end */
+  align-items: center;
+  /* vertical centering */
+  justify-content: space-between;
+  /* push actions to the end */
   gap: 1.5rem;
-  flex-wrap: wrap;            /* allows wrapping on small screens */
+  flex-wrap: wrap;
+  /* allows wrapping on small screens */
 }
 
 .filter-item {
@@ -77,7 +82,8 @@
 
 .filter-actions {
   display: flex;
-  align-items: center; /* vertical center */
+  align-items: center;
+  /* vertical center */
   flex-shrink: 0;
   gap: 0.75rem;
 }
@@ -202,10 +208,7 @@
   padding: 1rem;
 }
 
-.parcels-container
-  .p-paginator
-  .p-paginator-pages
-  .p-paginator-page.p-highlight {
+.parcels-container .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
   background-color: var(--primary-color);
   color: white;
   border-radius: 6px;
@@ -257,11 +260,9 @@
 
 /* ================= DIALOG STYLING ================= */
 ::ng-deep .parcel-detail-dialog .p-dialog-header {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color-dark) 0%,
-    var(--secondary-color) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color-dark) 0%,
+      var(--secondary-color) 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;

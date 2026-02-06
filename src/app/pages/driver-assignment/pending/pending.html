@@ -331,16 +331,18 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <div class="dialog-footer-actions" *ngIf="selectedAssignment?.approvalStatus === 'PENDING'">
-        <button pButton label="Reject" icon="pi pi-times" class="p-button-danger" (click)="submitApproval('REJECTED')">
+      <div class="dialog-footer-actions" *ngIf="selectedAssignment?.approvalStatus === 'PENDING'" style="gap: 1.5rem">
+        <button pButton label="Reject" icon="pi pi-times" iconPos="right" style="gap: 0.5rem; margin-right: 1rem;"
+          class="p-button-danger" (click)="submitApproval('REJECTED')">
         </button>
 
-        <button pButton label="Approve" icon="pi pi-check" class="p-button-success"
-          (click)="submitApproval('APPROVED')">
+        <button pButton label="Approve" icon="pi pi-check" class="p-button-success" iconPos="right"
+          style="gap: 0.5rem; margin-right: 1rem;" (click)="submitApproval('APPROVED')">
         </button>
       </div>
 
-      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDetailDialog()">
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"
+        (click)="closeDetailDialog()">
       </button>
     </ng-template>
 

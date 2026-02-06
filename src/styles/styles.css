@@ -60,7 +60,9 @@
   --secondary-color-dark: #7f0000;
 
   /* Status colors */
-  --success-color: #198754;
+  /* --success-color: #198754; */
+  --success-color: #28a745;
+  --success-color-dark: #1e7e34;
   --warning-color: #ffc107;
   --danger-color: #b71c1c;
   --info-color: #0dcaf0;
@@ -112,7 +114,7 @@ body {
 /* This rule is intentionally specific to override module-level or
    component-level styles that might be adding a background to the
    dialog's close button. */
-/* body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon {
+body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon {
   background: transparent !important;
   background-color: transparent !important;
   border: none !important;
@@ -120,7 +122,7 @@ body {
 
 body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:hover {
   background: rgba(255, 255, 255, 0.1) !important;
-} */
+}
 
 
 /* ============================================================

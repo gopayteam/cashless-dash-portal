@@ -20,7 +20,7 @@ body .p-dialog.custom-dialog .p-dialog-header .p-dialog-title {
 
 /* ================= CLOSE BUTTON - CLEAN X ICON ================= */
 /* Remove all backgrounds and borders from close button */
-body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon,
+/* body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icon,
 body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button {
   background: transparent !important;
   background-color: transparent !important;
@@ -31,6 +31,18 @@ body .p-dialog.custom-dialog .p-dialog-header .p-dialog-header-icons button {
   width: auto !important;
   height: auto !important;
   padding: 0.25rem !important;
+} */
+
+/* Remove background from dialog close button */
+.p-dialog .p-dialog-close-button {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: white !important;
+}
+
+.p-dialog .p-dialog-close-button:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
 }
 
 /* Hover state - subtle background */

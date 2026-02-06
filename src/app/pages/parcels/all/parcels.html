@@ -524,21 +524,21 @@
 
     <ng-template pTemplate="footer">
       <div class="dialog-footer receipt-footer">
-        <button pButton label="Simple" icon="pi pi-download" class="p-button-success receipt-download-btn"
+        <button pButton label="Simple" icon="pi pi-download" class="p-button-text receipt-download-btn"
           *ngIf="selectedParcel" [loading]="isSimpleReceiptDownloading" [disabled]="isSimpleReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="generateSimpleReceipt()" pTooltip="Download simple receipt"
-          tooltipPosition="top">
+          iconPos="right" style="gap: 0.5rem; margin-right: 1rem;" (click)="generateSimpleReceipt()"
+          pTooltip="Download simple receipt" tooltipPosition="top">
         </button>
 
-        <button pButton label="Thermal" icon="pi pi-download" class="p-button-success receipt-download-btn"
+        <button pButton label="Thermal" icon="pi pi-download" class="p-button-text receipt-download-btn"
           *ngIf="selectedParcel" [loading]="isThermalReceiptDownloading" [disabled]="isThermalReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="generateThermalReceipt()" pTooltip="Download thermal receipt"
-          tooltipPosition="top">
+          iconPos="right" style="gap: 0.5rem; margin-right: 1rem;" (click)="generateThermalReceipt()"
+          pTooltip="Download thermal receipt" tooltipPosition="top">
         </button>
 
-        <button pButton label="Color" icon="pi pi-download" class="p-button-success receipt-download-btn"
+        <button pButton label="Color" icon="pi pi-download" class="p-button-text receipt-download-btn"
           *ngIf="selectedParcel" [loading]="isColorReceiptDownloading" [disabled]="isColorReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="downloadColorReceipt(selectedParcel)"
+          iconPos="right" style="gap: 0.5rem; margin-right: 1rem;" (click)="downloadColorReceipt(selectedParcel)"
           pTooltip="Download color receipt" tooltipPosition="top">
         </button>
 

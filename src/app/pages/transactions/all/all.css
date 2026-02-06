@@ -1,3 +1,8 @@
+.transactions-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 /* ================= SEARCH CONTAINER ================= */
 .search-container {
   display: flex;

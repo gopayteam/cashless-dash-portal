@@ -1,4 +1,3 @@
-
 /* ============================================================
    REUSABLE TABLE STYLES
    ============================================================ */
@@ -11,7 +10,7 @@
   color: var(--medium-text);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   letter-spacing: 0.5px;
   padding: 1rem;
   border-bottom: 2px solid #dee2e6;

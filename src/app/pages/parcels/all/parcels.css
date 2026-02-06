@@ -7,12 +7,15 @@
   --medium-text: #64748b;
 }
 
+
 /* ================= MAIN CONTAINER ================= */
 .parcels-container {
   padding: 1rem;
   background-color: var(--light-bg);
   min-height: 100vh;
   position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* ================= HEADER ================= */

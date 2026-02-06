@@ -3,6 +3,8 @@
 .audits-container {
   padding: 1.5rem;
   min-height: 100vh;
+  max-width: 2400px;
+  margin: 0 auto;
 }
 
 /* ================= HEADER ================= */

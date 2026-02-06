@@ -62,18 +62,18 @@
 }
 
 /* Default/Primary button */
-.p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger) {
-  /* background: var(--primary-color);
+/* .p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger) {
+  background: var(--primary-color);
   border-color: var(--primary-color);
   color: var(--white);
-  box-shadow: var(--shadow-sm); */
-}
+  box-shadow: var(--shadow-sm);
+} */
 
-.p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover {
-  /* background: var(--primary-color-dark);
-  border-color: var(--primary-color-dark); */
+/* .p-button.p-component:not(.p-button-outlined):not(.p-button-secondary):not(.p-button-danger):enabled:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
   box-shadow: var(--shadow-md);
-}
+} */
 
 /* Secondary/Outlined button */
 .p-button.p-component.p-button-outlined,
@@ -95,11 +95,26 @@
 .p-button.p-component.p-button-danger {
   background: var(--secondary-color);
   border-color: var(--secondary-color);
+  color: var(--white);
 }
 
 .p-button.p-component.p-button-danger:enabled:hover {
-  background: var(--secondary-color-dark);
-  border-color: var(--secondary-color-dark);
+  background: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+/* Success Button */
+.p-button.p-component.p-button-success {
+  background: var(--success-color);
+  border-color: var(--success-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.p-button.p-component.p-button-success:enabled:hover {
+  background: var(--success-color-dark);
+  border-color: var(--success-color-dark);
+  box-shadow: var(--shadow-md);
 }
 
 /* Outlined Variants */
@@ -265,12 +280,12 @@ body .p-datepicker .p-datepicker-header .p-datepicker-next {
   color: white;
 }
 
-body .p-datepicker table td > span.p-highlight {
+body .p-datepicker table td>span.p-highlight {
   background: var(--primary-color);
   color: white;
 }
 
-body .p-datepicker table td > span:focus {
+body .p-datepicker table td>span:focus {
   box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
 }
 
@@ -278,7 +293,7 @@ body .p-datepicker table td > span:focus {
 /* ===========================
    Data Table (p-datatable)
    =========================== */
-.p-datatable .p-datatable-thead > tr > th {
+.p-datatable .p-datatable-thead>tr>th {
   background: var(--light-bg);
   color: var(--medium-text);
   font-weight: 600;
@@ -288,15 +303,15 @@ body .p-datepicker table td > span:focus {
   padding: 1rem;
 }
 
-.p-datatable .p-datatable-tbody > tr {
-    transition: background-color 0.2s ease;
+.p-datatable .p-datatable-tbody>tr {
+  transition: background-color 0.2s ease;
 }
 
-.p-datatable .p-datatable-tbody > tr:hover {
+.p-datatable .p-datatable-tbody>tr:hover {
   background: #f8f9fa;
 }
 
-.p-datatable .p-datatable-tbody > tr > td {
+.p-datatable .p-datatable-tbody>tr>td {
   border-color: var(--border-color);
   padding: 1rem;
   vertical-align: middle;
