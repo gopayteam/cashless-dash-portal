@@ -236,6 +236,32 @@
             </ul>
           </li>
 
+          <!-- Broadcast Category -->
+          <li *ngIf="hasUserManagementAccess()">
+            <div class="menu-category">Notifications </div>
+            <ul class="menu-items">
+              <!-- <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/send-notification')"
+                  (click)="navigate('/send-notification/agents')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-bell menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Create Notification</span>
+                  </span>
+                </button>
+              </li> -->
+
+              <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/send-broadcast')"
+                  (click)="navigate('/send-broadcast/agents')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-bell menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Create Broadcast</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
           <!-- Audits Category -->
           <li *ngIf="hasAuditAccess()">
             <div class="menu-category">Audits</div>

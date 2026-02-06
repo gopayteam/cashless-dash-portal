@@ -1,0 +1,105 @@
+<div class="broadcast-container" @slideIn>
+  <div class="broadcast-header">
+    <h1 class="title">Broadcast Center</h1>
+    <p class="subtitle">Send notifications to agents across your network</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div class="alert-container">
+    <div *ngIf="showSuccess" class="alert alert-success" @slideIn>
+      <div class="alert-icon">✓</div>
+      <div class="alert-content">
+        <h3>Broadcast Sent Successfully!</h3>
+        <p>{{ responseMessage }} — Reached {{ totalRecipients }} recipients</p>
+      </div>
+    </div>
+
+    <div *ngIf="showError" class="alert alert-error" @slideIn>
+      <div class="alert-icon">✕</div>
+      <div class="alert-content">
+        <h3>Error</h3>
+        <p>{{ responseMessage }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Broadcast Form -->
+  <div class="broadcast-form">
+    <!-- Agent Selection -->
+    <div class="form-section">
+      <label class="form-label">Select Target Agent</label>
+      <div class="agent-grid" @listAnimation>
+        <button *ngFor="let agent of agents" type="button" class="agent-card"
+          [class.selected]="broadcastData.agent === agent.value" [style.--agent-color]="agent.color"
+          (click)="broadcastData.agent = agent.value">
+          <span class="agent-icon">{{ agent.icon }}</span>
+          <span class="agent-label">{{ agent.label }}</span>
+          <div class="agent-indicator"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Entity ID (Optional) -->
+    <div class="form-section">
+      <label class="form-label" for="entityId">
+        Entity ID
+        <span class="label-optional">(Optional)</span>
+      </label>
+      <input id="entityId" type="text" class="form-input" [(ngModel)]="broadcastData.entityId"
+        placeholder="Enter specific entity ID..." />
+    </div>
+
+    <!-- Title -->
+    <div class="form-section">
+      <label class="form-label" for="title">
+        Notification Title
+        <span class="label-required">*</span>
+      </label>
+      <input id="title" type="text" class="form-input" [(ngModel)]="broadcastData.title"
+        (input)="updateCharacterCount()" placeholder="Enter notification title..." maxlength="100" required />
+      <div class="char-counter">{{ titleCharacterCount }}/100</div>
+    </div>
+
+    <!-- Message -->
+    <div class="form-section">
+      <label class="form-label" for="message">
+        Message Content
+        <span class="label-required">*</span>
+      </label>
+      <textarea id="message" class="form-textarea" [(ngModel)]="broadcastData.message" (input)="updateCharacterCount()"
+        placeholder="Type your broadcast message here..." rows="6" maxlength="500" required></textarea>
+      <div class="char-counter">{{ characterCount }}/500</div>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="form-section" *ngIf="broadcastData.title || broadcastData.message">
+      <label class="form-label">Preview</label>
+      <div class="preview-card">
+        <div class="preview-header">
+          <span class="preview-agent-icon" *ngIf="getSelectedAgent()">
+            {{ getSelectedAgent()?.icon }}
+          </span>
+          <span class="preview-title">{{ broadcastData.title || 'Notification Title' }}</span>
+        </div>
+        <p class="preview-message">{{ broadcastData.message || 'Your message will appear here...' }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="resetForm()" [disabled]="isLoading">
+        Reset
+      </button>
+      <button type="button" class="btn btn-primary" (click)="sendBroadcast()" [disabled]="!isFormValid() || isLoading">
+        <span *ngIf="!isLoading" class="btn-content">
+          <span class="btn-icon">📡</span>
+          <span>Send Broadcast</span>
+        </span>
+        <span *ngIf="isLoading" class="btn-loading">
+          <span class="spinner"></span>
+          <span>Sending...</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

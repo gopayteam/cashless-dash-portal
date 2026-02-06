@@ -1,0 +1,98 @@
+<div class="broadcast-container">
+  <p-toast position="top-right"></p-toast>
+
+  <div class="broadcast-header">
+    <h1 class="title">Broadcast Center</h1>
+    <p class="subtitle">Send notifications to agents across your network</p>
+  </div>
+
+  <!-- Broadcast Form Card -->
+  <p-card class="broadcast-form">
+    <form [formGroup]="broadcastForm" (ngSubmit)="onSubmit()">
+
+      <!-- Agent Selection -->
+      <div class="form-section">
+        <label class="form-label">Select Target Agent</label>
+        <div class="agent-grid">
+          @for (agent of agents; track agent.value) {
+          <button type="button" class="agent-card" [class.selected]="selectedAgentValue() === agent.value"
+            [style.--agent-color]="agent.color" (click)="selectAgent(agent.value)" [disabled]="loading()">
+            <span class="agent-icon">{{ agent.icon }}</span>
+            <span class="agent-label">{{ agent.label }}</span>
+            <div class="agent-indicator"></div>
+          </button>
+          }
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="form-section">
+        <label class="form-label" for="title">
+          Notification Title
+          <span class="label-required">*</span>
+        </label>
+        <input pInputText id="title" type="text" formControlName="title" placeholder="Enter notification title..."
+          maxlength="100" [disabled]="loading()" class="w-full"
+          [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('title')}" />
+        <div class="char-counter">{{ titleCharacterCount() }}/100</div>
+        @if (isFieldInvalid('title')) {
+        <small class="p-error">
+          {{ getErrorMessage('title') }}
+        </small>
+        }
+      </div>
+
+      <!-- Message -->
+      <div class="form-section">
+        <label class="form-label" for="message">
+          Message Content
+          <span class="label-required">*</span>
+        </label>
+        <textarea pInputTextarea id="message" formControlName="message"
+          placeholder="Type your broadcast message here..." rows="3" maxlength="1000" [disabled]="loading()"
+          class="w-full form-textarea" [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('message')}"></textarea>
+        <div class="char-counter">{{ characterCount() }}/1000</div>
+        @if (isFieldInvalid('message')) {
+        <small class="p-error">
+          {{ getErrorMessage('message') }}
+        </small>
+        }
+      </div>
+
+      <!-- Preview Card -->
+      @if (broadcastForm.get('title')?.value || broadcastForm.get('message')?.value) {
+      <div class="form-section">
+        <label class="form-label">Preview</label>
+        <div class="preview-card">
+          <div class="preview-header">
+            @if (selectedAgent(); as agent) {
+            <span class="preview-agent-icon">
+              {{ agent.icon }}
+            </span>
+            }
+            <span class="preview-title">
+              {{ broadcastForm.get('title')?.value || 'Notification Title' }}
+            </span>
+          </div>
+          <p class="preview-message">
+            {{ broadcastForm.get('message')?.value || 'Your message will appear here...' }}
+          </p>
+        </div>
+      </div>
+      }
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <p-button type="button" label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true"
+          (onClick)="resetForm()" [disabled]="loading()" class="btn btn-secondary" [style]="{'gap': '1rem'}"
+          class="btn btn-clear" styleClass="p-button-text p-button-plain"></p-button>
+
+        <p-button type="submit" [label]="loading() ? 'Sending...' : 'Send Broadcast'"
+          [icon]="loading() ? 'pi pi-spin pi-spinner' : 'pi pi-send'" severity="primary" [disabled]="loading()"
+          [loading]="loading()" class="btn btn-primary" [style]="{'gap': '1rem'} " class="btn btn-primary"
+          styleClass="p-button-text p-button-plain"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+</div>

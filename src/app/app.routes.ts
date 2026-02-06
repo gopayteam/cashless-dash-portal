@@ -88,6 +88,8 @@ import { RegisterApproverComponent } from './pages/forms/approver/register-appro
 import { RegisterInspectorComponent } from './pages/forms/inspector/register-inspector/register-inspector';
 import { UpdateInspectorComponent } from './pages/forms/inspector/update-inspector/update-inspector';
 import { UpdateVehicleComponent } from './pages/forms/vehicle/update-vehicle/update-vehicle';
+import { SendNotificationsComponent } from './pages/notifications/send-notifications/send-notifications';
+import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -671,6 +673,20 @@ export const routes: Routes = [
       {
         path: 'forms/update-inspector/:id',
         component: UpdateInspectorComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'send-notification/agents',
+        component: SendNotificationsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'send-broadcast/agents',
+        component: BroadcastComponent2,
         canActivate: [roleGuard],
         data: { roles: ['CAN_EDIT_USER'] }
       },
