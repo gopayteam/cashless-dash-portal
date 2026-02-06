@@ -117,6 +117,29 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Clear / Ghost Button */
+.p-button.p-component.p-button-clear {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--primary-color);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+/* Hover */
+.p-button.p-component.p-button-clear:enabled:hover {
+  background: rgba(0, 0, 0, 0.03);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* Active (click) */
+.p-button.p-component.p-button-clear:enabled:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-xs);
+}
+
+
 /* Outlined Variants */
 .p-button.p-button-outlined.p-button-danger {
   color: var(--secondary-color);
