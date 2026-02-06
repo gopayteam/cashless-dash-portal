@@ -56,9 +56,13 @@
   <!-- ================= TABLE ================= -->
   <p-card styleClass="card-hover card">
     <div class="table-header">
-      <div class="table-header-left">
-        <h3>Destination Stages</h3>
-        <span class="record-count">{{ totalRecords }} records</span>
+      <div class="table-header-left" style="display: flex; flex-direction: row; gap: 1.5rem; align-items: center;">
+        <div>
+          <h3>Destination Stages</h3>
+          <span class="record-count">{{ totalRecords }} records</span>
+        </div>
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="refresh()"></app-action-button>
       </div>
 
       <button pButton icon="pi pi-refresh" label="Reset" class="filter-btn filter-btn--reset" (click)="resetFilters()">

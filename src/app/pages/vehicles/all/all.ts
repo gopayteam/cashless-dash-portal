@@ -50,6 +50,8 @@ export class AllVehiclesComponent implements OnInit {
   allVehicles: Vehicle[] = [];
   filteredVehicles: Vehicle[] = [];
 
+  private lastEvent: any;
+
   // Pagination state
   rows: number = 10;
   first: number = 0;
@@ -102,6 +104,11 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   loadVehicles($event?: any): void {
+    this.lastEvent = event;
+    this.fetchVehicles(false, $event);
+  }
+
+  fetchVehicles(bypassCache: boolean, $event?: any): void {
     const event = $event;
 
     // Handle pagination from PrimeNG lazy load event
@@ -124,7 +131,7 @@ export class AllVehiclesComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles')
+      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', bypassCache)
       .subscribe({
         next: (response) => {
           this.allVehicles = response.data;
@@ -251,6 +258,7 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   refreshVehicles(): void {
-    this.loadVehicles();
+    if (this.lastEvent)
+      this.fetchVehicles(true, this.lastEvent);
   }
 }

@@ -476,22 +476,22 @@
 
     <ng-template pTemplate="footer">
       <div class="dialog-footer">
-        <button pButton label="Simple" icon="pi pi-download" class="p-button-success receipt-download-btn"
-          *ngIf="selectedParcel" [loading]="isSimpleReceiptDownloading" [disabled]="isSimpleReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="generateSimpleReceipt()" pTooltip="Download simple receipt"
-          tooltipPosition="top">
+        <button pButton label="Simple" icon="pi pi-download" class="p-button-clear" iconPos="right"
+          style="gap: 0.5rem; margin-right: 1rem;" severity="secondary" *ngIf="selectedParcel"
+          [loading]="isSimpleReceiptDownloading" [disabled]="isSimpleReceiptDownloading"
+          (click)="generateSimpleReceipt()" pTooltip="Download simple receipt" tooltipPosition="top">
         </button>
 
-        <button pButton label="Thermal" icon="pi pi-download" class="p-button-success receipt-download-btn"
-          *ngIf="selectedParcel" [loading]="isThermalReceiptDownloading" [disabled]="isThermalReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="generateThermalReceipt()" pTooltip="Download thermal receipt"
-          tooltipPosition="top">
+        <button pButton label="Thermal" icon="pi pi-download" class="p-button-clear" iconPos="right"
+          style="gap: 0.5rem; margin-right: 1rem;" severity="secondary" *ngIf="selectedParcel"
+          [loading]="isThermalReceiptDownloading" [disabled]="isThermalReceiptDownloading"
+          (click)="generateThermalReceipt()" pTooltip="Download thermal receipt" tooltipPosition="top">
         </button>
 
-        <button pButton label="Color" icon="pi pi-download" class="p-button-success receipt-download-btn"
-          *ngIf="selectedParcel" [loading]="isColorReceiptDownloading" [disabled]="isColorReceiptDownloading"
-          iconPos="right" style="gap: 0.5rem" (click)="downloadColorReceipt(selectedParcel)"
-          pTooltip="Download color receipt" tooltipPosition="top">
+        <button pButton label="Color" icon="pi pi-download" class="p-button-clear" iconPos="right"
+          style="gap: 0.5rem; margin-right: 1rem;" severity="secondary" *ngIf="selectedParcel"
+          [loading]="isColorReceiptDownloading" [disabled]="isColorReceiptDownloading"
+          (click)="downloadColorReceipt(selectedParcel)" pTooltip="Download color receipt" tooltipPosition="top">
         </button>
 
         <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"

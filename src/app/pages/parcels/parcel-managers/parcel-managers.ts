@@ -41,11 +41,14 @@ import { ActionButtonComponent } from "../../../components/action-button/action-
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent,
   ],
 })
 export class ParcelManagersComponent implements OnInit {
   entityId: string | null = null;
   parcelManagers: ParcelManager[] = [];
+
+  private lastEvent: any;
 
   // Pagination
   rows = 10;
@@ -81,6 +84,11 @@ export class ParcelManagersComponent implements OnInit {
   }
 
   loadParcelManagers(event: any): void {
+    this.lastEvent = event;
+    this.fetchParcelManagers(false, event)
+  }
+
+  fetchParcelManagers(bypassCache: boolean, event: any): void {
     this.loadingStore.start();
 
     const page = event.first / event.rows;
@@ -100,7 +108,8 @@ export class ParcelManagersComponent implements OnInit {
       .post<ParcelManagersApiResponse>(
         API_ENDPOINTS.ALL_PARCEL_MANAGERS,
         payload,
-        'parcel-managers'
+        'parcel-managers',
+        bypassCache
       )
       .subscribe({
         next: (response) => {
@@ -154,7 +163,10 @@ export class ParcelManagersComponent implements OnInit {
   }
 
   refresh(): void {
-    this.loadParcelManagers({ first: this.first, rows: this.rows });
+    if (this.lastEvent) {
+      if (this.lastEvent)
+        this.fetchParcelManagers(true, this.lastEvent);
+    }
   }
 
 }

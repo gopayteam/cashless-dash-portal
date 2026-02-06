@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeletedParcels } from './deleted-parcels';
+import { DeletedParcelsComponent as DeletedParcels } from './deleted-parcels';
 
 describe('DeletedParcels', () => {
   let component: DeletedParcels;
@@ -10,7 +10,7 @@ describe('DeletedParcels', () => {
     await TestBed.configureTestingModule({
       imports: [DeletedParcels]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeletedParcels);
     component = fixture.componentInstance;

@@ -21,6 +21,7 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { DialogModule } from 'primeng/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   standalone: true,
@@ -42,11 +43,14 @@ import { AuthService } from '../../../../@core/services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
-  ],
+    ActionButtonComponent
+],
 })
 export class ParcelDestinationComponent implements OnInit {
   entityId: string | null = null;
   stages: ParcelStage[] = [];
+
+  private lastEvent: any;
 
   // Pagination
   rows = 10;
@@ -62,10 +66,10 @@ export class ParcelDestinationComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);
@@ -81,6 +85,11 @@ export class ParcelDestinationComponent implements OnInit {
   }
 
   loadStages(event: any): void {
+    this.lastEvent = event;
+    this.fetchStages(false, event)
+  }
+
+  fetchStages(bypassCache: boolean, event?: any): void {
     this.loadingStore.start();
 
     const page = event.first / event.rows;
@@ -137,5 +146,11 @@ export class ParcelDestinationComponent implements OnInit {
   closeStageDialog(): void {
     this.showStageDialog = false;
     this.selectedStage = null;
+  }
+
+  refresh(): void {
+    if (this.lastEvent) {
+      this.fetchStages(true, this.lastEvent);
+    }
   }
 }

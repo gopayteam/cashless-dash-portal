@@ -69,6 +69,8 @@ export class ParcelsComponent implements OnInit {
   entityId: string | null = null;
   parcels: Parcel[] = [];
 
+  private lastEvent: any;
+
   // Pagination
   totalRecords = 0;
   rows = 10;
@@ -210,10 +212,11 @@ export class ParcelsComponent implements OnInit {
    * Load parcels from server with server-side filtering
    */
   loadParcels($event: any): void {
+    this.lastEvent = $event;
     this.fetchParcels(false, $event);
   }
 
-  fetchParcels(bypassCache: boolean, $event?: any): void {
+  fetchParcels(bypassCache: boolean, $event: any): void {
     const [start, end] = this.filters.dateRange;
 
     if (!start || !end) {
@@ -726,6 +729,7 @@ export class ParcelsComponent implements OnInit {
   }
 
   refreshParcels(): void {
-    this.fetchParcels(true);
+    if (this.lastEvent)
+      this.fetchParcels(true, this.lastEvent);
   }
 }

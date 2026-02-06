@@ -21,6 +21,7 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { DeletedParcel } from '../../../../@core/models/parcels/deleted-parcels/deleted-parcel.model';
 import { ApiResponse } from '../../../../@core/models/parcels/deleted-parcels/deleted-parcel-response.model';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   standalone: true,
@@ -46,12 +47,15 @@ import { ApiResponse } from '../../../../@core/models/parcels/deleted-parcels/de
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
 })
 export class DeletedParcelsComponent implements OnInit {
   entityId: string | null = null;
   deletedParcels: DeletedParcel[] = [];
   dateRange: Date[] = [];
+
+  private lastEvent: any;
 
   // Pagination
   totalRecords = 0;
@@ -116,6 +120,11 @@ export class DeletedParcelsComponent implements OnInit {
   }
 
   loadDeletedParcels($event: any): void {
+    this.lastEvent = $event;
+    this.fetchDeletedParcels(false, $event);
+  }
+
+  fetchDeletedParcels(bypassCache: boolean, $event: any): void {
     const [start, end] = this.filters.dateRange;
     const event = $event;
 
@@ -144,7 +153,8 @@ export class DeletedParcelsComponent implements OnInit {
       .post<ApiResponse<DeletedParcel>>(
         API_ENDPOINTS.ALL_DELETED_PARCELS,
         payload,
-        'deleted-parcels'
+        'deleted-parcels',
+        bypassCache
       )
       .subscribe({
         next: (response) => {
@@ -230,5 +240,10 @@ export class DeletedParcelsComponent implements OnInit {
   getLocationName(locationId: number): string {
     // TODO: Implement location lookup from your location service/data
     return `Location ${locationId}`;
+  }
+
+  refresh(): void {
+    if (this.lastEvent)
+      this.fetchDeletedParcels(true, this.lastEvent)
   }
 }
