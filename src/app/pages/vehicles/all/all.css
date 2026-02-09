@@ -304,3 +304,129 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ================= FILTER ACTIONS ROW ================= */
+.filter-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-buttons-group,
+.export-buttons-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ================= ACTION BUTTON STYLES WITH COLORS ================= */
+.filter-action-btn,
+.export-action-btn {
+  height: 2.5rem;
+  padding: 0 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  justify-content: center;
+}
+
+/* Primary Filter Button (Apply Filters) */
+.filter-action-btn.p-button-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark)) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.filter-action-btn.p-button-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.filter-action-btn.p-button-primary .pi-filter {
+  color: white !important;
+}
+
+/* Outlined Filter Button (Reset) */
+.filter-action-btn.p-button-outlined {
+  background: white !important;
+  color: #6b7280 !important;
+  border: 2px solid #d1d5db !important;
+}
+
+.filter-action-btn.p-button-outlined:hover:not(:disabled) {
+  background: #f9fafb !important;
+  color: #374151 !important;
+  border-color: #9ca3af !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.filter-action-btn.p-button-outlined .pi-refresh {
+  color: #6b7280 !important;
+}
+
+/* Success Export Button (Excel) */
+.export-action-btn.p-button-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.export-action-btn.p-button-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-action-btn.p-button-success .pi-file-excel {
+  color: white !important;
+}
+
+/* Help Export Button (CSV) */
+.export-action-btn.p-button-help {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.export-action-btn.p-button-help:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  transform: translateY(-2px);
+}
+
+.export-action-btn.p-button-help .pi-file {
+  color: white !important;
+}
+
+/* Disabled State */
+.filter-action-btn:disabled,
+.export-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Loading State */
+.filter-action-btn[loading="true"],
+.export-action-btn[loading="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+}

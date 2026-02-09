@@ -84,7 +84,17 @@
           (clicked)="navigateToAddVehicle()"></app-action-button>
         <app-action-button icon="pi-refresh" tooltip="Refresh Vehicles" variant="primary" (clicked)="refreshVehicles()">
         </app-action-button>
+      </div>
 
+      <div class="export-buttons-group">
+        <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
+          [disabled]="filteredVehicles.length === 0 || isExporting" [loading]="isExporting" (click)="exportToExcel()"
+          pTooltip="Export to Excel" tooltipPosition="bottom">
+        </button>
+        <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn"
+          [disabled]="filteredVehicles.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
+          pTooltip="Export to CSV" tooltipPosition="bottom">
+        </button>
       </div>
     </div>
 

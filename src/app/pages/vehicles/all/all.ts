@@ -18,6 +18,7 @@ import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_rep
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import * as XLSX from 'xlsx';
 
 interface StatusOption {
   label: string;
@@ -68,6 +69,9 @@ export class AllVehiclesComponent implements OnInit {
   totalCapacity: number = 0;
   activeVehicles: number = 0;
   totalStages: number = 0;
+
+  // Export state
+  isExporting = false;
 
   // Status filter options
   statusOptionsList: StatusOption[] = [
@@ -260,5 +264,188 @@ export class AllVehiclesComponent implements OnInit {
   refreshVehicles(): void {
     if (this.lastEvent)
       this.fetchVehicles(true, this.lastEvent);
+  }
+
+  /**
+  * Export vehicles to Excel
+  */
+  exportToExcel(): void {
+    if (this.vehicles.length === 0) {
+      console.warn('No vehicles to export');
+      // If you have MessageService, you can show a toast:
+      // this.messageService.add({
+      //   severity: 'warn',
+      //   summary: 'No Data',
+      //   detail: 'No vehicles to export',
+      //   life: 3000
+      // });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      // Prepare data for export
+      const exportData = this.vehicles.map(vehicle => ({
+        'Fleet Number': vehicle.fleetNumber,
+        'Fleet Code': vehicle.fleetCode,
+        'Registration Number': vehicle.registrationNumber,
+        'Stage': vehicle.stageName,
+        'Status': vehicle.status,
+        'Total Capacity': vehicle.capacity,
+        'Seated Capacity': vehicle.seatedCapacity,
+        'Standing Capacity': vehicle.standingCapacity,
+        'Investor Number': vehicle.investorNumber,
+        'Marshal Number': vehicle.marshalNumber,
+        'Store Number': vehicle.storeNumber || 'N/A',
+        'Till Number': vehicle.tillNumber || 'N/A',
+        'OTP Approver': vehicle.otpApproverNumber || 'N/A',
+        'Org Fees Maintained': vehicle.organizationFeesMaintained ? 'Yes' : 'No',
+        'Entity Name': vehicle.entityName,
+        'Created On': new Date(vehicle.createdOn).toLocaleString(),
+        'Created By': vehicle.createBy,
+        'Last Modified': vehicle.lastModifiedDate ? new Date(vehicle.lastModifiedDate).toLocaleString() : 'N/A',
+        'Modified By': vehicle.modifiedBy || 'N/A'
+      }));
+
+      // Create worksheet
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+
+      // Set column widths
+      const colWidths = [
+        { wch: 15 }, // Fleet Number
+        { wch: 15 }, // Fleet Code
+        { wch: 20 }, // Registration Number
+        { wch: 20 }, // Stage
+        { wch: 12 }, // Status
+        { wch: 15 }, // Total Capacity
+        { wch: 15 }, // Seated Capacity
+        { wch: 18 }, // Standing Capacity
+        { wch: 15 }, // Investor Number
+        { wch: 15 }, // Marshal Number
+        { wch: 15 }, // Store Number
+        { wch: 15 }, // Till Number
+        { wch: 15 }, // OTP Approver
+        { wch: 20 }, // Org Fees Maintained
+        { wch: 20 }, // Entity Name
+        { wch: 20 }, // Created On
+        { wch: 20 }, // Created By
+        { wch: 20 }, // Last Modified
+        { wch: 20 }  // Modified By
+      ];
+      ws['!cols'] = colWidths;
+
+      // Create workbook
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Vehicles');
+
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `vehicles_${timestamp}.xlsx`;
+
+      // Save file
+      XLSX.writeFile(wb, filename);
+
+      console.log('Vehicles exported to Excel successfully');
+      // If you have MessageService:
+      // this.messageService.add({
+      //   severity: 'success',
+      //   summary: 'Success',
+      //   detail: 'Vehicles exported to Excel successfully',
+      //   life: 4000
+      // });
+    } catch (error) {
+      console.error('Failed to export to Excel:', error);
+      // If you have MessageService:
+      // this.messageService.add({
+      //   severity: 'error',
+      //   summary: 'Error',
+      //   detail: 'Failed to export vehicles to Excel',
+      //   life: 4000
+      // });
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  /**
+   * Export vehicles to CSV
+   */
+  exportToCSV(): void {
+    if (this.vehicles.length === 0) {
+      console.warn('No vehicles to export');
+      // If you have MessageService:
+      // this.messageService.add({
+      //   severity: 'warn',
+      //   summary: 'No Data',
+      //   detail: 'No vehicles to export',
+      //   life: 3000
+      // });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      // Prepare data for export
+      const exportData = this.vehicles.map(vehicle => ({
+        'Fleet Number': vehicle.fleetNumber,
+        'Fleet Code': vehicle.fleetCode,
+        'Registration Number': vehicle.registrationNumber,
+        'Stage': vehicle.stageName,
+        'Status': vehicle.status,
+        'Total Capacity': vehicle.capacity,
+        'Seated Capacity': vehicle.seatedCapacity,
+        'Standing Capacity': vehicle.standingCapacity,
+        'Investor Number': vehicle.investorNumber,
+        'Marshal Number': vehicle.marshalNumber,
+        'Store Number': vehicle.storeNumber || 'N/A',
+        'Till Number': vehicle.tillNumber || 'N/A',
+        'OTP Approver': vehicle.otpApproverNumber || 'N/A',
+        'Org Fees Maintained': vehicle.organizationFeesMaintained ? 'Yes' : 'No',
+        'Entity Name': vehicle.entityName,
+        'Created On': new Date(vehicle.createdOn).toLocaleString(),
+        'Created By': vehicle.createBy,
+        'Last Modified': vehicle.lastModifiedDate ? new Date(vehicle.lastModifiedDate).toLocaleString() : 'N/A',
+        'Modified By': vehicle.modifiedBy || 'N/A'
+      }));
+
+      // Create worksheet and convert to CSV
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+
+      // Create blob and download
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `vehicles_${timestamp}.csv`;
+
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      console.log('Vehicles exported to CSV successfully');
+      // If you have MessageService:
+      // this.messageService.add({
+      //   severity: 'success',
+      //   summary: 'Success',
+      //   detail: 'Vehicles exported to CSV successfully',
+      //   life: 4000
+      // });
+    } catch (error) {
+      console.error('Failed to export to CSV:', error);
+      // If you have MessageService:
+      // this.messageService.add({
+      //   severity: 'error',
+      //   summary: 'Error',
+      //   detail: 'Failed to export vehicles to CSV',
+      //   life: 4000
+      // });
+    } finally {
+      this.isExporting = false;
+    }
   }
 }
