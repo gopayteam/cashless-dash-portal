@@ -19,6 +19,9 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 import * as XLSX from 'xlsx';
+import { MessageService } from 'primeng/api';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 
 interface StatusOption {
   label: string;
@@ -39,7 +42,9 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    MessageModule,
+    ToastModule,
   ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
@@ -85,6 +90,7 @@ export class AllVehiclesComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -272,13 +278,12 @@ export class AllVehiclesComponent implements OnInit {
   exportToExcel(): void {
     if (this.vehicles.length === 0) {
       console.warn('No vehicles to export');
-      // If you have MessageService, you can show a toast:
-      // this.messageService.add({
-      //   severity: 'warn',
-      //   summary: 'No Data',
-      //   detail: 'No vehicles to export',
-      //   life: 3000
-      // });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No vehicles to export',
+        life: 3000
+      });
       return;
     }
 
@@ -347,22 +352,20 @@ export class AllVehiclesComponent implements OnInit {
       XLSX.writeFile(wb, filename);
 
       console.log('Vehicles exported to Excel successfully');
-      // If you have MessageService:
-      // this.messageService.add({
-      //   severity: 'success',
-      //   summary: 'Success',
-      //   detail: 'Vehicles exported to Excel successfully',
-      //   life: 4000
-      // });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Vehicles exported to Excel successfully',
+        life: 4000
+      });
     } catch (error) {
       console.error('Failed to export to Excel:', error);
-      // If you have MessageService:
-      // this.messageService.add({
-      //   severity: 'error',
-      //   summary: 'Error',
-      //   detail: 'Failed to export vehicles to Excel',
-      //   life: 4000
-      // });
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export vehicles to Excel',
+        life: 4000
+      });
     } finally {
       this.isExporting = false;
     }
@@ -374,13 +377,12 @@ export class AllVehiclesComponent implements OnInit {
   exportToCSV(): void {
     if (this.vehicles.length === 0) {
       console.warn('No vehicles to export');
-      // If you have MessageService:
-      // this.messageService.add({
-      //   severity: 'warn',
-      //   summary: 'No Data',
-      //   detail: 'No vehicles to export',
-      //   life: 3000
-      // });
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No vehicles to export',
+        life: 3000
+      });
       return;
     }
 
@@ -428,22 +430,20 @@ export class AllVehiclesComponent implements OnInit {
       URL.revokeObjectURL(link.href);
 
       console.log('Vehicles exported to CSV successfully');
-      // If you have MessageService:
-      // this.messageService.add({
-      //   severity: 'success',
-      //   summary: 'Success',
-      //   detail: 'Vehicles exported to CSV successfully',
-      //   life: 4000
-      // });
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Vehicles exported to CSV successfully',
+        life: 4000
+      });
     } catch (error) {
       console.error('Failed to export to CSV:', error);
-      // If you have MessageService:
-      // this.messageService.add({
-      //   severity: 'error',
-      //   summary: 'Error',
-      //   detail: 'Failed to export vehicles to CSV',
-      //   life: 4000
-      // });
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export vehicles to CSV',
+        life: 4000
+      });
     } finally {
       this.isExporting = false;
     }

@@ -73,7 +73,7 @@
     <p-table [value]="parcelManagers" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
       [totalRecords]="totalRecords" [loading]="loading()" [rowsPerPageOptions]="[10, 20, 30, 50]"
       [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} managers"
-      (onLazyLoad)="loadParcelManagers($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }">
+      (onLazyLoad)="loadParcelManagers($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Manager</th>

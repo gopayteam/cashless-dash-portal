@@ -45,7 +45,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Bebas+Neue&display=swap');
 
 /* ============================================================
    COLOR VARIABLES
@@ -55,18 +54,27 @@
   --primary-color: #0e2c5a;
   --primary-color-dark: #093170;
   --primary-hover: #c82333;
+  --primary-active: #082044;
+  --primary-text: #ffffff;
 
   /* Secondary – Red 900 */
   --secondary-color: #c82333;
   --secondary-color-dark: #7f0000;
+  --secondary-hover: #dc3545;
+  --secondary-text: #ffffff;
 
   /* Status colors */
-  /* --success-color: #198754; */
-  --success-color: #28a745;
-  --success-color-dark: #1e7e34;
+  --success-color: #198754;
+  --success-bg: #d1e7dd;
+
   --warning-color: #ffc107;
+  --warning-bg: #fff3cd;
+
   --danger-color: #b71c1c;
+  --danger-bg: #f8d7da;
+
   --info-color: #0dcaf0;
+  --info-bg: #cff4fc;
 
   /* Neutrals */
   --light-bg: #f8f9fa;
@@ -75,6 +83,15 @@
   --medium-text: #495057;
   --light-text: #6c757d;
   --border-color: #e9ecef;
+
+  --bg-app: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f8f9fa;
+  --bg-topbar: #f8f9fa;
+
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
 
   /* Layout dimensions */
   --sidebar-width: 280px;
@@ -87,6 +104,58 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
+
+body.dark-mode {
+  /* Override neutrals for dark mode */
+  --light-bg: #1a1d23;
+  --white: #2d3139;
+  --dark-text: #e8eaed;
+  --medium-text: #c4c7cc;
+  --light-text: #9aa0a6;
+  --border-color: #3c4049;
+
+  /* Primary */
+  --primary-color: #4f83ff;
+  --primary-hover: #6b97ff;
+  --primary-active: #3b6ae6;
+  --primary-text: #ffffff;
+
+  /* Secondary */
+  --secondary-color: #ff5c5c;
+  --secondary-hover: #ff7676;
+  --secondary-text: #ffffff;
+
+  /* Status */
+  --success-color: #3ddc97;
+  --success-bg: #12372a;
+
+  --warning-color: #ffd166;
+  --warning-bg: #3a2f14;
+
+  --danger-color: #ff6b6b;
+  --danger-bg: #3a1c1c;
+
+  --info-color: #4dd0e1;
+  --info-bg: #12333a;
+
+  /* Neutrals */
+  --bg-app: #121418;
+  --bg-card: #1c1f26;
+  --bg-sidebar: #181b21;
+  --bg-topbar: #181b21;
+
+  --text-primary: #e8eaed;
+  --text-secondary: #c4c7cc;
+  --text-muted: #9aa0a6;
+
+  --border-color: #2f333b;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
 
 /* ============================================================
    RESET AND BASE STYLES
@@ -106,23 +175,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--light-bg);
   color: var(--dark-text);
-}
-
-
-/* ============================================================
-   FORCE DIALOG CLOSE BUTTON TRANSPARENCY (GLOBAL OVERRIDE)
-   ============================================================ */
-/* This rule is intentionally specific to override module-level or
-   component-level styles that might be adding a background to the
-   dialog's close button. */
-body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: none !important;
-}
-
-body .p-dialog .p-dialog-header .p-dialog-header-icons .p-dialog-header-icon:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 

@@ -123,7 +123,7 @@
       [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]"
       [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} deleted parcels" styleClass="data-table"
-      (onLazyLoad)="loadDeletedParcels($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      (onLazyLoad)="loadDeletedParcels($event)" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Parcel Number</th>

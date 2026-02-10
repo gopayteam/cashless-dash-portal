@@ -53,7 +53,7 @@
     <p-table [value]="transactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
       [totalRecords]="apiTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions" styleClass="data-table"
-      (onLazyLoad)="loadTransactions($event)" [tableStyle]="{ 'min-width': '40rem' }">
+      (onLazyLoad)="loadTransactions($event)" [tableStyle]="{ 'min-width': '40rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Receipt Number</th>

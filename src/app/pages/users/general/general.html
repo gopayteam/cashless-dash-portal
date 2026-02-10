@@ -86,6 +86,7 @@
   <p-card styleClass="stat-card card">
     <div class="table-header">
       <div class="table-header-left">
+
         <h3>Users List</h3>
         <span class="record-count">{{ filteredUsers.length }} of {{ totalRecords }} users</span>
 
@@ -111,7 +112,8 @@
     <p-table [value]="users" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
       [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100, 500, 1000]"
       [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users"
-      styleClass="data-table" (onLazyLoad)="loadUsers($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      styleClass="data-table" (onLazyLoad)="loadUsers($event)" [tableStyle]="{ 'min-width': '60rem' }"
+      responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>User Info</th>

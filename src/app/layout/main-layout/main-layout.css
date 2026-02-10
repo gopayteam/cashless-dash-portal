@@ -1,16 +1,6 @@
 /* =====================================================
    1. ANIMATIONS
 ===================================================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes slideInFromTop {
   from {
     opacity: 0;
@@ -40,19 +30,7 @@
 /* =====================================================
    3. SIDEBAR BASE
 ===================================================== */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 280px;
-  background: var(--light-bg);
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, width 0.3s ease;
-}
+
 
 /* =====================================================
    4. DESKTOP SIDEBAR BEHAVIOR
@@ -70,10 +48,7 @@
     box-shadow: none;
   }
 
-  .main-content {
-    margin-left: 280px;
-    transition: margin-left 0.3s ease;
-  }
+
 
   .main-content--sidebar-collapsed {
     margin-left: 0;
@@ -147,58 +122,7 @@
   padding: 1rem 0;
 }
 
-.sidebar__body::-webkit-scrollbar {
-  width: 6px;
-}
 
-.sidebar__body::-webkit-scrollbar-thumb {
-  background: #dee2e6;
-  border-radius: 10px;
-}
-
-/* =====================================================
-   8. DIALOG POSITIONING (PrimeNG)
-===================================================== */
-::ng-deep .p-dialog.notification-dialog,
-::ng-deep .p-dialog.settings-dialog {
-  position: fixed !important;
-  top: 70px !important;
-  right: 20px !important;
-  left: auto !important;
-  margin: 0 !important;
-  transform: none !important;
-  animation: slideInFromTop 0.3s ease-out;
-}
-
-::ng-deep .p-dialog.notification-dialog .p-dialog-content,
-::ng-deep .p-dialog.settings-dialog .p-dialog-content {
-  padding: 0;
-}
-
-@media (max-width: 768px) {
-
-  ::ng-deep .p-dialog.notification-dialog,
-  ::ng-deep .p-dialog.settings-dialog {
-    top: 10px !important;
-    right: 10px !important;
-    left: 10px !important;
-    width: calc(100% - 20px) !important;
-  }
-}
-
-
-
-/* =====================================================
-   14. SCROLLBARS
-===================================================== */
-.notification-panel::-webkit-scrollbar {
-  width: 6px;
-}
-
-.notification-panel::-webkit-scrollbar-thumb {
-  background: var(--secondary-color-dark);
-  border-radius: 10px;
-}
 
 
 /* =====================================================
@@ -224,8 +148,8 @@
 
 .sidebar__logo-img {
   height: 40px;
-  transform: scale(3.15);
-  transform-origin: center;
+  object-fit: contain;
+  display: block;
 }
 
 
@@ -258,15 +182,15 @@
    TOPBAR DIALOGS - ENHANCED STYLING
 ===================================================== */
 
-/* Dialog Positioning */
+/* Dialog Positioning and base styles */
 ::ng-deep .p-dialog.notification-dialog,
 ::ng-deep .p-dialog.settings-dialog {
-  position: fixed !important;
-  top: 80px !important;
-  right: 20px !important;
-  left: auto !important;
-  margin: 0 !important;
-  transform: none !important;
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  left: auto;
+  margin: 0;
+  transform: none;
   animation: slideInFromTop 0.3s ease-out;
 }
 
@@ -274,6 +198,7 @@
 ::ng-deep .p-dialog.settings-dialog .p-dialog-content {
   padding: 0;
   overflow: hidden;
+  border-radius: 0 0 12px 12px;
 }
 
 /* Dialog Header Styling */
@@ -294,6 +219,73 @@
   gap: 0.5rem;
 }
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+  ::ng-deep .p-dialog.notification-dialog,
+  ::ng-deep .p-dialog.settings-dialog {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+
+
+
+/* =====================================================
+   TOPBAR DIALOGS - ENHANCED STYLING
+===================================================== */
+
+/* Dialog Positioning */
+::ng-deep .p-dialog.notification-dialog,
+::ng-deep .p-dialog.settings-dialog {
+  position: fixed !important;
+  top: 80px !important;
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  transform: none !important;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+::ng-deep .p-dialog.notification-dialog .p-dialog-content,
+::ng-deep .p-dialog.settings-dialog .p-dialog-content {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Dialog Header Styling */
+::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color-dark));
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.25rem 1.5rem;
+  border: none;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
 
 /* Dialog Border Radius */
 ::ng-deep .p-dialog .p-dialog-content {
@@ -305,7 +297,7 @@
 ===================================================== */
 .notification-panel,
 .settings-panel {
-  background: #fff;
+  background: var(--bg-card);
   max-height: 520px;
   display: flex;
   flex-direction: column;
@@ -314,7 +306,7 @@
 /* Panel Header */
 .panel-header {
   padding: 1.25rem 1.5rem 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -356,12 +348,12 @@
 }
 
 .notification-list::-webkit-scrollbar-thumb {
-  background: #dee2e6;
+  background: var(--border-color);
   border-radius: 10px;
 }
 
 .notification-list::-webkit-scrollbar-thumb:hover {
-  background: #adb5bd;
+  background: var(--light-text);
 }
 
 /* Notification Item */
@@ -372,7 +364,7 @@
   padding: 1rem;
   border-radius: 10px;
   margin-bottom: 0.5rem;
-  background: #f8f9fa;
+  background: var(--light-bg);
   border-left: 3px solid transparent;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -380,7 +372,7 @@
 }
 
 .notification-item:hover {
-  background: #e9ecef;
+  background: var(--border-color);
   transform: translateX(2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -474,7 +466,7 @@
 
 .empty-state i {
   font-size: 3rem;
-  color: #dee2e6;
+  color: var(--border-color);
   margin-bottom: 1rem;
   display: block;
 }
@@ -501,11 +493,11 @@
 }
 
 .settings-item:hover {
-  background: #f8f9fa;
+  background: var(--light-bg);
 }
 
 .settings-item+.settings-item {
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--border-color);
 }
 
 .settings-item-info {
@@ -550,8 +542,8 @@
 ===================================================== */
 .panel-footer {
   padding: 1rem 1.5rem;
-  border-top: 2px solid #f0f0f0;
-  background: #fafafa;
+  border-top: 2px solid var(--border-color);
+  background: var(--light-bg);
 }
 
 .footer-btn {
@@ -585,42 +577,114 @@
 }
 
 /* =====================================================
-   TOGGLE SWITCH STYLING
+   TOGGLE SWITCH STYLING - MODERN DESIGN
 ===================================================== */
+
+/* Main toggle container */
 ::ng-deep .p-toggleswitch {
-  width: 3rem;
-  height: 1.75rem;
+  width: 3.5rem;
+  height: 2rem;
   flex-shrink: 0;
 }
 
+/* Track/Background */
 ::ng-deep .p-toggleswitch .p-toggleswitch-slider {
-  background: #dee2e6;
-  border-radius: 30px;
-  border: none;
-  transition: background-color 0.3s ease;
+  background: var(--border-color);
+  border-radius: 2rem;
+  border: 2px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Handle/Knob */
 ::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
-  width: 1.25rem;
-  height: 1.25rem;
-  left: 0.25rem;
-  bottom: 0.25rem;
-  background: #fff;
+  content: '';
+  position: absolute;
+  width: 1.5rem;
+  height: 1.5rem;
+  left: 0.125rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--white);
   border-radius: 50%;
-  transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Checked/Active state - Track */
 ::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  border-color: var(--primary-color);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 0 0 0px rgba(14, 44, 90, 0.2);
 }
 
+/* Checked/Active state - Handle */
 ::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
-  transform: translateX(1.25rem);
+  transform: translateX(1.5rem) translateY(-50%);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
+/* Focus state */
 ::ng-deep .p-toggleswitch.p-focus .p-toggleswitch-slider {
-  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(14, 44, 90, 0.15);
+  outline: none;
+}
+
+/* Hover state - unchecked */
+::ng-deep .p-toggleswitch:not(.p-toggleswitch-checked):hover .p-toggleswitch-slider {
+  background: var(--light-text);
+  border-color: var(--light-text);
+}
+
+/* Hover state - checked */
+::ng-deep .p-toggleswitch.p-toggleswitch-checked:hover .p-toggleswitch-slider {
+  background: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color));
+}
+
+/* Hover state - handle */
+::ng-deep .p-toggleswitch:hover .p-toggleswitch-slider:before {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Active/Pressed state */
+::ng-deep .p-toggleswitch:active .p-toggleswitch-slider:before {
+  width: 1.7rem;
+}
+
+/* Disabled state */
+::ng-deep .p-toggleswitch.p-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+::ng-deep .p-toggleswitch.p-disabled .p-toggleswitch-slider {
+  background: var(--border-color);
+  border-color: var(--border-color);
+}
+
+/* Optional: Add icons to the toggle (ON/OFF indicators) */
+::ng-deep .p-toggleswitch .p-toggleswitch-slider:after {
+  content: '';
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:after {
+  opacity: 1;
 }
 
 /* =====================================================
@@ -695,5 +759,20 @@
     width: 36px;
     height: 36px;
     font-size: 1.1rem;
+  }
+
+  /* Smaller toggle on mobile */
+  ::ng-deep .p-toggleswitch {
+    width: 3rem;
+    height: 1.75rem;
+  }
+
+  ::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  ::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
+    transform: translateX(1.25rem) translateY(-50%);
   }
 }

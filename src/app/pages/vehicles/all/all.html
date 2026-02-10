@@ -1,5 +1,8 @@
 <!-- pages/vehicles/all-vehicles.component.html -->
 <div class="vehicles-container">
+  <!-- Toast for notifications -->
+  <p-toast position="top-right" [life]="4000"></p-toast>
+
   <!-- ================= HEADER ================= -->
   <div class="vehicles-header">
     <div class="header-content">
@@ -101,7 +104,7 @@
     <p-table [value]="vehicles" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
       [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} vehicles" styleClass="data-table"
-      (onLazyLoad)="loadVehicles($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      (onLazyLoad)="loadVehicles($event)" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Fleet Number</th>

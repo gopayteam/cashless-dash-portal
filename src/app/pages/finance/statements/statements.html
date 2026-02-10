@@ -78,7 +78,7 @@
     <p-table [value]="statements" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
       [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} statements" styleClass="data-table"
-      (onLazyLoad)="loadStatements($event)" [tableStyle]="{ 'min-width': '60rem' }">
+      (onLazyLoad)="loadStatements($event)" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
 
       <ng-template pTemplate="header">
         <tr>

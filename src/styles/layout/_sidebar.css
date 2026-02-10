@@ -1,13 +1,16 @@
 /* from main-layout.css */
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
   width: var(--sidebar-width);
   background: var(--bg-sidebar);
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
-  transition: width var(--transition);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, width 0.3s ease;
   overflow: hidden;
-  position: relative;
   z-index: 1000;
 }
 
@@ -33,11 +36,17 @@
 
 /* New icon logo */
 .sidebar__logo-img {
-  width: 80px;              /* logo width */
-  height: 60px;              /* logo height */
-  object-fit: contain;       /* prevent distortion */
-  display: block;            /* best for images */
+  width: 80px;
+  /* logo width */
+  height: 60px;
+  /* logo height */
+  object-fit: contain;
+  /* prevent distortion */
+  display: block;
+  /* best for images */
   transition: all var(--transition);
+  transform: scale(3.15);
+  transform-origin: center;
 }
 
 .sidebar__logo i {
@@ -292,11 +301,9 @@
 
 /* Active Menu Item */
 .menu-link--active {
-  background: linear-gradient(
-    90deg,
-    rgba(220, 53, 69, 0.12) 0%,
-    rgba(220, 53, 69, 0.06) 100%
-  ) !important;
+  background: linear-gradient(90deg,
+      rgba(220, 53, 69, 0.12) 0%,
+      rgba(220, 53, 69, 0.06) 100%) !important;
   box-shadow: 0 2px 8px rgba(220, 53, 69, 0.15);
 }
 
@@ -326,7 +333,8 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #c82333;           /* brand red */
+  color: #c82333;
+  /* brand red */
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -334,13 +342,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: all 0.2s ease; /* smoother transition */
+  transition: all 0.2s ease;
+  /* smoother transition */
   font-family: inherit;
 }
 
 .sidebar__logout-btn:hover {
-  background-color: rgba(200, 35, 51, 0.1); /* light red hover */
-  color: #c82333;                             /* keep brand red on hover */
+  background-color: rgba(200, 35, 51, 0.1);
+  /* light red hover */
+  color: #c82333;
+  /* keep brand red on hover */
   transform: translateY(-2px);
 }
 

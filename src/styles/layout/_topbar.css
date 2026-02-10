@@ -1,6 +1,6 @@
 /* from main-layout.css */
 .topbar {
-  background: var(--bg-white);
+  background: var(--bg-topbar);
   padding: 1rem 1.5rem;
   box-shadow: var(--shadow-sm);
   display: flex;
@@ -76,7 +76,7 @@
 
 /* HORIZONTAL TAB NAVIGATION */
 .tab-nav {
-  background: var(--bg-white);
+  background: var(--bg-topbar-navigation);
   border-bottom: 2px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   position: relative;

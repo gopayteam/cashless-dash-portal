@@ -38,12 +38,10 @@
           <label for="password" class="form-label">
             Password <span class="required-indicator">*</span>
           </label>
-          <p-password id="password" formControlName="password" placeholder="Enter your password" [toggleMask]="true"
-            [feedback]="false" styleClass="w-full" inputStyleClass="w-full"
-            [class.p-invalid]="isFieldInvalid('password')">
-            <ng-template pTemplate="header"></ng-template>
-            <ng-template pTemplate="footer"></ng-template>
+          <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="false"
+            styleClass="w-full" inputStyleClass="w-full">
           </p-password>
+
           <small class="p-error" *ngIf="isFieldInvalid('password')">
             {{ getErrorMessage('password') }}
           </small>
@@ -59,7 +57,8 @@
         <!-- Submit Button -->
         <div class="form-actions">
           <p-button type="submit" label="Sign In" [loading]="loading()" iconPos="right"
-            styleClass="w-full p-button-lg primary-button" [style]="{'--icon-margin-left': '0.5rem', 'gap': '1rem', 'margin-left': '10px'}"></p-button>
+            styleClass="w-full p-button-lg primary-button"
+            [style]="{'--icon-margin-left': '0.5rem', 'gap': '1rem', 'margin-left': '10px'}"></p-button>
         </div>
 
         <!-- Sign Up Link -->
