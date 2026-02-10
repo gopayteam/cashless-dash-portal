@@ -9,6 +9,7 @@ import { Dialog } from "primeng/dialog";
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { Subscription } from 'rxjs';
 import { DarkModeService } from '../../../@core/services/dark-mode.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 interface TabConfig {
   label: string;
@@ -36,7 +37,7 @@ interface Notification {
     RouterOutlet,
     Dialog,
     ReactiveFormsModule,
-    ToggleSwitchModule,
+    MatSlideToggleModule,
   ],
   templateUrl: './main-layout.html',
   styleUrls: ['./main-layout.css']

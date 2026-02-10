@@ -158,6 +158,8 @@ export class UpdateVehicleComponent implements OnInit {
     return this.loadingStore.loading;
   }
 
+
+
   ngOnInit(): void {
     const user = this.authService.currentUser();
     if (!user) {
@@ -186,6 +188,12 @@ export class UpdateVehicleComponent implements OnInit {
     });
   }
 
+  private cleanPayload(obj: any) {
+    Object.keys(obj).forEach(
+      key => obj[key] === '' && delete obj[key]
+    );
+  }
+
   private initializeData(): void {
     const stateVehicle = this.getVehicleFromState();
 
@@ -211,22 +219,22 @@ export class UpdateVehicleComponent implements OnInit {
       investors: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
-        'investor-users'
+        'investor-users', true,
       ),
       marshals: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
-        'marshall-users'
+        'marshall-users', true,
       ),
       stages: this.dataService.post<StagesResponse>(
         API_ENDPOINTS.ALL_STAGES,
         { entityId: this.entityId, page: 0, size: 100 },
-        'stages'
+        'stages', true,
       ),
       organization: this.dataService.post<OrganizationsApiResponse>(
         API_ENDPOINTS.ALL_ORGANIZATIONS,
         { entityId: this.entityId, page: 0, size: 200 },
-        'organizations'
+        'organizations', true,
       )
     };
 
@@ -284,22 +292,22 @@ export class UpdateVehicleComponent implements OnInit {
       investors: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
-        'investor-users'
+        'investor-users', true,
       ),
       marshals: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
-        'marshall-users'
+        'marshall-users', true,
       ),
       stages: this.dataService.post<StagesResponse>(
         API_ENDPOINTS.ALL_STAGES,
         { entityId: this.entityId, page: 0, size: 100 },
-        'stages'
+        'stages', true,
       ),
       organization: this.dataService.post<OrganizationsApiResponse>(
         API_ENDPOINTS.ALL_ORGANIZATIONS,
         { entityId: this.entityId, page: 0, size: 200 },
-        'organizations'
+        'organizations', true
       ),
       vehicle: this.dataService.postWithParams<VehiclesApiResponse>(
         API_ENDPOINTS.VEHICLE_DATA,
@@ -373,7 +381,7 @@ export class UpdateVehicleComponent implements OnInit {
     };
 
     this.dataService
-      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees')
+      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees', true)
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
@@ -647,7 +655,9 @@ export class UpdateVehicleComponent implements OnInit {
       stageId: this.selectedStage!,
       maintainFees: this.maintainFees,
       vehicleFees: vehicleFees,
-      username: this.username
+      username: this.username,
+      // storeNumber: this.storeNumber ? this.storeNumber : '',
+      // tillNumber: this.tillNumber ? this.tillNumber : '',
     };
 
     // Add optional fields only if they have values
@@ -658,13 +668,25 @@ export class UpdateVehicleComponent implements OnInit {
       payload.tillNumber = this.tillNumber.trim();
     }
 
+    this.cleanPayload(payload);
+
+    if (vehicleFees.some(f => f.id === null)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Fee configuration missing. Please refresh the page.',
+        life: 4000
+      });
+      return;
+    }
+
     console.log('Updating vehicle with payload:', payload);
 
     this.submitting = true;
     this.loadingStore.start();
 
     this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.UPDATE_VEHICLE, payload, 'update-vehicle')
+      .post<ApiResponse>(API_ENDPOINTS.UPDATE_VEHICLE, payload, 'update-vehicle', true)
       .subscribe({
         next: (response) => {
 

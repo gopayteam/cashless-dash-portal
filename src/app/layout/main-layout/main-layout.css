@@ -695,93 +695,95 @@ body.dark-mode .empty-state i {
 }
 
 /* =====================================================
-   TOGGLE SWITCH STYLING
+   MATERIAL SLIDE TOGGLE STYLING
 ===================================================== */
-::ng-deep .p-toggleswitch {
+::ng-deep .settings-item .mat-mdc-slide-toggle {
+  --mdc-switch-selected-track-color: var(--primary-color);
+  --mdc-switch-selected-hover-track-color: var(--primary-color-dark);
+  --mdc-switch-selected-pressed-track-color: var(--primary-color-dark);
+  --mdc-switch-selected-focus-track-color: var(--primary-color);
+
+  --mdc-switch-selected-handle-color: var(--white);
+  --mdc-switch-selected-hover-handle-color: var(--white);
+  --mdc-switch-selected-pressed-handle-color: var(--white);
+  --mdc-switch-selected-focus-handle-color: var(--white);
+
+  --mdc-switch-unselected-track-color: var(--border-color);
+  --mdc-switch-unselected-hover-track-color: var(--light-text);
+  --mdc-switch-unselected-pressed-track-color: var(--light-text);
+  --mdc-switch-unselected-focus-track-color: var(--border-color);
+
+  --mdc-switch-unselected-handle-color: var(--white);
+  --mdc-switch-unselected-hover-handle-color: var(--white);
+  --mdc-switch-unselected-pressed-handle-color: var(--white);
+  --mdc-switch-unselected-focus-handle-color: var(--white);
+
+  --mdc-switch-handle-surface-color: var(--white);
+  --mdc-switch-handle-elevation-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --mdc-switch-handle-shadow-color: rgba(0, 0, 0, 0.2);
+
+  --mdc-switch-disabled-selected-handle-color: #424242;
+  --mdc-switch-disabled-selected-track-color: #424242;
+  --mdc-switch-disabled-unselected-handle-color: #424242;
+  --mdc-switch-disabled-unselected-track-color: #424242;
+}
+
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch {
   width: 3.5rem;
   height: 2rem;
-  flex-shrink: 0;
 }
 
-::ng-deep .p-toggleswitch .p-toggleswitch-slider {
-  background: var(--border-color);
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__track {
+  height: 2rem;
   border-radius: 2rem;
-  border: 2px solid var(--border-color);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid transparent;
 }
 
-::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
-  content: '';
-  position: absolute;
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__handle-track {
+  height: 2rem;
+}
+
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__handle {
   width: 1.5rem;
   height: 1.5rem;
-  left: 0.125rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--white);
-  border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__shadow {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
-  border-color: var(--primary-color);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 0px rgba(14, 44, 90, 0.2);
-}
-
-::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
-  transform: translateX(1.5rem) translateY(-50%);
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch--selected .mdc-switch__shadow {
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-::ng-deep .p-toggleswitch.p-focus .p-toggleswitch-slider {
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(14, 44, 90, 0.15);
-  outline: none;
+/* Focus ring */
+::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch:focus-visible .mdc-switch__ripple {
+  opacity: 0.15;
 }
 
-::ng-deep .p-toggleswitch:not(.p-toggleswitch-checked):hover .p-toggleswitch-slider {
-  background: var(--light-text);
-  border-color: var(--light-text);
-}
-
-::ng-deep .p-toggleswitch.p-toggleswitch-checked:hover .p-toggleswitch-slider {
-  background: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color));
-}
-
-::ng-deep .p-toggleswitch:hover .p-toggleswitch-slider:before {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
-::ng-deep .p-toggleswitch:active .p-toggleswitch-slider:before {
-  width: 1.7rem;
-}
-
-::ng-deep .p-toggleswitch.p-disabled {
+/* Disabled state */
+::ng-deep .settings-item .mat-mdc-slide-toggle.mat-mdc-slide-toggle-disabled {
   opacity: 0.5;
-  cursor: not-allowed;
 }
 
-::ng-deep .p-toggleswitch.p-disabled .p-toggleswitch-slider {
-  background: var(--border-color);
-  border-color: var(--border-color);
-}
-
+/* Responsive */
 @media (max-width: 768px) {
-  ::ng-deep .p-toggleswitch {
+  ::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch {
     width: 3rem;
     height: 1.75rem;
   }
 
-  ::ng-deep .p-toggleswitch .p-toggleswitch-slider:before {
-    width: 1.25rem;
-    height: 1.25rem;
+  ::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__track {
+    height: 1.75rem;
   }
 
-  ::ng-deep .p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider:before {
-    transform: translateX(1.25rem) translateY(-50%);
+  ::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__handle-track {
+    height: 1.75rem;
+  }
+
+  ::ng-deep .settings-item .mat-mdc-slide-toggle .mdc-switch__handle {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 }
 

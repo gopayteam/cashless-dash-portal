@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   // #####################  NOTIFICATION SUB-ENDPOINTS   #######################
   ALL_NOTIFICATIONS: '/api/notifications',
   SEND_NOTIFICATIONS: '/api/v1/org/notification/send',
+  SEND_BROADCAST: '/api/v1/org/notification/send',
 
   // #####################  WALLET SUB-ENDPOINTS   #######################
   ALL_WALLETS: '/api/payment/wallets/all',

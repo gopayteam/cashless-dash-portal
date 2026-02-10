@@ -85,7 +85,14 @@ export class DashboardComponent implements OnInit {
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.router.events.subscribe(() => {
+      // Initialize with default pagination
+      const event = { first: 0, rows: this.rows };
+      this.loadTransactions(event);
+      this.loadDashboardData()
+    });
+  }
 
   // Expose loading signal to template
   get loading() {

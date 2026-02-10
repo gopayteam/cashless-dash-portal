@@ -103,7 +103,11 @@ export class AllVehiclesComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {
+    this.router.events.subscribe(() => {
+      this.loadVehicles();
+    });
+  }
 
   get loading() {
     return this.loadingStore.loading;
@@ -149,7 +153,7 @@ export class AllVehiclesComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', bypassCache)
+      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', true)
       .subscribe({
         next: (response) => {
           this.allVehicles = response.data;
@@ -249,7 +253,7 @@ export class AllVehiclesComponent implements OnInit {
     console.log('Fetching vehicle fees for:', fleetNumber);
 
     this.dataService
-      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees')
+      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees', true)
       .subscribe({
         next: (response) => {
           if (response.data && response.data.length > 0) {
@@ -339,8 +343,8 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   refreshVehicles(): void {
-    if (this.lastEvent)
-      this.fetchVehicles(true, this.lastEvent);
+    // if (this.lastEvent)
+    this.fetchVehicles(true, this.lastEvent);
   }
 
   /**

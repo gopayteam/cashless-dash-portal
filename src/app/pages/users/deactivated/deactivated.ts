@@ -111,7 +111,13 @@ export class DeactivatedUsersComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {
+    this.router.events.subscribe(() => {
+      // Initialize with default pagination
+      const event = { first: 0, rows: this.rows };
+      this.loadUsers(event);
+    });
+  }
 
   get loading() {
     return this.loadingStore.loading;

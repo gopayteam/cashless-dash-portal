@@ -388,8 +388,9 @@
                     <small class="settings-description">Toggle dark theme</small>
                   </div>
                 </div>
-                <p-toggleSwitch [(ngModel)]="darkModeEnabled" (ngModelChange)="onDarkModeChange($event)">
-                </p-toggleSwitch>
+                <mat-slide-toggle [(ngModel)]="darkModeEnabled" (ngModelChange)="onDarkModeChange($event)"
+                  color="primary">
+                </mat-slide-toggle>
               </div>
 
               <!-- Email Notifications Toggle -->
@@ -401,9 +402,9 @@
                     <small class="settings-description">Receive email updates</small>
                   </div>
                 </div>
-                <p-toggleSwitch [(ngModel)]="emailNotificationsEnabled"
-                  (ngModelChange)="onEmailNotificationsChange($event)">
-                </p-toggleSwitch>
+                <mat-slide-toggle [(ngModel)]="emailNotificationsEnabled"
+                  (ngModelChange)="onEmailNotificationsChange($event)" color="primary">
+                </mat-slide-toggle>
               </div>
 
               <!-- Auto Logout Toggle -->
@@ -415,8 +416,9 @@
                     <small class="settings-description">Auto logout after inactivity</small>
                   </div>
                 </div>
-                <p-toggleSwitch [(ngModel)]="autoLogoutEnabled" (ngModelChange)="onAutoLogoutChange($event)">
-                </p-toggleSwitch>
+                <mat-slide-toggle [(ngModel)]="autoLogoutEnabled" (ngModelChange)="onAutoLogoutChange($event)"
+                  color="primary">
+                </mat-slide-toggle>
               </div>
             </div>
 

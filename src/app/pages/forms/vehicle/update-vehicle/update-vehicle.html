@@ -22,10 +22,19 @@
           <div class="form-grid">
 
             <!-- Investor Number -->
-            <div class="form-field">
+            <!-- <div class="form-field">
               <label for="investorNumber" class="field-label required">Investor Phone Number</label>
               <input pInputText id="investorNumber" [(ngModel)]="investorNumber" name="investorNumber"
                 placeholder="Enter investor phone number (e.g., 254XXXXXXXXX)" class="w-full" required />
+            </div> -->
+            <!-- Investor Number (with dropdown for reference) -->
+            <div class="form-field">
+              <label for="investorNumber" class="field-label required">Investor Phone Number</label>
+              <p-select id="investorNumber" [(ngModel)]="investorNumber" name="investorNumber"
+                [options]="investorOptions" placeholder="Select an investor" optionLabel="label" optionValue="value"
+                [filter]="true" filterPlaceholder="Search investors" [loading]="investorsLoading" [showClear]="true"
+                styleClass="w-full" required [editable]="true"></p-select>
+              <small class="field-hint">Format: 254XXXXXXXXX</small>
             </div>
 
             <!-- Fleet Number -->
@@ -50,11 +59,20 @@
             </div>
 
             <!-- Marshal Number -->
-            <div class="form-field">
+            <!-- <div class="form-field">
               <label for="marshalNumber" class="field-label required">Marshal Phone Number</label>
               <input pInputText id="marshalNumber" [(ngModel)]="marshalNumber" name="marshalNumber"
                 placeholder="Enter marshal phone number (e.g., 254XXXXXXXXX)" class="w-full" required />
+            </div> -->
+            <div class="form-field">
+              <label for="marshalNumber" class="field-label required">Marshal Phone Number</label>
+              <p-select id="marshalNumber" [(ngModel)]="marshalNumber" name="marshalNumber" [options]="marshalOptions"
+                placeholder="Select a marshal" optionLabel="label" optionValue="value" [filter]="true"
+                filterPlaceholder="Search marshals" [loading]="marshalsLoading" [showClear]="true" styleClass="w-full"
+                required [editable]="true"></p-select>
+              <small class="field-hint">Format: 254XXXXXXXXX</small>
             </div>
+
 
             <!-- Store Number -->
             <div class="form-field">
