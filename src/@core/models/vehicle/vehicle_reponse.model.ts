@@ -6,3 +6,11 @@ export interface VehicleApiResponse {
   data: Vehicle[];         // Array of vehicle objects
   totalRecords: number;    // Total number of records available
 }
+
+export interface VehicleFeesApiResponse {
+  status: number;          // Response status code (e.g., 0 for success)
+  message: string;         // Response message (e.g., "Vehicle data.")
+  data: Vehicle[];         // Array of vehicle objects
+  totalRecords: number;    // Total number of records available
+}
+

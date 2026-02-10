@@ -1,5 +1,5 @@
 // pages/vehicles/add-vehicle/add-vehicle.component.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,19 +20,14 @@ import { Stage } from '../../../../../@core/models/locations/stage.model';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { VehicleFee } from '../../../../../@core/models/vehicle/vehicle.model';
+import { Organization } from '../../../../../@core/models/organization/organization.model';
+import { forkJoin } from 'rxjs';
+import { OrganizationsApiResponse } from '../../../../../@core/models/organization/organization-response.model';
 
 interface DropdownOption {
   label: string;
   value: any;
-}
-
-interface VehicleFee {
-  id: string;
-  feeName: string;
-  dayType: string;
-  feeAmount: number;
-  username: string;
-  entityId: string;
 }
 
 interface VehiclePayload {
@@ -49,6 +44,13 @@ interface VehiclePayload {
   maintainFees: boolean;
   vehicleFees: VehicleFee[];
   username: string;
+}
+
+interface ApiResponse {
+  status: number;
+  message: string;
+  data: any;
+  totalRecords: number;
 }
 
 @Component({
@@ -68,10 +70,12 @@ interface VehiclePayload {
   ],
   templateUrl: './add-vehicle.html',
   styleUrls: ['./add-vehicle.css', '../../../../../styles/global/_toast.css'],
+  providers: [MessageService]
 })
 export class AddVehicleComponent implements OnInit {
   entityId: string | null = null;
   username: string | null = null;
+  organization: Organization | null = null;
 
   // Form fields
   investorNumber: string = '';
@@ -102,14 +106,17 @@ export class AddVehicleComponent implements OnInit {
   investorsLoading: boolean = false;
   marshalsLoading: boolean = false;
   stagesLoading: boolean = false;
+  organizationLoading: boolean = false;
   submitting: boolean = false;
+  initialDataLoaded: boolean = false;
 
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     private authService: AuthService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   get loading() {
@@ -118,17 +125,143 @@ export class AddVehicleComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    if (user) {
-      this.entityId = user.entityId;
-      this.username = user.username || user.email;
-    } else {
+    if (!user) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.loadInvestors();
-    this.loadMarshals();
-    this.loadStages();
+    this.entityId = user.entityId;
+    this.username = user.username || user.email;
+
+    // Load all required data in parallel
+    this.loadInitialData();
+  }
+
+  private loadInitialData(): void {
+    if (!this.entityId) return;
+
+    this.loadingStore.start();
+
+    const requests = {
+      investors: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
+        'investor-users'
+      ),
+      marshals: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
+        'marshall-users'
+      ),
+      stages: this.dataService.post<StagesResponse>(
+        API_ENDPOINTS.ALL_STAGES,
+        { entityId: this.entityId, page: 0, size: 100 },
+        'stages'
+      ),
+      organization: this.dataService.post<OrganizationsApiResponse>(
+        API_ENDPOINTS.ALL_ORGANIZATIONS,
+        { entityId: this.entityId, page: 0, size: 200 },
+        'organizations'
+      )
+    };
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        // Process investors
+        this.investorOptions = results.investors.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.phoneNumber,
+        }));
+
+        // Process marshals
+        this.marshalOptions = results.marshals.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.phoneNumber,
+        }));
+
+        // Process stages
+        this.stageOptions = results.stages.data.map((stage: Stage) => ({
+          label: stage.name,
+          value: stage.id,
+        }));
+
+        // Process organization and set default fees
+        if (results.organization.data && results.organization.data.length > 0) {
+          this.organization = results.organization.data[0];
+          console.log('✓ Organization data loaded:', this.organization);
+          this.setDefaultFeesFromOrganization();
+        } else {
+          console.warn('⚠ No organization data found, fees will need to be entered manually');
+          this.setDefaultFeesToZero();
+        }
+
+        this.initialDataLoaded = true;
+        this.loadingStore.stop();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load initial data:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load required data. Please try again.',
+          life: 4000
+        });
+        this.loadingStore.stop();
+      }
+    });
+  }
+
+  private setDefaultFeesFromOrganization(): void {
+    if (!this.organization?.organizationCategoryFees) {
+      this.setDefaultFeesToZero();
+      return;
+    }
+
+    const fees = this.organization.organizationCategoryFees;
+
+    // Find and set SYSTEM fee
+    const systemFee = fees.find(f => f.categoryName === 'SYSTEM');
+    this.systemFeeAmount = systemFee?.feeAmount ?? 0;
+
+    // Find and set MANAGEMENT fee
+    const managementFee = fees.find(f => f.categoryName === 'MANAGEMENT');
+    this.managementFeeAmount = managementFee?.feeAmount ?? 0;
+
+    // Find and set SACCO fee
+    const saccoFee = fees.find(f => f.categoryName === 'SACCO');
+    this.saccoFeeAmount = saccoFee?.feeAmount ?? 0;
+
+    // Find and set OFFLOAD fee (same for all days by default, can be changed)
+    const offloadFee = fees.find(f => f.categoryName === 'OFFLOAD');
+    const defaultOffloadAmount = offloadFee?.feeAmount ?? 0;
+    this.offloadWeekdayFeeAmount = defaultOffloadAmount;
+    this.offloadSaturdayFeeAmount = defaultOffloadAmount;
+    this.offloadSundayFeeAmount = defaultOffloadAmount;
+
+    // Find and set DRIVER fee
+    const driverFee = fees.find(f => f.categoryName === 'DRIVER');
+    this.driverFeeAmount = driverFee?.feeAmount ?? 0;
+
+    console.log('✓ Default fees set from organization:', {
+      system: this.systemFeeAmount,
+      management: this.managementFeeAmount,
+      sacco: this.saccoFeeAmount,
+      offloadWeekday: this.offloadWeekdayFeeAmount,
+      offloadSaturday: this.offloadSaturdayFeeAmount,
+      offloadSunday: this.offloadSundayFeeAmount,
+      driver: this.driverFeeAmount
+    });
+  }
+
+  private setDefaultFeesToZero(): void {
+    this.systemFeeAmount = 0;
+    this.managementFeeAmount = 0;
+    this.saccoFeeAmount = 0;
+    this.offloadWeekdayFeeAmount = 0;
+    this.offloadSaturdayFeeAmount = 0;
+    this.offloadSundayFeeAmount = 0;
+    this.driverFeeAmount = 0;
   }
 
   loadInvestors(): void {
@@ -151,6 +284,7 @@ export class AddVehicleComponent implements OnInit {
             value: user.phoneNumber,
           }));
           this.investorsLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Failed to load investors', err);
@@ -179,6 +313,7 @@ export class AddVehicleComponent implements OnInit {
             value: user.phoneNumber,
           }));
           this.marshalsLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Failed to load marshals', err);
@@ -204,6 +339,7 @@ export class AddVehicleComponent implements OnInit {
             value: stage.id,
           }));
           this.stagesLoading = false;
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Failed to load stages', err);
@@ -240,6 +376,12 @@ export class AddVehicleComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.isFormValid() || !this.entityId || !this.username) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields correctly',
+        life: 4000
+      });
       return;
     }
 
@@ -251,7 +393,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'ALL',
         feeAmount: this.systemFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -259,7 +401,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'ALL',
         feeAmount: this.managementFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -267,7 +409,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'ALL',
         feeAmount: this.saccoFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -275,7 +417,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'WEEKDAY',
         feeAmount: this.offloadWeekdayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -283,7 +425,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'SATURDAY',
         feeAmount: this.offloadSaturdayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -291,7 +433,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'SUNDAY',
         feeAmount: this.offloadSundayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
         id: '',
@@ -299,7 +441,7 @@ export class AddVehicleComponent implements OnInit {
         dayType: 'ALL',
         feeAmount: this.driverFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       }
     ];
 
@@ -325,40 +467,67 @@ export class AddVehicleComponent implements OnInit {
       payload.tillNumber = this.tillNumber.trim();
     }
 
+    console.log('Creating vehicle with payload:', payload);
+
     this.submitting = true;
     this.loadingStore.start();
 
     this.dataService
-      .post(API_ENDPOINTS.CREATE_VEHICLE, payload, 'create-vehicle')
+      .post<ApiResponse>(API_ENDPOINTS.CREATE_VEHICLE, payload, 'create-vehicle')
       .subscribe({
         next: (response) => {
           console.log('Vehicle created successfully', response);
-
-          // Show validation success toast
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Created Successfully',
-            detail: 'Vehicle created successfully',
-            life: 4000
-          });
-
           this.submitting = false;
           this.loadingStore.stop();
-          this.router.navigate(['/vehicles/all']);
+
+          if (response.status === 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.message || 'Vehicle created successfully',
+              life: 4000
+            });
+
+            // Navigate back to vehicles list
+            setTimeout(() => {
+              this.router.navigate(['/vehicles/all']);
+            }, 1500);
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error Occurred',
+              detail: response.message || 'Failed to create vehicle',
+              life: 5000
+            });
+          }
         },
         error: (err) => {
-          console.error('Failed to create vehicle', err);
+          console.error('Failed to create vehicle - Full error:', err);
+          console.error('Error status:', err.status);
+          console.error('Error details:', err.error);
 
-          // Show validation error toast
+          let errorMessage = 'Failed to create vehicle';
+
+          if (err.status === 409) {
+            errorMessage = 'Vehicle with this registration number or fleet number already exists';
+          } else if (err.status === 400) {
+            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
+          } else if (err.status === 500) {
+            errorMessage = 'Server error occurred. Please try again later.';
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          }
+
           this.messageService.add({
             severity: 'error',
             summary: 'Error Occurred',
-            detail: 'Failed to create vehicle',
-            life: 4000
+            detail: errorMessage,
+            life: 5000
           });
 
           this.submitting = false;
           this.loadingStore.stop();
+          this.cdr.detectChanges();
         },
       });
   }
@@ -377,12 +546,8 @@ export class AddVehicleComponent implements OnInit {
     this.tillNumber = '';
     this.selectedStage = null;
     this.maintainFees = false;
-    this.systemFeeAmount = null;
-    this.managementFeeAmount = null;
-    this.saccoFeeAmount = null;
-    this.offloadWeekdayFeeAmount = null;
-    this.offloadSaturdayFeeAmount = null;
-    this.offloadSundayFeeAmount = null;
-    this.driverFeeAmount = null;
+
+    // Reset fees to organization defaults
+    this.setDefaultFeesFromOrganization();
   }
 }

@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
 
   SEND_RESET_PASSWORD: '/api/v1/auth/forgot-password',
+  RBAC_ROLES: '/api/v1/org/rbac/profiles/view',
 
   // #####################  DASHBOARD SUB-ENDPOINTS   #######################
   ALL_PAYMENTS: '/api/payment/passenger/manifest',
@@ -44,6 +45,8 @@ export const API_ENDPOINTS = {
 
   // #####################  VEHICLE SUB-ENDPOINTS   #######################
   ALL_VEHICLES: '/api/v1/org/vehicles/view-all',
+  VEHICLE_DATA: '/api/v1/org/vehicles/view/fleet',
+  VEHICLE_FEES: '/api/v1/org/vehicles/fleet-fees',
 
   // #####################  DRIVER-ASSIGNMENTS SUB-ENDPOINTS   #######################
   ALL_DRIVER_ASSIGNMENTS: '/api/v1/org/view-activated-fleets',
@@ -78,5 +81,7 @@ export const API_ENDPOINTS = {
 
   ACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/driver/fleets/approve',
   DEACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/activated-deactivate-fleet',
+
+  ALL_ORGANIZATIONS: '/api/v1/org/organizations/view-all',
 
 };

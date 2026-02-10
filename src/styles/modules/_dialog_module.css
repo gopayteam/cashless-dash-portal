@@ -5,8 +5,8 @@
 /* These styles target overlay elements and MUST be global and specific. */
 body .p-dialog.custom-dialog .p-dialog-header {
   background: linear-gradient(135deg,
-      var(--primary-color-dark) 0%,
-      var(--secondary-color) 100%);
+      var(--primary-color) 0%,
+      var(--secondary-color-dark) 100%);
   color: white;
   padding: 1.5rem;
   border-radius: 6px 6px 0 0;

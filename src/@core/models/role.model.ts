@@ -1,10 +1,33 @@
-export enum Role {
-  Admin = 'Admin',
-  Client = 'Client',
-  User = 'User',
+export interface Role {
+  id: number;
+  name: RoleName;
+  remarks: string;
+  softDelete: boolean;
+  createdOn: string;
+  createBy: string | null;
+  lastModifiedDate: string | null;
+  modifiedBy: string | null;
 }
 
-
+export type RoleName =
+  | 'USER'
+  | 'ADMIN'
+  | 'SUPER_ADMIN'
+  | 'DRIVER'
+  | 'CONDUCTOR'
+  | 'PASSENGER'
+  | 'INVESTOR'
+  | 'GUEST'
+  | 'DISCIPLINARY'
+  | 'ENABLED_ADMIN'
+  | 'CASH_COLLECTOR'
+  | 'MS_DYNAMICS_ADMIN'
+  | 'TPS_ADMIN'
+  | 'PARCEL'
+  | 'SUPER_METRO_ADMIN'
+  | 'INSPECTOR'
+  | 'MARSHAL'
+  | 'DASHMASTER';
 
 // {
 //     "status": 0,

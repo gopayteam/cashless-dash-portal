@@ -1,5 +1,5 @@
 // pages/vehicles/update-vehicle/update-vehicle.component.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -20,19 +20,14 @@ import { Stage } from '../../../../../@core/models/locations/stage.model';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { VehicleFee } from '../../../../../@core/models/vehicle/vehicle.model';
+import { Organization } from '../../../../../@core/models/organization/organization.model';
+import { forkJoin } from 'rxjs';
+import { OrganizationsApiResponse } from '../../../../../@core/models/organization/organization-response.model';
 
 interface DropdownOption {
   label: string;
   value: any;
-}
-
-interface VehicleFee {
-  id: string;
-  feeName: string;
-  dayType: string;
-  feeAmount: number;
-  username: string;
-  entityId: string;
 }
 
 interface Vehicle {
@@ -73,6 +68,13 @@ interface VehiclesApiResponse {
   data: Vehicle[];
 }
 
+interface VehicleFeesApiResponse {
+  status: number;
+  message: string;
+  data: VehicleFee[];
+  totalRecords: number;
+}
+
 interface ApiResponse {
   status: number;
   message: string;
@@ -103,6 +105,7 @@ export class UpdateVehicleComponent implements OnInit {
   vehicleId: string = '';
   vehicleData: Vehicle | null = null;
   username: string | null = null;
+  organization: Organization | null = null;
 
   // Form fields
   investorNumber: string = '';
@@ -124,6 +127,9 @@ export class UpdateVehicleComponent implements OnInit {
   offloadSundayFeeAmount: number | null = null;
   driverFeeAmount: number | null = null;
 
+  // Store vehicle fees with IDs from API
+  vehicleFeesWithIds: VehicleFee[] = [];
+
   // Dropdown options
   investorOptions: DropdownOption[] = [];
   marshalOptions: DropdownOption[] = [];
@@ -134,6 +140,7 @@ export class UpdateVehicleComponent implements OnInit {
   marshalsLoading: boolean = false;
   stagesLoading: boolean = false;
   vehicleLoading: boolean = false;
+  organizationLoading: boolean = false;
   submitting: boolean = false;
   dataLoadedFromState: boolean = false;
 
@@ -143,7 +150,8 @@ export class UpdateVehicleComponent implements OnInit {
     private authService: AuthService,
     private messageService: MessageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) { }
 
   get loading() {
@@ -159,12 +167,7 @@ export class UpdateVehicleComponent implements OnInit {
     this.entityId = user.entityId;
     this.username = user.username || user.email;
 
-    // Load dropdown data
-    this.loadInvestors();
-    this.loadMarshals();
-    this.loadStages();
-
-    // Get vehicle ID from route and initialize vehicle data
+    // Get vehicle ID from route
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (!id) {
@@ -179,22 +182,216 @@ export class UpdateVehicleComponent implements OnInit {
       }
 
       this.vehicleId = id;
-      this.initializeVehicleData();
+      this.initializeData();
     });
   }
 
-  private initializeVehicleData(): void {
+  private initializeData(): void {
     const stateVehicle = this.getVehicleFromState();
 
     if (stateVehicle) {
       console.log('✓ Vehicle data loaded from navigation state');
-      this.populateFormFromVehicle(stateVehicle);
       this.dataLoadedFromState = true;
+
+      // Load dropdowns and organization data in parallel
+      this.loadAllRequiredData(stateVehicle);
+      this.cdr.detectChanges();
     } else {
-      console.log('⚠ No state data found, fetching from API');
-      this.loadVehicleDataFromAPI(this.vehicleId!);
+      console.log('⚠ No state data found, fetching all data from API');
       this.dataLoadedFromState = false;
+      this.loadAllDataFromAPI();
+      this.cdr.detectChanges();
     }
+  }
+
+  private loadAllRequiredData(vehicle?: Vehicle): void {
+    this.loadingStore.start();
+
+    const requests = {
+      investors: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
+        'investor-users'
+      ),
+      marshals: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
+        'marshall-users'
+      ),
+      stages: this.dataService.post<StagesResponse>(
+        API_ENDPOINTS.ALL_STAGES,
+        { entityId: this.entityId, page: 0, size: 100 },
+        'stages'
+      ),
+      organization: this.dataService.post<OrganizationsApiResponse>(
+        API_ENDPOINTS.ALL_ORGANIZATIONS,
+        { entityId: this.entityId, page: 0, size: 200 },
+        'organizations'
+      )
+    };
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        // Process investors
+        this.investorOptions = results.investors.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.username,
+        }));
+
+        // Process marshals
+        this.marshalOptions = results.marshals.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.username,
+        }));
+
+        // Process stages
+        this.stageOptions = results.stages.data.map((stage: Stage) => ({
+          label: stage.name,
+          value: stage.id,
+        }));
+
+        // Process organization
+        if (results.organization.data && results.organization.data.length > 0) {
+          this.organization = results.organization.data[0];
+          console.log('✓ Organization data loaded:', this.organization);
+        }
+
+        // If vehicle data from state, populate form
+        if (vehicle) {
+          this.loadVehicleFeesAndPopulateForm(vehicle);
+        }
+
+        this.loadingStore.stop();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load required data:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load required data. Please try again.',
+          life: 4000
+        });
+        this.loadingStore.stop();
+      }
+    });
+  }
+
+  private loadAllDataFromAPI(): void {
+    this.loadingStore.start();
+
+    const requests = {
+      investors: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
+        'investor-users'
+      ),
+      marshals: this.dataService.post<UserApiResponse>(
+        API_ENDPOINTS.ALL_USERS,
+        { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
+        'marshall-users'
+      ),
+      stages: this.dataService.post<StagesResponse>(
+        API_ENDPOINTS.ALL_STAGES,
+        { entityId: this.entityId, page: 0, size: 100 },
+        'stages'
+      ),
+      organization: this.dataService.post<OrganizationsApiResponse>(
+        API_ENDPOINTS.ALL_ORGANIZATIONS,
+        { entityId: this.entityId, page: 0, size: 200 },
+        'organizations'
+      ),
+      vehicle: this.dataService.postWithParams<VehiclesApiResponse>(
+        API_ENDPOINTS.VEHICLE_DATA,
+        { entityId: this.entityId!, fleetNumber: this.vehicleId }
+      )
+    };
+
+    forkJoin(requests).subscribe({
+      next: (results) => {
+        // Process investors
+        this.investorOptions = results.investors.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.username,
+        }));
+
+        // Process marshals
+        this.marshalOptions = results.marshals.data.map((user: User) => ({
+          label: `${user.firstName} ${user.lastName} - ${user.username}`,
+          value: user.username,
+        }));
+
+        // Process stages
+        this.stageOptions = results.stages.data.map((stage: Stage) => ({
+          label: stage.name,
+          value: stage.id,
+        }));
+
+        // Process organization
+        if (results.organization.data && results.organization.data.length > 0) {
+          this.organization = results.organization.data[0];
+          console.log('✓ Organization data loaded:', this.organization);
+        }
+
+        // Process vehicle
+        if (results.vehicle.data && results.vehicle.data.length > 0) {
+          const vehicle = results.vehicle.data.find((v: Vehicle) => v.id === this.vehicleId);
+          if (vehicle) {
+            console.log('✓ Vehicle data fetched successfully from API');
+            this.loadVehicleFeesAndPopulateForm(vehicle);
+          } else {
+            this.handleVehicleNotFound(this.vehicleId);
+          }
+        } else {
+          this.handleNoVehiclesAvailable();
+        }
+
+        this.loadingStore.stop();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load data from API:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to fetch data. Please try again.',
+          life: 4000
+        });
+        this.loadingStore.stop();
+        this.router.navigate(['/vehicles/all']);
+      }
+    });
+  }
+
+  private loadVehicleFeesAndPopulateForm(vehicle: Vehicle): void {
+    // Encode fleet number for URL (handle spaces)
+    const encodedFleetNumber = encodeURIComponent(vehicle.fleetNumber);
+
+    const params = {
+      entityId: this.entityId!,
+      fleetNumber: encodedFleetNumber
+    };
+
+    this.dataService
+      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees')
+      .subscribe({
+        next: (response) => {
+          if (response.data && response.data.length > 0) {
+            this.vehicleFeesWithIds = response.data;
+            console.log('✓ Vehicle fees loaded:', this.vehicleFeesWithIds);
+          }
+
+          // Populate form with vehicle data and fees
+          this.populateFormFromVehicle(vehicle);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load vehicle fees:', err);
+          // Still populate form even if fees fail to load
+          this.populateFormFromVehicle(vehicle);
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   private getVehicleFromState(): Vehicle | null {
@@ -249,9 +446,11 @@ export class UpdateVehicleComponent implements OnInit {
     this.selectedStage = vehicle.stageId;
     this.maintainFees = vehicle.maintainFees || false;
 
-    // Extract fee amounts from vehicleFees array
-    if (vehicle.vehicleFees && Array.isArray(vehicle.vehicleFees)) {
-      vehicle.vehicleFees.forEach((fee: VehicleFee) => {
+    // Extract fee amounts from vehicleFeesWithIds (from API) or vehicle.vehicleFees (from state)
+    const feesToUse = this.vehicleFeesWithIds.length > 0 ? this.vehicleFeesWithIds : vehicle.vehicleFees;
+
+    if (feesToUse && Array.isArray(feesToUse)) {
+      feesToUse.forEach((fee: VehicleFee) => {
         switch (fee.feeName) {
           case 'SYSTEM':
             this.systemFeeAmount = fee.feeAmount;
@@ -277,64 +476,33 @@ export class UpdateVehicleComponent implements OnInit {
         }
       });
     }
-  }
 
-  private loadVehicleDataFromAPI(vehicleId: string): void {
-    if (!this.entityId) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Entity ID not found',
-        life: 4000
-      });
-      this.router.navigate(['/vehicles/all']);
-      return;
+    // If fees are not set, use organization default fees as fallback
+    if (this.organization?.organizationCategoryFees) {
+      if (this.systemFeeAmount === null) {
+        const systemFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'SYSTEM');
+        this.systemFeeAmount = systemFee?.feeAmount ?? 0;
+      }
+      if (this.managementFeeAmount === null) {
+        const managementFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'MANAGEMENT');
+        this.managementFeeAmount = managementFee?.feeAmount ?? 0;
+      }
+      if (this.saccoFeeAmount === null) {
+        const saccoFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'SACCO');
+        this.saccoFeeAmount = saccoFee?.feeAmount ?? 0;
+      }
+      if (this.offloadWeekdayFeeAmount === null || this.offloadSaturdayFeeAmount === null || this.offloadSundayFeeAmount === null) {
+        const offloadFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'OFFLOAD');
+        const defaultOffloadAmount = offloadFee?.feeAmount ?? 0;
+        this.offloadWeekdayFeeAmount = this.offloadWeekdayFeeAmount ?? defaultOffloadAmount;
+        this.offloadSaturdayFeeAmount = this.offloadSaturdayFeeAmount ?? defaultOffloadAmount;
+        this.offloadSundayFeeAmount = this.offloadSundayFeeAmount ?? defaultOffloadAmount;
+      }
+      if (this.driverFeeAmount === null) {
+        const driverFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'DRIVER');
+        this.driverFeeAmount = driverFee?.feeAmount ?? 0;
+      }
     }
-
-    this.vehicleLoading = true;
-    this.loadingStore.start();
-
-    const payload = {
-      entityId: this.entityId,
-      page: 0,
-      size: 1000
-    };
-
-    console.log('Fetching vehicle data from API for ID:', vehicleId);
-
-    this.dataService
-      .post<VehiclesApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'get-vehicles')
-      .subscribe({
-        next: (response) => {
-          if (response.data && response.data.length > 0) {
-            const vehicle = response.data.find((v: Vehicle) => v.id === vehicleId);
-
-            if (vehicle) {
-              console.log('✓ Vehicle data fetched successfully from API');
-              this.populateFormFromVehicle(vehicle);
-            } else {
-              this.handleVehicleNotFound(vehicleId);
-            }
-          } else {
-            this.handleNoVehiclesAvailable();
-          }
-
-          this.vehicleLoading = false;
-          this.loadingStore.stop();
-        },
-        error: (err) => {
-          console.error('Failed to load vehicle data from API:', err);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to fetch vehicle data. Please try again.',
-            life: 4000
-          });
-          this.vehicleLoading = false;
-          this.loadingStore.stop();
-          this.router.navigate(['/vehicles/all']);
-        },
-      });
   }
 
   private handleVehicleNotFound(vehicleId: string): void {
@@ -363,87 +531,11 @@ export class UpdateVehicleComponent implements OnInit {
     }, 2000);
   }
 
-  loadInvestors(): void {
-    if (!this.entityId) return;
-
-    this.investorsLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      agent: 'INVESTOR',
-      page: 0,
-      size: 100,
-    };
-
-    this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'investor-users')
-      .subscribe({
-        next: (response) => {
-          this.investorOptions = response.data.map((user: User) => ({
-            label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.id,
-          }));
-          this.investorsLoading = false;
-        },
-        error: (err) => {
-          console.error('Failed to load investors', err);
-          this.investorsLoading = false;
-        },
-      });
-  }
-
-  loadMarshals(): void {
-    if (!this.entityId) return;
-
-    this.marshalsLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      agent: 'MARSHAL',
-      page: 0,
-      size: 100,
-    };
-
-    this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'marshall-users')
-      .subscribe({
-        next: (response) => {
-          this.marshalOptions = response.data.map((user: User) => ({
-            label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.id,
-          }));
-          this.marshalsLoading = false;
-        },
-        error: (err) => {
-          console.error('Failed to load marshals', err);
-          this.marshalsLoading = false;
-        },
-      });
-  }
-
-  loadStages(): void {
-    if (!this.entityId) return;
-
-    this.stagesLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      page: 0,
-      size: 100,
-    };
-
-    this.dataService
-      .post<StagesResponse>(API_ENDPOINTS.ALL_STAGES, payload, 'stages')
-      .subscribe({
-        next: (response) => {
-          this.stageOptions = response.data.map((stage: Stage) => ({
-            label: stage.name,
-            value: stage.id,
-          }));
-          this.stagesLoading = false;
-        },
-        error: (err) => {
-          console.error('Failed to load stages', err);
-          this.stagesLoading = false;
-        },
-      });
+  private getFeeId(feeName: string, dayType: string = 'ALL'): number | string | null {
+    const fee = this.vehicleFeesWithIds.find(
+      f => f.feeName === feeName && f.dayType === dayType
+    );
+    return fee?.id ?? null;
   }
 
   isFormValid(): boolean {
@@ -484,63 +576,63 @@ export class UpdateVehicleComponent implements OnInit {
       return;
     }
 
-    // Build vehicleFees array
+    // Build vehicleFees array with proper IDs from the fetched fees
     const vehicleFees: VehicleFee[] = [
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'SYSTEM')?.id || '',
+        id: this.getFeeId('SYSTEM', 'ALL'),
         feeName: 'SYSTEM',
         dayType: 'ALL',
         feeAmount: this.systemFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'MANAGEMENT')?.id || '',
+        id: this.getFeeId('MANAGEMENT', 'ALL'),
         feeName: 'MANAGEMENT',
         dayType: 'ALL',
         feeAmount: this.managementFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'SACCO')?.id || '',
+        id: this.getFeeId('SACCO', 'ALL'),
         feeName: 'SACCO',
         dayType: 'ALL',
         feeAmount: this.saccoFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'OFFLOAD' && f.dayType === 'WEEKDAY')?.id || '',
+        id: this.getFeeId('OFFLOAD', 'WEEKDAY'),
         feeName: 'OFFLOAD',
         dayType: 'WEEKDAY',
         feeAmount: this.offloadWeekdayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'OFFLOAD' && f.dayType === 'SATURDAY')?.id || '',
+        id: this.getFeeId('OFFLOAD', 'SATURDAY'),
         feeName: 'OFFLOAD',
         dayType: 'SATURDAY',
         feeAmount: this.offloadSaturdayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'OFFLOAD' && f.dayType === 'SUNDAY')?.id || '',
+        id: this.getFeeId('OFFLOAD', 'SUNDAY'),
         feeName: 'OFFLOAD',
         dayType: 'SUNDAY',
         feeAmount: this.offloadSundayFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       },
       {
-        id: this.vehicleData?.vehicleFees?.find(f => f.feeName === 'DRIVER')?.id || '',
+        id: this.getFeeId('DRIVER', 'ALL'),
         feeName: 'DRIVER',
         dayType: 'ALL',
         feeAmount: this.driverFeeAmount!,
         username: this.username,
-        entityId: this.entityId
+        entityId: this.entityId,
       }
     ];
 
@@ -575,18 +667,25 @@ export class UpdateVehicleComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.UPDATE_VEHICLE, payload, 'update-vehicle')
       .subscribe({
         next: (response) => {
-          console.log('Vehicle updated successfully', response);
+
           this.submitting = false;
           this.loadingStore.stop();
 
           if (response.status == 0) {
+            console.log('Vehicle updated successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
               detail: response.message || 'Vehicle updated successfully',
               life: 4000
             });
+
+            // Navigate back to vehicles list
+            setTimeout(() => {
+              this.router.navigate(['/vehicles/all']);
+            }, 1500);
           } else {
+            console.log('Vehicle update failed', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',
@@ -594,11 +693,6 @@ export class UpdateVehicleComponent implements OnInit {
               life: 5000
             });
           }
-
-          // Navigate back to vehicles list
-          setTimeout(() => {
-            this.router.navigate(['/vehicles/all']);
-          }, 1500);
         },
         error: (err) => {
           console.error('Failed to update vehicle - Full error:', err);

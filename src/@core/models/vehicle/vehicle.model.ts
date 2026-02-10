@@ -24,3 +24,25 @@ export interface Vehicle {
   stageId: number;              // Stage ID
   stageName: string;            // Stage name (e.g., CBD, Kenya Cinema)
 }
+
+export interface VehicleFee {
+  id: number | null | string;
+  createdOn?: string;              // ISO string from backend
+  createBy?: string | null;
+  lastModifiedDate?: string | null;
+  modifiedBy?: string | null;
+  softDelete?: boolean;
+  created?: boolean;
+  entityId: string;
+  feeName: string;
+  feeAmount: number;
+  username: string;
+  priority?: number;
+  fleetNumber?: string;
+  accountNumber?: string | null;
+  receiverShortCode?: string | null;
+  dayType: DayType;
+}
+
+export type DayType = 'ALL' | 'WEEKDAY' | 'SATURDAY' | 'SUNDAY';
+

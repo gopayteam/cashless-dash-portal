@@ -258,7 +258,7 @@ export class AllVehiclesComponent implements OnInit {
 
     // Pass the complete user object through router state
     // This ensures the data is immediately available in the update component
-    this.router.navigate(['/forms/update-vehicle', vehicle.id], {
+    this.router.navigate(['/forms/update-vehicle', vehicle.fleetNumber], {
       state: {
         vehicle: vehicle,
         // Add timestamp to ensure fresh state
