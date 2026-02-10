@@ -865,6 +865,12 @@
   .filter-action-btn,
   .export-action-btn {
     width: 100%;
+    min-height: 48px;
+    /* proper touch target */
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 10px;
   }
 
   .filter-label {

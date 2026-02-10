@@ -481,6 +481,12 @@
     grid-template-columns: 1fr;
   }
 
+  .summary-card {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
   .wallets-grid {
     grid-template-columns: 1fr;
   }

@@ -949,6 +949,12 @@
     justify-content: space-around;
     align-items: center;
   }
+
+  .summary-card {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
 }
 
 @media (max-width: 576px) {

@@ -60,8 +60,7 @@
 
           <p-select id="driverId" formControlName="driverId" [options]="filteredDrivers" optionLabel="label"
             optionValue="driverId" placeholder="Select a driver" [showClear]="true" [filter]="true"
-            filterBy="label, driverId" class="w-full" [invalid]="isFieldInvalid('driverId')"
-            [disabled]="!creditDriverForm.get('fleetNumber')?.value">
+            filterBy="label, driverId" class="w-full" [invalid]="isFieldInvalid('driverId')">
 
             <!-- Selected Item Template -->
             <ng-template pTemplate="selectedItem" let-option>

@@ -78,7 +78,7 @@ export class CreditDriverComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -86,7 +86,7 @@ export class CreditDriverComponent implements OnInit {
 
   ngOnInit(): void {
 
-     const user = this.authService.currentUser();
+    const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
       // console.log('Logged in as:', user.username);
@@ -103,9 +103,10 @@ export class CreditDriverComponent implements OnInit {
   initForm(): void {
     this.creditDriverForm = this.fb.group({
       fleetNumber: [null, Validators.required],
-      driverId: [null, Validators.required],
+      driverId: [{ value: null, disabled: true }, Validators.required],
       activityDate: [null, Validators.required],
     });
+
 
     // Watch for fleet changes to filter drivers
     this.creditDriverForm.get('fleetNumber')?.valueChanges.subscribe((fleetNumber) => {
@@ -176,7 +177,7 @@ export class CreditDriverComponent implements OnInit {
             driverId: d.entityId,
             label: this.getDriverLabel(d),
             fleetNumber: d.phoneNumber, // Assuming username contains fleet number
-            username:  d.username ? d.username : this.getDriverLabel(d),
+            username: d.username ? d.username : this.getDriverLabel(d),
             phoneNumber: d.phoneNumber,
           }));
 
@@ -229,7 +230,10 @@ export class CreditDriverComponent implements OnInit {
   }
 
   onFleetChange(fleetNumber: string): void {
+    const driverControl = this.creditDriverForm.get('driverId');
+
     if (!fleetNumber) {
+      driverControl?.disable();
       this.filteredDrivers = [];
       this.creditDriverForm.patchValue({ driverId: null });
       return;
@@ -237,6 +241,7 @@ export class CreditDriverComponent implements OnInit {
 
     // Filter drivers based on selected fleet
     // Assuming driver.username contains the fleet number they're assigned to
+    driverControl?.enable();
     this.filteredDrivers = this.allDriverOptions.filter(
       driver => driver.fleetNumber === fleetNumber
     );
@@ -276,16 +281,16 @@ export class CreditDriverComponent implements OnInit {
 
     // api/payment/wallets/assign/driver
     // activeDriver
-    // : 
+    // :
     // "254722157126"
     // currentDate
-    // : 
+    // :
     // "2026-02-03"
     // entityId
-    // : 
+    // :
     // "GS000002"
     // fleetNumber
-    // : 
+    // :
     // "SM368"
 
     // TODO: Replace with actual API endpoint for credit driver

@@ -303,6 +303,13 @@
   .summary-stats {
     grid-template-columns: 1fr;
   }
+
+  .summary-card {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+
 }
 
 /* ================= FILTER ACTIONS ROW ================= */

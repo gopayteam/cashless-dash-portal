@@ -231,7 +231,8 @@ export class MainLayoutComponent implements OnInit {
  * Handle dark mode toggle change
  */
   onDarkModeChange(enabled: boolean): void {
-    this.darkModeService.setDarkMode(enabled);
+    // this.darkModeService.setDarkMode(enabled);
+    this.darkModeService.setDarkMode(false)
     console.log('Dark mode:', enabled ? 'enabled' : 'disabled');
   }
 
