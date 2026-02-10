@@ -132,6 +132,17 @@
   color: var(--light-text);
 }
 
+/* Input Styles */
+input[pInputText],
+p-select {
+  width: 100%;
+}
+
+input[pInputText]:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
 /* PrimeNG Select Customization */
 .form-field ::ng-deep .p-select {
   border: 1px solid var(--border-color);

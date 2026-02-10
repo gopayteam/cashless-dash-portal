@@ -40,8 +40,8 @@
             <!-- Fleet Number -->
             <div class="form-field">
               <label for="fleetNumber" class="field-label required">Fleet Number</label>
-              <input pInputText id="fleetNumber" [(ngModel)]="fleetNumber" name="fleetNumber"
-                placeholder="Enter fleet number" class="w-full" required />
+              <input pInputText id="fleetNumber" [value]="fleetNumber" name="fleetNumber" class="w-full" disabled
+                readonly />
             </div>
 
             <!-- Registration Number -->
