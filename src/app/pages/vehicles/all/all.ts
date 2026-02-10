@@ -13,7 +13,7 @@ import { SelectModule } from 'primeng/select';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
+import { Vehicle, VehicleFee } from '../../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
@@ -26,6 +26,13 @@ import { ToastModule } from 'primeng/toast';
 interface StatusOption {
   label: string;
   value: string;
+}
+
+interface VehicleFeesApiResponse {
+  status: number;
+  message: string;
+  data: VehicleFee[];
+  totalRecords: number;
 }
 
 @Component({
@@ -48,6 +55,7 @@ interface StatusOption {
   ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
+  providers: [MessageService]
 })
 export class AllVehiclesComponent implements OnInit {
 
@@ -69,6 +77,8 @@ export class AllVehiclesComponent implements OnInit {
   // Dialog state
   displayDetailDialog: boolean = false;
   selectedVehicle: Vehicle | null = null;
+  selectedVehicleFees: VehicleFee[] = [];
+  loadingFees: boolean = false;
 
   // Summary stats
   totalCapacity: number = 0;
@@ -100,11 +110,9 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
-      // console.log('Logged in as:', user.username);
     } else {
       this.router.navigate(['/login']);
       console.log('No user logged in');
@@ -154,6 +162,7 @@ export class AllVehiclesComponent implements OnInit {
         error: (err) => {
           console.error('Failed to load vehicles', err);
           this.loadingStore.stop();
+          this.cdr.detectChanges();
         },
       });
   }
@@ -216,11 +225,78 @@ export class AllVehiclesComponent implements OnInit {
   viewVehicleDetails(vehicle: Vehicle): void {
     this.selectedVehicle = vehicle;
     this.displayDetailDialog = true;
+    this.loadVehicleFees(vehicle.fleetNumber);
+    this.cdr.detectChanges();
+  }
+
+  loadVehicleFees(fleetNumber: string): void {
+    if (!this.entityId || !fleetNumber) {
+      console.error('Missing entityId or fleetNumber');
+      return;
+    }
+
+    this.loadingFees = true;
+    this.selectedVehicleFees = [];
+
+    // Encode fleet number for URL (handle spaces)
+    const encodedFleetNumber = encodeURIComponent(fleetNumber);
+
+    const params = {
+      entityId: this.entityId,
+      fleetNumber: encodedFleetNumber
+    };
+
+    console.log('Fetching vehicle fees for:', fleetNumber);
+
+    this.dataService
+      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees')
+      .subscribe({
+        next: (response) => {
+          if (response.data && response.data.length > 0) {
+            this.selectedVehicleFees = response.data;
+            console.log('✓ Vehicle fees loaded:', this.selectedVehicleFees);
+          } else {
+            console.log('⚠ No fees found for this vehicle');
+            this.selectedVehicleFees = [];
+          }
+          this.loadingFees = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load vehicle fees:', err);
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Warning',
+            detail: 'Failed to load vehicle fees',
+            life: 3000
+          });
+          this.loadingFees = false;
+          this.selectedVehicleFees = [];
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  getFeeByNameAndDay(feeName: string, dayType: string = 'ALL'): VehicleFee | null {
+    return this.selectedVehicleFees.find(
+      fee => fee.feeName === feeName && fee.dayType === dayType
+    ) || null;
+  }
+
+  getFeeAmount(feeName: string, dayType: string = 'ALL'): number {
+    const fee = this.getFeeByNameAndDay(feeName, dayType);
+    return fee?.feeAmount ?? 0;
+  }
+
+  getTotalFees(): number {
+    return this.selectedVehicleFees.reduce((sum, fee) => sum + fee.feeAmount, 0);
   }
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
     this.selectedVehicle = null;
+    this.selectedVehicleFees = [];
+    this.loadingFees = false;
   }
 
   getStatusClass(status: string): string {
@@ -253,15 +329,10 @@ export class AllVehiclesComponent implements OnInit {
       return;
     }
 
-    // console.log('Navigating to update vehicle:', vehicle.id);
-    // console.log('Vehicle data being passed:', vehicle);
-
-    // Pass the complete user object through router state
-    // This ensures the data is immediately available in the update component
+    // Pass the complete vehicle object through router state
     this.router.navigate(['/forms/update-vehicle', vehicle.fleetNumber], {
       state: {
         vehicle: vehicle,
-        // Add timestamp to ensure fresh state
         timestamp: Date.now()
       }
     });

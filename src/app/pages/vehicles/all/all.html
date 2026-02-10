@@ -21,14 +21,6 @@
           (click)="clearSearch()" pTooltip="Clear search"></button>
       </div>
 
-      <!-- <p-dropdown
-        [options]="statusOptionsList"
-        [(ngModel)]="selectedStatus"
-        (onChange)="onStatusChange()"
-        placeholder="Filter by Status"
-        styleClass="status-dropdown"
-      ></p-dropdown> -->
-
       <button *ngIf="searchTerm || selectedStatus" pButton label="Clear Filters" icon="pi pi-filter-slash"
         class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
     </div>
@@ -114,7 +106,6 @@
           <th>Status</th>
           <th>Investor</th>
           <th>Marshal</th>
-          <!-- <th>Actions</th> -->
         </tr>
       </ng-template>
 
@@ -169,16 +160,6 @@
               <span>{{ vehicle.marshalNumber }}</span>
             </div>
           </td>
-          <!-- <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-              (click)="viewVehicleDetails(vehicle); $event.stopPropagation()"
-            ></button>
-          </td> -->
         </tr>
       </ng-template>
 
@@ -199,7 +180,7 @@
 
   <!-- ================= VEHICLE DETAILS DIALOG ================= -->
   <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
-    [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '900px' }">
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '1000px' }">
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <div class="dialog-header-top">
@@ -343,6 +324,129 @@
             <label>Created By</label>
             <span class="value">{{ selectedVehicle.createBy }}</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Fee Structure Section -->
+      <div class="detail-section fee-section">
+        <div class="section-header">
+          <h4 class="section-title">
+            <i class="pi pi-money-bill"></i>
+            Fee Structure
+          </h4>
+          <div *ngIf="loadingFees" class="loading-indicator">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Loading fees...</span>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingFees && selectedVehicleFees.length > 0" class="fees-content">
+          <!-- Standard Fees Grid -->
+          <div class="fees-grid">
+            <div class="fee-card">
+              <div class="fee-icon system">
+                <i class="pi pi-cog"></i>
+              </div>
+              <div class="fee-details">
+                <span class="fee-label">System Fee</span>
+                <span class="fee-amount">{{ getFeeAmount('SYSTEM', 'ALL') | currency:'KES ':'symbol':'1.2-2' }}</span>
+                <span class="fee-day-type">All Days</span>
+              </div>
+            </div>
+
+            <div class="fee-card">
+              <div class="fee-icon management">
+                <i class="pi pi-briefcase"></i>
+              </div>
+              <div class="fee-details">
+                <span class="fee-label">Management Fee</span>
+                <span class="fee-amount">{{ getFeeAmount('MANAGEMENT', 'ALL') | currency:'KES ':'symbol':'1.2-2'
+                  }}</span>
+                <span class="fee-day-type">All Days</span>
+              </div>
+            </div>
+
+            <div class="fee-card">
+              <div class="fee-icon sacco">
+                <i class="pi pi-building"></i>
+              </div>
+              <div class="fee-details">
+                <span class="fee-label">SACCO Fee</span>
+                <span class="fee-amount">{{ getFeeAmount('SACCO', 'ALL') | currency:'KES ':'symbol':'1.2-2' }}</span>
+                <span class="fee-day-type">All Days</span>
+              </div>
+            </div>
+
+            <div class="fee-card">
+              <div class="fee-icon driver">
+                <i class="pi pi-id-card"></i>
+              </div>
+              <div class="fee-details">
+                <span class="fee-label">Driver Fee</span>
+                <span class="fee-amount">{{ getFeeAmount('DRIVER', 'ALL') | currency:'KES ':'symbol':'1.2-2' }}</span>
+                <span class="fee-day-type">All Days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Offload Fees by Day -->
+          <div class="offload-fees-section">
+            <h5 class="subsection-title">Offload Fees by Day</h5>
+            <div class="offload-fees-grid">
+              <div class="fee-card offload">
+                <div class="fee-icon offload-weekday">
+                  <i class="pi pi-calendar"></i>
+                </div>
+                <div class="fee-details">
+                  <span class="fee-label">Weekday</span>
+                  <span class="fee-amount">{{ getFeeAmount('OFFLOAD', 'WEEKDAY') | currency:'KES ':'symbol':'1.2-2'
+                    }}</span>
+                  <span class="fee-day-type">Monday - Friday</span>
+                </div>
+              </div>
+
+              <div class="fee-card offload">
+                <div class="fee-icon offload-saturday">
+                  <i class="pi pi-calendar"></i>
+                </div>
+                <div class="fee-details">
+                  <span class="fee-label">Saturday</span>
+                  <span class="fee-amount">{{ getFeeAmount('OFFLOAD', 'SATURDAY') | currency:'KES ':'symbol':'1.2-2'
+                    }}</span>
+                  <span class="fee-day-type">Saturday Only</span>
+                </div>
+              </div>
+
+              <div class="fee-card offload">
+                <div class="fee-icon offload-sunday">
+                  <i class="pi pi-calendar"></i>
+                </div>
+                <div class="fee-details">
+                  <span class="fee-label">Sunday</span>
+                  <span class="fee-amount">{{ getFeeAmount('OFFLOAD', 'SUNDAY') | currency:'KES ':'symbol':'1.2-2'
+                    }}</span>
+                  <span class="fee-day-type">Sunday Only</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Fees Summary -->
+          <div class="total-fees-card">
+            <div class="total-icon">
+              <i class="pi pi-calculator"></i>
+            </div>
+            <div class="total-content">
+              <span class="total-label">Total Daily Fees</span>
+              <span class="total-amount">{{ getTotalFees() | currency:'KES ':'symbol':'1.2-2' }}</span>
+              <span class="total-note">Sum of all fees</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!loadingFees && selectedVehicleFees.length === 0" class="no-fees-message">
+          <i class="pi pi-info-circle"></i>
+          <p>No fee information available for this vehicle</p>
         </div>
       </div>
     </div>
