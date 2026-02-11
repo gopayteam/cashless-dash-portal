@@ -27,6 +27,7 @@
 @import './layout/_topbar.css';
 @import './layout/_sidebar.css';
 @import './layout/_content.css';
+@import './layout/_footer.css';
 
 /* import fonts */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');

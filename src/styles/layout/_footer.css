@@ -1,0 +1,51 @@
+/* ===============================
+   APP FOOTER (DOCUMENT FLOW)
+=============================== */
+
+.app-footer {
+  margin-top: 3rem;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  background: var(--surface-ground);
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+
+  /* Hidden by default */
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When bottom is reached */
+.app-footer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Branding colors */
+.app-footer .gopay {
+  color: #1e88e5;
+  font-weight: 700;
+}
+
+.app-footer .pay {
+  color: #f58220;
+  font-weight: 700;
+}
+
+/* ===============================
+   MOBILE BEHAVIOUR
+=============================== */
+
+@media (max-width: 768px) {
+  .app-footer {
+    opacity: 1;
+    /* always visible */
+    transform: none;
+    /* no animation */
+    font-size: 0.75rem;
+    padding: 0.8rem 0.6rem;
+    margin-top: 2rem;
+  }
+}

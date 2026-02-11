@@ -471,6 +471,23 @@
     <!-- Page Content Area -->
     <section class="content">
       <router-outlet></router-outlet>
+      <!-- This is the invisible bottom marker -->
+      <div #footerTrigger class="footer-trigger"></div>
+      <!-- ========== BOTTOM FOOTER ========== -->
+      <footer class="app-footer" [class.visible]="showFooter">
+        <span>
+          Powered by
+          <a href="https://gopay.ke" target="_blank" rel="noopener noreferrer" class="gopay-link">
+            <strong class="gopay">Go</strong><strong class="pay">Pay</strong>
+          </a>
+          — Travel Smart. Pay Easy.
+        </span>
+        <br />
+        <small>
+          © 2026 GoPay Kenya. Purpose-built cashless solutions for PSV owners, SACCOs, drivers, and commuters.
+        </small>
+      </footer>
     </section>
   </main>
+
 </div>

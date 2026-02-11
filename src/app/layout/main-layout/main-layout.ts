@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, inject, ViewChild, ElementRef } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -173,6 +173,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
     ]
   };
+
+  showFooter: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -539,4 +541,30 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.authService.signOut();
     this.themeService.clearTheme();
   }
+
+  // @HostListener('window:scroll', [])
+  // onScroll() {
+  //   const threshold = 2; // px from bottom
+  //   const position = window.innerHeight + window.scrollY;
+  //   const height = document.documentElement.scrollHeight;
+
+  //   this.showFooter = position >= height - threshold;
+  // }
+
+
+
+  @ViewChild('footerTrigger') trigger!: ElementRef;
+
+  ngAfterViewInit() {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        this.showFooter = entry.isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(this.trigger.nativeElement);
+  }
+
+
 }
