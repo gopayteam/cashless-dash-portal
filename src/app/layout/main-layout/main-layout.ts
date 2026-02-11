@@ -57,6 +57,30 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     initials: ''
   };
 
+  logoUrl: string = 'gopay_clear.png';
+  logoSideBarUrl: string = 'gopay_clear.png';
+  brandName = '';
+  brandType: 'text' | 'logo' = 'text';
+
+  private logoMap: Record<string, string> = {
+    GS000002: 'logo_2.png',
+    GS000006: 'BUNGOMA_LOGO.png'
+  };
+
+  brandingMap: Record<string, { logo: string; name: string; type: 'text' | 'logo' }> = {
+    GS000006: {
+      logo: 'BUNGOMA_LOGO.png',
+      name: 'Bungoma Line Shuttle',
+      type: 'text'
+    },
+    GS000002: {
+      logo: 'super_metro_logo.png',
+      name: 'Super Metro',
+      type: 'logo'
+    }
+  };
+
+
   // Notifications
   notificationDialogVisible = false;
   notifications: Notification[] = [];
@@ -163,6 +187,22 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     if (user) {
       this.entityId = user.entityId
       this.themeService.applyTheme(user.entityId);
+
+      this.logoSideBarUrl =
+        this.logoMap[this.entityId] || 'assets/logos/logo_default.png';
+
+      const branding = this.brandingMap[this.entityId];
+
+      if (branding) {
+        this.logoUrl = branding.logo;
+        this.brandName = branding.name;
+        this.brandType = branding.type;
+      } else {
+        this.logoUrl = 'assets/images/logo_default.png';
+        this.brandName = 'GoPay';
+        this.brandType = 'text';
+      }
+
       // console.log('Logged in as:', user.username);
     } else {
       this.router.navigate(['/login']);

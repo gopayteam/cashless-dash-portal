@@ -34,22 +34,39 @@
   padding: 1.2rem 0.5rem;
 }
 
+.sidebar__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: auto;
+  min-width: 0;
+  flex: 1;
+}
+
 /* New icon logo */
 .sidebar__logo-img {
-  width: 80px;
+  margin: 0 auto;
+  width: auto;
   /* logo width */
-  height: 60px;
+  height: auto;
   /* logo height */
-  object-fit: contain;
+  object-fit: cover;
   /* prevent distortion */
   display: block;
   /* best for images */
   transition: all var(--transition);
-  transform: scale(3.15);
+  /* transform: scale(3.05); */
   transform-origin: center;
 }
 
+.sidebar__logo:hover .sidebar__logo-img {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+
 .sidebar__logo i {
+  text-align: center;
   font-size: 1.5rem;
   color: var(--primary-hover);
 }

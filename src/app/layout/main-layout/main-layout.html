@@ -7,8 +7,9 @@
     <!-- Logo Header -->
     <div class="sidebar__header">
       <div class="sidebar__logo">
-        <img src="/logo_2.png" alt="Gopay Logo" class="sidebar__logo-img" />
+        <img [src]="logoSideBarUrl" alt="Gopay Logo" class="sidebar__logo-img" />
       </div>
+
       <!-- Close button for mobile -->
       <button class="sidebar__close-btn" (click)="closeMobileSidebar()" *ngIf="isMobile()">
         <i class="pi pi-times"></i>
@@ -299,6 +300,27 @@
           <i class="pi pi-bars"></i>
         </button>
       </div>
+
+      <div class="brand-name">
+        <!-- Bungoma special styling -->
+        <ng-container *ngIf="entityId === 'GS000006'; else normalBrand">
+          <span class="green">Bungoma</span>
+          <span class="green">Line</span>
+          <span class="orange">Shuttle</span>
+        </ng-container>
+
+        <!-- Normal branding -->
+        <ng-template #normalBrand>
+          <ng-container *ngIf="brandType === 'logo'; else textBrand">
+            <img [src]="logoUrl" class="brand-logo" />
+          </ng-container>
+
+          <ng-template #textBrand>
+            {{ brandName }}
+          </ng-template>
+        </ng-template>
+      </div>
+
 
       <div class="topbar__right">
         <!-- 🔔 Notifications -->
