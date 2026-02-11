@@ -81,7 +81,7 @@
 .sidebar__profile {
   display: flex;
   align-items: center;
-  background: linear-gradient(125deg, #0e2c5a 50%, #c82333 100%);
+  background: linear-gradient(125deg, var(--primary-color) 50%, var(--secondary-color-dark) 100%);
   padding: 1rem;
   border-radius: 12px;
   margin: 1rem;

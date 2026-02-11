@@ -38,6 +38,7 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
 import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ThemeService } from '../../../../@core/services/theme.service';
 
 @Component({
   imports: [
@@ -83,8 +84,9 @@ export class DashboardComponent implements OnInit {
     private dataService: DataService,
     private router: Router,
     public loadingStore: LoadingStore,
+    private themeService: ThemeService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {
     this.router.events.subscribe(() => {
       // Initialize with default pagination
@@ -103,11 +105,14 @@ export class DashboardComponent implements OnInit {
     const user = this.authService.currentUser();
     if (user) {
       this.entityId = user.entityId
+      this.themeService.applyTheme(user.entityId);
       // console.log('Logged in as:', user.username);
     } else {
       this.router.navigate(['/login']);
       console.log('No user logged in');
     }
+
+    this.themeService.loadPersistedTheme();
 
     this.setDateRange();
     this.loadDashboardData();
@@ -149,12 +154,12 @@ export class DashboardComponent implements OnInit {
   }
 
   mapPaymentRecords(records: PaymentRecord[]): PaymentRecordVM[] {
-  return records.map((r) => ({
-    ...r,
-    createdAtFormatted: formatRelativeTime(r.createdAt),
-    updatedAtFormatted: formatRelativeTime(r.updatedAt),
-  }));
-}
+    return records.map((r) => ({
+      ...r,
+      createdAtFormatted: formatRelativeTime(r.createdAt),
+      updatedAtFormatted: formatRelativeTime(r.updatedAt),
+    }));
+  }
 
   loadDashboardData(): void {
     this.loadingStore.start();

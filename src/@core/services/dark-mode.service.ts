@@ -42,6 +42,7 @@ export class DarkModeService {
     this.setDarkMode(newMode);
   }
 
+
   /**
    * Set dark mode to a specific state
    * @param enabled - true for dark mode, false for light mode

@@ -10,6 +10,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { Subscription } from 'rxjs';
 import { DarkModeService } from '../../../@core/services/dark-mode.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ThemeService } from '../../../@core/services/theme.service';
 
 interface TabConfig {
   label: string;
@@ -77,6 +78,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   settingsForm!: FormGroup;
+  entityId: string | null = null;
 
   private tabConfigs: { [key: string]: TabConfig[] } = {
     '/transactions': [
@@ -151,15 +153,29 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private darkModeService: DarkModeService
+    private darkModeService: DarkModeService,
+    private themeService: ThemeService,
   ) { }
 
   ngOnInit() {
+
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId
+      this.themeService.applyTheme(user.entityId);
+      // console.log('Logged in as:', user.username);
+    } else {
+      this.router.navigate(['/login']);
+      console.log('No user logged in');
+    }
+
     this.loadUserInfo();
     this.setupRouteListener();
     this.loadNotifications();
     this.initializeSettingsForm();
     this.initializeSidebarState();
+    this.themeService.loadPersistedTheme();
+
 
     // Subscribe to dark mode changes
     this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(
@@ -481,5 +497,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   ============================================= */
   logout(): void {
     this.authService.signOut();
+    this.themeService.clearTheme();
   }
 }

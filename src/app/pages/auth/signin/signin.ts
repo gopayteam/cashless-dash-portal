@@ -13,6 +13,9 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
+import { THEMES } from '../../../../styles/theme.config';
+import { ThemeService } from '../../../../@core/services/theme.service';
+import { AuthResponse } from '../../../../@core/models/auth/authResponse.model';
 
 @Component({
   selector: 'app-signin',
@@ -36,13 +39,15 @@ export class SignInComponent implements OnInit {
   signInForm!: FormGroup;
   submitted = false;
   errorMessage = '';
+  entityId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     public loadingStore: LoadingStore,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private themeService: ThemeService,
   ) { }
 
   get loading() {
@@ -94,14 +99,18 @@ export class SignInComponent implements OnInit {
     };
 
     this.authService.signIn(credentials).subscribe({
-      next: (response: any) => {
-        console.log('Sign in successful', response);
+      next: (response: AuthResponse) => {
+        // console.log('Sign in successful', response);
         this.loadingStore.stop();
 
         // Get username from form or response
         const username = response.data?.username ||
-          response.data?.name ||
+          response.data?.email ||
           this.signInForm.value.username;
+
+        const user = response.data
+
+        this.themeService.applyTheme(user.entityId);
 
         // Show success toast
         this.messageService.add({
