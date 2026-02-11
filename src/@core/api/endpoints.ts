@@ -72,8 +72,8 @@ export const API_ENDPOINTS = {
 
   // #####################  INITIATE TRANSFER SUB-ENDPOINTS   #######################
   CREDIT_DRIVER: '/api/payment/wallets/assign/driver',
-  INITIATE_REASSIGNMENT: 'api/payment/wallets/initiate/reassignment',
-  CONFIRM_REASSIGNMENT: 'api/payment/wallets/reassign/funds',
+  INITIATE_REASSIGNMENT: '/api/payment/wallets/initiate/reassignment',
+  CONFIRM_REASSIGNMENT: '/api/payment/wallets/reassign/funds',
 
   // #####################  FORMS-extra SUB-ENDPOINTS   #######################
   ENTITY_STAGES: '/api/route/view/entity-stages',

@@ -7,16 +7,18 @@ import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { DialogModule } from 'primeng/dialog';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 interface Vehicle {
   fleetNumber: string;
-  // Add other vehicle properties as needed
   vehicleType?: string;
   registrationNumber?: string;
 }
@@ -24,6 +26,24 @@ interface Vehicle {
 interface VehicleOption {
   fleetNumber: string;
   label: string;
+}
+
+interface InitiateReassignmentResponse {
+  data: {
+    message: string;
+    status: string;
+    refId: string;
+    category: string;
+    success: boolean;
+  };
+  message: string;
+  code: number;
+}
+
+interface ConfirmReassignmentResponse {
+  data: null;
+  message: string;
+  code: number;
 }
 
 @Component({
@@ -36,28 +56,39 @@ interface VehicleOption {
     SelectModule,
     InputNumberModule,
     MessageModule,
+    ToastModule,
     ProgressSpinnerModule,
+    DialogModule,
   ],
   standalone: true,
   selector: 'app-fund-reassignment',
   templateUrl: './fund-reassignment.html',
   styleUrls: [
     './fund-reassignment.css',
+    '../../../../styles/global/_toast.css'
   ],
 })
 export class FundReassignmentComponent implements OnInit {
   entityId: string | null = null;
+  walletEntityId: string | null = null;
+  username: string | null = null;
   fundReassignmentForm!: FormGroup;
   vehicles: Vehicle[] = [];
   sourceFleetOptions: VehicleOption[] = [];
   destinationFleetOptions: VehicleOption[] = [];
   submitted = false;
 
+  // Confirmation dialog state
+  showConfirmDialog = false;
+  confirmationLoading = false;
+  initiateResponse: InitiateReassignmentResponse | null = null;
+
   constructor(
     private fb: FormBuilder,
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -69,11 +100,13 @@ export class FundReassignmentComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUser();
     if (user) {
-      this.entityId = user.entityId
-      // console.log('Logged in as:', user.username);
+      this.entityId = user.entityId;
+      this.walletEntityId = user.entityId; // Assuming walletEntityId is same as entityId
+      this.username = user.username;
     } else {
       this.router.navigate(['/login']);
       console.log('No user logged in');
+      return;
     }
 
     this.initForm();
@@ -102,19 +135,15 @@ export class FundReassignmentComponent implements OnInit {
       size: 10000,
     };
 
-    // TODO: Replace with actual API endpoint for vehicles
-    // Example: API_ENDPOINTS.VEHICLES or API_ENDPOINTS.ALL_VEHICLES
     this.dataService
       .post<any>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles')
       .subscribe({
         next: (response) => {
-          // Adjust based on your actual API response structure
-          // Assuming response has a data.manifest or similar structure
           this.vehicles = response.data?.manifest || response.data || response;
 
           this.sourceFleetOptions = this.vehicles.map(v => ({
             fleetNumber: v.fleetNumber,
-            label: `${v.fleetNumber} - ${v.registrationNumber}`,
+            label: `${v.fleetNumber}${v.registrationNumber ? ' - ' + v.registrationNumber : ''}`,
           }));
 
           this.destinationFleetOptions = [...this.sourceFleetOptions];
@@ -128,16 +157,16 @@ export class FundReassignmentComponent implements OnInit {
 
           // Fallback mock data for development
           this.vehicles = [
-            { fleetNumber: 'FL001' },
-            { fleetNumber: 'FL002' },
-            { fleetNumber: 'FL003' },
-            { fleetNumber: 'FL004' },
-            { fleetNumber: 'FL005' },
+            { fleetNumber: 'FL001', registrationNumber: 'KAA 001A' },
+            { fleetNumber: 'FL002', registrationNumber: 'KAA 002B' },
+            { fleetNumber: 'FL003', registrationNumber: 'KAA 003C' },
+            { fleetNumber: 'FL004', registrationNumber: 'KAA 004D' },
+            { fleetNumber: 'FL005', registrationNumber: 'KAA 005E' },
           ];
 
           this.sourceFleetOptions = this.vehicles.map(v => ({
             fleetNumber: v.fleetNumber,
-            label: `Fleet ${v.fleetNumber}`,
+            label: `${v.fleetNumber}${v.registrationNumber ? ' - ' + v.registrationNumber : ''}`,
           }));
 
           this.destinationFleetOptions = [...this.sourceFleetOptions];
@@ -148,7 +177,6 @@ export class FundReassignmentComponent implements OnInit {
 
   updateDestinationOptions(sourceFleet: string | null): void {
     if (!sourceFleet) {
-      // If no source selected, show all options
       this.destinationFleetOptions = [...this.sourceFleetOptions];
       return;
     }
@@ -180,46 +208,134 @@ export class FundReassignmentComponent implements OnInit {
       return;
     }
 
+    this.initiateReassignment();
+  }
+
+  initiateReassignment(): void {
     this.loadingStore.start();
 
+    const formValue = this.fundReassignmentForm.value;
+
     const payload = {
-      sourceFleetNumber: formValue.sourceFleetNumber,
-      destinationFleetNumber: formValue.destinationFleetNumber,
+      paymentType: 'FARE',
+      paymentSource: 'WALLET',
       amount: formValue.amount,
-      entityId: this.entityId,
+      username: this.username,
+      phoneNumber: this.username, // Using username as phoneNumber as per your example
+      fleetNumber: formValue.sourceFleetNumber,
+      saccoEntityId: this.entityId,
+      walletEntityId: this.walletEntityId,
     };
 
-    // TODO: Replace with actual API endpoint for fund reassignment
-    console.log('Submitting fund reassignment:', payload);
+    console.log('Initiating fund reassignment:', payload);
 
-    /*
-    this.dataService.post(API_ENDPOINTS.FUND_REASSIGNMENT, payload, 'reassignment').subscribe({
-      next: (response) => {
-        console.log('Fund reassignment successful', response);
-        this.resetForm();
-        this.loadingStore.stop();
-        // Show success message
-      },
-      error: (err) => {
-        console.error('Failed to reassign funds', err);
-        this.loadingStore.stop();
-        // Show error message
-      },
-    });
-    */
+    this.dataService
+      .post<InitiateReassignmentResponse>(API_ENDPOINTS.INITIATE_REASSIGNMENT, payload, 'reassignment')
+      .subscribe({
+        next: (response) => {
+          console.log('Initiate reassignment response:', response);
+          this.loadingStore.stop();
 
-    // Simulate API call
-    setTimeout(() => {
-      this.loadingStore.stop();
-      this.resetForm();
-      console.log('Fund reassignment submitted successfully');
-    }, 1500);
+          if (response.data?.success) {
+            this.initiateResponse = response;
+            this.showConfirmDialog = true;
+          } else {
+            console.error('Initiate reassignment failed:', response);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.message || 'failed to Initiate funds reassignment ',
+              life: 4000
+            });
+            alert('Failed to initiate reassignment: ' + (response.data?.message || 'Unknown error'));
+          }
+        },
+        error: (err) => {
+          console.error('Failed to initiate reassignment', err);
+          this.loadingStore.stop();
+          // You can add toast notification here
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: err.message || 'Failed to initiate reassignment',
+            life: 4000
+          });
+          alert('Error initiating reassignment. Please try again.');
+        },
+      });
+  }
+
+  confirmReassignment(): void {
+    if (!this.initiateResponse) {
+      console.error('No initiate response available');
+      return;
+    }
+
+    this.confirmationLoading = true;
+
+    const formValue = this.fundReassignmentForm.value;
+
+    const payload = {
+      amount: formValue.amount,
+      destinationFleetNumber: formValue.destinationFleetNumber,
+      sourceFleetNumber: formValue.sourceFleetNumber,
+      saccoEntityId: this.entityId,
+      walletEntityId: this.walletEntityId,
+      phoneNumber: this.username,
+      paymentSource: 'WALLET',
+      paymentType: 'FARE',
+      mpesaId: this.initiateResponse.data.refId,
+      category: this.initiateResponse.data.category,
+    };
+
+    console.log('Confirming fund reassignment:', payload);
+
+    this.dataService
+      .post<ConfirmReassignmentResponse>(API_ENDPOINTS.CONFIRM_REASSIGNMENT, payload, 'confirmation')
+      .subscribe({
+        next: (response) => {
+          console.log('Confirm reassignment response:', response);
+          this.confirmationLoading = false;
+          this.showConfirmDialog = false;
+
+          if (response.code === 0) {
+            // Success
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Transfer successful',
+              detail: `Fund reassignment completed successfully!`,
+              life: 3000
+            });
+            alert('Fund reassignment completed successfully!');
+            this.resetForm();
+            this.initiateResponse = null;
+          } else {
+            console.error('Confirm reassignment failed:', response);
+            alert('Failed to confirm reassignment: ' + (response.message || 'Unknown error'));
+          }
+        },
+        error: (err) => {
+          console.error('Failed to confirm reassignment', err);
+          this.confirmationLoading = false;
+          this.showConfirmDialog = false;
+          alert('Error confirming reassignment. Please try again.');
+        },
+      });
+  }
+
+  rejectReassignment(): void {
+    this.showConfirmDialog = false;
+    this.initiateResponse = null;
+    console.log('Reassignment rejected by user');
+    // Optionally show a toast notification
   }
 
   resetForm(): void {
     this.submitted = false;
     this.fundReassignmentForm.reset();
     this.destinationFleetOptions = [...this.sourceFleetOptions];
+    this.showConfirmDialog = false;
+    this.initiateResponse = null;
   }
 
   isFieldInvalid(fieldName: string): boolean {

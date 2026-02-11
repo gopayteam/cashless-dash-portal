@@ -4,7 +4,7 @@
     <p class="page-description">Transfer funds between fleet accounts</p>
   </div>
 
-  <div class="page-container card-hover">
+  <div class="page-container">
 
     <p-card>
       <ng-container *ngIf="loading() && sourceFleetOptions.length === 0">
@@ -32,8 +32,7 @@
             <ng-template pTemplate="selectedItem" let-option>
               <div class="flex align-items-center gap-2" *ngIf="option">
                 <i class="pi pi-car"></i>
-                <span> - </span>
-                <span>{{ option.label }}</span>
+                <span> {{ option.label }}</span>
               </div>
             </ng-template>
 
@@ -41,8 +40,7 @@
             <ng-template pTemplate="item" let-option>
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-car"></i>
-                <span> - </span>
-                <span>{{ option.label }}</span>
+                <span> {{ option.label }}</span>
               </div>
             </ng-template>
           </p-select>
@@ -67,8 +65,7 @@
             <ng-template pTemplate="selectedItem" let-option>
               <div class="flex align-items-center gap-2" *ngIf="option">
                 <i class="pi pi-car"></i>
-                <span> - </span>
-                <span>{{ option.label }}</span>
+                <span> {{ option.label }}</span>
               </div>
             </ng-template>
 
@@ -76,8 +73,7 @@
             <ng-template pTemplate="item" let-option>
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-car"></i>
-                <span> - </span>
-                <span>{{ option.label }}</span>
+                <span> {{ option.label }}</span>
               </div>
             </ng-template>
           </p-select>
@@ -145,11 +141,74 @@
         <div class="form-actions">
           <p-button type="button" label="Reset" iconPos="right" [style]="{'gap':'0.5rem'}" severity="secondary"
             [outlined]="true" (click)="resetForm()" [disabled]="loading()"></p-button>
-          <p-button type="submit" label="Transfer Funds" iconPos="right" [style]="{'gap':'0.5rem'}"
+          <p-button type="submit" label="Initiate Transfer" iconPos="right" [style]="{'gap':'0.5rem'}"
             [loading]="loading()" icon="pi pi-arrow-right-arrow-left"></p-button>
         </div>
       </form>
     </p-card>
 
   </div>
+
+  <!-- Confirmation Dialog -->
+  <p-dialog [(visible)]="showConfirmDialog" [modal]="true" [closable]="!confirmationLoading" [closeOnEscape]="false"
+    [draggable]="false" [resizable]="false" styleClass="confirmation-dialog" header="Confirm Fund Transfer">
+
+    <ng-template pTemplate="content">
+      <div class="confirmation-content">
+        <div class="confirmation-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+
+        <div class="confirmation-message">
+          <p class="confirmation-title">Confirm this fund transfer?</p>
+          <p class="confirmation-subtitle">Please review the details below before proceeding</p>
+        </div>
+
+        <div class="confirmation-details">
+          <div class="detail-row">
+            <span class="detail-label">Reference ID:</span>
+            <span class="detail-value">{{ initiateResponse?.data?.refId }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">From Fleet:</span>
+            <span class="detail-value">{{ fundReassignmentForm.get('sourceFleetNumber')?.value }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">To Fleet:</span>
+            <span class="detail-value">{{ fundReassignmentForm.get('destinationFleetNumber')?.value }}</span>
+          </div>
+          <div class="detail-row highlight">
+            <span class="detail-label">Amount:</span>
+            <span class="detail-value">KES {{ fundReassignmentForm.get('amount')?.value | number:'1.2-2' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Category:</span>
+            <span class="detail-value">{{ initiateResponse?.data?.category }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value status-success">{{ initiateResponse?.data?.status }}</span>
+          </div>
+        </div>
+
+        <div class="confirmation-warning">
+          <i class="pi pi-info-circle"></i>
+          <span>This action cannot be undone. Please ensure all details are correct.</span>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button label="Reject" severity="secondary" [outlined]="true" (click)="rejectReassignment()"
+          [disabled]="confirmationLoading" icon="pi pi-times"></p-button>
+        <p-button label="Approve Transfer" severity="success" (click)="confirmReassignment()"
+          [loading]="confirmationLoading" icon="pi pi-check"></p-button>
+      </div>
+    </ng-template>
+
+  </p-dialog>
+
+  <!-- Toast for notifications -->
+  <p-toast position="top-right" [life]="4000"></p-toast>
 </div>

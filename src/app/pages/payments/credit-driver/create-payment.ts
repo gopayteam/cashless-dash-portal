@@ -22,6 +22,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 
 interface FleetOption {
@@ -52,12 +54,14 @@ interface DriverOption {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    ToastModule,
   ],
   standalone: true,
   selector: 'app-credit-driver',
   templateUrl: './create-payment.html',
   styleUrls: [
     './create-payment.css',
+    '../../../../styles/global/_toast.css'
   ],
 })
 export class CreditDriverComponent implements OnInit {
@@ -76,6 +80,7 @@ export class CreditDriverComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -296,21 +301,31 @@ export class CreditDriverComponent implements OnInit {
     // TODO: Replace with actual API endpoint for credit driver
     console.log('Submitting credit driver data:', payload);
 
-    /*
-    this.dataService.post(API_ENDPOINTS.CREDIT_DRIVER, payload, 'credit').subscribe({
+
+    this.dataService.post<any>(API_ENDPOINTS.CREDIT_DRIVER, payload, 'credit', true).subscribe({
       next: (response) => {
         console.log('Driver credited successfully', response);
         this.resetForm();
         this.loadingStore.stop();
-        // Show success message
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: response.message || 'Driver credited successfully',
+          life: 4000
+        });
       },
       error: (err) => {
         console.error('Failed to credit driver', err);
         this.loadingStore.stop();
-        // Show error message
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: err.message || 'Failed to credit driver',
+          life: 4000
+        });
       },
     });
-    */
+
 
     // Simulate API call
     setTimeout(() => {
