@@ -73,7 +73,9 @@
 }
 
 .brand__logo-img {
-  height: 40px;
+  height: 90px;
+  transform: scale(3.05);
+  transform-origin: center;
 }
 
 .brand-title {
