@@ -194,6 +194,15 @@ export class FundReassignmentComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Warning',
+      detail: 'Feature disabled. contact support',
+      life: 4000
+    });
+  }
+
+  onSubmit22(): void {
     this.submitted = true;
 
     if (this.fundReassignmentForm.invalid) {
