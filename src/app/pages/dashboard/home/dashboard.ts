@@ -35,7 +35,7 @@ import {
 import { forkJoin } from 'rxjs';
 import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
-import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
+import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/date-time.util';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../../../@core/services/theme.service';
@@ -87,14 +87,7 @@ export class DashboardComponent implements OnInit {
     private themeService: ThemeService,
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
-  ) {
-    this.router.events.subscribe(() => {
-      // Initialize with default pagination
-      const event = { first: 0, rows: this.rows };
-      this.loadTransactions(event);
-      this.loadDashboardData()
-    });
-  }
+  ) { }
 
   // Expose loading signal to template
   get loading() {
@@ -103,22 +96,38 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    if (user) {
-      this.entityId = user.entityId
-      this.themeService.applyTheme(user.entityId);
-      // console.log('Logged in as:', user.username);
-    } else {
+
+    if (!user) {
       this.router.navigate(['/login']);
-      console.log('No user logged in');
+      return;
     }
 
+    this.entityId = user.entityId;
+    this.themeService.applyTheme(user.entityId);
     this.themeService.loadPersistedTheme();
 
     this.setDateRange();
+
+    // 🔥 FIRST LOAD
+    const event = { first: 0, rows: this.rows };
+    this.loadTransactions(event);
     this.loadDashboardData();
+
+    // 🔁 RELOAD ON NAVIGATION
+    // this.router.events.subscribe(() => {
+    //   const event = { first: 0, rows: this.rows };
+    //   this.loadTransactions(event);
+    //   this.loadDashboardData();
+    // });
   }
 
+
+
   loadTransactions($event: any): void {
+    if (!this.dateRange || this.dateRange.length < 2) {
+      return; // dates not ready yet
+    }
+
     const [start, end] = this.dateRange;
     const event = $event;
 
@@ -128,9 +137,9 @@ export class DashboardComponent implements OnInit {
     this.first = event.first;
 
     const payload = {
-      entityId: 'GS000002',
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
+      entityId: this.entityId,
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
       page,
       size: event.rows,
       paymentStatus: 'PAID',
@@ -162,14 +171,18 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData(): void {
+    if (!this.dateRange || this.dateRange.length < 2) {
+      return;
+    }
+
     this.loadingStore.start();
 
     const [start, end] = this.dateRange;
 
     const baseParams = {
       entityId: this.entityId,
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
     };
 
     const transactionsPayload = {
@@ -185,7 +198,7 @@ export class DashboardComponent implements OnInit {
       transaction_stats: this.dataService.get<TransactionStats>(
         API_ENDPOINTS.TRANSACTION_STATS,
         baseParams,
-        'stats'
+        'stats',
       ),
       transaction_stats_by_period: this.dataService.get<TransactionStatsByPeriod[]>(
         API_ENDPOINTS.STATS_BY_PERIOD,
@@ -195,13 +208,13 @@ export class DashboardComponent implements OnInit {
       transaction_stats_per_category: this.dataService.get<TransactionStatsPerCategory[]>(
         API_ENDPOINTS.STATS_PER_CATEGORY,
         baseParams,
-        'categories'
+        'categories',
       ),
 
       recentTransactions: this.dataService.post<PaymentsApiResponse>(
         API_ENDPOINTS.ALL_PAYMENTS,
         transactionsPayload,
-        'transactions'
+        'transactions',
       ),
     }).subscribe({
       next: (data: DashboardData) => {
@@ -240,10 +253,11 @@ export class DashboardComponent implements OnInit {
   }
 
   onDateRangeChange() {
-    // Reload dashboard data with new date range
-    console.log('Date range changed:', this.dateRange);
+    const event = { first: 0, rows: this.rows };
+    this.loadTransactions(event);
     this.loadDashboardData();
   }
+
 
   exportData() {
     // TODO: Implement export functionality

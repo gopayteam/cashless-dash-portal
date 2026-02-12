@@ -67,13 +67,15 @@ export class InactiveDriversComponent implements OnInit {
   // Dropdown options
   driverStatuses: DriverStatus[] = ['ACTIVE', 'INACTIVE'];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -94,6 +96,7 @@ export class InactiveDriversComponent implements OnInit {
   }
 
   loadDrivers(event: any): void {
+    this.lastEvent = event;
     this.loadingStore.start();
 
     const page = event.first / event.rows;
@@ -157,6 +160,11 @@ export class InactiveDriversComponent implements OnInit {
         },
         complete: () => this.loadingStore.stop(),
       });
+  }
+
+  refreshDrivers(): void {
+    const event = this.lastEvent || { first: 0, rows: this.rows };
+    this.loadDrivers(event);
   }
 
   calculateStats(drivers: Driver[]): void {

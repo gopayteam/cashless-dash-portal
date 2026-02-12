@@ -22,6 +22,7 @@ import { Router } from '@angular/router';
 import { DeletedParcel } from '../../../../@core/models/parcels/deleted-parcels/deleted-parcel.model';
 import { ApiResponse } from '../../../../@core/models/parcels/deleted-parcels/deleted-parcel-response.model';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 @Component({
   standalone: true,
@@ -110,6 +111,14 @@ export class DeletedParcelsComponent implements OnInit {
 
     this.setDefaultDateRange();
     this.loadDeletedParcels({ first: 0, rows: this.rows });
+
+    // this.router.events.subscribe(() => {
+    //   if (this.lastEvent) {
+    //     this.fetchDeletedParcels(true, this.lastEvent);
+    //   } else {
+    //     this.fetchDeletedParcels(true, { first: 0, rows: this.rows });
+    //   }
+    // });
   }
 
   setDefaultDateRange(): void {
@@ -133,7 +142,10 @@ export class DeletedParcelsComponent implements OnInit {
       return;
     }
 
-    const page = event?.first ? event.first / event.rows : 0;
+    const page = ($event && $event.first !== undefined)
+      ? $event.first / $event.rows
+      : 0;
+
     const size = event?.rows ?? this.rows;
 
     this.first = event?.first ?? 0;
@@ -143,8 +155,8 @@ export class DeletedParcelsComponent implements OnInit {
       entityId: this.entityId,
       page: page,
       size: size,
-      startDate: start ? start.toISOString().split('T')[0] : null,
-      endDate: end ? end.toISOString().split('T')[0] : null,
+      startDate: start ? formatDateLocal(start) : null,
+      endDate: end ? formatDateLocal(end) : null,
     };
 
     this.loadingStore.start();
@@ -242,8 +254,11 @@ export class DeletedParcelsComponent implements OnInit {
     return `Location ${locationId}`;
   }
 
-  refresh(): void {
-    if (this.lastEvent)
-      this.fetchDeletedParcels(true, this.lastEvent)
+  refreshParcels(): void {
+    if (this.lastEvent) {
+      this.fetchDeletedParcels(true, this.lastEvent);
+    } else {
+      this.fetchDeletedParcels(true, { first: 0, rows: this.rows });
+    }
   }
 }

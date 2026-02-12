@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, OnDestroy, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, inject, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -48,6 +48,8 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   // Sidebar state
   sidebarCollapsed = false;
   sidebarVisible = false;
+  showFooter: boolean = true;
+
   private currentScreenWidth = window.innerWidth;
 
   // User info
@@ -174,13 +176,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     ]
   };
 
-  showFooter: boolean = false;
-
   constructor(
     private authService: AuthService,
     private router: Router,
     private darkModeService: DarkModeService,
     private themeService: ThemeService,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -550,21 +551,4 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   //   this.showFooter = position >= height - threshold;
   // }
-
-
-
-  @ViewChild('footerTrigger') trigger!: ElementRef;
-
-  ngAfterViewInit() {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        this.showFooter = entry.isIntersecting;
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(this.trigger.nativeElement);
-  }
-
-
 }

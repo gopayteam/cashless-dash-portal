@@ -20,6 +20,7 @@ import { DialogModule } from 'primeng/dialog';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 @Component({
   standalone: true,
@@ -80,7 +81,18 @@ export class ParcelManagersComponent implements OnInit {
       console.log('No user logged in');
     }
 
+    this.setDefaultDateRange();
+
     this.loadParcelManagers({ first: 0, rows: this.rows });
+
+    // this.router.events.subscribe(() => {
+    //   if (this.lastEvent) {
+    //     this.fetchParcelManagers(true, this.lastEvent);
+    //   } else {
+    //     this.fetchParcelManagers(true, { first: 0, rows: this.rows });
+    //   }
+    // });
+
   }
 
   loadParcelManagers(event: any): void {
@@ -91,7 +103,10 @@ export class ParcelManagersComponent implements OnInit {
   fetchParcelManagers(bypassCache: boolean, event: any): void {
     this.loadingStore.start();
 
-    const page = event.first / event.rows;
+    const page = (event && event.first !== undefined)
+      ? event.first / event.rows
+      : 0;
+
     const [start, end] = this.dateRange || [];
 
     const payload = {
@@ -100,9 +115,11 @@ export class ParcelManagersComponent implements OnInit {
       size: event.rows,
       transactionType: 'DEBIT',
       paymentStatus: 'PAID',
-      startDate: start ? start.toISOString().split('T')[0] : null,
-      endDate: end ? end.toISOString().split('T')[0] : null,
+      startDate: start ? formatDateLocal(start) : null,
+      endDate: end ? formatDateLocal(start) : null,
     };
+
+    
 
     this.dataService
       .post<ParcelManagersApiResponse>(
@@ -127,6 +144,14 @@ export class ParcelManagersComponent implements OnInit {
         complete: () => this.loadingStore.stop(),
       });
   }
+
+  setDefaultDateRange(): void {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    this.dateRange = [lastWeek, today];
+  }
+
 
   applyFilters(): void {
     this.first = 0;
@@ -164,9 +189,11 @@ export class ParcelManagersComponent implements OnInit {
 
   refresh(): void {
     if (this.lastEvent) {
-      if (this.lastEvent)
-        this.fetchParcelManagers(true, this.lastEvent);
+      this.fetchParcelManagers(true, this.lastEvent);
+    } else {
+      this.fetchParcelManagers(true, { first: 0, rows: this.rows });
     }
   }
+
 
 }

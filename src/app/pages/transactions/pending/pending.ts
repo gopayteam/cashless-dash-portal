@@ -21,6 +21,7 @@ import { PaymentsApiResponse } from '../../../../@core/models/transactions/payme
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 @Component({
   selector: 'app-pending',
@@ -79,19 +80,25 @@ export class PendingTransactionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     const user = this.authService.currentUser();
-    if (user) {
-      this.entityId = user.entityId
-      // console.log('Logged in as:', user.username);
-    } else {
+    if (!user) {
       this.router.navigate(['/login']);
-      console.log('No user logged in');
+      return;
     }
 
+    this.entityId = user.entityId;
+
     this.setDefaultDateRange();
+
+    // initial load
     this.loadTransactions();
+
+    // reload on navigation
+    // this.router.events.subscribe(() => {
+    //   this.fetchTransactions(true);
+    // });
   }
+
 
   setDefaultDateRange(): void {
     const today = new Date();
@@ -127,8 +134,8 @@ export class PendingTransactionsComponent implements OnInit {
 
     const payload = {
       entityId: this.entityId,
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
       page,
       paymentStatus: 'PENDING',
       // transactionType: 'CREDIT',

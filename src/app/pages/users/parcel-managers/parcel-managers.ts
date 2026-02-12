@@ -107,6 +107,8 @@ export class ParcelManagerUsersComponent implements OnInit {
     { label: 'Blocked', value: 'blocked' },
   ];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
@@ -139,9 +141,9 @@ export class ParcelManagerUsersComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
-    this.fetchUsers(false, $event)
+    this.lastEvent = $event;
+    this.fetchUsers(false, $event);
   }
-
 
   fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
@@ -175,12 +177,11 @@ export class ParcelManagerUsersComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load users', err);
-          this.loadingStore.stop();
+          console.error('Failed to load parcel managers', err);
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -345,6 +346,10 @@ export class ParcelManagerUsersComponent implements OnInit {
   }
 
   refresh(): void {
-    this.fetchUsers(true);
+    if (this.lastEvent) {
+      this.fetchUsers(true, this.lastEvent);
+    } else {
+      this.fetchUsers(true, { first: 0, rows: this.rows });
+    }
   }
 }

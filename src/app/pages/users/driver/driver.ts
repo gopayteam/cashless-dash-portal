@@ -107,19 +107,15 @@ export class DriverUserComponent implements OnInit {
     { label: 'Blocked', value: 'blocked' },
   ];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-    this.router.events.subscribe(() => {
-      // Initialize with default pagination
-      const event = { first: 0, rows: this.rows };
-      this.loadUsers(event);
-    });
-  }
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -139,7 +135,8 @@ export class DriverUserComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
-    this.fetchUsers(false, $event)
+    this.lastEvent = $event;
+    this.fetchUsers(false, $event);
   }
 
   fetchUsers(bypassCache: boolean, $event?: any): void {
@@ -149,7 +146,7 @@ export class DriverUserComponent implements OnInit {
     let page = 0;
     let pageSize = this.rows;
 
-    if (event) {
+    if (event && event.first !== undefined) {
       page = event.first / event.rows;
       pageSize = event.rows;
       this.first = event.first;
@@ -174,12 +171,11 @@ export class DriverUserComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load users', err);
-          this.loadingStore.stop();
+          console.error('Failed to load drivers', err);
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -344,6 +340,10 @@ export class DriverUserComponent implements OnInit {
   }
 
   refresh(): void {
-    this.fetchUsers(true);
+    if (this.lastEvent) {
+      this.fetchUsers(true, this.lastEvent);
+    } else {
+      this.fetchUsers(true, { first: 0, rows: this.rows });
+    }
   }
 }

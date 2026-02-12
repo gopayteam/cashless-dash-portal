@@ -32,6 +32,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { SelectModule } from 'primeng/select';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 @Component({
   standalone: true,
@@ -161,6 +162,15 @@ export class ParcelsComponent implements OnInit {
 
     this.setDefaultDateRange();
     this.loadStages();
+
+    // this.router.events.subscribe(() => {
+    //   if (this.lastEvent) {
+    //     this.fetchParcels(true, this.lastEvent);
+    //   } else {
+    //     this.fetchParcels(true, { first: 0, rows: this.rows });
+    //   }
+    // });
+
   }
 
   setDefaultDateRange(): void {
@@ -224,7 +234,10 @@ export class ParcelsComponent implements OnInit {
       return;
     }
 
-    const page = $event?.first ? $event.first / $event.rows : 0;
+    const page = ($event && $event.first !== undefined)
+      ? $event.first / $event.rows
+      : 0;
+
     const size = $event?.rows ?? this.rows;
 
     this.first = $event?.first ?? 0;
@@ -236,10 +249,12 @@ export class ParcelsComponent implements OnInit {
       page: page,
       size: size,
       paymentStatus: 'PAID',
-      startDate: start ? start.toISOString().split('T')[0] : null,
-      endDate: end ? end.toISOString().split('T')[0] : null,
+      startDate: start ? formatDateLocal(start) : null,
+      endDate: end ? formatDateLocal(end) : null,
       sort: 'createdAt,DESC',
     };
+
+
 
     // Add optional filters
     if (this.filters.sourceId) {
@@ -281,6 +296,7 @@ export class ParcelsComponent implements OnInit {
         complete: () => this.loadingStore.stop(),
       });
   }
+
 
   /**
    * Search by parcel number using API endpoint
@@ -597,9 +613,10 @@ export class ParcelsComponent implements OnInit {
 
       // Generate filename with date range
       const [start, end] = this.filters.dateRange;
-      const startDate = start ? start.toISOString().split('T')[0] : 'all';
-      const endDate = end ? end.toISOString().split('T')[0] : 'time';
+      const startDate = start ? formatDateLocal(start) : 'all';
+      const endDate = end ? formatDateLocal(end) : 'time';
       const filename = `parcels_${startDate}_to_${endDate}.xlsx`;
+
 
       // Save file
       XLSX.writeFile(wb, filename);
@@ -676,9 +693,11 @@ export class ParcelsComponent implements OnInit {
 
       // Generate filename with date range
       const [start, end] = this.filters.dateRange;
-      const startDate = start ? start.toISOString().split('T')[0] : 'all';
-      const endDate = end ? end.toISOString().split('T')[0] : 'time';
+      const startDate = start ?  formatDateLocal(start) : 'all';
+      const endDate = end ?  formatDateLocal(end) : 'time';
       const filename = `parcels_${startDate}_to_${endDate}.csv`;
+
+      
 
       link.href = URL.createObjectURL(blob);
       link.download = filename;
@@ -729,7 +748,10 @@ export class ParcelsComponent implements OnInit {
   }
 
   refreshParcels(): void {
-    if (this.lastEvent)
+    if (this.lastEvent) {
       this.fetchParcels(true, this.lastEvent);
+    } else {
+      this.fetchParcels(true, { first: 0, rows: this.rows });
+    }
   }
 }

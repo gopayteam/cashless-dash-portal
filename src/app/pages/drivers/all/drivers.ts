@@ -71,6 +71,8 @@ export class AllDriversComponent implements OnInit {
   // Dropdown options
   driverStatuses: DriverStatus[] = ['ACTIVE', 'INACTIVE'];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
@@ -97,6 +99,7 @@ export class AllDriversComponent implements OnInit {
   }
 
   loadDrivers(event: any): void {
+    this.lastEvent = event;
     this.loadingStore.start();
 
     const page = event.first / event.rows;
@@ -160,6 +163,12 @@ export class AllDriversComponent implements OnInit {
         complete: () => this.loadingStore.stop(),
       });
   }
+
+  refreshDrivers(): void {
+    const event = this.lastEvent || { first: 0, rows: this.rows };
+    this.loadDrivers(event);
+  }
+
 
   calculateStats(drivers: Driver[]): void {
     const activeDrivers = drivers.filter((d) => d.status === 'ACTIVE').length;

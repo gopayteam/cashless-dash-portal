@@ -24,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 
 interface FleetOption {
@@ -32,7 +33,7 @@ interface FleetOption {
 }
 
 interface DriverOption {
-  driverId: string;
+  driverId: number;
   label: string;
   fleetNumber?: string;
   username: string;
@@ -179,7 +180,7 @@ export class CreditDriverComponent implements OnInit {
 
           // Create driver options with labels
           this.allDriverOptions = this.drivers.map(d => ({
-            driverId: d.entityId,
+            driverId: d.id,
             label: this.getDriverLabel(d),
             fleetNumber: d.phoneNumber, // Assuming username contains fleet number
             username: d.username ? d.username : this.getDriverLabel(d),
@@ -196,21 +197,21 @@ export class CreditDriverComponent implements OnInit {
           // Fallback mock data for development
           this.allDriverOptions = [
             {
-              driverId: 'DRV001',
+              driverId: 1,
               label: 'DRV001 - John Doe (0712345678)',
               fleetNumber: 'FL001',
               username: 'Test user 1',
               phoneNumber: '07xxxxxxxx'
             },
             {
-              driverId: 'DRV002',
+              driverId: 2,
               label: 'DRV002 - Jane Smith (0723456789)',
               fleetNumber: 'FL002',
               username: 'Test user 2',
               phoneNumber: '07xxxxxxxx'
             },
             {
-              driverId: 'DRV003',
+              driverId: 3,
               label: 'DRV003 - Mike Johnson (0734567890)',
               fleetNumber: 'FL003',
               username: 'Test user 3',
@@ -274,45 +275,66 @@ export class CreditDriverComponent implements OnInit {
 
     // Format date to YYYY-MM-DD
     const activityDate = formValue.activityDate instanceof Date
-      ? formValue.activityDate.toISOString().split('T')[0]
+      ? formatDateLocal(formValue.activityDate)
       : formValue.activityDate;
 
+
+    // Find the selected driver option
+    const selectedDriver = this.allDriverOptions.find(
+      d => d.driverId === Number(formValue.driverId)
+    );
+
+    if (!selectedDriver) {
+      this.loadingStore.stop();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Driver mismatch',
+        detail: 'Selected driver could not be validated. Please reselect.',
+      });
+      return;
+    }
+
     const payload = {
-      fleetNumber: formValue.fleetNumber,
-      activeDriver: formValue.driverId,
-      currentDate: activityDate,
       entityId: this.entityId,
+      currentDate: activityDate,
+      fleetNumber: formValue.fleetNumber,
+      activeDriver: selectedDriver.phoneNumber,
     };
 
     // api/payment/wallets/assign/driver
-    // activeDriver
-    // :
-    // "254722157126"
-    // currentDate
-    // :
-    // "2026-02-03"
-    // entityId
-    // :
-    // "GS000002"
-    // fleetNumber
-    // :
-    // "SM368"
+    // activeDriver:"254722157126"
+    // currentDate:"2026-02-03"
+    // entityId:"GS000002"
+    // fleetNumber:"SM368"
 
     // TODO: Replace with actual API endpoint for credit driver
     console.log('Submitting credit driver data:', payload);
 
-
     this.dataService.post<any>(API_ENDPOINTS.CREDIT_DRIVER, payload, 'credit', true).subscribe({
       next: (response) => {
-        console.log('Driver credited successfully', response);
+
         this.resetForm();
         this.loadingStore.stop();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: response.message || 'Driver credited successfully',
-          life: 4000
-        });
+
+        if (response.status === 0 || response.code === 0) {
+          // console.log('Driver credited successfully', response);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: response.message || 'Driver credited successfully',
+            life: 4000
+          });
+
+
+        } else {
+          console.log('Failed to credit driver', response);
+          this.messageService.add({
+            severity: 'Error',
+            summary: 'Error Occurred',
+            detail: response.message || 'Failed to credit driver',
+            life: 4000
+          });
+        }
       },
       error: (err) => {
         console.error('Failed to credit driver', err);

@@ -18,6 +18,9 @@ import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { MessageService } from 'primeng/api';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 
 interface ProfileOption {
   label: string;
@@ -53,14 +56,17 @@ interface StatusOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    MessageModule,
+    ToastModule,
   ],
   templateUrl: './general.html',
   styleUrls: [
     './general.css',
     '../../../../styles/modules/_cards.css',
     '../../../../styles/modules/_user_module.css',
-    '../../../../styles/modules/_filter_actions.css'
+    '../../../../styles/modules/_filter_actions.css',
+    '../../../../styles/global/_toast.css',
   ],
 })
 export class GeneralUserComponent implements OnInit {
@@ -121,19 +127,16 @@ export class GeneralUserComponent implements OnInit {
     { label: 'Blocked', value: 'blocked' },
   ];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-    this.router.events.subscribe(() => {
-      // Initialize with default pagination
-      const event = { first: 0, rows: this.rows };
-      this.loadUsers(event);
-    });
-  }
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -153,7 +156,8 @@ export class GeneralUserComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
-    this.fetchUsers(false, $event)
+    this.lastEvent = $event;
+    this.fetchUsers(false, $event);
   }
 
   fetchUsers(bypassCache: boolean, $event?: any): void {
@@ -163,13 +167,12 @@ export class GeneralUserComponent implements OnInit {
     let page = 0;
     let pageSize = this.rows;
 
-    if (event) {
+    if (event && event.first !== undefined) {
       page = event.first / event.rows;
       pageSize = event.rows;
       this.first = event.first;
       this.rows = event.rows;
     }
-
     const payload = {
       entityId: this.entityId,
       page,
@@ -187,12 +190,11 @@ export class GeneralUserComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load users', err);
-          this.loadingStore.stop();
+          console.error('Failed to load all users', err);
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -242,6 +244,13 @@ export class GeneralUserComponent implements OnInit {
 
     this.filteredUsers = filtered;
     this.users = filtered;
+
+    if (this.selectedUser) {
+      const exists = this.users.find(u => u.id === this.selectedUser!.id);
+      if (!exists) {
+        this.selectedUser = null; // or optionally, keep showing previous user
+      }
+    }
   }
 
   onSearchChange(): void {
@@ -274,14 +283,19 @@ export class GeneralUserComponent implements OnInit {
   }
 
   viewUserDetails(user: User): void {
-    this.selectedUser = user;
+    this.selectedUser = { ...user };
     this.displayDetailDialog = true;
   }
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
-    this.selectedUser = null;
+
+    // Reset after a short delay to let Angular close the dialog smoothly
+    setTimeout(() => {
+      this.selectedUser = null;
+    }, 200);
   }
+
 
   getProfileClass(profile: string): string {
     const profileMap: { [key: string]: string } = {
@@ -357,6 +371,64 @@ export class GeneralUserComponent implements OnInit {
   }
 
   refresh(): void {
-    this.fetchUsers(true);
+    if (this.lastEvent) {
+      this.fetchUsers(true, this.lastEvent);
+    } else {
+      this.fetchUsers(true, { first: 0, rows: this.rows });
+    }
+  }
+
+  sendResetPinPhone(user: User): void {
+    if (!user.phoneNumber) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Missing Data',
+        detail: 'User phone number is missing.'
+      });
+      return;
+    }
+
+    const payload = {
+      channel: 'PORTAL',
+      entityId: this.entityId,
+      username: user.phoneNumber
+    };
+
+    interface PinResponse {
+      status: number,
+      message: string,
+      data: any[],
+      totalRecords: number
+    }
+
+    this.dataService.post<PinResponse>(API_ENDPOINTS.SEND_RESET_PASSWORD, payload).subscribe({
+      next: (response) => {
+
+        if (response.status === 0) {
+          // REAL success
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: response.message || 'Reset PIN sent successfully.'
+          });
+        } else {
+          // Business error from backend
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed',
+            detail: response.message || 'Request failed.'
+          });
+        }
+      },
+      error: (error) => {
+        // Network / server crash
+        console.error('HTTP Error:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'System Error',
+          detail: 'Server is unreachable. Try again later.'
+        });
+      }
+    });
   }
 }

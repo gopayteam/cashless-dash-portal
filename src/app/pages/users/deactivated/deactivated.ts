@@ -105,19 +105,15 @@ export class DeactivatedUsersComponent implements OnInit {
     { label: 'Blocked', value: 'blocked' },
   ];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-    this.router.events.subscribe(() => {
-      // Initialize with default pagination
-      const event = { first: 0, rows: this.rows };
-      this.loadUsers(event);
-    });
-  }
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -139,8 +135,10 @@ export class DeactivatedUsersComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
-    this.fetchUsers(false, $event)
+    this.lastEvent = $event;
+    this.fetchUsers(false, $event);
   }
+
 
   fetchUsers(bypassCache: boolean, $event?: any): void {
     const event = $event;
@@ -149,7 +147,7 @@ export class DeactivatedUsersComponent implements OnInit {
     let page = 0;
     let pageSize = this.rows;
 
-    if (event) {
+    if (event && event.first !== undefined) {
       page = event.first / event.rows;
       pageSize = event.rows;
       this.first = event.first;
@@ -173,12 +171,11 @@ export class DeactivatedUsersComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load users', err);
-          this.loadingStore.stop();
+          console.error('Failed to load deactivated users', err);
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -316,7 +313,11 @@ export class DeactivatedUsersComponent implements OnInit {
     return blocked ? 'Blocked' : 'Active';
   }
 
-  refresh() {
-    this.fetchUsers(true)
+  refresh(): void {
+    if (this.lastEvent) {
+      this.fetchUsers(true, this.lastEvent);
+    } else {
+      this.fetchUsers(true, { first: 0, rows: this.rows });
+    }
   }
 }

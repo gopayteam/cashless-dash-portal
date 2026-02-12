@@ -21,6 +21,7 @@ import { StatementApiResponse } from '../../../../@core/models/statement/stateme
 import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 interface TransactionTypeOption {
   label: string;
@@ -156,8 +157,8 @@ export class WithdrawalStatementsComponent implements OnInit {
 
     const payload: any = {
       entityId: this.entityId,
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
       page,
       size: pageSize,
     };

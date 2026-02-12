@@ -22,6 +22,7 @@ import { DialogModule } from 'primeng/dialog';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 @Component({
   standalone: true,
@@ -84,7 +85,18 @@ export class ParcelSourceComponent implements OnInit {
       console.log('No user logged in');
     }
 
+    this.setDefaultDateRange();
     this.loadStages({ first: 0, rows: this.rows });
+
+    // this.router.events.subscribe(() => {
+    //   if (this.lastEvent) {
+    //     this.fetchStages(true, this.lastEvent);
+    //   } else {
+    //     this.fetchStages(true, { first: 0, rows: this.rows });
+    //   }
+    // });
+
+
   }
 
   loadStages(event: any): void {
@@ -95,15 +107,19 @@ export class ParcelSourceComponent implements OnInit {
   fetchStages(bypassCache: boolean, event?: any): void {
     this.loadingStore.start();
 
-    const page = event.first / event.rows;
+    const page = (event && event.first !== undefined)
+      ? event.first / event.rows
+      : 0;
+
+    const size = event?.rows || this.rows;
     const [start, end] = this.dateRange || [];
 
     const params = {
       entityId: this.entityId,
       page,
-      size: event.rows,
-      startDate: start ? start.toISOString().split('T')[0] : null,
-      endDate: end ? end.toISOString().split('T')[0] : null,
+      size,
+      startDate: start ? formatDateLocal(start) : null,
+      endDate: end ? formatDateLocal(start) : null,
     };
 
     this.dataService
@@ -111,23 +127,29 @@ export class ParcelSourceComponent implements OnInit {
         API_ENDPOINTS.ALL_PARCEL_SOURCES,
         params,
         'parcel-source-stages',
+        bypassCache
       )
       .subscribe({
         next: (response) => {
           this.stages = response.data;
           this.totalRecords = response.totalRecords;
-
-          this.rows = event.rows;
-          this.first = event.first;
-
+          this.rows = size;
+          this.first = event?.first || 0;
           this.cdr.detectChanges();
         },
-        error: (err) => {
-          console.error('Failed to load parcel source stages', err);
-        },
+        error: () => this.loadingStore.stop(),
         complete: () => this.loadingStore.stop(),
       });
   }
+
+
+  setDefaultDateRange(): void {
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    this.dateRange = [lastWeek, today];
+  }
+
 
   applyFilters(): void {
     this.first = 0;
@@ -154,6 +176,8 @@ export class ParcelSourceComponent implements OnInit {
   refresh(): void {
     if (this.lastEvent) {
       this.fetchStages(true, this.lastEvent);
+    } else {
+      this.fetchStages(true, { first: 0, rows: this.rows });
     }
   }
 }

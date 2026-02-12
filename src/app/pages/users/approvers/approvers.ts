@@ -107,19 +107,15 @@ export class ApproversComponent implements OnInit {
     { label: 'Blocked', value: 'blocked' },
   ];
 
+  private lastEvent: any;
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {
-    this.router.events.subscribe(() => {
-      // Initialize with default pagination
-      const event = { first: 0, rows: this.rows };
-      this.loadUsers(event);
-    });
-  }
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -140,7 +136,8 @@ export class ApproversComponent implements OnInit {
   }
 
   loadUsers($event?: any): void {
-    this.fetchUsers(false, $event)
+    this.lastEvent = $event;
+    this.fetchUsers(false, $event);
   }
 
 
@@ -151,7 +148,7 @@ export class ApproversComponent implements OnInit {
     let page = 0;
     let pageSize = this.rows;
 
-    if (event) {
+    if (event && event.first !== undefined) {
       page = event.first / event.rows;
       pageSize = event.rows;
       this.first = event.first;
@@ -176,12 +173,11 @@ export class ApproversComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load approver users', err);
-          this.loadingStore.stop();
+          console.error('Failed to load approvers', err);
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -346,6 +342,10 @@ export class ApproversComponent implements OnInit {
   }
 
   refresh(): void {
-    this.fetchUsers(true);
+    if (this.lastEvent) {
+      this.fetchUsers(true, this.lastEvent);
+    } else {
+      this.fetchUsers(true, { first: 0, rows: this.rows });
+    }
   }
 }

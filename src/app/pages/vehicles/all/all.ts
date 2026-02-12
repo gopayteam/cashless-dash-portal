@@ -22,6 +22,7 @@ import * as XLSX from 'xlsx';
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 interface StatusOption {
   label: string;
@@ -126,23 +127,17 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   loadVehicles($event?: any): void {
-    this.lastEvent = event;
+    this.lastEvent = $event;
     this.fetchVehicles(false, $event);
   }
 
   fetchVehicles(bypassCache: boolean, $event?: any): void {
-    const event = $event;
+    const event = $event || { first: 0, rows: this.rows };
+    let page = event.first / event.rows;
+    let pageSize = event.rows;
 
-    // Handle pagination from PrimeNG lazy load event
-    let page = 0;
-    let pageSize = this.rows;
-
-    if (event) {
-      page = event.first / event.rows;
-      pageSize = event.rows;
-      this.first = event.first;
-      this.rows = event.rows;
-    }
+    this.first = event.first;
+    this.rows = event.rows;
 
     const payload = {
       entityId: this.entityId,
@@ -153,7 +148,7 @@ export class AllVehiclesComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', true)
+      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', bypassCache)
       .subscribe({
         next: (response) => {
           this.allVehicles = response.data;
@@ -161,13 +156,12 @@ export class AllVehiclesComponent implements OnInit {
           this.calculateStats();
           this.applyClientSideFilter();
           this.cdr.detectChanges();
-          this.loadingStore.stop();
         },
         error: (err) => {
           console.error('Failed to load vehicles', err);
-          this.loadingStore.stop();
           this.cdr.detectChanges();
         },
+        complete: () => this.loadingStore.stop(),
       });
   }
 
@@ -343,9 +337,10 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   refreshVehicles(): void {
-    // if (this.lastEvent)
-    this.fetchVehicles(true, this.lastEvent);
+    const event = this.lastEvent || { first: 0, rows: this.rows };
+    this.fetchVehicles(true, event);
   }
+
 
   /**
   * Export vehicles to Excel
@@ -420,7 +415,7 @@ export class AllVehiclesComponent implements OnInit {
       XLSX.utils.book_append_sheet(wb, ws, 'Vehicles');
 
       // Generate filename with timestamp
-      const timestamp = new Date().toISOString().split('T')[0];
+      const timestamp = formatDateLocal(new Date());
       const filename = `vehicles_${timestamp}.xlsx`;
 
       // Save file
@@ -496,7 +491,7 @@ export class AllVehiclesComponent implements OnInit {
       const link = document.createElement('a');
 
       // Generate filename with timestamp
-      const timestamp = new Date().toISOString().split('T')[0];
+      const timestamp = formatDateLocal(new Date());
       const filename = `vehicles_${timestamp}.csv`;
 
       link.href = URL.createObjectURL(blob);
