@@ -90,6 +90,8 @@ import { UpdateInspectorComponent } from './pages/forms/inspector/update-inspect
 import { UpdateVehicleComponent } from './pages/forms/vehicle/update-vehicle/update-vehicle';
 import { SendNotificationsComponent } from './pages/notifications/send-notifications/send-notifications';
 import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts';
+import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignment/fund-reassignment';
+import { FleetCollectionsComponent } from './pages/fleet/total-collection/total-collection';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -159,6 +161,13 @@ export const routes: Routes = [
         data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
       },
 
+      {
+        path: 'fleet/total-collection',
+        component: FleetCollectionsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_TRANSACTIONS'] }
+      },
+
       /* Payments */
       {
         path: 'deposits/all',
@@ -181,6 +190,12 @@ export const routes: Routes = [
       {
         path: 'transfer-payment/2',
         component: FundReassignmentComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
+      },
+      {
+        path: 'hidden/vincent-gopay',
+        component: HiddenFundReassignmentComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
       },

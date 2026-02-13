@@ -1,0 +1,269 @@
+<!-- fleet-collections.component.html -->
+<p-toast position="top-right" />
+
+<div class="fleet-container">
+
+  <!-- ─── Page Header ─────────────────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <i class="pi pi-chart-bar"></i>
+      </div>
+      <div class="header-text">
+        <h1>Fleet Collections</h1>
+        <p class="text-muted">Revenue collected per fleet vehicle</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Date Picker -->
+      <div class="date-picker-wrapper">
+        <i class="pi pi-calendar date-icon"></i>
+        <input type="date" class="date-input" [(ngModel)]="selectedDate" (change)="onDateChange()" [max]="''" />
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search fleet number..." [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Sort -->
+      <p-select [options]="sortOptions" [(ngModel)]="selectedSort" (onChange)="onSortChange()" optionLabel="label"
+        optionValue="value" styleClass="sort-dropdown" placeholder="Sort by" />
+    </div>
+  </div>
+
+  <!-- ─── Summary Stats ───────────────────────────────────────────────────── -->
+  <div class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-card-inner">
+        <div class="stat-icon-box">
+          <i class="pi pi-dollar"></i>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Total Revenue</span>
+          <span class="stat-val">{{ formatCurrency(totalRevenue) }}</span>
+          <span class="stat-sub">{{ selectedDate }}</span>
+        </div>
+      </div>
+      <div class="stat-glow stat-glow-blue"></div>
+    </div>
+
+    <div class="stat-card stat-top">
+      <div class="stat-card-inner">
+        <div class="stat-icon-box">
+          <i class="pi pi-trophy"></i>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Top Earner</span>
+          <span class="stat-val">{{ topFleet?.fleetNumber ?? '—' }}</span>
+          <span class="stat-sub">{{ topFleet ? formatCurrency(topFleet.totalAmount) : 'No data' }}</span>
+        </div>
+      </div>
+      <div class="stat-glow stat-glow-gold"></div>
+    </div>
+
+    <div class="stat-card stat-avg">
+      <div class="stat-card-inner">
+        <div class="stat-icon-box">
+          <i class="pi pi-chart-line"></i>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Avg. Per Fleet</span>
+          <span class="stat-val">{{ formatCurrency(averageCollection) }}</span>
+          <span class="stat-sub">{{ activeFleetCount }} active fleets</span>
+        </div>
+      </div>
+      <div class="stat-glow stat-glow-green"></div>
+    </div>
+
+    <div class="stat-card stat-count">
+      <div class="stat-card-inner">
+        <div class="stat-icon-box">
+          <i class="pi pi-car"></i>
+        </div>
+        <div class="stat-body">
+          <span class="stat-label">Total Fleets</span>
+          <span class="stat-val">{{ totalElements }}</span>
+          <span class="stat-sub">{{ filteredFleets.length }} showing</span>
+        </div>
+      </div>
+      <div class="stat-glow stat-glow-purple"></div>
+    </div>
+  </div>
+
+  <!-- ─── Charts Section ──────────────────────────────────────────────────── -->
+  <div class="charts-section" *ngIf="showChart && allFleets.length > 0">
+    <div class="charts-header">
+      <h3 class="section-title">
+        <i class="pi pi-chart-bar"></i>
+        Top 10 Performers
+      </h3>
+      <button class="icon-btn" (click)="toggleChart()" pTooltip="Hide charts">
+        <i class="pi pi-eye-slash"></i>
+      </button>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-box">
+        <p class="chart-label">Collection by Fleet</p>
+        <div class="chart-canvas-wrapper bar-wrapper">
+          <canvas #barChartCanvas></canvas>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <p class="chart-label">Revenue Share</p>
+        <div class="chart-canvas-wrapper donut-wrapper">
+          <canvas #donutChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show charts button when hidden -->
+  <div *ngIf="!showChart && allFleets.length > 0" class="show-charts-bar">
+    <button class="show-charts-btn" (click)="toggleChart()">
+      <i class="pi pi-chart-bar"></i> Show Charts
+    </button>
+  </div>
+
+  <!-- ─── Toolbar ─────────────────────────────────────────────────────────── -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <span class="record-badge">
+        <i class="pi pi-list"></i>
+        {{ filteredFleets.length }} of {{ totalElements }} fleets
+      </span>
+
+    </div>
+    <!-- ─── Pagination ───────────────────────────────────────────── -->
+    <p-paginator [first]="page * size" [rows]="size" [totalRecords]="totalElements"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)">
+    </p-paginator>
+    <div class="toolbar-right">
+      <button class="icon-btn" (click)="toggleView()"
+        [pTooltip]="viewMode === 'cards' ? 'Switch to List' : 'Switch to Cards'">
+        <i [class]="'pi ' + (viewMode === 'cards' ? 'pi-list' : 'pi-th-large')"></i>
+      </button>
+      <button class="icon-btn" (click)="refreshData()" pTooltip="Refresh" [disabled]="loading">
+        <i class="pi pi-refresh" [class.spinning]="loading"></i>
+      </button>
+      <button class="export-btn excel" (click)="exportToExcel()" [disabled]="isExporting">
+        <i class="pi pi-file-excel"></i> Excel
+      </button>
+      <button class="export-btn csv" (click)="exportToCSV()" [disabled]="isExporting">
+        <i class="pi pi-file"></i> CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Loading State ───────────────────────────────────────────────────── -->
+  <!-- <div *ngIf="loading" class="loading-overlay">
+    <p-progressSpinner strokeWidth="4" styleClass="custom-spinner" />
+    <p>Loading fleet collections…</p>
+  </div> -->
+
+  <!-- ─── Cards View ──────────────────────────────────────────────────────── -->
+  <div *ngIf="!loading && viewMode === 'cards'" class="fleet-cards-grid">
+
+    <div *ngIf="filteredFleets.length === 0" class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <h3>No data found</h3>
+      <p>Try adjusting your search or selecting a different date.</p>
+    </div>
+
+    <div *ngFor="let fleet of displayedFleets; let i = index" class="fleet-card"
+      [class.card-gold]="getRank(fleet) === 1" [class.card-silver]="getRank(fleet) === 2"
+      [class.card-bronze]="getRank(fleet) === 3" [style.animation-delay]="(i * 40) + 'ms'">
+      <!-- Rank Badge -->
+      <div class="rank-badge" [class]="getRankClass(fleet)">
+        <i [class]="'pi ' + getRankIcon(fleet)"></i>
+        <span>#{{ getRank(fleet) }}</span>
+      </div>
+
+      <!-- Fleet Number -->
+      <div class="card-fleet-info">
+        <div class="fleet-icon-circle">
+          <i class="pi pi-car"></i>
+        </div>
+        <div>
+          <span class="fleet-number-label">Fleet No.</span>
+          <span class="fleet-number-value">{{ fleet.fleetNumber }}</span>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="card-amount">
+        <span class="amount-label">Total Collected</span>
+        <span class="amount-value">{{ formatCurrency(fleet.totalAmount) }}</span>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-meta">
+          <span class="progress-text">{{ getPercentageOfTotal(fleet.totalAmount).toFixed(1) }}% of total</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width]="getPercentageOfTotal(fleet.totalAmount) + '%'"
+            [style.background]="getProgressBarColor(fleet)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── List View ───────────────────────────────────────────────────────── -->
+  <div *ngIf="!loading && viewMode === 'list'" class="fleet-list">
+
+    <div *ngIf="filteredFleets.length === 0" class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <h3>No data found</h3>
+      <p>Try adjusting your search or selecting a different date.</p>
+    </div>
+
+    <div class="list-table-wrapper" *ngIf="filteredFleets.length > 0">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Fleet Number</th>
+            <th>Total Collection</th>
+            <th>% of Total</th>
+            <th>Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fleet of displayedFleets; let i = index" [style.animation-delay]="(i * 20) + 'ms'"
+            class="list-row">
+            <td>
+              <div class="rank-badge-sm" [class]="getRankClass(fleet)">
+                <i [class]="'pi ' + getRankIcon(fleet)"></i>
+                <span>#{{ getRank(fleet) }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="list-fleet-cell">
+                <i class="pi pi-car"></i>
+                <strong>{{ fleet.fleetNumber }}</strong>
+              </div>
+            </td>
+            <td class="amount-cell">{{ formatCurrency(fleet.totalAmount) }}</td>
+            <td class="pct-cell">{{ getPercentageOfTotal(fleet.totalAmount).toFixed(2) }}%</td>
+            <td class="bar-cell">
+              <div class="mini-progress-track">
+                <div class="mini-progress-fill" [style.width]="getPercentageOfTotal(fleet.totalAmount) + '%'"
+                  [style.background]="getProgressBarColor(fleet)"></div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

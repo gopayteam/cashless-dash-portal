@@ -80,6 +80,16 @@
                 </button>
               </li>
 
+              <li class="menu-item" *hasRole="'CAN_VIEW_TRANSACTIONS'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/fleet')"
+                  (click)="navigate('/fleet/total-collection')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-chart-line menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <span class="menu-text">Fleet Collection</span>
+                  </span>
+                </button>
+              </li>
+
               <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/transfer-payment')"
                   (click)="navigate('/transfer-payment/1')">

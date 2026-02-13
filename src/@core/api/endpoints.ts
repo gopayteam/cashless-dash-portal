@@ -85,4 +85,6 @@ export const API_ENDPOINTS = {
 
   ALL_ORGANIZATIONS: '/api/v1/org/organizations/view-all',
 
+  TOTAL_COLLECTION_PER_FLEET: '/api/payment/transactions/total-collection-per-fleet',
+
 };
