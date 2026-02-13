@@ -192,7 +192,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       this.themeService.applyTheme(user.entityId);
 
       this.logoSideBarUrl =
-        this.logoMap[this.entityId] || 'assets/logos/logo_default.png';
+        this.logoMap[this.entityId] || 'logo_2.png';
 
       const branding = this.brandingMap[this.entityId];
 
@@ -201,7 +201,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         this.brandName = branding.name;
         this.brandType = branding.type;
       } else {
-        this.logoUrl = 'assets/images/logo_default.png';
+        this.logoUrl = 'logo_2.png';
         this.brandName = 'GoPay';
         this.brandType = 'text';
       }

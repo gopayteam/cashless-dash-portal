@@ -438,6 +438,11 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+
+  .text-red {
+    display: none
+  }
+
 }
 
 .balance-value {
@@ -446,4 +451,8 @@
 
 .detail-balance-value {
   font-size: 2rem;
+}
+
+.text-red {
+  color: red;
 }
