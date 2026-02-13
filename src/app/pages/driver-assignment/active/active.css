@@ -132,6 +132,52 @@
 }
 
 /* ─────────────────────────────────────────────
+   PAGINATION
+───────────────────────────────────────────── */
+.pagination-wrapper {
+  margin-bottom: 1rem;
+}
+
+.pagination-wrapper:last-of-type {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+::ng-deep .p-paginator {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+::ng-deep .p-paginator .p-paginator-current {
+  color: #4a5568;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+::ng-deep .p-paginator .p-dropdown {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+::ng-deep .p-paginator .p-paginator-page,
+::ng-deep .p-paginator .p-paginator-first,
+::ng-deep .p-paginator .p-paginator-prev,
+::ng-deep .p-paginator .p-paginator-next,
+::ng-deep .p-paginator .p-paginator-last {
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  margin: 0 0.125rem;
+}
+
+::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+/* ─────────────────────────────────────────────
    STATS
 ───────────────────────────────────────────── */
 .stats-grid {
@@ -214,6 +260,8 @@
   border: 1px solid #e2e8f0;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  position: relative;
+  min-height: 400px;
 }
 
 /* ─── Table cells ─── */
@@ -380,6 +428,10 @@
   margin: 0;
 }
 
+.empty-message-row {
+  border: none !important;
+}
+
 .loading-overlay {
   display: flex;
   flex-direction: column;
@@ -388,6 +440,13 @@
   padding: 5rem 2rem;
   gap: 1.25rem;
   color: #718096;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 10;
 }
 
 /* ─────────────────────────────────────────────
@@ -624,6 +683,10 @@
 
   .page-header {
     flex-direction: column;
+  }
+
+  .page-title i {
+    display: none;
   }
 
   .search-input {

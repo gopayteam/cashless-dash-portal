@@ -65,11 +65,25 @@ export interface DormantDriverAssignment extends BaseDriverAssignment {
   endDate?: string;
 }
 
-// Fetch all driver assignments
+/**
+ * General driver assignment interface that can represent any status
+ * Used when fetching all driver assignments where the status can be mixed
+ *
+ * This interface includes all optional properties that might exist across
+ * different driver assignment types to avoid TypeScript errors when accessing them
+ */
 export interface GeneralDriverAssignment extends BaseDriverAssignment {
-  status: "ACTIVE" | "INACTIVE" | "PENDING" | "REJECTED";
+  // Status field - required for all assignments in the general view
+  status: "ACTIVE" | "INACTIVE" | "PENDING" | "REJECTED" | "DORMANT";
+
+  // Date fields - present in ACTIVE, INACTIVE, DORMANT assignments
   startDate?: string;
   endDate?: string;
+
+  // Approval fields - present in PENDING and REJECTED assignments
+  approved?: boolean;
+  approvalCount?: number;
+  approvalStatus?: "PENDING" | "REJECTED" | "APPROVED";
 }
 
 export type AnyDriverAssignment =
@@ -78,5 +92,3 @@ export type AnyDriverAssignment =
   | ActiveDriverAssignment
   | InactiveDriverAssignment
   | DormantDriverAssignment;
-
-

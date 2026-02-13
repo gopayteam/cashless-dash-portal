@@ -1,3 +1,4 @@
+// pages/driver-assignments/pending/pending-driver-assignments.component.ts
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,24 +14,26 @@ import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { PendingDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
-import { DriverAssignmentApiResponse, PendingDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
-import { Router } from '@angular/router';
+import { PendingDriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 import { AuthService } from '../../../../@core/services/auth.service';
+import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
-import { ActionButtonComponent } from "../../../components/action-button/action-button";
-
+import { PaginatorModule } from 'primeng/paginator';
 
 interface ApprovalStatusOption {
   label: string;
   value: string;
 }
 
-interface ApprovalFilterOption {
-  label: string;
-  value: string;
+interface ApprovalResponse {
+  status: number;
+  message: string;
+  data: any;
 }
+
+type ApprovalAction = 'APPROVED' | 'REJECTED';
 
 @Component({
   selector: 'app-all-pending-driver-assignments',
@@ -48,13 +51,16 @@ interface ApprovalFilterOption {
     SelectModule,
     MessageModule,
     ToastModule,
-    ActionButtonComponent
+    PaginatorModule,
   ],
   templateUrl: './pending.html',
   styleUrls: ['./pending.css', '../../../../styles/global/_toast.css'],
+  providers: [MessageService],
 })
 export class AllPendingDriverAssignmentsComponent implements OnInit {
   entityId: string | null = null;
+  username: string | null = null;
+
   assignments: PendingDriverAssignment[] = [];
   allAssignments: PendingDriverAssignment[] = [];
   filteredAssignments: PendingDriverAssignment[] = [];
@@ -63,33 +69,30 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
   rows: number = 10;
   first: number = 0;
   totalRecords: number = 0;
+  currentPage: number = 0;
 
   searchTerm: string = '';
   selectedApprovalStatus: string = '';
-  selectedApprovalFilter: string = '';
 
-  // Dialog state
+  // Detail dialog
   displayDetailDialog: boolean = false;
   selectedAssignment: PendingDriverAssignment | null = null;
 
+  // Approval confirm dialogs
+  displayApproveDialog: boolean = false;
+  displayRejectDialog: boolean = false;
+  processing: boolean = false;
+
   // Summary stats
   totalDrivers: number = 0;
-  approvedDrivers: number = 0;
-  pendingApprovals: number = 0;
   totalFleets: number = 0;
+  pendingApprovals: number = 0;
 
-  // Filter options
   approvalStatusOptions: ApprovalStatusOption[] = [
     { label: 'All Status', value: '' },
     { label: 'Pending', value: 'PENDING' },
     { label: 'Approved', value: 'APPROVED' },
     { label: 'Rejected', value: 'REJECTED' },
-  ];
-
-  approvalFilterOptions: ApprovalFilterOption[] = [
-    { label: 'All', value: '' },
-    { label: 'Approved Only', value: 'approved' },
-    { label: 'Not Approved', value: 'not-approved' },
   ];
 
   constructor(
@@ -101,35 +104,43 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
-  get loading() {
-    return this.loadingStore.loading;
+  get loading(): boolean {
+    return this.loadingStore.loading();
   }
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
     if (user) {
-      this.entityId = user.entityId
-      // console.log('Logged in as:', user.username);
+      this.entityId = user.entityId;
+      this.username = user.username || user.email;
     } else {
       this.router.navigate(['/login']);
-      console.log('No user logged in');
+      return;
     }
-
     this.loadAssignments();
   }
 
-  loadAssignments($event?: any): void {
-    const event = $event;
+  // ── Data loading ────────────────────────────────────────────────────────
 
-    // Handle pagination from PrimeNG lazy load event
-    let page = 0;
+  /**
+   * Load assignments from server with pagination support
+   * Can be called by:
+   * - Initial load (ngOnInit)
+   * - Pagination changes (page navigation or rows per page change)
+   * - Refresh button
+   * - After approval/rejection actions
+   */
+  loadAssignments(event?: any): void {
+    let page = this.currentPage;
     let pageSize = this.rows;
 
+    // If event is provided, it's from pagination component
     if (event) {
-      page = event.first / event.rows;
+      page = event.page !== undefined ? event.page : Math.floor(event.first / event.rows);
       pageSize = event.rows;
       this.first = event.first;
       this.rows = event.rows;
+      this.currentPage = page;
     }
 
     const payload = {
@@ -139,77 +150,123 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
       status: 'PENDING',
     };
 
+    console.log('Loading pending assignments with payload:', payload);
+
     this.loadingStore.start();
 
     this.dataService
       .post<PendingDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_PENDING_REQUESTS,
         payload,
-        'driver-assignments',
+        'pending-driver-assignments',
         true
       )
       .subscribe({
         next: (response) => {
-          this.allAssignments = response.data;
-          this.totalRecords = response.totalRecords;
-          this.calculateStats();
+          console.log('Received response:', response);
+
+          // Store the raw data from server
+          this.allAssignments = response.data || [];
+          this.totalRecords = response.totalRecords || 0;
+
+          // Apply client-side filtering to current page data
           this.applyClientSideFilter();
+
+          // Calculate stats from current page
+          this.calculateStats();
+
           this.cdr.detectChanges();
           this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load driver assignments', err);
+          console.error('Failed to load pending driver assignments:', err);
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load assignments. Please try again.',
+            life: 5000,
+          });
+
+          this.allAssignments = [];
+          this.assignments = [];
+          this.filteredAssignments = [];
+          this.totalRecords = 0;
+
           this.loadingStore.stop();
+          this.cdr.detectChanges();
         },
       });
   }
 
-  calculateStats(): void {
-    this.totalDrivers = this.allAssignments.length;
-    this.approvedDrivers = this.allAssignments.filter(a => a.approved).length;
-    this.pendingApprovals = this.allAssignments.filter(
-      a => a.approvalStatus === 'PENDING'
-    ).length;
+  /**
+   * Handle page change event from p-paginator
+   */
+  onPageChange(event: any): void {
+    console.log('Page change event:', event);
+    this.loadAssignments(event);
+  }
 
-    // Count unique fleets
-    const uniqueFleets = new Set(this.allAssignments.map(a => a.fleetNumber));
+  /**
+   * Refresh current page data
+   * Maintains current page and rows per page settings
+   */
+  refresh(): void {
+    console.log('Refreshing current page');
+
+    // Show success message for user feedback
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Refreshing',
+      detail: 'Loading latest data...',
+      life: 2000,
+    });
+
+    // Reload with current pagination state
+    this.loadAssignments({
+      first: this.first,
+      rows: this.rows,
+      page: this.currentPage,
+    });
+  }
+
+  calculateStats(): void {
+    // Stats are calculated from current page only
+    this.totalDrivers = this.allAssignments.length;
+    this.pendingApprovals = this.allAssignments.filter(
+      (a) => a.approvalStatus === 'PENDING'
+    ).length;
+    const uniqueFleets = new Set(
+      this.allAssignments.map((a) => a.fleetNumber)
+    );
     this.totalFleets = uniqueFleets.size;
   }
 
   applyClientSideFilter(): void {
     let filtered = [...this.allAssignments];
 
-    // Apply search filter
-    if (this.searchTerm && this.searchTerm.trim() !== '') {
-      const searchLower = this.searchTerm.toLowerCase().trim();
-      filtered = filtered.filter((assignment) => {
-        const fullName = `${assignment.firstName} ${assignment.lastName}`.toLowerCase();
+    // Apply search filter to current page data
+    if (this.searchTerm.trim()) {
+      const lower = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter((a) => {
+        const fullName = `${a.firstName} ${a.lastName}`.toLowerCase();
         return (
-          fullName.includes(searchLower) ||
-          assignment.phoneNumber?.includes(searchLower) ||
-          assignment.fleetNumber?.toLowerCase().includes(searchLower) ||
-          assignment.registrationNumber?.toLowerCase().includes(searchLower) ||
-          assignment.investorNumber?.includes(searchLower) ||
-          assignment.marshalNumber?.includes(searchLower) ||
-          assignment.username?.toLowerCase().includes(searchLower)
+          fullName.includes(lower) ||
+          a.phoneNumber?.includes(lower) ||
+          a.fleetNumber?.toLowerCase().includes(lower) ||
+          a.registrationNumber?.toLowerCase().includes(lower) ||
+          a.investorNumber?.includes(lower) ||
+          a.marshalNumber?.includes(lower) ||
+          a.username?.toLowerCase().includes(lower)
         );
       });
     }
 
-    // Apply approval status filter
-    if (this.selectedApprovalStatus && this.selectedApprovalStatus !== '') {
+    // Apply status filter to current page data
+    if (this.selectedApprovalStatus) {
       filtered = filtered.filter(
-        assignment => assignment.approvalStatus === this.selectedApprovalStatus
+        (a) => a.approvalStatus === this.selectedApprovalStatus
       );
-    }
-
-    // Apply approved/not approved filter
-    if (this.selectedApprovalFilter && this.selectedApprovalFilter !== '') {
-      if (this.selectedApprovalFilter === 'approved') {
-        filtered = filtered.filter(assignment => assignment.approved);
-      } else if (this.selectedApprovalFilter === 'not-approved') {
-        filtered = filtered.filter(assignment => !assignment.approved);
-      }
     }
 
     this.filteredAssignments = filtered;
@@ -217,115 +274,199 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
   }
 
   onSearchChange(): void {
+    // When searching, reset to first page and reload
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
+
+    // If you want server-side search, uncomment this:
+    // this.loadAssignments({ first: 0, rows: this.rows, page: 0 });
   }
 
-  onApprovalStatusChange(): void {
+  onStatusChange(): void {
+    // When filtering by status, reset to first page and reload
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
-  }
 
-  onApprovalFilterChange(): void {
-    this.applyClientSideFilter();
+    // If you want server-side filtering, uncomment this:
+    // this.loadAssignments({ first: 0, rows: this.rows, page: 0 });
   }
 
   clearSearch(): void {
     this.searchTerm = '';
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedApprovalStatus = '';
-    this.selectedApprovalFilter = '';
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
   }
+
+  // ── Detail dialog ────────────────────────────────────────────────────────
 
   viewAssignmentDetails(assignment: PendingDriverAssignment): void {
     this.selectedAssignment = assignment;
     this.displayDetailDialog = true;
+    this.cdr.detectChanges();
   }
 
   closeDetailDialog(): void {
     this.displayDetailDialog = false;
-    // this.selectedAssignment = null;
   }
 
-  getApprovalStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'PENDING': 'warning',
-      'ACTIVE': 'active',
-      'INACTIVE': 'inactive',
-      'REJECTED': 'rejected',
+  // ── Approval flow ────────────────────────────────────────────────────────
+
+  openApproveDialog(assignment: PendingDriverAssignment, event?: Event): void {
+    event?.stopPropagation();
+    this.selectedAssignment = assignment;
+    this.displayDetailDialog = false;
+    this.displayApproveDialog = true;
+    this.cdr.detectChanges();
+  }
+
+  closeApproveDialog(): void {
+    this.displayApproveDialog = false;
+    setTimeout(() => {
+      if (!this.displayApproveDialog) {
+        this.selectedAssignment = null;
+      }
+    }, 300);
+  }
+
+  openRejectDialog(assignment: PendingDriverAssignment, event?: Event): void {
+    event?.stopPropagation();
+    this.selectedAssignment = assignment;
+    this.displayDetailDialog = false;
+    this.displayRejectDialog = true;
+    this.cdr.detectChanges();
+  }
+
+  closeRejectDialog(): void {
+    this.displayRejectDialog = false;
+    setTimeout(() => {
+      if (!this.displayRejectDialog) {
+        this.selectedAssignment = null;
+      }
+    }, 300);
+  }
+
+  confirmApprove(): void {
+    this.submitApproval('APPROVED');
+  }
+
+  confirmReject(): void {
+    this.submitApproval('REJECTED');
+  }
+
+  submitApproval(action: ApprovalAction): void {
+    if (!this.selectedAssignment || !this.entityId) return;
+
+    const assignment = this.selectedAssignment;
+
+    const payload = {
+      entityId: assignment.entityId ?? this.entityId,
+      id: assignment.id,
+      status: action,
     };
-    return statusMap[status] || 'default';
+
+    console.log('Approval payload:', payload);
+
+    this.processing = true;
+
+    this.dataService
+      .post<ApprovalResponse>(
+        API_ENDPOINTS.ACTIVATE_DRIVER_ASSIGNMENT,
+        payload
+      )
+      .subscribe({
+        next: (response) => {
+          this.processing = false;
+
+          if (response.status === 0) {
+            const actionText = action === 'APPROVED' ? 'approved' : 'rejected';
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail:
+                response.message ||
+                `${this.getFullName(assignment)} has been ${actionText}.`,
+              life: 4000,
+            });
+
+            this.closeApproveDialog();
+            this.closeRejectDialog();
+
+            // Reload current page to reflect changes
+            this.loadAssignments({
+              first: this.first,
+              rows: this.rows,
+              page: this.currentPage,
+            });
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: response.message || 'Request failed.',
+              life: 5000,
+            });
+            this.closeApproveDialog();
+            this.closeRejectDialog();
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Approval error:', err);
+
+          let msg = 'Request failed. Please try again.';
+          if (err.status === 404) msg = 'Driver assignment not found.';
+          else if (err.status === 400)
+            msg = err.error?.message || 'Invalid request.';
+          else if (err.status === 500)
+            msg = 'Server error. Please try again later.';
+          else if (err.error?.message) msg = err.error.message;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: msg,
+            life: 5000,
+          });
+
+          this.processing = false;
+          this.closeApproveDialog();
+          this.closeRejectDialog();
+          this.cdr.detectChanges();
+        },
+      });
   }
 
-  getApprovalStatusIcon(status: string): string {
-    const iconMap: { [key: string]: string } = {
-      'PENDING': 'pi pi-clock',
-      'ACTIVE': 'pi pi-check-circle',
-      'INACTIVE': 'pi pi-times-circle',
-      'REJECTED': 'pi pi-ban',
-    };
-    return iconMap[status] || 'pi pi-circle';
-  }
-
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
   getFullName(assignment: PendingDriverAssignment): string {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 
-  submitApproval(action: ApprovalAction): void {
-    if (!this.selectedAssignment) return;
-
-    const assignment = this.selectedAssignment;
-    const payload = {
-      entityId: assignment.entityId,
-      id: assignment.id,
-      status: action
+  getApprovalStatusClass(status: string): string {
+    const map: Record<string, string> = {
+      APPROVED: 'active',
+      PENDING: 'warning',
+      REJECTED: 'rejected',
     };
-
-    console.log('approval payload', payload);
-
-    this.dataService
-      .post<ApprovalResponse>(API_ENDPOINTS.ACTIVATE_DRIVER_ASSIGNMENT, payload)
-      .subscribe({
-        next: (response) => {
-          if (response.status === 0) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: response.message || `Request ${action.toLowerCase()} successfully.`
-            });
-
-            // Update UI immediately
-            assignment.approvalStatus = action as any;
-            (assignment as any).approvalStatus = action === 'APPROVED';
-
-            this.closeDetailDialog();
-            this.loadAssignments(); // reload table
-
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Failed',
-              detail: response.message || 'Request failed.'
-            });
-          }
-        },
-        error: (error) => {
-          console.error('HTTP Error:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'System Error',
-            detail: 'Server is unreachable. Try again later.'
-          });
-        }
-      });
+    return map[status] ?? 'default';
   }
 
-  refresh(): void {
-    this.loadAssignments();
+  getApprovalStatusIcon(status: string): string {
+    const map: Record<string, string> = {
+      APPROVED: 'pi pi-check-circle',
+      PENDING: 'pi pi-clock',
+      REJECTED: 'pi pi-ban',
+    };
+    return map[status] ?? 'pi pi-circle';
   }
-
 }

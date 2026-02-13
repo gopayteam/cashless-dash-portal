@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
-import { ActionButtonComponent } from '../../../components/action-button/action-button';
+import { PaginatorModule } from 'primeng/paginator';
 
 interface ApprovalStatusOption {
   label: string;
@@ -49,7 +49,7 @@ interface DeactivateApiResponse {
     SelectModule,
     MessageModule,
     ToastModule,
-    // ActionButtonComponent,
+    PaginatorModule,
   ],
   templateUrl: './active.html',
   styleUrls: ['./active.css', '../../../../styles/global/_toast.css'],
@@ -63,10 +63,11 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
   allAssignments: ActiveDriverAssignment[] = [];
   filteredAssignments: ActiveDriverAssignment[] = [];
 
-  // Pagination
-  rows: number = 100;
+  // Pagination state
+  rows: number = 10;
   first: number = 0;
   totalRecords: number = 0;
+  currentPage: number = 0;
 
   searchTerm: string = '';
   selectedApprovalStatus: string = '';
@@ -116,15 +117,25 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
 
   // ── Data loading ────────────────────────────────────────────────────────
 
-  loadAssignments($event?: any): void {
-    let page = 0;
+  /**
+   * Load assignments from server with pagination support
+   * Can be called by:
+   * - Initial load (ngOnInit)
+   * - Pagination changes (page navigation or rows per page change)
+   * - Refresh button
+   * - After deactivation action
+   */
+  loadAssignments(event?: any): void {
+    let page = this.currentPage;
     let pageSize = this.rows;
 
-    if ($event) {
-      page = $event.first / $event.rows;
-      pageSize = $event.rows;
-      this.first = $event.first;
-      this.rows = $event.rows;
+    // If event is provided, it's from pagination component
+    if (event) {
+      page = event.page !== undefined ? event.page : Math.floor(event.first / event.rows);
+      pageSize = event.rows;
+      this.first = event.first;
+      this.rows = event.rows;
+      this.currentPage = page;
     }
 
     const payload = {
@@ -134,32 +145,88 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
       status: 'ACTIVE',
     };
 
+    console.log('Loading active assignments with payload:', payload);
+
     this.loadingStore.start();
 
     this.dataService
       .post<ActiveDriverAssignmentApiResponse>(
         API_ENDPOINTS.ALL_ACTIVE_DRIVERS,
         payload,
-        'driver-assignments',
+        'active-driver-assignments',
         true
       )
       .subscribe({
         next: (response) => {
-          this.allAssignments = response.data;
-          this.totalRecords = response.totalRecords;
-          this.calculateStats();
+          console.log('Received response:', response);
+
+          // Store the raw data from server
+          this.allAssignments = response.data || [];
+          this.totalRecords = response.totalRecords || 0;
+
+          // Apply client-side filtering to current page data
           this.applyClientSideFilter();
+
+          // Calculate stats from current page
+          this.calculateStats();
+
           this.cdr.detectChanges();
           this.loadingStore.stop();
         },
         error: (err) => {
-          console.error('Failed to load active driver assignments', err);
+          console.error('Failed to load active driver assignments:', err);
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load assignments. Please try again.',
+            life: 5000,
+          });
+
+          this.allAssignments = [];
+          this.assignments = [];
+          this.filteredAssignments = [];
+          this.totalRecords = 0;
+
           this.loadingStore.stop();
+          this.cdr.detectChanges();
         },
       });
   }
 
+  /**
+   * Handle page change event from p-paginator
+   */
+  onPageChange(event: any): void {
+    console.log('Page change event:', event);
+    this.loadAssignments(event);
+  }
+
+  /**
+   * Refresh current page data
+   * Maintains current page and rows per page settings
+   */
+  refresh(): void {
+    console.log('Refreshing current page');
+
+    // Show success message for user feedback
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Refreshing',
+      detail: 'Loading latest data...',
+      life: 2000,
+    });
+
+    // Reload with current pagination state
+    this.loadAssignments({
+      first: this.first,
+      rows: this.rows,
+      page: this.currentPage,
+    });
+  }
+
   calculateStats(): void {
+    // Stats are calculated from current page only
     this.totalDrivers = this.allAssignments.length;
     const uniqueFleets = new Set(this.allAssignments.map((a) => a.fleetNumber));
     this.totalFleets = uniqueFleets.size;
@@ -168,6 +235,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
   applyClientSideFilter(): void {
     let filtered = [...this.allAssignments];
 
+    // Apply search filter to current page data
     if (this.searchTerm.trim()) {
       const lower = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter((a) => {
@@ -184,6 +252,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
       });
     }
 
+    // Apply status filter to current page data
     if (this.selectedApprovalStatus) {
       filtered = filtered.filter(
         (a) => (a as any).status === this.selectedApprovalStatus
@@ -194,22 +263,39 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
     this.assignments = filtered;
   }
 
-  onSearchChange(): void { this.applyClientSideFilter(); }
-  onStatusChange(): void { this.applyClientSideFilter(); }
+  onSearchChange(): void {
+    // When searching, reset to first page and reload
+    this.first = 0;
+    this.currentPage = 0;
+    this.applyClientSideFilter();
+
+    // If you want server-side search, uncomment this:
+    // this.loadAssignments({ first: 0, rows: this.rows, page: 0 });
+  }
+
+  onStatusChange(): void {
+    // When filtering by status, reset to first page and reload
+    this.first = 0;
+    this.currentPage = 0;
+    this.applyClientSideFilter();
+
+    // If you want server-side filtering, uncomment this:
+    // this.loadAssignments({ first: 0, rows: this.rows, page: 0 });
+  }
 
   clearSearch(): void {
     this.searchTerm = '';
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
   }
 
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedApprovalStatus = '';
+    this.first = 0;
+    this.currentPage = 0;
     this.applyClientSideFilter();
-  }
-
-  refresh(): void {
-    this.loadAssignments();
   }
 
   // ── Detail dialog ────────────────────────────────────────────────────────
@@ -231,10 +317,13 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
    * Can be called from both the table row action and the detail dialog.
    * Stops event propagation so row-click doesn't also open the detail dialog.
    */
-  openDeactivateDialog(assignment: ActiveDriverAssignment, event?: Event): void {
+  openDeactivateDialog(
+    assignment: ActiveDriverAssignment,
+    event?: Event
+  ): void {
     event?.stopPropagation();
     this.selectedAssignment = assignment;
-    this.displayDetailDialog = false;   // close detail if open
+    this.displayDetailDialog = false; // close detail if open
     this.displayDeactivateDialog = true;
     this.cdr.detectChanges();
   }
@@ -252,8 +341,7 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
 
   /**
    * Submits the deactivation request.
-   * Mirrors the old Angular Material component's handleAction('deactivate'),
-   * sending status: 'INACTIVE' to the deactivate endpoint.
+   * Sends status: 'INACTIVE' to the deactivate endpoint.
    */
   confirmDeactivate(): void {
     if (!this.selectedAssignment || !this.entityId || !this.username) return;
@@ -291,7 +379,13 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
             });
 
             this.closeDeactivateDialog();
-            this.loadAssignments(); // refresh the list
+
+            // Reload current page to reflect changes
+            this.loadAssignments({
+              first: this.first,
+              rows: this.rows,
+              page: this.currentPage,
+            });
           } else {
             this.messageService.add({
               severity: 'error',
@@ -308,8 +402,10 @@ export class AllActiveDriverAssignmentsComponent implements OnInit {
 
           let msg = 'Deactivation failed. Please try again.';
           if (err.status === 404) msg = 'Driver assignment not found.';
-          else if (err.status === 400) msg = err.error?.message || 'Invalid request.';
-          else if (err.status === 500) msg = 'Server error. Please try again later.';
+          else if (err.status === 400)
+            msg = err.error?.message || 'Invalid request.';
+          else if (err.status === 500)
+            msg = 'Server error. Please try again later.';
           else if (err.error?.message) msg = err.error.message;
 
           this.messageService.add({

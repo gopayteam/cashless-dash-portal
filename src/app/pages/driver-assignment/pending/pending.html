@@ -1,352 +1,448 @@
-<!-- pages/drivers/driver-assignments.component.html -->
+<!-- pending.html -->
+<p-toast position="top-right"></p-toast>
+
 <div class="assignments-container">
-  <!-- ================= HEADER ================= -->
-  <div class="assignments-header">
+
+  <!-- ─── Header ──────────────────────────────────────────────────────────── -->
+  <div class="page-header">
     <div class="header-content">
-      <h1>Pending Driver Assignments</h1>
-      <p class="text-muted">Manage and track all pending driver-vehicle assignments</p>
+      <h1 class="page-title">
+        <i class="pi pi-clock"></i>
+        Pending Driver Assignments
+      </h1>
+      <p class="page-subtitle">Review and approve driver-fleet assignment requests</p>
     </div>
 
-    <!-- <div class="header-filters">
-      <p-select [options]="approvalStatusOptions" [(ngModel)]="selectedApprovalStatus"
-        (onChange)="onApprovalStatusChange()" placeholder="Approval Status" styleClass="filter-dropdown"></p-select>
+    <div class="header-controls">
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search driver, fleet, phone..." [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
+        <button *ngIf="searchTerm" class="clear-btn" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
 
-      <p-select [options]="approvalFilterOptions" [(ngModel)]="selectedApprovalFilter"
-        (onChange)="onApprovalFilterChange()" placeholder="Approval Filter" styleClass="filter-dropdown"></p-select>
-
-
-      <button *ngIf="searchTerm || selectedApprovalStatus || selectedApprovalFilter" pButton label="Clear All"
-        icon="pi pi-filter-slash" class="p-button-outlined p-button-sm" (click)="clearFilters()"></button>
-    </div> -->
+      <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
+        <i class="pi pi-refresh" [class.spinning]="loading"></i>
+      </button>
+    </div>
   </div>
 
-  <!-- ================= SUMMARY STATS ================= -->
-  <!-- <div class="summary-stats">
-    <div class="stat-card summary-card">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-        <i class="pi pi-users"></i>
-      </div>
-      <div class="stat-content">
-        <span class="stat-label">Total Drivers</span>
-        <span class="stat-value">{{ totalRecords }}</span>
+  <!-- ─── Stats ────────────────────────────────────────────────────────────── -->
+  <!-- <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon-box stat-blue"><i class="pi pi-users"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Total Requests</span>
+        <span class="stat-value">{{ totalDrivers }}</span>
       </div>
     </div>
-
-    <div class="stat-card summary-card">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-        <i class="pi pi-check-circle"></i>
-      </div>
-      <div class="stat-content">
-        <span class="stat-label">Approved</span>
-        <span class="stat-value">{{ approvedDrivers }}</span>
-      </div>
-    </div>
-
-    <div class="stat-card summary-card">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-        <i class="pi pi-clock"></i>
-      </div>
-      <div class="stat-content">
+    <div class="stat-card">
+      <div class="stat-icon-box stat-orange"><i class="pi pi-clock"></i></div>
+      <div class="stat-body">
         <span class="stat-label">Pending</span>
         <span class="stat-value">{{ pendingApprovals }}</span>
       </div>
     </div>
-
-    <div class="stat-card summary-card">
-      <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-        <i class="pi pi-car"></i>
-      </div>
-      <div class="stat-content">
-        <span class="stat-label">Assigned Fleets</span>
+    <div class="stat-card">
+      <div class="stat-icon-box stat-green"><i class="pi pi-car"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Unique Fleets</span>
         <span class="stat-value">{{ totalFleets }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon-box stat-purple"><i class="pi pi-list"></i></div>
+      <div class="stat-body">
+        <span class="stat-label">Showing</span>
+        <span class="stat-value">{{ filteredAssignments.length }}</span>
       </div>
     </div>
   </div> -->
 
-  <!-- ================= ASSIGNMENTS TABLE ================= -->
-  <p-card styleClass="card-hover card">
-    <div class="table-header">
-      <div class="table-header-left">
-        <h3>Driver Assignments</h3>
-        <span class="record-count">{{ filteredAssignments.length }} of {{ totalRecords }} assignments</span>
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="pagination-wrapper">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
 
-        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
-          (clicked)="refresh()"></app-action-button>
-      </div>
+  <!-- ─── Table ─────────────────────────────────────────────────────────────── -->
+  <div class="table-card">
 
-      <div class="search-container">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input pInputText type="text" placeholder="Search by name, phone, fleet..." [(ngModel)]="searchTerm"
-            (input)="onSearchChange()" class="search-input" />
-        </span>
-        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
-          (click)="clearSearch()" pTooltip="Clear search"></button>
-      </div>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-overlay">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p>Loading assignments…</p>
     </div>
 
-    <p-table [value]="assignments" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
-      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} assignments" styleClass="data-table"
-      (onLazyLoad)="loadAssignments($event)" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <!-- Empty State -->
+    <div *ngIf="!loading && assignments.length === 0" class="empty-state">
+      <i class="pi pi-inbox"></i>
+      <h3>No pending assignments found</h3>
+      <p>Try adjusting your search filters.</p>
+    </div>
+
+    <!-- Table with Data -->
+    <p-table *ngIf="!loading && assignments.length > 0" [value]="assignments" styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '50rem' }">
+
       <ng-template pTemplate="header">
         <tr>
-          <th>Driver Name</th>
-          <th>Phone Number</th>
-          <th>Fleet Number</th>
-          <th>Registration</th>
-          <th>Approval Status</th>
-          <th>Approved</th>
+          <th>Driver</th>
+          <th>Phone</th>
+          <th>Fleet / Reg</th>
+          <th>Investor</th>
+          <th>Marshal</th>
+          <th>Status</th>
           <th>Approvals</th>
-          <th>Active Days</th>
-          <!-- <th>Actions</th> -->
+          <th>Actions</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-assignment>
-        <tr class="clickable-row" (click)="viewAssignmentDetails(assignment)">
+        <tr class="table-row" (click)="viewAssignmentDetails(assignment)">
+
           <td>
             <div class="driver-cell">
-              <i class="pi pi-user"></i>
-              <div class="driver-info">
-                <span class="driver-name">{{ getFullName(assignment) }}</span>
-                <span class="driver-username">@{{ assignment.username }}</span>
+              <div class="driver-avatar">
+                {{ assignment.firstName?.charAt(0) }}{{ assignment.lastName?.charAt(0) }}
+              </div>
+              <div>
+                <div class="driver-name">{{ getFullName(assignment) }}</div>
+                <div class="driver-sub">{{ assignment.username }}</div>
               </div>
             </div>
           </td>
+
           <td>
-            <div class="contact-cell">
-              <i class="pi pi-phone"></i>
-              <span>{{ assignment.phoneNumber }}</span>
-            </div>
+            <span class="mono-text">{{ assignment.phoneNumber }}</span>
           </td>
+
           <td>
             <div class="fleet-cell">
-              <i class="pi pi-car"></i>
               <span class="fleet-number">{{ assignment.fleetNumber }}</span>
+              <span class="reg-number">{{ assignment.registrationNumber }}</span>
             </div>
           </td>
+
           <td>
-            <span class="registration-number">{{ assignment.registrationNumber }}</span>
+            <span class="mono-text">{{ assignment.investorNumber }}</span>
           </td>
+
           <td>
-            <span [class]="'badge badge-' + getApprovalStatusClass(assignment.approvalStatus)">
-              <i [class]="'pi ' + getApprovalStatusIcon(assignment.approvalStatus)"></i>
+            <span class="mono-text">{{ assignment.marshalNumber }}</span>
+          </td>
+
+          <td>
+            <span [class]="'status-badge status-' + getApprovalStatusClass(assignment.approvalStatus)">
+              <i [class]="getApprovalStatusIcon(assignment.approvalStatus)"></i>
               {{ assignment.approvalStatus }}
             </span>
           </td>
-          <td>
-            <span [class]="'badge badge-' + (assignment.approved ? 'active' : 'inactive')">
-              <i [class]="assignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
-              {{ assignment.approved ? 'Yes' : 'No' }}
-            </span>
-          </td>
+
           <td>
             <div class="approval-count">
               <i class="pi pi-thumbs-up"></i>
               <span>{{ assignment.approvalCount }}</span>
             </div>
           </td>
-          <td>
-            <div class="days-cell">
-              <i class="pi pi-calendar"></i>
-              <span>{{ assignment.allowedActiveDays }} days</span>
+
+          <td (click)="$event.stopPropagation()">
+            <div class="action-cell">
+              <button class="action-btn btn-view" (click)="viewAssignmentDetails(assignment)" pTooltip="View details"
+                tooltipPosition="top">
+                <i class="pi pi-eye"></i>
+              </button>
+
+              <button *ngIf="assignment.approvalStatus === 'PENDING'" class="action-btn btn-approve"
+                (click)="openApproveDialog(assignment, $event)" pTooltip="Approve" tooltipPosition="top">
+                <i class="pi pi-check"></i>
+              </button>
+
+              <button *ngIf="assignment.approvalStatus === 'PENDING'" class="action-btn btn-reject"
+                (click)="openRejectDialog(assignment, $event)" pTooltip="Reject" tooltipPosition="top">
+                <i class="pi pi-times"></i>
+              </button>
             </div>
           </td>
-          <!-- <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-              (click)="viewAssignmentDetails(assignment); $event.stopPropagation()"
-            ></button>
-          </td> -->
+
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="9" class="empty-message">
+          <td colspan="8" class="empty-message-row">
             <div class="empty-state">
-              <i class="pi pi-users"></i>
-              <h3>No Driver Assignments Found</h3>
-              <p *ngIf="searchTerm || selectedApprovalStatus || selectedApprovalFilter">
-                Try adjusting your filters
-              </p>
-              <p *ngIf="!searchTerm && !selectedApprovalStatus && !selectedApprovalFilter">
-                No driver assignments available
-              </p>
+              <i class="pi pi-inbox"></i>
+              <h3>No assignments found</h3>
+              <p>No data available for the current filters.</p>
             </div>
           </td>
         </tr>
       </ng-template>
+
     </p-table>
-  </p-card>
+  </div>
 
-  <!-- ================= ASSIGNMENT DETAILS DIALOG ================= -->
-  <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
-    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
-    [style]="{ width: '90vw', maxWidth: '900px', background: '#fff' }">
-    <ng-template pTemplate="header">
-      <div class="dialog-header">
-        <div class="dialog-header-top">
-          <div class="dialog-icon">
-            <i class="pi pi-user"></i>
-          </div>
-          <div class="dialog-title-section">
-            <h2>{{ getFullName(selectedAssignment!) }}</h2>
-            <div class="dialog-badges">
-              <span *ngIf="selectedAssignment"
-                [class]="'badge badge-' + getApprovalStatusClass(selectedAssignment.approvalStatus)">
-                <i [class]="'pi ' + getApprovalStatusIcon(selectedAssignment.approvalStatus)"></i>
-                {{ selectedAssignment.approvalStatus }}
-              </span>
-              <span *ngIf="selectedAssignment"
-                [class]="'badge badge-' + (selectedAssignment.approved ? 'active' : 'inactive')">
-                <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
-                {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
-              </span>
-            </div>
-          </div>
+  <!-- ─── Pagination Controls (Bottom) ─────────────────────────────────────── -->
+  <div class="pagination-wrapper" *ngIf="!loading && assignments.length > 0">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DETAIL DIALOG
+══════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [draggable]="false" [resizable]="false"
+  styleClass="custom-dialog" [style]="{ width: '560px' }" (onHide)="closeDetailDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div>
+          <h3 class="dialog-title">Assignment Details</h3>
+          <p class="dialog-subtitle">Pending driver-fleet information</p>
         </div>
       </div>
-    </ng-template>
+    </div>
+  </ng-template>
 
-    <div class="detail-content" *ngIf="selectedAssignment">
-      <!-- Status Cards -->
-      <div class="status-cards">
-        <div class="status-card">
-          <i class="pi pi-thumbs-up"></i>
-          <span class="status-label">Approval Count</span>
-          <span class="status-value">{{ selectedAssignment.approvalCount }}</span>
-        </div>
-        <div class="status-card">
-          <i class="pi pi-calendar"></i>
-          <span class="status-label">Active Days</span>
-          <span class="status-value">{{ selectedAssignment.allowedActiveDays }}</span>
-        </div>
-      </div>
+  <div *ngIf="selectedAssignment" class="dialog-body">
 
-      <!-- Details Grid -->
+    <!-- Status info -->
+    <div class="detail-section">
+      <h4 class="detail-section-title"><i class="pi pi-info-circle"></i> Status</h4>
       <div class="detail-grid">
-        <!-- Left Column -->
-        <div class="detail-column">
-          <h3 class="column-title">Driver Information</h3>
-
-          <div class="detail-item">
-            <label>Full Name</label>
-            <span class="value driver-name-highlight">
-              <i class="pi pi-user"></i>
-              {{ getFullName(selectedAssignment) }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>Username</label>
-            <span class="value">{{ selectedAssignment.username }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Phone Number</label>
-            <span class="value contact-value">
-              <i class="pi pi-phone"></i>
-              {{ selectedAssignment.phoneNumber }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>First Name</label>
-            <span class="value">{{ selectedAssignment.firstName }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Last Name</label>
-            <span class="value">{{ selectedAssignment.lastName }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Created On</label>
-            <span class="value">
-              {{ selectedAssignment.createdOn | date : 'dd MMM yyyy, hh:mm a' }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>Created By</label>
-            <span class="value">{{ selectedAssignment.createBy }}</span>
-          </div>
+        <div class="detail-item">
+          <span class="detail-label">Approval Status</span>
+          <span [class]="'status-badge status-' + getApprovalStatusClass(selectedAssignment.approvalStatus)">
+            <i [class]="getApprovalStatusIcon(selectedAssignment.approvalStatus)"></i>
+            {{ selectedAssignment.approvalStatus }}
+          </span>
         </div>
-
-        <!-- Right Column -->
-        <div class="detail-column">
-          <h3 class="column-title">Assignment Details</h3>
-
-          <div class="detail-item">
-            <label>Fleet Number</label>
-            <span class="value fleet-highlight">
-              <i class="pi pi-car"></i>
-              {{ selectedAssignment.fleetNumber }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>Registration Number</label>
-            <span class="value code-value">{{ selectedAssignment.registrationNumber }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Stage ID</label>
-            <span class="value">{{ selectedAssignment.stageId }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Investor Number</label>
-            <span class="value contact-value">
-              <i class="pi pi-phone"></i>
-              {{ selectedAssignment.investorNumber }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>Marshal Number</label>
-            <span class="value contact-value">
-              <i class="pi pi-phone"></i>
-              {{ selectedAssignment.marshalNumber }}
-            </span>
-          </div>
-
-          <div class="detail-item">
-            <label>Entity ID</label>
-            <span class="value code-value">{{ selectedAssignment.entityId }}</span>
-          </div>
-
-          <div class="detail-item">
-            <label>Assignment ID</label>
-            <span class="value">{{ selectedAssignment.id }}</span>
-          </div>
+        <div class="detail-item">
+          <span class="detail-label">Approval Count</span>
+          <span class="detail-value">{{ selectedAssignment.approvalCount }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Approved</span>
+          <span class="detail-value">{{ selectedAssignment.approved ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Active Days</span>
+          <span class="detail-value">{{ selectedAssignment.allowedActiveDays }}</span>
         </div>
       </div>
     </div>
 
-    <ng-template pTemplate="footer">
-      <div class="dialog-footer-actions" *ngIf="selectedAssignment?.approvalStatus === 'PENDING'" style="gap: 1.5rem">
-        <button pButton label="Reject" icon="pi pi-times" iconPos="right" style="gap: 0.5rem; margin-right: 1rem;"
-          class="p-button-danger" (click)="submitApproval('REJECTED')">
-        </button>
+    <!-- Driver info -->
+    <div class="detail-section">
+      <h4 class="detail-section-title"><i class="pi pi-user"></i> Driver</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Full Name</span>
+          <span class="detail-value">{{ getFullName(selectedAssignment) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Username</span>
+          <span class="detail-value">{{ selectedAssignment.username }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Phone</span>
+          <span class="detail-value mono">{{ selectedAssignment.phoneNumber }}</span>
+        </div>
+      </div>
+    </div>
 
-        <button pButton label="Approve" icon="pi pi-check" class="p-button-success" iconPos="right"
-          style="gap: 0.5rem; margin-right: 1rem;" (click)="submitApproval('APPROVED')">
+    <!-- Fleet info -->
+    <div class="detail-section">
+      <h4 class="detail-section-title"><i class="pi pi-car"></i> Fleet</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Fleet Number</span>
+          <span class="detail-value mono">{{ selectedAssignment.fleetNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Registration</span>
+          <span class="detail-value mono">{{ selectedAssignment.registrationNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Investor</span>
+          <span class="detail-value mono">{{ selectedAssignment.investorNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Marshal</span>
+          <span class="detail-value mono">{{ selectedAssignment.marshalNumber }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
+        <i class="pi pi-times"></i> Close
+      </button>
+      <div *ngIf="selectedAssignment?.approvalStatus === 'PENDING'" class="footer-actions-group">
+        <button class="footer-btn btn-danger" (click)="openRejectDialog(selectedAssignment!)">
+          <i class="pi pi-times"></i> Reject
+        </button>
+        <button class="footer-btn btn-success" (click)="openApproveDialog(selectedAssignment!)">
+          <i class="pi pi-check"></i> Approve
         </button>
       </div>
+    </div>
+  </ng-template>
+</p-dialog>
 
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"
-        (click)="closeDetailDialog()">
+<!-- ══════════════════════════════════════════════════════════════
+     APPROVE CONFIRMATION DIALOG
+══════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayApproveDialog" [modal]="true" [draggable]="false" [resizable]="false"
+  styleClass="custom-dialog" [style]="{ width: '460px' }" (onHide)="closeApproveDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon icon-success">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div>
+          <h3 class="dialog-title">Confirm Approval</h3>
+          <p class="dialog-subtitle">Approve this driver assignment request</p>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="confirm-body" *ngIf="selectedAssignment">
+    <p class="confirm-message">
+      Are you sure you want to approve the assignment for
+      <strong>{{ getFullName(selectedAssignment) }}</strong>
+      on fleet <strong class="mono">{{ selectedAssignment.fleetNumber }}</strong>?
+    </p>
+
+    <div class="confirm-detail-card">
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Driver</span>
+        <span class="confirm-value">{{ getFullName(selectedAssignment) }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Phone</span>
+        <span class="confirm-value mono">{{ selectedAssignment.phoneNumber }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Fleet</span>
+        <span class="confirm-value mono">{{ selectedAssignment.fleetNumber }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Registration</span>
+        <span class="confirm-value mono">{{ selectedAssignment.registrationNumber }}</span>
+      </div>
+    </div>
+
+    <div class="confirm-success-note">
+      <i class="pi pi-info-circle"></i>
+      The driver's assignment status will be set to <strong>APPROVED</strong>.
+      They will be able to start operating on this fleet.
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="closeApproveDialog()" [disabled]="processing">
+        <i class="pi pi-times"></i> Cancel
       </button>
-    </ng-template>
 
-  </p-dialog>
+      <button class="footer-btn btn-success" (click)="confirmApprove()" [disabled]="processing">
+        <span *ngIf="!processing">
+          <i class="pi pi-check"></i> Approve
+        </span>
+        <span *ngIf="processing">
+          <i class="pi pi-spin pi-spinner"></i> Processing…
+        </span>
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
 
-  <p-toast position="top-right"></p-toast>
-</div>
+<!-- ══════════════════════════════════════════════════════════════
+     REJECT CONFIRMATION DIALOG
+══════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayRejectDialog" [modal]="true" [draggable]="false" [resizable]="false"
+  styleClass="custom-dialog" [style]="{ width: '460px' }" (onHide)="closeRejectDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon icon-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <div>
+          <h3 class="dialog-title">Confirm Rejection</h3>
+          <p class="dialog-subtitle">Reject this driver assignment request</p>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="confirm-body" *ngIf="selectedAssignment">
+    <p class="confirm-message">
+      Are you sure you want to reject the assignment for
+      <strong>{{ getFullName(selectedAssignment) }}</strong>
+      on fleet <strong class="mono">{{ selectedAssignment.fleetNumber }}</strong>?
+    </p>
+
+    <div class="confirm-detail-card">
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Driver</span>
+        <span class="confirm-value">{{ getFullName(selectedAssignment) }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Phone</span>
+        <span class="confirm-value mono">{{ selectedAssignment.phoneNumber }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Fleet</span>
+        <span class="confirm-value mono">{{ selectedAssignment.fleetNumber }}</span>
+      </div>
+      <div class="confirm-detail-row">
+        <span class="confirm-label">Registration</span>
+        <span class="confirm-value mono">{{ selectedAssignment.registrationNumber }}</span>
+      </div>
+    </div>
+
+    <div class="confirm-warning-note">
+      <i class="pi pi-info-circle"></i>
+      The driver's assignment status will be set to <strong>REJECTED</strong>.
+      They will need to submit a new request to be assigned to this fleet.
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="closeRejectDialog()" [disabled]="processing">
+        <i class="pi pi-times"></i> Cancel
+      </button>
+
+      <button class="footer-btn btn-danger" (click)="confirmReject()" [disabled]="processing">
+        <span *ngIf="!processing">
+          <i class="pi pi-ban"></i> Reject
+        </span>
+        <span *ngIf="processing">
+          <i class="pi pi-spin pi-spinner"></i> Processing…
+        </span>
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

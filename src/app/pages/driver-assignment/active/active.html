@@ -54,18 +54,35 @@
     </div>
   </div> -->
 
-  <!-- ─── Table ─────────────────────────────────────────────────────────────── -->
-  <div class="table-card" *ngIf="!loading">
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="pagination-wrapper">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
 
-    <div *ngIf="filteredAssignments.length === 0" class="empty-state">
+  <!-- ─── Table ─────────────────────────────────────────────────────────────── -->
+  <div class="table-card">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-overlay">
+      <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      <p>Loading assignments…</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && assignments.length === 0" class="empty-state">
       <i class="pi pi-inbox"></i>
       <h3>No active assignments found</h3>
       <p>Try adjusting your search filters.</p>
     </div>
 
-    <p-table *ngIf="filteredAssignments.length > 0" [value]="filteredAssignments" [paginator]="true" [rows]="rows"
-      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 25, 50, 100, 500]" [lazy]="false"
-      styleClass="p-datatable-gridlines">
+    <!-- Table with Data -->
+    <p-table *ngIf="!loading && assignments.length > 0" [value]="assignments" styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '50rem' }">
+
       <ng-template pTemplate="header">
         <tr>
           <th>Driver</th>
@@ -135,14 +152,30 @@
 
         </tr>
       </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message-row">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No assignments found</h3>
+              <p>No data available for the current filters.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
     </p-table>
   </div>
 
-  <!-- ─── Loading ──────────────────────────────────────────────────────────── -->
-  <!-- <div *ngIf="loading" class="loading-overlay">
-    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
-    <p>Loading assignments…</p>
-  </div> -->
+  <!-- ─── Pagination Controls (Bottom) ─────────────────────────────────────── -->
+  <div class="pagination-wrapper" *ngIf="!loading && assignments.length > 0">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
 
 </div>
 
