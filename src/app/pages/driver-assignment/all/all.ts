@@ -45,7 +45,7 @@ interface ApprovalFilterOption {
     InputTextModule,
     SelectModule,
     ActionButtonComponent
-],
+  ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
 })

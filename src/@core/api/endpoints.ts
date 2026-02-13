@@ -80,8 +80,8 @@ export const API_ENDPOINTS = {
   FIND_PARCEL_BY_NUMBER: '/api/parcels/find/parcel-number',
   RETRIEVE_STATEMENTS: '/api/statements/retrieve',
 
-  ACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/driver/fleets/approve',
-  DEACTIVATE_DRIVER_ASSIGNMENT: 'api/v1/org/activated-deactivate-fleet',
+  ACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/driver/fleets/approve',
+  DEACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/activated-deactivate-fleet',
 
   ALL_ORGANIZATIONS: '/api/v1/org/organizations/view-all',
 

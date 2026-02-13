@@ -72,3 +72,11 @@ export interface GeneralDriverAssignment extends BaseDriverAssignment {
   endDate?: string;
 }
 
+export type AnyDriverAssignment =
+  | PendingDriverAssignment
+  | RejectedDriverAssignment
+  | ActiveDriverAssignment
+  | InactiveDriverAssignment
+  | DormantDriverAssignment;
+
+

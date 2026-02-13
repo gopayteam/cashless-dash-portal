@@ -287,8 +287,6 @@ export class AllPendingDriverAssignmentsComponent implements OnInit {
 
     console.log('approval payload', payload);
 
-    return
-
     this.dataService
       .post<ApprovalResponse>(API_ENDPOINTS.ACTIVATE_DRIVER_ASSIGNMENT, payload)
       .subscribe({
