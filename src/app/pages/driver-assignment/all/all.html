@@ -263,26 +263,28 @@
      DETAIL DIALOG
 ═══════════════════════════════════════════════════════════════════ -->
 <p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
-  [draggable]="false" [resizable]="false" styleClass="assignment-dialog" [style]="{ width: '90vw', maxWidth: '880px' }"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '880px' }"
   (onHide)="closeDetailDialog()">
 
   <ng-template pTemplate="header">
     <div class="dialog-header">
-      <div class="dialog-header-icon">
-        <i class="pi pi-user"></i>
-      </div>
-      <div class="dialog-title-block">
-        <h2 class="dialog-title">{{ getFullName(selectedAssignment!) }}</h2>
-        <div class="dialog-badges" *ngIf="selectedAssignment">
-          <span [class]="'status-badge status-' + getApprovalStatusClass(selectedAssignment.status)">
-            <i [class]="getApprovalStatusIcon(selectedAssignment.status)"></i>
-            {{ selectedAssignment.status }}
-          </span>
-          <span *ngIf="selectedAssignment.approved !== undefined"
-            [class]="'status-badge ' + (selectedAssignment.approved ? 'status-active' : 'status-inactive')">
-            <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
-            {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
-          </span>
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="dialog-title-block">
+          <h2 class="dialog-title">{{ getFullName(selectedAssignment!) }}</h2>
+          <div class="dialog-badges" *ngIf="selectedAssignment">
+            <span [class]="'status-badge status-' + getApprovalStatusClass(selectedAssignment.status)">
+              <i [class]="getApprovalStatusIcon(selectedAssignment.status)"></i>
+              {{ selectedAssignment.status }}
+            </span>
+            <span *ngIf="selectedAssignment.approved !== undefined"
+              [class]="'status-badge ' + (selectedAssignment.approved ? 'status-active' : 'status-inactive')">
+              <i [class]="selectedAssignment.approved ? 'pi pi-check' : 'pi pi-times'"></i>
+              {{ selectedAssignment.approved ? 'Approved' : 'Not Approved' }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
