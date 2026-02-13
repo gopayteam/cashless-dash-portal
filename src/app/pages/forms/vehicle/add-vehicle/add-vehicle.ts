@@ -30,6 +30,38 @@ interface DropdownOption {
   value: any;
 }
 
+/**
+ * A resolved fee row the template iterates over.
+ * One entry per category, EXCEPT OFFLOAD which expands to three.
+ */
+export interface FeeRow {
+  /** Display label shown to the user */
+  label: string;
+  /** Internal model key used to read / write the numeric value */
+  modelKey: FeeModelKey;
+  /** feeName sent to the API  */
+  feeName: string;
+  /** dayType sent to the API  */
+  dayType: string;
+  /** Icon class (PrimeIcons) */
+  icon: string;
+  /** Soft hint shown below the input */
+  hint?: string;
+}
+
+/**
+ * All possible keys on this component that hold a fee amount.
+ * Keeping them explicit makes the template type-safe.
+ */
+export type FeeModelKey =
+  | 'systemFeeAmount'
+  | 'managementFeeAmount'
+  | 'saccoFeeAmount'
+  | 'offloadWeekdayFeeAmount'
+  | 'offloadSaturdayFeeAmount'
+  | 'offloadSundayFeeAmount'
+  | 'driverFeeAmount';
+
 interface VehiclePayload {
   id: string;
   entityId: string;
@@ -73,11 +105,12 @@ interface ApiResponse {
   providers: [MessageService]
 })
 export class AddVehicleComponent implements OnInit {
+
   entityId: string | null = null;
   username: string | null = null;
   organization: Organization | null = null;
 
-  // Form fields
+  // ── Basic form fields ────────────────────────────────────────────────────
   investorNumber: string = '';
   marshalNumber: string = '';
   fleetNumber: string = '';
@@ -88,7 +121,7 @@ export class AddVehicleComponent implements OnInit {
   selectedStage: number | null = null;
   maintainFees: boolean = false;
 
-  // Fee amounts
+  // ── Fee amount holders (one per possible fee type) ───────────────────────
   systemFeeAmount: number | null = null;
   managementFeeAmount: number | null = null;
   saccoFeeAmount: number | null = null;
@@ -97,16 +130,21 @@ export class AddVehicleComponent implements OnInit {
   offloadSundayFeeAmount: number | null = null;
   driverFeeAmount: number | null = null;
 
-  // Dropdown options
+  /**
+   * The ordered list of fee rows the template renders.
+   * Built from organizationCategoryFees once the org is loaded.
+   */
+  feeRows: FeeRow[] = [];
+
+  // ── Dropdown options ─────────────────────────────────────────────────────
   investorOptions: DropdownOption[] = [];
   marshalOptions: DropdownOption[] = [];
   stageOptions: DropdownOption[] = [];
 
-  // Loading states
+  // ── Loading states ───────────────────────────────────────────────────────
   investorsLoading: boolean = false;
   marshalsLoading: boolean = false;
   stagesLoading: boolean = false;
-  organizationLoading: boolean = false;
   submitting: boolean = false;
   initialDataLoaded: boolean = false;
 
@@ -119,9 +157,7 @@ export class AddVehicleComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
-  get loading() {
-    return this.loadingStore.loading;
-  }
+  get loading() { return this.loadingStore.loading; }
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
@@ -129,20 +165,18 @@ export class AddVehicleComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-
     this.entityId = user.entityId;
     this.username = user.username || user.email;
-
-    // Load all required data in parallel
     this.loadInitialData();
   }
 
+  // ── Data loading ─────────────────────────────────────────────────────────
+
   private loadInitialData(): void {
     if (!this.entityId) return;
-
     this.loadingStore.start();
 
-    const requests = {
+    forkJoin({
       investors: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
@@ -163,36 +197,30 @@ export class AddVehicleComponent implements OnInit {
         { entityId: this.entityId, page: 0, size: 200 },
         'organizations'
       )
-    };
-
-    forkJoin(requests).subscribe({
+    }).subscribe({
       next: (results) => {
-        // Process investors
-        this.investorOptions = results.investors.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.phoneNumber,
+        this.investorOptions = results.investors.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.phoneNumber,
         }));
 
-        // Process marshals
-        this.marshalOptions = results.marshals.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.phoneNumber,
+        this.marshalOptions = results.marshals.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.phoneNumber,
         }));
 
-        // Process stages
-        this.stageOptions = results.stages.data.map((stage: Stage) => ({
-          label: stage.name,
-          value: stage.id,
+        this.stageOptions = results.stages.data.map((s: Stage) => ({
+          label: s.name,
+          value: s.id,
         }));
 
-        // Process organization and set default fees
-        if (results.organization.data && results.organization.data.length > 0) {
+        if (results.organization.data?.length) {
           this.organization = results.organization.data[0];
-          console.log('✓ Organization data loaded:', this.organization);
-          this.setDefaultFeesFromOrganization();
+          this.buildFeeRows();
+          this.prefillFeeDefaults();
         } else {
-          console.warn('⚠ No organization data found, fees will need to be entered manually');
-          this.setDefaultFeesToZero();
+          console.warn('No organization data found — fee fields will be empty');
+          this.buildFeeRows(); // build with no org = empty rows fallback
         }
 
         this.initialDataLoaded = true;
@@ -212,167 +240,169 @@ export class AddVehicleComponent implements OnInit {
     });
   }
 
-  private setDefaultFeesFromOrganization(): void {
-    if (!this.organization?.organizationCategoryFees) {
-      this.setDefaultFeesToZero();
-      return;
+  // ── Fee row construction ──────────────────────────────────────────────────
+
+  /**
+   * Builds `feeRows` from whatever categories the organisation has configured.
+   * OFFLOAD is always expanded into three day-type rows.
+   */
+  buildFeeRows(): void {
+    const categories = this.organization?.organizationCategoryFees ?? [];
+
+    // Sort by priority so the order matches the backend definition
+    const sorted = [...categories].sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+
+    const rows: FeeRow[] = [];
+
+    for (const cat of sorted) {
+      switch (cat.categoryName) {
+        case 'SYSTEM':
+          rows.push({
+            label: 'System Fee',
+            modelKey: 'systemFeeAmount',
+            feeName: 'SYSTEM',
+            dayType: 'ALL',
+            icon: 'pi-cog',
+            hint: 'Platform transaction fee'
+          });
+          break;
+
+        case 'MANAGEMENT':
+          rows.push({
+            label: 'Management Fee',
+            modelKey: 'managementFeeAmount',
+            feeName: 'MANAGEMENT',
+            dayType: 'ALL',
+            icon: 'pi-briefcase',
+            hint: 'Organisation management fee'
+          });
+          break;
+
+        case 'SACCO':
+          rows.push({
+            label: 'SACCO Fee',
+            modelKey: 'saccoFeeAmount',
+            feeName: 'SACCO',
+            dayType: 'ALL',
+            icon: 'pi-building',
+            hint: 'SACCO contribution'
+          });
+          break;
+
+        case 'OFFLOAD':
+          // Always expand OFFLOAD into three day-type rows
+          rows.push(
+            {
+              label: 'Offload Fee – Weekday',
+              modelKey: 'offloadWeekdayFeeAmount',
+              feeName: 'OFFLOAD',
+              dayType: 'WEEKDAY',
+              icon: 'pi-calendar',
+              hint: 'Monday – Friday'
+            },
+            {
+              label: 'Offload Fee – Saturday',
+              modelKey: 'offloadSaturdayFeeAmount',
+              feeName: 'OFFLOAD',
+              dayType: 'SATURDAY',
+              icon: 'pi-calendar',
+              hint: 'Saturday rate'
+            },
+            {
+              label: 'Offload Fee – Sunday',
+              modelKey: 'offloadSundayFeeAmount',
+              feeName: 'OFFLOAD',
+              dayType: 'SUNDAY',
+              icon: 'pi-calendar',
+              hint: 'Sunday / public holiday rate'
+            }
+          );
+          break;
+
+        case 'DRIVER':
+          rows.push({
+            label: 'Driver Fee',
+            modelKey: 'driverFeeAmount',
+            feeName: 'DRIVER',
+            dayType: 'ALL',
+            icon: 'pi-user',
+            hint: 'Driver incentive fee'
+          });
+          break;
+
+        default:
+          console.warn(`Unknown fee category: ${cat.categoryName}`);
+          break;
+      }
     }
 
-    const fees = this.organization.organizationCategoryFees;
-
-    // Find and set SYSTEM fee
-    const systemFee = fees.find(f => f.categoryName === 'SYSTEM');
-    this.systemFeeAmount = systemFee?.feeAmount ?? 0;
-
-    // Find and set MANAGEMENT fee
-    const managementFee = fees.find(f => f.categoryName === 'MANAGEMENT');
-    this.managementFeeAmount = managementFee?.feeAmount ?? 0;
-
-    // Find and set SACCO fee
-    const saccoFee = fees.find(f => f.categoryName === 'SACCO');
-    this.saccoFeeAmount = saccoFee?.feeAmount ?? 0;
-
-    // Find and set OFFLOAD fee (same for all days by default, can be changed)
-    const offloadFee = fees.find(f => f.categoryName === 'OFFLOAD');
-    const defaultOffloadAmount = offloadFee?.feeAmount ?? 0;
-    this.offloadWeekdayFeeAmount = defaultOffloadAmount;
-    this.offloadSaturdayFeeAmount = defaultOffloadAmount;
-    this.offloadSundayFeeAmount = defaultOffloadAmount;
-
-    // Find and set DRIVER fee
-    const driverFee = fees.find(f => f.categoryName === 'DRIVER');
-    this.driverFeeAmount = driverFee?.feeAmount ?? 0;
-
-    console.log('✓ Default fees set from organization:', {
-      system: this.systemFeeAmount,
-      management: this.managementFeeAmount,
-      sacco: this.saccoFeeAmount,
-      offloadWeekday: this.offloadWeekdayFeeAmount,
-      offloadSaturday: this.offloadSaturdayFeeAmount,
-      offloadSunday: this.offloadSundayFeeAmount,
-      driver: this.driverFeeAmount
-    });
+    this.feeRows = rows;
   }
 
-  private setDefaultFeesToZero(): void {
-    this.systemFeeAmount = 0;
-    this.managementFeeAmount = 0;
-    this.saccoFeeAmount = 0;
-    this.offloadWeekdayFeeAmount = 0;
-    this.offloadSaturdayFeeAmount = 0;
-    this.offloadSundayFeeAmount = 0;
-    this.driverFeeAmount = 0;
-  }
+  /**
+   * Pre-fills each fee amount from `organizationCategoryFees`.
+   * Uses 0 when feeAmount is null (backend sometimes sends null for unconfigured fees).
+   */
+  prefillFeeDefaults(): void {
+    const cats = this.organization?.organizationCategoryFees ?? [];
 
-  loadInvestors(): void {
-    if (!this.entityId) return;
-
-    this.investorsLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      agent: 'INVESTOR',
-      page: 0,
-      size: 100,
+    const get = (name: string): number => {
+      const found = cats.find(c => c.categoryName === name);
+      return found?.feeAmount ?? 0;
     };
 
-    this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'investor-users')
-      .subscribe({
-        next: (response) => {
-          this.investorOptions = response.data.map((user: User) => ({
-            label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.phoneNumber,
-          }));
-          this.investorsLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Failed to load investors', err);
-          this.investorsLoading = false;
-        },
-      });
+    if (this.hasCategory('SYSTEM')) this.systemFeeAmount = get('SYSTEM');
+    if (this.hasCategory('MANAGEMENT')) this.managementFeeAmount = get('MANAGEMENT');
+    if (this.hasCategory('SACCO')) this.saccoFeeAmount = get('SACCO');
+    if (this.hasCategory('DRIVER')) this.driverFeeAmount = get('DRIVER');
+
+    if (this.hasCategory('OFFLOAD')) {
+      const base = get('OFFLOAD');
+      this.offloadWeekdayFeeAmount = base;
+      this.offloadSaturdayFeeAmount = base;
+      this.offloadSundayFeeAmount = base;
+    }
   }
 
-  loadMarshals(): void {
-    if (!this.entityId) return;
-
-    this.marshalsLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      agent: 'MARSHAL',
-      page: 0,
-      size: 100,
-    };
-
-    this.dataService
-      .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, 'marshall-users')
-      .subscribe({
-        next: (response) => {
-          this.marshalOptions = response.data.map((user: User) => ({
-            label: `${user.firstName} ${user.lastName} - ${user.username}`,
-            value: user.phoneNumber,
-          }));
-          this.marshalsLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Failed to load marshals', err);
-          this.marshalsLoading = false;
-        },
-      });
+  /** Returns true if this entity's org has the given category configured */
+  hasCategory(name: string): boolean {
+    return (this.organization?.organizationCategoryFees ?? [])
+      .some(c => c.categoryName === name);
   }
 
-  loadStages(): void {
-    this.stagesLoading = true;
-    const payload = {
-      entityId: this.entityId,
-      page: 0,
-      size: 100,
-    };
+  // ── Template helpers ──────────────────────────────────────────────────────
 
-    this.dataService
-      .post<StagesResponse>(API_ENDPOINTS.ALL_STAGES, payload, 'stages')
-      .subscribe({
-        next: (response) => {
-          this.stageOptions = response.data.map((stage: Stage) => ({
-            label: stage.name,
-            value: stage.id,
-          }));
-          this.stagesLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Failed to load stages', err);
-          this.stagesLoading = false;
-        },
-      });
+  /** Used by [(ngModel)] in the template to bind fee amounts dynamically */
+  getFeeValue(key: FeeModelKey): number | null {
+    return (this as any)[key] as number | null;
   }
+
+  setFeeValue(key: FeeModelKey, value: number | null): void {
+    (this as any)[key] = value;
+  }
+
+  // ── Validation ────────────────────────────────────────────────────────────
 
   isFormValid(): boolean {
-    return !!(
+    const basicValid = !!(
       this.investorNumber.trim() &&
       this.marshalNumber.trim() &&
       this.fleetNumber.trim() &&
       this.registrationNumber.trim() &&
-      this.capacity &&
-      this.capacity > 0 &&
-      this.selectedStage &&
-      this.systemFeeAmount !== null &&
-      this.systemFeeAmount >= 0 &&
-      this.managementFeeAmount !== null &&
-      this.managementFeeAmount >= 0 &&
-      this.saccoFeeAmount !== null &&
-      this.saccoFeeAmount >= 0 &&
-      this.offloadWeekdayFeeAmount !== null &&
-      this.offloadWeekdayFeeAmount >= 0 &&
-      this.offloadSaturdayFeeAmount !== null &&
-      this.offloadSaturdayFeeAmount >= 0 &&
-      this.offloadSundayFeeAmount !== null &&
-      this.offloadSundayFeeAmount >= 0 &&
-      this.driverFeeAmount !== null &&
-      this.driverFeeAmount >= 0
+      this.capacity && this.capacity > 0 &&
+      this.selectedStage
     );
+
+    if (!basicValid) return false;
+
+    // Every fee row that exists must have a non-negative value
+    return this.feeRows.every(row => {
+      const val = this.getFeeValue(row.modelKey);
+      return val !== null && val >= 0;
+    });
   }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
 
   onSubmit(): void {
     if (!this.isFormValid() || !this.entityId || !this.username) {
@@ -385,65 +415,15 @@ export class AddVehicleComponent implements OnInit {
       return;
     }
 
-    // Build vehicleFees array
-    const vehicleFees: VehicleFee[] = [
-      {
-        id: '',
-        feeName: 'SYSTEM',
-        dayType: 'ALL',
-        feeAmount: this.systemFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'MANAGEMENT',
-        dayType: 'ALL',
-        feeAmount: this.managementFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'SACCO',
-        dayType: 'ALL',
-        feeAmount: this.saccoFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'OFFLOAD',
-        dayType: 'WEEKDAY',
-        feeAmount: this.offloadWeekdayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'OFFLOAD',
-        dayType: 'SATURDAY',
-        feeAmount: this.offloadSaturdayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'OFFLOAD',
-        dayType: 'SUNDAY',
-        feeAmount: this.offloadSundayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: '',
-        feeName: 'DRIVER',
-        dayType: 'ALL',
-        feeAmount: this.driverFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      }
-    ];
+    // Build vehicleFees from feeRows — only the categories that exist for this entity
+    const vehicleFees: VehicleFee[] = this.feeRows.map(row => ({
+      id: '',
+      feeName: row.feeName,
+      dayType: row.dayType,
+      feeAmount: this.getFeeValue(row.modelKey) ?? 0,
+      username: this.username!,
+      entityId: this.entityId!,
+    }));
 
     const payload: VehiclePayload = {
       id: '',
@@ -455,28 +435,21 @@ export class AddVehicleComponent implements OnInit {
       capacity: this.capacity!,
       stageId: this.selectedStage!,
       maintainFees: this.maintainFees,
-      vehicleFees: vehicleFees,
+      vehicleFees,
       username: this.username
     };
 
-    // Add optional fields only if they have values
-    if (this.storeNumber.trim()) {
-      payload.storeNumber = this.storeNumber.trim();
-    }
-    if (this.tillNumber.trim()) {
-      payload.tillNumber = this.tillNumber.trim();
-    }
+    if (this.storeNumber.trim()) payload.storeNumber = this.storeNumber.trim();
+    if (this.tillNumber.trim()) payload.tillNumber = this.tillNumber.trim();
 
     console.log('Creating vehicle with payload:', payload);
 
     this.submitting = true;
     this.loadingStore.start();
 
-    this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.CREATE_VEHICLE, payload, 'create-vehicle')
+    this.dataService.post<ApiResponse>(API_ENDPOINTS.CREATE_VEHICLE, payload, 'create-vehicle')
       .subscribe({
         next: (response) => {
-          console.log('Vehicle created successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
@@ -487,54 +460,32 @@ export class AddVehicleComponent implements OnInit {
               detail: response.message || 'Vehicle created successfully',
               life: 4000
             });
-
-            // Navigate back to vehicles list
-            setTimeout(() => {
-              this.router.navigate(['/vehicles/all']);
-            }, 1500);
+            setTimeout(() => this.router.navigate(['/vehicles/all']), 1500);
           } else {
             this.messageService.add({
               severity: 'error',
-              summary: 'Error Occurred',
+              summary: 'Error',
               detail: response.message || 'Failed to create vehicle',
               life: 5000
             });
           }
         },
         error: (err) => {
-          console.error('Failed to create vehicle - Full error:', err);
-          console.error('Error status:', err.status);
-          console.error('Error details:', err.error);
+          let msg = 'Failed to create vehicle';
+          if (err.status === 409) msg = 'Vehicle with this registration/fleet number already exists';
+          else if (err.status === 400) msg = err.error?.message || 'Invalid data provided.';
+          else if (err.status === 500) msg = 'Server error. Please try again later.';
+          else if (err.error?.message) msg = err.error.message;
 
-          let errorMessage = 'Failed to create vehicle';
-
-          if (err.status === 409) {
-            errorMessage = 'Vehicle with this registration number or fleet number already exists';
-          } else if (err.status === 400) {
-            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
-          } else if (err.status === 500) {
-            errorMessage = 'Server error occurred. Please try again later.';
-          } else if (err.error?.message) {
-            errorMessage = err.error.message;
-          }
-
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error Occurred',
-            detail: errorMessage,
-            life: 5000
-          });
-
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: msg, life: 5000 });
           this.submitting = false;
           this.loadingStore.stop();
           this.cdr.detectChanges();
-        },
+        }
       });
   }
 
-  onCancel(): void {
-    this.router.navigate(['/vehicles/all']);
-  }
+  onCancel(): void { this.router.navigate(['/vehicles/all']); }
 
   resetForm(): void {
     this.investorNumber = '';
@@ -546,8 +497,6 @@ export class AddVehicleComponent implements OnInit {
     this.tillNumber = '';
     this.selectedStage = null;
     this.maintainFees = false;
-
-    // Reset fees to organization defaults
-    this.setDefaultFeesFromOrganization();
+    this.prefillFeeDefaults();
   }
 }

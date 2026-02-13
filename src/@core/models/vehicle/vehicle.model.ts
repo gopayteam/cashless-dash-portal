@@ -41,7 +41,7 @@ export interface VehicleFee {
   fleetNumber?: string;
   accountNumber?: string | null;
   receiverShortCode?: string | null;
-  dayType: DayType;
+  dayType: string;
 }
 
 export type DayType = 'ALL' | 'WEEKDAY' | 'SATURDAY' | 'SUNDAY';

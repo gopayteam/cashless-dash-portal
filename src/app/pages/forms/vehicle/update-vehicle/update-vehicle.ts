@@ -25,12 +25,32 @@ import { Organization } from '../../../../../@core/models/organization/organizat
 import { forkJoin } from 'rxjs';
 import { OrganizationsApiResponse } from '../../../../../@core/models/organization/organization-response.model';
 
+// ── Shared fee-row types (copy from add-vehicle or move to a shared model) ──
+
+export interface FeeRow {
+  label: string;
+  modelKey: FeeModelKey;
+  feeName: string;
+  dayType: string;
+  icon: string;
+  hint?: string;
+}
+
+export type FeeModelKey =
+  | 'systemFeeAmount'
+  | 'managementFeeAmount'
+  | 'saccoFeeAmount'
+  | 'offloadWeekdayFeeAmount'
+  | 'offloadSaturdayFeeAmount'
+  | 'offloadSundayFeeAmount'
+  | 'driverFeeAmount';
+
 interface DropdownOption {
   label: string;
   value: any;
 }
 
-interface Vehicle {
+interface VehicleState {
   id: string;
   entityId: string;
   investorNumber: string;
@@ -65,7 +85,7 @@ interface UpdateVehiclePayload {
 interface VehiclesApiResponse {
   status: number;
   message: string;
-  data: Vehicle[];
+  data: VehicleState[];
 }
 
 interface VehicleFeesApiResponse {
@@ -101,13 +121,14 @@ interface ApiResponse {
   providers: [MessageService]
 })
 export class UpdateVehicleComponent implements OnInit {
+
   entityId: string | null = null;
   vehicleId: string = '';
-  vehicleData: Vehicle | null = null;
+  vehicleData: VehicleState | null = null;
   username: string | null = null;
   organization: Organization | null = null;
 
-  // Form fields
+  // ── Basic form fields ────────────────────────────────────────────────────
   investorNumber: string = '';
   marshalNumber: string = '';
   fleetNumber: string = '';
@@ -118,7 +139,7 @@ export class UpdateVehicleComponent implements OnInit {
   selectedStage: number | null = null;
   maintainFees: boolean = false;
 
-  // Fee amounts
+  // ── Fee amounts ──────────────────────────────────────────────────────────
   systemFeeAmount: number | null = null;
   managementFeeAmount: number | null = null;
   saccoFeeAmount: number | null = null;
@@ -127,22 +148,27 @@ export class UpdateVehicleComponent implements OnInit {
   offloadSundayFeeAmount: number | null = null;
   driverFeeAmount: number | null = null;
 
-  // Store vehicle fees with IDs from API
+  /** Ordered fee rows built from the organisation's category configuration */
+  feeRows: FeeRow[] = [];
+
+  /**
+   * Fees fetched from the vehicle-fees API — these carry the real IDs
+   * that must be included in the update payload.
+   */
   vehicleFeesWithIds: VehicleFee[] = [];
 
-  // Dropdown options
+  // ── Dropdown options ─────────────────────────────────────────────────────
   investorOptions: DropdownOption[] = [];
   marshalOptions: DropdownOption[] = [];
   stageOptions: DropdownOption[] = [];
 
-  // Loading states
+  // ── Loading states ───────────────────────────────────────────────────────
   investorsLoading: boolean = false;
   marshalsLoading: boolean = false;
   stagesLoading: boolean = false;
-  vehicleLoading: boolean = false;
-  organizationLoading: boolean = false;
   submitting: boolean = false;
   dataLoadedFromState: boolean = false;
+  initialDataLoaded: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -154,119 +180,88 @@ export class UpdateVehicleComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { }
 
-  get loading() {
-    return this.loadingStore.loading;
-  }
-
-
+  get loading() { return this.loadingStore.loading; }
 
   ngOnInit(): void {
     const user = this.authService.currentUser();
-    if (!user) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!user) { this.router.navigate(['/login']); return; }
+
     this.entityId = user.entityId;
     this.username = user.username || user.email;
 
-    // Get vehicle ID from route
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (!id) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Vehicle ID not found in route',
-          life: 4000
-        });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Vehicle ID not found', life: 4000 });
         this.router.navigate(['/vehicles/all']);
         return;
       }
-
       this.vehicleId = id;
       this.initializeData();
     });
   }
 
-  private cleanPayload(obj: any) {
-    Object.keys(obj).forEach(
-      key => obj[key] === '' && delete obj[key]
-    );
-  }
+  // ── Initialisation ────────────────────────────────────────────────────────
 
   private initializeData(): void {
     const stateVehicle = this.getVehicleFromState();
-
     if (stateVehicle) {
-      console.log('✓ Vehicle data loaded from navigation state');
       this.dataLoadedFromState = true;
-
-      // Load dropdowns and organization data in parallel
       this.loadAllRequiredData(stateVehicle);
-      this.cdr.detectChanges();
     } else {
-      console.log('⚠ No state data found, fetching all data from API');
       this.dataLoadedFromState = false;
       this.loadAllDataFromAPI();
-      this.cdr.detectChanges();
     }
   }
 
-  private loadAllRequiredData(vehicle?: Vehicle): void {
+  private loadAllRequiredData(vehicle?: VehicleState): void {
     this.loadingStore.start();
 
-    const requests = {
+    forkJoin({
       investors: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
-        'investor-users', true,
+        'investor-users', true
       ),
       marshals: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
-        'marshall-users', true,
+        'marshall-users', true
       ),
       stages: this.dataService.post<StagesResponse>(
         API_ENDPOINTS.ALL_STAGES,
         { entityId: this.entityId, page: 0, size: 100 },
-        'stages', true,
+        'stages', true
       ),
       organization: this.dataService.post<OrganizationsApiResponse>(
         API_ENDPOINTS.ALL_ORGANIZATIONS,
         { entityId: this.entityId, page: 0, size: 200 },
-        'organizations', true,
+        'organizations', true
       )
-    };
-
-    forkJoin(requests).subscribe({
+    }).subscribe({
       next: (results) => {
-        // Process investors
-        this.investorOptions = results.investors.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.username,
+        this.investorOptions = results.investors.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.username,
+        }));
+        this.marshalOptions = results.marshals.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.username,
+        }));
+        this.stageOptions = results.stages.data.map((s: Stage) => ({
+          label: s.name,
+          value: s.id,
         }));
 
-        // Process marshals
-        this.marshalOptions = results.marshals.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.username,
-        }));
-
-        // Process stages
-        this.stageOptions = results.stages.data.map((stage: Stage) => ({
-          label: stage.name,
-          value: stage.id,
-        }));
-
-        // Process organization
-        if (results.organization.data && results.organization.data.length > 0) {
+        if (results.organization.data?.length) {
           this.organization = results.organization.data[0];
-          console.log('✓ Organization data loaded:', this.organization);
+          this.buildFeeRows(); // build rows BEFORE populating values
+        } else {
+          this.buildFeeRows();
         }
 
-        // If vehicle data from state, populate form
         if (vehicle) {
-          this.loadVehicleFeesAndPopulateForm(vehicle);
+          this.loadVehicleFeesAndPopulate(vehicle);
         }
 
         this.loadingStore.stop();
@@ -274,12 +269,7 @@ export class UpdateVehicleComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load required data:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load required data. Please try again.',
-          life: 4000
-        });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load required data.', life: 4000 });
         this.loadingStore.stop();
       }
     });
@@ -288,21 +278,21 @@ export class UpdateVehicleComponent implements OnInit {
   private loadAllDataFromAPI(): void {
     this.loadingStore.start();
 
-    const requests = {
+    forkJoin({
       investors: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'INVESTOR', page: 0, size: 100 },
-        'investor-users', true,
+        'investor-users', true
       ),
       marshals: this.dataService.post<UserApiResponse>(
         API_ENDPOINTS.ALL_USERS,
         { entityId: this.entityId, agent: 'MARSHAL', page: 0, size: 100 },
-        'marshall-users', true,
+        'marshall-users', true
       ),
       stages: this.dataService.post<StagesResponse>(
         API_ENDPOINTS.ALL_STAGES,
         { entityId: this.entityId, page: 0, size: 100 },
-        'stages', true,
+        'stages', true
       ),
       organization: this.dataService.post<OrganizationsApiResponse>(
         API_ENDPOINTS.ALL_ORGANIZATIONS,
@@ -313,45 +303,33 @@ export class UpdateVehicleComponent implements OnInit {
         API_ENDPOINTS.VEHICLE_DATA,
         { entityId: this.entityId!, fleetNumber: this.vehicleId }
       )
-    };
-
-    forkJoin(requests).subscribe({
+    }).subscribe({
       next: (results) => {
-        // Process investors
-        this.investorOptions = results.investors.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.username,
+        this.investorOptions = results.investors.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.username,
+        }));
+        this.marshalOptions = results.marshals.data.map((u: User) => ({
+          label: `${u.firstName} ${u.lastName} - ${u.username}`,
+          value: u.username,
+        }));
+        this.stageOptions = results.stages.data.map((s: Stage) => ({
+          label: s.name,
+          value: s.id,
         }));
 
-        // Process marshals
-        this.marshalOptions = results.marshals.data.map((user: User) => ({
-          label: `${user.firstName} ${user.lastName} - ${user.username}`,
-          value: user.username,
-        }));
-
-        // Process stages
-        this.stageOptions = results.stages.data.map((stage: Stage) => ({
-          label: stage.name,
-          value: stage.id,
-        }));
-
-        // Process organization
-        if (results.organization.data && results.organization.data.length > 0) {
+        if (results.organization.data?.length) {
           this.organization = results.organization.data[0];
-          console.log('✓ Organization data loaded:', this.organization);
+          this.buildFeeRows();
+        } else {
+          this.buildFeeRows();
         }
 
-        // Process vehicle
-        if (results.vehicle.data && results.vehicle.data.length > 0) {
-          const vehicle = results.vehicle.data.find((v: Vehicle) => v.id === this.vehicleId);
-          if (vehicle) {
-            console.log('✓ Vehicle data fetched successfully from API');
-            this.loadVehicleFeesAndPopulateForm(vehicle);
-          } else {
-            this.handleVehicleNotFound(this.vehicleId);
-          }
+        const vehicle = results.vehicle.data?.find((v: VehicleState) => v.id === this.vehicleId);
+        if (vehicle) {
+          this.loadVehicleFeesAndPopulate(vehicle);
         } else {
-          this.handleNoVehiclesAvailable();
+          this.handleVehicleNotFound(this.vehicleId);
         }
 
         this.loadingStore.stop();
@@ -359,89 +337,85 @@ export class UpdateVehicleComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load data from API:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to fetch data. Please try again.',
-          life: 4000
-        });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch data.', life: 4000 });
         this.loadingStore.stop();
         this.router.navigate(['/vehicles/all']);
       }
     });
   }
 
-  private loadVehicleFeesAndPopulateForm(vehicle: Vehicle): void {
-    // Encode fleet number for URL (handle spaces)
-    const encodedFleetNumber = encodeURIComponent(vehicle.fleetNumber);
+  private loadVehicleFeesAndPopulate(vehicle: VehicleState): void {
+    const encoded = encodeURIComponent(vehicle.fleetNumber);
 
-    const params = {
-      entityId: this.entityId!,
-      fleetNumber: encodedFleetNumber
-    };
-
-    this.dataService
-      .post<VehicleFeesApiResponse>(API_ENDPOINTS.VEHICLE_FEES, params, 'vehicle-fees', true)
-      .subscribe({
-        next: (response) => {
-          if (response.data && response.data.length > 0) {
-            this.vehicleFeesWithIds = response.data;
-            console.log('✓ Vehicle fees loaded:', this.vehicleFeesWithIds);
-          }
-
-          // Populate form with vehicle data and fees
-          this.populateFormFromVehicle(vehicle);
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Failed to load vehicle fees:', err);
-          // Still populate form even if fees fail to load
-          this.populateFormFromVehicle(vehicle);
-          this.cdr.detectChanges();
+    this.dataService.post<VehicleFeesApiResponse>(
+      API_ENDPOINTS.VEHICLE_FEES,
+      { entityId: this.entityId!, fleetNumber: encoded },
+      'vehicle-fees',
+      true
+    ).subscribe({
+      next: (response) => {
+        if (response.data?.length) {
+          this.vehicleFeesWithIds = response.data;
         }
-      });
+        this.populateFormFromVehicle(vehicle);
+        this.initialDataLoaded = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load vehicle fees:', err);
+        this.populateFormFromVehicle(vehicle);
+        this.initialDataLoaded = true;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  private getVehicleFromState(): Vehicle | null {
-    try {
-      const navigation = this.router.getCurrentNavigation();
-      if (navigation?.extras?.state?.['vehicle']) {
-        const stateVehicle = navigation.extras.state['vehicle'] as Vehicle;
-        if (this.isValidVehicleObject(stateVehicle)) {
-          return stateVehicle;
-        }
-      }
+  // ── Fee row construction ──────────────────────────────────────────────────
 
-      if (window.history.state?.vehicle) {
-        const historyVehicle = window.history.state.vehicle as Vehicle;
-        if (this.isValidVehicleObject(historyVehicle)) {
-          return historyVehicle;
-        }
-      }
+  /**
+   * Identical logic to AddVehicleComponent.
+   * Build rows from the org's configured categories sorted by priority.
+   */
+  buildFeeRows(): void {
+    const categories = this.organization?.organizationCategoryFees ?? [];
+    const sorted = [...categories].sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+    const rows: FeeRow[] = [];
 
-      return null;
-    } catch (error) {
-      console.error('Error retrieving vehicle from state:', error);
-      return null;
+    for (const cat of sorted) {
+      switch (cat.categoryName) {
+        case 'SYSTEM':
+          rows.push({ label: 'System Fee', modelKey: 'systemFeeAmount', feeName: 'SYSTEM', dayType: 'ALL', icon: 'pi-cog', hint: 'Platform transaction fee' });
+          break;
+        case 'MANAGEMENT':
+          rows.push({ label: 'Management Fee', modelKey: 'managementFeeAmount', feeName: 'MANAGEMENT', dayType: 'ALL', icon: 'pi-briefcase', hint: 'Organisation management fee' });
+          break;
+        case 'SACCO':
+          rows.push({ label: 'SACCO Fee', modelKey: 'saccoFeeAmount', feeName: 'SACCO', dayType: 'ALL', icon: 'pi-building', hint: 'SACCO contribution' });
+          break;
+        case 'OFFLOAD':
+          rows.push(
+            { label: 'Offload Fee – Weekday', modelKey: 'offloadWeekdayFeeAmount', feeName: 'OFFLOAD', dayType: 'WEEKDAY', icon: 'pi-calendar', hint: 'Monday – Friday' },
+            { label: 'Offload Fee – Saturday', modelKey: 'offloadSaturdayFeeAmount', feeName: 'OFFLOAD', dayType: 'SATURDAY', icon: 'pi-calendar', hint: 'Saturday rate' },
+            { label: 'Offload Fee – Sunday', modelKey: 'offloadSundayFeeAmount', feeName: 'OFFLOAD', dayType: 'SUNDAY', icon: 'pi-calendar', hint: 'Sunday / public holiday rate' }
+          );
+          break;
+        case 'DRIVER':
+          rows.push({ label: 'Driver Fee', modelKey: 'driverFeeAmount', feeName: 'DRIVER', dayType: 'ALL', icon: 'pi-user', hint: 'Driver incentive fee' });
+          break;
+        default:
+          console.warn(`Unknown fee category: ${cat.categoryName}`);
+      }
     }
+
+    this.feeRows = rows;
   }
 
-  private isValidVehicleObject(vehicle: any): boolean {
-    return !!(
-      vehicle &&
-      typeof vehicle === 'object' &&
-      vehicle.id &&
-      vehicle.entityId &&
-      vehicle.investorNumber &&
-      vehicle.marshalNumber &&
-      vehicle.fleetNumber &&
-      vehicle.registrationNumber &&
-      vehicle.capacity &&
-      vehicle.stageId
-    );
-  }
-
-  private populateFormFromVehicle(vehicle: Vehicle): void {
+  /**
+   * Populates form fields from the vehicle object.
+   * Fee amounts come from vehicleFeesWithIds (API) first, falling back to
+   * vehicle.vehicleFees (state), then org defaults.
+   */
+  private populateFormFromVehicle(vehicle: VehicleState): void {
     this.vehicleData = vehicle;
     this.vehicleId = vehicle.id;
     this.investorNumber = vehicle.investorNumber || '';
@@ -454,195 +428,104 @@ export class UpdateVehicleComponent implements OnInit {
     this.selectedStage = vehicle.stageId;
     this.maintainFees = vehicle.maintainFees || false;
 
-    // Extract fee amounts from vehicleFeesWithIds (from API) or vehicle.vehicleFees (from state)
-    const feesToUse = this.vehicleFeesWithIds.length > 0 ? this.vehicleFeesWithIds : vehicle.vehicleFees;
+    // Source of truth for fee amounts: prefer fresh API fees, then state fees
+    const feeSrc: VehicleFee[] =
+      this.vehicleFeesWithIds.length > 0
+        ? this.vehicleFeesWithIds
+        : (vehicle.vehicleFees ?? []);
 
-    if (feesToUse && Array.isArray(feesToUse)) {
-      feesToUse.forEach((fee: VehicleFee) => {
-        switch (fee.feeName) {
-          case 'SYSTEM':
-            this.systemFeeAmount = fee.feeAmount;
-            break;
-          case 'MANAGEMENT':
-            this.managementFeeAmount = fee.feeAmount;
-            break;
-          case 'SACCO':
-            this.saccoFeeAmount = fee.feeAmount;
-            break;
-          case 'OFFLOAD':
-            if (fee.dayType === 'WEEKDAY') {
-              this.offloadWeekdayFeeAmount = fee.feeAmount;
-            } else if (fee.dayType === 'SATURDAY') {
-              this.offloadSaturdayFeeAmount = fee.feeAmount;
-            } else if (fee.dayType === 'SUNDAY') {
-              this.offloadSundayFeeAmount = fee.feeAmount;
-            }
-            break;
-          case 'DRIVER':
-            this.driverFeeAmount = fee.feeAmount;
-            break;
-        }
-      });
-    }
+    const findFee = (name: string, day: string): number | null => {
+      const f = feeSrc.find(x => x.feeName === name && x.dayType === day);
+      return f?.feeAmount ?? null;
+    };
 
-    // If fees are not set, use organization default fees as fallback
-    if (this.organization?.organizationCategoryFees) {
-      if (this.systemFeeAmount === null) {
-        const systemFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'SYSTEM');
-        this.systemFeeAmount = systemFee?.feeAmount ?? 0;
-      }
-      if (this.managementFeeAmount === null) {
-        const managementFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'MANAGEMENT');
-        this.managementFeeAmount = managementFee?.feeAmount ?? 0;
-      }
-      if (this.saccoFeeAmount === null) {
-        const saccoFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'SACCO');
-        this.saccoFeeAmount = saccoFee?.feeAmount ?? 0;
-      }
-      if (this.offloadWeekdayFeeAmount === null || this.offloadSaturdayFeeAmount === null || this.offloadSundayFeeAmount === null) {
-        const offloadFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'OFFLOAD');
-        const defaultOffloadAmount = offloadFee?.feeAmount ?? 0;
-        this.offloadWeekdayFeeAmount = this.offloadWeekdayFeeAmount ?? defaultOffloadAmount;
-        this.offloadSaturdayFeeAmount = this.offloadSaturdayFeeAmount ?? defaultOffloadAmount;
-        this.offloadSundayFeeAmount = this.offloadSundayFeeAmount ?? defaultOffloadAmount;
-      }
-      if (this.driverFeeAmount === null) {
-        const driverFee = this.organization.organizationCategoryFees.find(f => f.categoryName === 'DRIVER');
-        this.driverFeeAmount = driverFee?.feeAmount ?? 0;
+    // Only set values for categories that exist in feeRows
+    for (const row of this.feeRows) {
+      const fetched = findFee(row.feeName, row.dayType);
+
+      if (fetched !== null) {
+        // We have a real value from the vehicle's fees
+        this.setFeeValue(row.modelKey, fetched);
+      } else {
+        // Fall back to org default (null → 0)
+        const orgCat = this.organization?.organizationCategoryFees?.find(
+          c => c.categoryName === row.feeName
+        );
+        this.setFeeValue(row.modelKey, orgCat?.feeAmount ?? 0);
       }
     }
   }
 
-  private handleVehicleNotFound(vehicleId: string): void {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Warning',
-      detail: `Vehicle with ID ${vehicleId} not found`,
-      life: 4000
-    });
-    console.error('Vehicle not found with ID:', vehicleId);
-    setTimeout(() => {
-      this.router.navigate(['/vehicles/all']);
-    }, 2000);
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
+  getFeeValue(key: FeeModelKey): number | null {
+    return (this as any)[key] as number | null;
   }
 
-  private handleNoVehiclesAvailable(): void {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Warning',
-      detail: 'No vehicle data available',
-      life: 4000
-    });
-    console.error('No vehicles found in API response');
-    setTimeout(() => {
-      this.router.navigate(['/vehicles/all']);
-    }, 2000);
+  setFeeValue(key: FeeModelKey, value: number | null): void {
+    (this as any)[key] = value;
   }
 
-  private getFeeId(feeName: string, dayType: string = 'ALL'): number | string | null {
-    const fee = this.vehicleFeesWithIds.find(
-      f => f.feeName === feeName && f.dayType === dayType
+  /**
+   * Looks up the stored fee ID for a feeName+dayType combination.
+   * Returns null if not found — the submit guard will block if any are missing.
+   */
+  private getFeeId(feeName: string, dayType: string): string | number | null {
+    const f = this.vehicleFeesWithIds.find(
+      x => x.feeName === feeName && x.dayType === dayType
     );
-    return fee?.id ?? null;
+    return f?.id ?? null;
   }
+
+  // ── Validation ────────────────────────────────────────────────────────────
 
   isFormValid(): boolean {
-    return !!(
+    const basic = !!(
       this.vehicleId &&
       this.investorNumber.trim() &&
       this.marshalNumber.trim() &&
       this.fleetNumber.trim() &&
       this.registrationNumber.trim() &&
-      this.capacity &&
-      this.capacity > 0 &&
-      this.selectedStage &&
-      this.systemFeeAmount !== null &&
-      this.systemFeeAmount >= 0 &&
-      this.managementFeeAmount !== null &&
-      this.managementFeeAmount >= 0 &&
-      this.saccoFeeAmount !== null &&
-      this.saccoFeeAmount >= 0 &&
-      this.offloadWeekdayFeeAmount !== null &&
-      this.offloadWeekdayFeeAmount >= 0 &&
-      this.offloadSaturdayFeeAmount !== null &&
-      this.offloadSaturdayFeeAmount >= 0 &&
-      this.offloadSundayFeeAmount !== null &&
-      this.offloadSundayFeeAmount >= 0 &&
-      this.driverFeeAmount !== null &&
-      this.driverFeeAmount >= 0
+      this.capacity && this.capacity > 0 &&
+      this.selectedStage
     );
+    if (!basic) return false;
+
+    return this.feeRows.every(row => {
+      const val = this.getFeeValue(row.modelKey);
+      return val !== null && val >= 0;
+    });
   }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
 
   onSubmit(): void {
     if (!this.isFormValid() || !this.entityId || !this.vehicleId || !this.username) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation Error',
-        detail: 'Please fill in all required fields correctly',
-        life: 4000
-      });
+      this.messageService.add({ severity: 'warn', summary: 'Validation Error', detail: 'Please fill in all required fields correctly', life: 4000 });
       return;
     }
 
-    // Build vehicleFees array with proper IDs from the fetched fees
-    const vehicleFees: VehicleFee[] = [
-      {
-        id: this.getFeeId('SYSTEM', 'ALL'),
-        feeName: 'SYSTEM',
-        dayType: 'ALL',
-        feeAmount: this.systemFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('MANAGEMENT', 'ALL'),
-        feeName: 'MANAGEMENT',
-        dayType: 'ALL',
-        feeAmount: this.managementFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('SACCO', 'ALL'),
-        feeName: 'SACCO',
-        dayType: 'ALL',
-        feeAmount: this.saccoFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('OFFLOAD', 'WEEKDAY'),
-        feeName: 'OFFLOAD',
-        dayType: 'WEEKDAY',
-        feeAmount: this.offloadWeekdayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('OFFLOAD', 'SATURDAY'),
-        feeName: 'OFFLOAD',
-        dayType: 'SATURDAY',
-        feeAmount: this.offloadSaturdayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('OFFLOAD', 'SUNDAY'),
-        feeName: 'OFFLOAD',
-        dayType: 'SUNDAY',
-        feeAmount: this.offloadSundayFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      },
-      {
-        id: this.getFeeId('DRIVER', 'ALL'),
-        feeName: 'DRIVER',
-        dayType: 'ALL',
-        feeAmount: this.driverFeeAmount!,
-        username: this.username,
-        entityId: this.entityId,
-      }
-    ];
+    // Build fees — include the stored ID for each row
+    const vehicleFees: VehicleFee[] = this.feeRows.map(row => ({
+      id: this.getFeeId(row.feeName, row.dayType),
+      feeName: row.feeName,
+      dayType: row.dayType,
+      feeAmount: this.getFeeValue(row.modelKey) ?? 0,
+      username: this.username!,
+      entityId: this.entityId!,
+    }));
+
+    // Guard: all fees must have an ID (otherwise the API will reject)
+    const missingId = vehicleFees.find(f => f.id === null);
+    if (missingId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Fee Configuration Error',
+        detail: `Could not resolve ID for ${missingId.feeName} (${missingId.dayType}). Please refresh and try again.`,
+        life: 5000
+      });
+      return;
+    }
 
     const payload: UpdateVehiclePayload = {
       id: this.vehicleId,
@@ -654,101 +537,71 @@ export class UpdateVehicleComponent implements OnInit {
       capacity: this.capacity!,
       stageId: this.selectedStage!,
       maintainFees: this.maintainFees,
-      vehicleFees: vehicleFees,
+      vehicleFees,
       username: this.username,
-      // storeNumber: this.storeNumber ? this.storeNumber : '',
-      // tillNumber: this.tillNumber ? this.tillNumber : '',
     };
 
-    // Add optional fields only if they have values
-    if (this.storeNumber.trim()) {
-      payload.storeNumber = this.storeNumber.trim();
-    }
-    if (this.tillNumber.trim()) {
-      payload.tillNumber = this.tillNumber.trim();
-    }
-
-    this.cleanPayload(payload);
-
-    if (vehicleFees.some(f => f.id === null)) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Fee configuration missing. Please refresh the page.',
-        life: 4000
-      });
-      return;
-    }
+    if (this.storeNumber.trim()) payload.storeNumber = this.storeNumber.trim();
+    if (this.tillNumber.trim()) payload.tillNumber = this.tillNumber.trim();
 
     console.log('Updating vehicle with payload:', payload);
 
     this.submitting = true;
     this.loadingStore.start();
 
-    this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.UPDATE_VEHICLE, payload, 'update-vehicle', true)
+    this.dataService.post<ApiResponse>(API_ENDPOINTS.UPDATE_VEHICLE, payload, 'update-vehicle', true)
       .subscribe({
         next: (response) => {
-
           this.submitting = false;
           this.loadingStore.stop();
 
-          if (response.status == 0) {
-            console.log('Vehicle updated successfully', response);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: response.message || 'Vehicle updated successfully',
-              life: 4000
-            });
-
-            // Navigate back to vehicles list
-            setTimeout(() => {
-              this.router.navigate(['/vehicles/all']);
-            }, 1500);
+          if (response.status === 0) {
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: response.message || 'Vehicle updated successfully', life: 4000 });
+            setTimeout(() => this.router.navigate(['/vehicles/all']), 1500);
           } else {
-            console.log('Vehicle update failed', response);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error Occurred',
-              detail: response.message,
-              life: 5000
-            });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message, life: 5000 });
           }
         },
         error: (err) => {
-          console.error('Failed to update vehicle - Full error:', err);
-          console.error('Error status:', err.status);
-          console.error('Error details:', err.error);
+          let msg = 'Failed to update vehicle';
+          if (err.status === 409) msg = 'Vehicle with this registration number already exists';
+          else if (err.status === 400) msg = err.error?.message || 'Invalid data provided.';
+          else if (err.status === 404) msg = 'Vehicle not found';
+          else if (err.status === 500) msg = 'Server error. Please try again later.';
+          else if (err.error?.message) msg = err.error.message;
 
-          let errorMessage = 'Failed to update vehicle';
-
-          if (err.status === 409) {
-            errorMessage = 'Vehicle with this registration number already exists';
-          } else if (err.status === 400) {
-            errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
-          } else if (err.status === 404) {
-            errorMessage = 'Vehicle not found';
-          } else if (err.status === 500) {
-            errorMessage = 'Server error occurred. Please try again later.';
-          } else if (err.error?.message) {
-            errorMessage = err.error.message;
-          }
-
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error Occurred',
-            detail: errorMessage,
-            life: 5000
-          });
-
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: msg, life: 5000 });
           this.submitting = false;
           this.loadingStore.stop();
-        },
+        }
       });
   }
 
-  onCancel(): void {
-    this.router.navigate(['/vehicles/all']);
+  onCancel(): void { this.router.navigate(['/vehicles/all']); }
+
+  // ── State helpers ─────────────────────────────────────────────────────────
+
+  private getVehicleFromState(): VehicleState | null {
+    try {
+      const nav = this.router.getCurrentNavigation();
+      if (nav?.extras?.state?.['vehicle']) {
+        const v = nav.extras.state['vehicle'] as VehicleState;
+        if (this.isValidVehicle(v)) return v;
+      }
+      if (window.history.state?.vehicle) {
+        const v = window.history.state.vehicle as VehicleState;
+        if (this.isValidVehicle(v)) return v;
+      }
+      return null;
+    } catch { return null; }
+  }
+
+  private isValidVehicle(v: any): boolean {
+    return !!(v && v.id && v.entityId && v.investorNumber && v.marshalNumber && v.fleetNumber && v.registrationNumber && v.capacity && v.stageId);
+  }
+
+  private handleVehicleNotFound(id: string): void {
+    this.messageService.add({ severity: 'warn', summary: 'Warning', detail: `Vehicle ${id} not found`, life: 4000 });
+    setTimeout(() => this.router.navigate(['/vehicles/all']), 2000);
   }
 }
