@@ -314,7 +314,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   }
 
   hasParcelAccess(): boolean {
-    return this.authService.hasAnyRole(['CAN_MANAGE_PARCELS', 'CAN_DELETE']);
+    return this.authService.hasAnyRole(['CAN_MANAGE_PARCELS', 'CAN_DELETE']) && this.entityId === "GS000002";
   }
 
   hasVehicleOrDriverAccess(): boolean {
