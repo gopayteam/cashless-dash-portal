@@ -561,7 +561,8 @@ export class AllDriverAssignmentsComponent implements OnInit {
   }
 
   canActivate(assignment: GeneralDriverAssignment): boolean {
-    return assignment.status === 'REJECTED' || assignment.status === 'DORMANT' || assignment.status === 'INACTIVE';
+    // return assignment.status === 'REJECTED' || assignment.status === 'DORMANT' || assignment.status === 'INACTIVE';
+    return assignment.status === 'PENDING'
   }
 
   canDeactivate(assignment: GeneralDriverAssignment): boolean {

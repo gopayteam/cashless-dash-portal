@@ -70,7 +70,7 @@ interface UpdateVehiclePayload {
   id: string;
   entityId: string;
   investorNumber: string;
-  marshalNumber: string;
+  otpApproverNumber: string;
   fleetNumber: string;
   registrationNumber: string;
   capacity: number;
@@ -515,6 +515,13 @@ export class UpdateVehicleComponent implements OnInit {
       entityId: this.entityId!,
     }));
 
+    // Format the OTP approver number (marshal number)
+    let otpApproverNumber: string | undefined;
+    if (this.marshalNumber) {
+      // Use the globalService.formatPhoneNumber if available, or just trim
+      otpApproverNumber = this.marshalNumber.trim();
+    }
+
     // Guard: all fees must have an ID (otherwise the API will reject)
     const missingId = vehicleFees.find(f => f.id === null);
     if (missingId) {
@@ -531,18 +538,17 @@ export class UpdateVehicleComponent implements OnInit {
       id: this.vehicleId,
       entityId: this.entityId,
       investorNumber: this.investorNumber.trim(),
-      marshalNumber: this.marshalNumber.trim(),
-      fleetNumber: this.fleetNumber.trim(),
+      otpApproverNumber: this.marshalNumber.trim(),
+      fleetNumber: this.fleetNumber.trim().replace(/\s+/g, ''),
       registrationNumber: this.registrationNumber.trim(),
       capacity: this.capacity!,
       stageId: this.selectedStage!,
-      maintainFees: this.maintainFees,
+      maintainFees: true,
       vehicleFees,
       username: this.username,
+      storeNumber: this.storeNumber.trim() ? this.storeNumber.trim() : undefined,
+      tillNumber: this.tillNumber.trim() ? this.tillNumber.trim() : undefined
     };
-
-    if (this.storeNumber.trim()) payload.storeNumber = this.storeNumber.trim();
-    if (this.tillNumber.trim()) payload.tillNumber = this.tillNumber.trim();
 
     console.log('Updating vehicle with payload:', payload);
 

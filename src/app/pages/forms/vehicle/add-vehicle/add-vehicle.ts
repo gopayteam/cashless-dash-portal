@@ -67,6 +67,7 @@ interface VehiclePayload {
   entityId: string;
   investorNumber: string;
   marshalNumber: string;
+  otpApproverNumber: string;
   fleetNumber: string;
   registrationNumber: string;
   capacity: number;
@@ -119,7 +120,7 @@ export class AddVehicleComponent implements OnInit {
   storeNumber: string = '';
   tillNumber: string = '';
   selectedStage: number | null = null;
-  maintainFees: boolean = false;
+  maintainFees: boolean = true;
 
   // ── Fee amount holders (one per possible fee type) ───────────────────────
   systemFeeAmount: number | null = null;
@@ -384,7 +385,19 @@ export class AddVehicleComponent implements OnInit {
   // ── Validation ────────────────────────────────────────────────────────────
 
   isFormValid(): boolean {
+    const noSpaces = !/\s/.test(this.fleetNumber);
+
+    if (!noSpaces) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Invalid Fleet Number',
+        detail: 'Fleet number must not contain spaces',
+        life: 4000
+      });
+    }
+
     const basicValid = !!(
+      noSpaces &&
       this.investorNumber.trim() &&
       this.marshalNumber.trim() &&
       this.fleetNumber.trim() &&
@@ -430,17 +443,20 @@ export class AddVehicleComponent implements OnInit {
       entityId: this.entityId,
       investorNumber: this.investorNumber.trim(),
       marshalNumber: this.marshalNumber.trim(),
-      fleetNumber: this.fleetNumber.trim(),
+      otpApproverNumber: this.marshalNumber.trim(),
+      fleetNumber: this.fleetNumber.trim().replace(/\s+/g, ''),
       registrationNumber: this.registrationNumber.trim(),
       capacity: this.capacity!,
       stageId: this.selectedStage!,
-      maintainFees: this.maintainFees,
+      maintainFees: true,
       vehicleFees,
-      username: this.username
+      username: this.username,
+      storeNumber: this.storeNumber.trim() ? this.storeNumber.trim() : undefined,
+      tillNumber: this.tillNumber.trim() ? this.tillNumber.trim() : undefined
     };
 
-    if (this.storeNumber.trim()) payload.storeNumber = this.storeNumber.trim();
-    if (this.tillNumber.trim()) payload.tillNumber = this.tillNumber.trim();
+    // if (this.storeNumber.trim()) payload.storeNumber = this.storeNumber.trim();
+    // if (this.tillNumber.trim()) payload.tillNumber = this.tillNumber.trim();
 
     console.log('Creating vehicle with payload:', payload);
 
@@ -496,7 +512,7 @@ export class AddVehicleComponent implements OnInit {
     this.storeNumber = '';
     this.tillNumber = '';
     this.selectedStage = null;
-    this.maintainFees = false;
+    this.maintainFees = true;
     this.prefillFeeDefaults();
   }
 }

@@ -35,7 +35,12 @@
             <div class="form-field">
               <label for="fleetNumber" class="field-label required">Fleet Number</label>
               <input pInputText id="fleetNumber" [(ngModel)]="fleetNumber" name="fleetNumber"
-                placeholder="Enter fleet number" class="w-full" required />
+                placeholder="Enter fleet number" class="w-full" required (keydown.space)="$event.preventDefault()"
+                (input)="fleetNumber = fleetNumber.replace(/\s+/g, '')" />
+              <small class="text-red-500" *ngIf="fleetNumber.includes(' ')">
+                Fleet number cannot contain spaces
+              </small>
+
             </div>
 
             <div class="form-field">

@@ -226,6 +226,12 @@
                 </button>
               </ng-container>
 
+              <!-- View (always available) -->
+              <button class="action-btn btn-view" (click)="viewAssignmentDetails(assignment)" pTooltip="View details"
+                tooltipPosition="top">
+                <i class="pi pi-eye"></i>
+              </button>
+
               <!-- ACTIVE → Deactivate -->
               <ng-container *ngIf="canDeactivate(assignment)">
                 <button class="action-btn btn-deactivate" (click)="openDeactivateDialog(assignment, $event)"
@@ -241,12 +247,6 @@
                   <i class="pi pi-play"></i>
                 </button>
               </ng-container>
-
-              <!-- View (always available) -->
-              <button class="action-btn btn-view" (click)="viewAssignmentDetails(assignment)" pTooltip="View details"
-                tooltipPosition="top">
-                <i class="pi pi-eye"></i>
-              </button>
 
             </div>
           </td>

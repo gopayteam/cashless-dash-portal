@@ -37,6 +37,9 @@
               <label for="fleetNumber" class="field-label required">Fleet Number</label>
               <input pInputText id="fleetNumber" [value]="fleetNumber" name="fleetNumber" class="w-full" disabled
                 readonly />
+              <small class="text-red-500" *ngIf="fleetNumber.includes(' ')">
+                Fleet number cannot contain spaces
+              </small>
             </div>
 
             <div class="form-field">
