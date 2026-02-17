@@ -1,0 +1,267 @@
+<div>
+  <div class="page-header">
+    <h1>Missed Transaction</h1>
+    <p class="page-description">Submit a missed M-Pesa transaction for reprocessing</p>
+  </div>
+
+  <div class="page-container">
+    <p-card>
+      <form [formGroup]="missedTransactionForm" (ngSubmit)="onSubmit()" class="form-container">
+
+        <!-- Transaction ID -->
+        <div class="form-field">
+          <label for="TransID" class="form-label">
+            Transaction ID <span class="required-indicator">*</span>
+          </label>
+          <input pInputText id="TransID" formControlName="TransID" placeholder="e.g. UBH556W24" class="w-full"
+            [class.p-invalid]="isFieldInvalid('TransID')" autocomplete="off" />
+          <small class="form-error" *ngIf="isFieldInvalid('TransID')">
+            {{ getErrorMessage('TransID') }}
+          </small>
+          <small class="form-hint" *ngIf="!isFieldInvalid('TransID')">
+            Enter the M-Pesa transaction ID (e.g. UBH556W24)
+          </small>
+        </div>
+
+        <!-- Transaction Amount -->
+        <div class="form-field">
+          <label for="TransAmount" class="form-label">
+            Transaction Amount <span class="required-indicator">*</span>
+          </label>
+          <p-inputNumber id="TransAmount" formControlName="TransAmount" mode="currency" currency="KES" locale="en-KE"
+            [minFractionDigits]="2" [maxFractionDigits]="2" placeholder="0.00" styleClass="w-full"
+            [class.invalid]="isFieldInvalid('TransAmount')"></p-inputNumber>
+          <small class="form-error" *ngIf="isFieldInvalid('TransAmount')">
+            {{ getErrorMessage('TransAmount') }}
+          </small>
+          <small class="form-hint" *ngIf="!isFieldInvalid('TransAmount')">
+            Enter the exact amount from the M-Pesa message
+          </small>
+        </div>
+
+        <!-- Business Short Code -->
+        <div class="form-field">
+          <label for="BusinessShortCode" class="form-label">
+            Business Short Code <span class="required-indicator">*</span>
+          </label>
+          <input pInputText id="BusinessShortCode" formControlName="BusinessShortCode" placeholder="e.g. 3020755"
+            class="w-full" [class.p-invalid]="isFieldInvalid('BusinessShortCode')" autocomplete="off" />
+          <small class="form-error" *ngIf="isFieldInvalid('BusinessShortCode')">
+            {{ getErrorMessage('BusinessShortCode') }}
+          </small>
+          <small class="form-hint" *ngIf="!isFieldInvalid('BusinessShortCode')">
+            The Paybill or Till number that received the payment
+          </small>
+        </div>
+
+        <!-- Transaction Time Section -->
+        <div class="form-field time-section">
+          <div class="time-header">
+            <label class="form-label">Transaction Time</label>
+            <div class="time-toggle-wrapper">
+              <span class="toggle-label">Use current time</span>
+              <button type="button" class="toggle-btn" [class.active]="useCustomTime" (click)="toggleCustomTime()"
+                [attr.aria-pressed]="useCustomTime">
+                <span class="toggle-thumb"></span>
+              </button>
+              <span class="toggle-label">Pick custom time</span>
+            </div>
+          </div>
+
+          <!-- Current time indicator -->
+          <div class="current-time-badge" *ngIf="!useCustomTime">
+            <i class="pi pi-clock"></i>
+            <span>Will use current date &amp; time when the request is submitted</span>
+          </div>
+
+          <!-- Custom time picker -->
+          <div class="custom-time-picker" *ngIf="useCustomTime">
+            <div class="datetime-input-wrapper" [class.is-invalid]="isFieldInvalid('customTransTime')">
+              <i class="pi pi-calendar datetime-icon"></i>
+              <input type="datetime-local" id="customTransTime" formControlName="customTransTime"
+                class="datetime-local-input" step="1" [max]="maxDatetimeLocal" />
+            </div>
+            <small class="form-error" *ngIf="isFieldInvalid('customTransTime')">
+              {{ getErrorMessage('customTransTime') }}
+            </small>
+            <small class="form-hint" *ngIf="!isFieldInvalid('customTransTime')">
+              Select the exact date and time from the M-Pesa confirmation SMS
+            </small>
+          </div>
+        </div>
+
+        <!-- Optional Fields Toggle -->
+        <div class="optional-fields-section">
+          <button type="button" class="optional-toggle-btn" (click)="toggleOptionalFields()"
+            [attr.aria-expanded]="showOptionalFields">
+            <span class="optional-toggle-left">
+              <i class="pi pi-sliders-h"></i>
+              <span>Optional Fields</span>
+              <span class="optional-badge" *ngIf="!showOptionalFields">Will send as empty strings</span>
+              <span class="optional-badge active" *ngIf="showOptionalFields">Editing</span>
+            </span>
+            <i class="pi optional-toggle-chevron" [class.pi-chevron-down]="!showOptionalFields"
+              [class.pi-chevron-up]="showOptionalFields">
+            </i>
+          </button>
+
+          <!-- Collapsible optional fields -->
+          <div class="optional-fields-body" *ngIf="showOptionalFields">
+
+            <!-- Bill Reference Number -->
+            <div class="form-field optional-field">
+              <label for="BillRefNumber" class="form-label">Bill Reference Number</label>
+              <input pInputText id="BillRefNumber" formControlName="BillRefNumber"
+                placeholder="Leave empty or enter value" class="w-full" autocomplete="off" />
+              <small class="form-hint">Sent as an empty string if left blank</small>
+            </div>
+
+            <!-- Invoice Number -->
+            <div class="form-field optional-field">
+              <label for="InvoiceNumber" class="form-label">Invoice Number</label>
+              <input pInputText id="InvoiceNumber" formControlName="InvoiceNumber"
+                placeholder="Leave empty or enter value" class="w-full" autocomplete="off" />
+              <small class="form-hint">Sent as an empty string if left blank</small>
+            </div>
+
+            <!-- Third Party Transaction ID -->
+            <div class="form-field optional-field">
+              <label for="ThirdPartyTransID" class="form-label">Third Party Transaction ID</label>
+              <input pInputText id="ThirdPartyTransID" formControlName="ThirdPartyTransID"
+                placeholder="Leave empty or enter value" class="w-full" autocomplete="off" />
+              <small class="form-hint">Sent as an empty string if left blank</small>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Auto-filled fields info banner -->
+        <div class="info-banner">
+          <div class="info-banner-header">
+            <i class="pi pi-info-circle"></i>
+            <span>Auto-populated fields</span>
+          </div>
+          <div class="info-banner-body">
+            The following fields are set automatically and do not require input:
+            <ul>
+              <li><strong>Transaction Type</strong> — Customer Merchant Payment</li>
+              <li><strong>MSISDN</strong> — 657b7a747ba9</li>
+              <li><strong>First Name</strong> — MISSED TRANS</li>
+              <li><strong>Org Account Balance</strong> — 00</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <p-button type="button" label="Reset" iconPos="right" [style]="{'gap':'0.5rem'}" severity="secondary"
+            [outlined]="true" (click)="resetForm()" [disabled]="loading()"></p-button>
+          <p-button type="submit" label="Review &amp; Submit" iconPos="right" [style]="{'gap':'0.5rem'}"
+            [loading]="loading()" icon="pi pi-send"></p-button>
+        </div>
+
+      </form>
+    </p-card>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <p-dialog [(visible)]="showConfirmDialog" [modal]="true" [closable]="!confirmationLoading" [closeOnEscape]="false"
+    [draggable]="false" [resizable]="false" styleClass="confirmation-dialog" header="Confirm Transaction Submission">
+
+    <ng-template pTemplate="content">
+      <div class="confirmation-content">
+
+        <div class="confirmation-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+
+        <div class="confirmation-message">
+          <p class="confirmation-title">Submit this missed transaction?</p>
+          <p class="confirmation-subtitle">Please verify all payload details before confirming</p>
+        </div>
+
+        <!-- Full payload preview -->
+        <div class="confirmation-details" *ngIf="builtPayload">
+
+          <div class="payload-section-label">Required Fields</div>
+
+          <div class="detail-row">
+            <span class="detail-label">Transaction ID</span>
+            <span class="detail-value mono">{{ builtPayload.TransID }}</span>
+          </div>
+          <div class="detail-row highlight">
+            <span class="detail-label">Amount</span>
+            <span class="detail-value">KES {{ builtPayload.TransAmount }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Business Short Code</span>
+            <span class="detail-value mono">{{ builtPayload.BusinessShortCode }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Transaction Time</span>
+            <span class="detail-value mono">{{ builtPayload.TransTime }}</span>
+          </div>
+
+          <div class="payload-section-label auto">Auto-populated Fields</div>
+
+          <div class="detail-row muted">
+            <span class="detail-label">Transaction Type</span>
+            <span class="detail-value">{{ builtPayload.TransactionType }}</span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">MSISDN</span>
+            <span class="detail-value mono">{{ builtPayload.MSISDN }}</span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">First Name</span>
+            <span class="detail-value">{{ builtPayload.FirstName }}</span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">Org Account Balance</span>
+            <span class="detail-value mono">{{ builtPayload.OrgAccountBalance }}</span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">Bill Ref Number</span>
+            <span class="detail-value" [class.empty-val]="!builtPayload.BillRefNumber">
+              {{ builtPayload.BillRefNumber || '(empty)' }}
+            </span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">Invoice Number</span>
+            <span class="detail-value" [class.empty-val]="!builtPayload.InvoiceNumber">
+              {{ builtPayload.InvoiceNumber || '(empty)' }}
+            </span>
+          </div>
+          <div class="detail-row muted">
+            <span class="detail-label">Third Party Trans ID</span>
+            <span class="detail-value" [class.empty-val]="!builtPayload.ThirdPartyTransID">
+              {{ builtPayload.ThirdPartyTransID || '(empty)' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="confirmation-warning">
+          <i class="pi pi-shield"></i>
+          <span>
+            This will reprocess the transaction in the system. Ensure the Transaction ID and Amount
+            are correct before approving.
+          </span>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <p-button label="Cancel" iconPos="right" [style]="{'gap':'0.5rem'}" severity="secondary" [outlined]="true"
+          (click)="rejectSubmission()" [disabled]="confirmationLoading" icon="pi pi-times"></p-button>
+
+        <p-button iconPos="right" [style]="{'gap':'0.5rem'}" label="Confirm &amp; Submit" severity="success"
+          (click)="confirmSubmission()" [loading]="confirmationLoading" icon="pi pi-check"></p-button>
+      </div>
+    </ng-template>
+
+  </p-dialog>
+
+  <!-- Toast notifications -->
+  <p-toast position="top-right" [life]="4000"></p-toast>
+</div>

@@ -565,6 +565,7 @@ export class UpdateVehicleComponent implements OnInit {
             this.messageService.add({ severity: 'success', summary: 'Success', detail: response.message || 'Vehicle updated successfully', life: 4000 });
             setTimeout(() => this.router.navigate(['/vehicles/all']), 1500);
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message, life: 5000 });
           }
         },

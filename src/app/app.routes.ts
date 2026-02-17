@@ -92,6 +92,7 @@ import { SendNotificationsComponent } from './pages/notifications/send-notificat
 import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts';
 import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignment/fund-reassignment';
 import { FleetCollectionsComponent } from './pages/fleet/total-collection/total-collection';
+import { MissedTransactionComponent } from './pages/hidden/missed-transactions/missed-transactions';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -196,6 +197,13 @@ export const routes: Routes = [
       {
         path: 'hidden/vincent-gopay',
         component: HiddenFundReassignmentComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
+      },
+
+      {
+        path: 'hidden/missed-transactions',
+        component: MissedTransactionComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_ADD', 'CAN_EDIT'] }
       },

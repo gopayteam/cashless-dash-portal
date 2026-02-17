@@ -79,20 +79,26 @@
               <label for="profile" class="field-label required">Profile</label>
               <p-select id="profile" [(ngModel)]="selectedProfile" name="profile" [options]="profileOptions"
                 placeholder="Select user profile" optionLabel="label" optionValue="value" [showClear]="true"
-                styleClass="w-full" required [disabled]="submitting">
+                styleClass="w-full" required [disabled]="submitting" (onChange)="onProfileChange($event)">
               </p-select>
+
               <small class="field-hint">User's role and permissions level</small>
             </div>
 
-            <!-- Agent -->
-            <div class="form-field">
+            <!-- Agent (Read-only) -->
+            <!-- <div class="form-field">
               <label for="agent" class="field-label required">Agent Type</label>
-              <p-select id="agent" [(ngModel)]="selectedAgent" name="agent" [options]="agentOptions"
-                placeholder="Select agent type" optionLabel="label" optionValue="value" [showClear]="true"
-                styleClass="w-full" required [disabled]="submitting">
-              </p-select>
-              <small class="field-hint">Type of agent for this user</small>
+              <input id="agent" [(ngModel)]="selectedAgent" name="agent" optionLabel="label" optionValue="value"
+                styleClass="w-full" [disabled]="true">
+
+              <small class="field-hint">Automatically set from profile</small>
+            </div> -->
+
+            <div class="form-field">
+              <label for="agent" class="field-label">Agent Type</label>
+              <input pInputText id="agent" [value]="selectedAgent" name="agent" class="w-full" disabled readonly />
             </div>
+
 
             <!-- Channel (Read-only) -->
             <div class="form-field">

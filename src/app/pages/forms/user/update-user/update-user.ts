@@ -67,10 +67,7 @@ export class UpdateUserComponent implements OnInit {
   userId: number | null = null;
   userData: User | null = null;
 
-  // Constants
-  readonly PROFILE = 'ADMIN';
   readonly CHANNEL = 'PORTAL';
-  readonly AGENT = 'ADMIN';
 
   // Form fields
   firstName: string = '';
@@ -357,7 +354,6 @@ export class UpdateUserComponent implements OnInit {
       this.idNumber.trim() &&
       this.selectedProfile &&
       this.selectedAgent &&
-      this.selectedChannel &&
       this.userId !== null
     );
   }
@@ -424,7 +420,7 @@ export class UpdateUserComponent implements OnInit {
     const payload: UpdateUserPayload = {
       id: this.userId,
       agent: this.selectedAgent,
-      channel: this.selectedChannel,
+      channel: this.CHANNEL,
       email: this.email.trim().toLowerCase(),
       entityId: this.entityId,
       firstName: this.firstName.trim(),
@@ -443,11 +439,11 @@ export class UpdateUserComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.UPDATE_USER, payload, 'update-admin-user')
       .subscribe({
         next: (response) => {
-          console.log('User updated successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
-          if (response.status == 0) {
+          if (response.status === 0) {
+            console.log('User updated successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -455,6 +451,7 @@ export class UpdateUserComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('Failed to update user', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',

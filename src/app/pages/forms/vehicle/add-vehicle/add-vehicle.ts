@@ -478,6 +478,7 @@ export class AddVehicleComponent implements OnInit {
             });
             setTimeout(() => this.router.navigate(['/vehicles/all']), 1500);
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',

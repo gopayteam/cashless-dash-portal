@@ -1,0 +1,874 @@
+/* missed-transaction.component.css */
+
+/* ============================================ */
+/* PAGE LAYOUT                                  */
+/* ============================================ */
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  background: var(--light-bg);
+  min-height: calc(100vh - var(--topbar-height, 64px));
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--dark-text, #2c3e50);
+  margin: 0 0 0.5rem 0;
+}
+
+.page-description {
+  color: var(--medium-text);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ============================================ */
+/* CARD                                         */
+/* ============================================ */
+
+::ng-deep p-card {
+  width: 100%;
+  max-width: 560px;
+}
+
+::ng-deep p-card .p-card {
+  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--white);
+  transition: box-shadow var(--transition);
+}
+
+::ng-deep p-card .p-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+::ng-deep p-card .p-card-body {
+  padding: 2rem;
+}
+
+/* ============================================ */
+/* FORM LAYOUT                                  */
+/* ============================================ */
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--dark-text);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.required-indicator {
+  color: var(--danger-color, #b71c1c);
+  margin-left: 2px;
+}
+
+/* ============================================ */
+/* INPUT STYLES                                 */
+/* ============================================ */
+
+::ng-deep .p-inputtext,
+::ng-deep .p-dropdown {
+  width: 100%;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+::ng-deep .p-inputtext {
+  padding: 0.625rem 0.75rem;
+  color: var(--dark-text);
+}
+
+::ng-deep .p-inputtext:enabled:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+}
+
+::ng-deep .p-inputtext:enabled:hover {
+  border-color: var(--primary-color);
+}
+
+/* Invalid input state */
+::ng-deep .p-inputtext.p-invalid,
+::ng-deep .p-inputtext.ng-invalid.ng-touched {
+  border-color: var(--danger-color, #b71c1c);
+}
+
+::ng-deep .p-inputtext.p-invalid:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+}
+
+/* InputNumber */
+::ng-deep .p-inputnumber {
+  width: 100%;
+}
+
+::ng-deep .p-inputnumber .p-inputtext {
+  width: 100%;
+}
+
+::ng-deep .p-inputnumber.invalid .p-inputtext {
+  border-color: var(--danger-color, #b71c1c);
+}
+
+::ng-deep .p-inputnumber.invalid .p-inputtext:enabled:focus {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color, #b71c1c);
+}
+
+/* ============================================ */
+/* FORM MESSAGES                                */
+/* ============================================ */
+
+.form-error {
+  color: var(--danger-color, #b71c1c);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: 0.875rem;
+}
+
+.form-hint {
+  color: var(--light-text);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* ============================================ */
+/* TRANSACTION TIME SECTION                     */
+/* ============================================ */
+
+.time-section {
+  background: var(--light-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  gap: 0.75rem;
+}
+
+.time-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.time-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.toggle-label {
+  font-size: 0.75rem;
+  color: var(--medium-text);
+  white-space: nowrap;
+}
+
+/* Custom toggle switch */
+.toggle-btn {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--border-color);
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  padding: 0;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.toggle-btn.active {
+  background: var(--primary-color);
+}
+
+.toggle-btn:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.25);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--white);
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.toggle-btn.active .toggle-thumb {
+  transform: translateX(18px);
+}
+
+/* Current time badge */
+.current-time-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--white);
+  border: 1px dashed var(--border-color);
+  border-radius: 4px;
+  padding: 0.625rem 0.875rem;
+  color: var(--medium-text);
+  font-size: 0.8125rem;
+}
+
+.current-time-badge i {
+  color: var(--primary-color);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Custom time picker */
+.custom-time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Wrapper gives us the icon + border treatment */
+.datetime-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--white);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.datetime-input-wrapper:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.15);
+}
+
+.datetime-input-wrapper:hover:not(:focus-within) {
+  border-color: var(--primary-color);
+}
+
+.datetime-input-wrapper.is-invalid {
+  border-color: var(--danger-color, #b71c1c);
+}
+
+.datetime-input-wrapper.is-invalid:focus-within {
+  box-shadow: 0 0 0 0.2rem rgba(183, 28, 28, 0.15);
+  border-color: var(--danger-color, #b71c1c);
+}
+
+.datetime-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* The actual native input */
+.datetime-local-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--dark-text);
+  background: transparent;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  /* Ensure seconds show in the picker */
+  cursor: pointer;
+}
+
+/* Remove the default browser calendar icon so our pi icon shows cleanly */
+.datetime-local-input::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+  filter: invert(20%) sepia(60%) saturate(400%) hue-rotate(190deg);
+}
+
+.datetime-local-input::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+
+.datetime-local-input::-webkit-datetime-edit {
+  padding: 0;
+  color: var(--dark-text);
+}
+
+/* Firefox */
+.datetime-local-input[type="datetime-local"] {
+  appearance: none;
+}
+
+/* ============================================ */
+/* OPTIONAL FIELDS SECTION                      */
+/* ============================================ */
+
+.optional-fields-section {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.optional-fields-section:focus-within {
+  box-shadow: 0 0 0 0.2rem rgba(14, 44, 90, 0.08);
+}
+
+/* The clickable toggle button row */
+.optional-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--light-bg);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--dark-text);
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.optional-toggle-btn:hover {
+  background: #dde6f0;
+}
+
+.optional-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.optional-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.optional-toggle-left .pi-sliders-h {
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
+
+/* Status badge beside the label */
+.optional-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.125rem 0.5rem;
+  border-radius: 99px;
+  background: var(--border-color);
+  color: var(--medium-text);
+  text-transform: uppercase;
+}
+
+.optional-badge.active {
+  background: rgba(14, 44, 90, 0.12);
+  color: var(--primary-color);
+}
+
+/* Chevron icon */
+.optional-toggle-chevron {
+  font-size: 0.8rem;
+  color: var(--medium-text);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Collapsible body */
+.optional-fields-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--white);
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Individual optional field — slightly reduced visual weight */
+.optional-field .form-label {
+  color: var(--medium-text);
+  font-weight: 400;
+}
+
+/* ============================================ */
+/* INFO BANNER                                  */
+/* ============================================ */
+
+.info-banner {
+  background: linear-gradient(135deg, #e8eef5 0%, #d4e2f0 100%);
+  border: 1px solid #c5d7e8;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  font-size: 0.8125rem;
+}
+
+.info-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.625rem;
+}
+
+.info-banner-header i {
+  font-size: 1rem;
+}
+
+.info-banner-body {
+  color: var(--medium-text);
+  line-height: 1.6;
+}
+
+.info-banner-body ul {
+  margin: 0.5rem 0 0 1rem;
+  padding: 0;
+  list-style: disc;
+}
+
+.info-banner-body li {
+  margin-bottom: 0.25rem;
+}
+
+.info-banner-body strong {
+  color: var(--dark-text);
+}
+
+/* ============================================ */
+/* FORM ACTIONS                                 */
+/* ============================================ */
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  padding-top: 0;
+}
+
+::ng-deep .form-actions .p-button {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  min-width: 90px;
+}
+
+/* Primary submit button */
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary) {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:hover {
+  background: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+  box-shadow: var(--shadow-md);
+}
+
+::ng-deep .form-actions .p-button:not(.p-button-outlined):not(.p-button-secondary):enabled:active {
+  background: #072040;
+  border-color: #072040;
+}
+
+/* Reset button */
+::ng-deep .form-actions .p-button.p-button-outlined,
+::ng-deep .form-actions .p-button.p-button-secondary {
+  background: var(--white);
+  border-color: var(--border-color);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+
+::ng-deep .form-actions .p-button.p-button-outlined:enabled:hover,
+::ng-deep .form-actions .p-button.p-button-secondary:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+  color: var(--dark-text);
+}
+
+::ng-deep .p-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================ */
+/* CONFIRMATION DIALOG                          */
+/* ============================================ */
+
+::ng-deep .confirmation-dialog {
+  width: 90vw;
+  max-width: 580px;
+}
+
+::ng-deep .confirmation-dialog .p-dialog-header {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: 1.5rem;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+::ng-deep .confirmation-dialog .p-dialog-header .p-dialog-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+::ng-deep .confirmation-dialog .p-dialog-header-icon {
+  color: var(--white);
+}
+
+::ng-deep .confirmation-dialog .p-dialog-header-icon:enabled:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::ng-deep .confirmation-dialog .p-dialog-content {
+  padding: 0;
+  background: var(--white);
+}
+
+/* Content wrapper */
+.confirmation-content {
+  padding: 2rem 1.75rem;
+}
+
+/* Animated icon */
+.confirmation-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.confirmation-icon i {
+  font-size: 3.5rem;
+  color: #f59e0b;
+  animation: bounce 0.9s ease-in-out;
+}
+
+/* Heading */
+.confirmation-message {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.confirmation-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-text);
+  margin: 0 0 0.375rem 0;
+}
+
+.confirmation-subtitle {
+  color: var(--medium-text);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Details table */
+.confirmation-details {
+  background: var(--light-bg);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 1.25rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Section labels inside the payload table */
+.payload-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin: 1rem 0 0.25rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.payload-section-label.auto {
+  color: var(--medium-text);
+  border-bottom-color: var(--border-color);
+  margin-top: 1.25rem;
+}
+
+/* Detail rows */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+/* Highlighted amount row */
+.detail-row.highlight {
+  background: #fef3c7;
+  margin: 0.5rem -1.25rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  border: 1px solid #fbbf24;
+}
+
+.detail-row.highlight .detail-label,
+.detail-row.highlight .detail-value {
+  color: #92400e;
+}
+
+.detail-row.highlight .detail-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* Muted auto-populated rows */
+.detail-row.muted .detail-label {
+  color: var(--light-text);
+}
+
+.detail-row.muted .detail-value {
+  color: var(--medium-text);
+  font-weight: 500;
+}
+
+/* Labels & values */
+.detail-label {
+  font-weight: 500;
+  color: var(--medium-text);
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: var(--dark-text);
+  font-size: 0.875rem;
+  text-align: right;
+  word-break: break-all;
+}
+
+/* Monospace for IDs and codes */
+.detail-value.mono {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+
+/* Empty / optional field indicator */
+.detail-value.empty-val {
+  color: var(--light-text);
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Warning banner */
+.confirmation-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 1rem;
+  color: #92400e;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.confirmation-warning i {
+  font-size: 1.25rem;
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Dialog footer */
+.dialog-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--light-bg);
+}
+
+::ng-deep .dialog-footer .p-button {
+  padding: 0.625rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  min-width: 130px;
+}
+
+::ng-deep .dialog-footer .p-button.p-button-secondary,
+::ng-deep .dialog-footer .p-button.p-button-outlined {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  color: var(--dark-text);
+}
+
+::ng-deep .dialog-footer .p-button.p-button-secondary:enabled:hover,
+::ng-deep .dialog-footer .p-button.p-button-outlined:enabled:hover {
+  background: var(--light-bg);
+  border-color: var(--medium-text);
+}
+
+::ng-deep .dialog-footer .p-button.p-button-success {
+  background: #059669;
+  border-color: #059669;
+  color: var(--white);
+}
+
+::ng-deep .dialog-footer .p-button.p-button-success:enabled:hover {
+  background: #047857;
+  border-color: #047857;
+}
+
+::ng-deep .dialog-footer .p-button.p-button-success:enabled:active {
+  background: #065f46;
+  border-color: #065f46;
+}
+
+/* ============================================ */
+/* ANIMATIONS                                   */
+/* ============================================ */
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  ::ng-deep p-card {
+    max-width: 100%;
+  }
+
+  ::ng-deep p-card .p-card-body {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .time-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-actions {
+    flex-direction: row;
+  }
+
+  .form-actions .p-button {
+    width: 100%;
+  }
+
+  ::ng-deep .confirmation-dialog {
+    width: 95vw;
+  }
+
+  .confirmation-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .confirmation-details {
+    padding: 0.25rem 1rem 0.75rem;
+  }
+
+  .payload-section-label {
+    /* keep readable on narrow screens */
+    padding: auto;
+  }
+
+  .detail-row.highlight {
+    margin: 0.5rem -1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .dialog-footer {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  ::ng-deep .dialog-footer .p-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

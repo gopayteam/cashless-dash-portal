@@ -87,4 +87,7 @@ export const API_ENDPOINTS = {
 
   TOTAL_COLLECTION_PER_FLEET: '/api/payment/transactions/total-collection-per-fleet',
 
+  // #####################  DEBUG-ENDPOINTS   #######################
+  MISSED_TRANSACTION: '/api/payment/c2b/callback/queue',
+
 };

@@ -209,11 +209,12 @@ export class RegisterAdminComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-admin-user')
       .subscribe({
         next: (response) => {
-          console.log('Admin created successfully', response);
+
           this.submitting = false;
           this.loadingStore.stop();
 
           if (response.status == 0) {
+            console.log('Admin created successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -221,6 +222,7 @@ export class RegisterAdminComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',

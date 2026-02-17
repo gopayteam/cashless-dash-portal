@@ -70,8 +70,8 @@ export class RegisterUserComponent implements OnInit {
   email: string = '';
   phoneNumber: string = '';
   idNumber: string = '';
-  selectedProfile: string = '';
-  selectedAgent: string = '';
+  selectedProfile: string | null = '';
+  selectedAgent: string | null = '';
   selectedChannel: string = '';
 
   // Dropdown options
@@ -107,6 +107,27 @@ export class RegisterUserComponent implements OnInit {
     { label: 'Web', value: 'WEB' },
   ];
 
+
+  private profileToAgentMap: Record<string, string> = {
+    DASHMASTER: 'DASHMASTER',
+    ADMIN: 'ADMIN',
+    USER: 'PASSENGER',
+    PARCEL: 'PARCEL',
+    MARSHAL: 'MARSHAL',
+    DRIVER: 'DRIVER',
+    CONDUCTOR: 'CONDUCTOR',
+    INVESTOR: 'INVESTOR',
+    APPROVER: 'APPROVER',
+    INSPECTOR: 'INSPECTOR',
+  };
+
+  onProfileChange(event: any) {
+    const profile = event.value;
+    this.selectedAgent = this.profileToAgentMap[profile] || null;
+  }
+
+
+
   // Loading state
   submitting: boolean = false;
 
@@ -130,6 +151,11 @@ export class RegisterUserComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+
+    if (this.selectedProfile) {
+      this.selectedAgent =
+        this.profileToAgentMap[this.selectedProfile];
+    }
   }
 
   isFormValid(): boolean {
@@ -141,8 +167,7 @@ export class RegisterUserComponent implements OnInit {
       this.phoneNumber.trim() &&
       this.idNumber.trim() &&
       this.selectedProfile &&
-      this.selectedAgent &&
-      this.selectedChannel
+      this.selectedAgent
     );
   }
 
@@ -204,17 +229,26 @@ export class RegisterUserComponent implements OnInit {
     }
 
     const normalizedPhone = this.normalizePhoneNumber(this.phoneNumber.trim());
+    if (!this.selectedProfile && !this.selectedAgent) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Invalid Profile and Agent type',
+        life: 4000
+      });
+      return;
+    }
 
     const payload: CreateUserPayload = {
-      agent: this.selectedAgent,
-      channel: this.selectedChannel,
+      agent: this.selectedAgent!,
+      channel: this.CHANNEL,
       email: this.email.trim().toLowerCase(),
       entityId: this.entityId,
       firstName: this.firstName.trim(),
       idNumber: this.idNumber.trim(),
       lastName: this.lastName.trim(),
       phoneNumber: normalizedPhone,
-      profile: this.selectedProfile,
+      profile: this.selectedProfile!,
     };
 
     console.log('Creating user with payload:', payload);
@@ -226,11 +260,11 @@ export class RegisterUserComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-any-user')
       .subscribe({
         next: (response) => {
-          console.log('User created successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
-          if (response.status == 0) {
+          if (response.status === 0) {
+            console.log('User created successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -238,6 +272,7 @@ export class RegisterUserComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',

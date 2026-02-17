@@ -38,6 +38,7 @@ interface ApiResponse {
   status: number;
   message: string;
   data: any;
+  totalRecords: number;
 }
 
 @Component({
@@ -200,20 +201,20 @@ export class RegisterInvestorComponent implements OnInit {
       profile: this.PROFILE,
     };
 
-    console.log('Creating user with payload:', payload);
+    console.log('Creating investor with payload:', payload);
 
     this.submitting = true;
     this.loadingStore.start();
 
     this.dataService
-      .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-investor-user')
+      .post<ApiResponse>(API_ENDPOINTS.REGISTER_USER, payload, 'register-investor-user', true)
       .subscribe({
         next: (response) => {
-          console.log('Investor created successfully', response);
           this.submitting = false;
           this.loadingStore.stop();
 
-          if (response.status == 0) {
+          if (response.status === 0) {
+            console.log('Investor created successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -221,13 +222,13 @@ export class RegisterInvestorComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('An error occurred while creating investor', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',
               detail: response.message,
               life: 5000
             });
-
           }
 
           // Reset form

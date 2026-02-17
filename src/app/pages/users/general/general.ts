@@ -95,23 +95,33 @@ export class GeneralUserComponent implements OnInit {
   blockedUsers: number = 0;
   firstLoginUsers: number = 0;
 
-  // Filter options
+  // Dropdown options
   profileOptions: ProfileOption[] = [
     { label: 'All Profiles', value: '' },
-    { label: 'Super Admin', value: 'SUPER_ADMIN' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
     { label: 'Admin', value: 'ADMIN' },
-    { label: 'User', value: 'USER' },
-    { label: 'Manager', value: 'MANAGER' },
+    { label: 'Passenger', value: 'USER' },
+    { label: 'Parcel', value: 'PARCEL' },
+    { label: 'Marshal', value: 'MARSHAL' },
+    { label: 'Driver', value: 'DRIVER' },
+    { label: 'Conductor', value: 'CONDUCTOR' },
+    { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
   ];
 
   agentOptions: AgentOption[] = [
-    { label: 'All Profiles', value: '' },
-    { label: 'Super Admin', value: 'SUPER_ADMIN' },
+    { label: 'All Agents', value: '' },
     { label: 'Dashmaster', value: 'DASHMASTER' },
     { label: 'Admin', value: 'ADMIN' },
-    { label: 'User', value: 'USER' },
-    { label: 'Manager', value: 'MANAGER' },
+    { label: 'Passenger', value: 'PASSENGER' },
+    { label: 'Parcel', value: 'PARCEL' },
+    { label: 'Marshal', value: 'MARSHAL' },
+    { label: 'Driver', value: 'DRIVER' },
+    { label: 'Conductor', value: 'CONDUCTOR' },
+    { label: 'Investor', value: 'INVESTOR' },
+    { label: 'Approver', value: 'APPROVER' },
+    { label: 'Inspector', value: 'INSPECTOR' },
   ];
 
   channelOptions: ChannelOption[] = [

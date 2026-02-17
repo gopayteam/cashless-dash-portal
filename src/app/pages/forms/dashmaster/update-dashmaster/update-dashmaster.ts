@@ -411,11 +411,12 @@ export class UpdateDashmasterComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.UPDATE_USER, payload, 'update-dashmaster-user')
       .subscribe({
         next: (response) => {
-          console.log('dashmaster updated successfully', response);
+
           this.submitting = false;
           this.loadingStore.stop();
 
           if (response.status == 0) {
+            console.log('dashmaster updated successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -423,6 +424,7 @@ export class UpdateDashmasterComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',

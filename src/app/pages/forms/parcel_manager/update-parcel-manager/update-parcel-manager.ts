@@ -397,11 +397,12 @@ export class UpdateParcelManagerComponent implements OnInit {
       .post<ApiResponse>(API_ENDPOINTS.UPDATE_PARCEL_MANAGER, payload, 'update-parcel-manager')
       .subscribe({
         next: (response) => {
-          console.log('Parcel manager updated successfully', response);
+
           this.submitting = false;
           this.loadingStore.stop();
 
           if (response.status == 0) {
+            console.log('Parcel manager updated successfully', response);
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
@@ -409,6 +410,7 @@ export class UpdateParcelManagerComponent implements OnInit {
               life: 4000
             });
           } else {
+            console.log('An error occurred', response);
             this.messageService.add({
               severity: 'error',
               summary: 'Error Occurred',
