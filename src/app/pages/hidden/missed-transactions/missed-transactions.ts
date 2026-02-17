@@ -250,6 +250,11 @@ export class MissedTransactionComponent implements OnInit {
           this.confirmationLoading = false;
           this.showConfirmDialog = false;
 
+          if (response == null) {
+            this.resetForm();
+            return
+          }
+
           if (response.code === 0 || response.data?.success) {
             this.messageService.add({
               severity: 'success',
