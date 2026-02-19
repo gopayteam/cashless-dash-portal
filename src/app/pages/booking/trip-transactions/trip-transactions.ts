@@ -19,7 +19,6 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { nonWhiteSpace } from 'html2canvas/dist/types/css/syntax/parser';
 
 // ── Models ────────────────────────────────────────────────────────────────────
 
@@ -79,7 +78,7 @@ interface StatusOption {
   providers: [MessageService],
 })
 export class TripTransactionsComponent implements OnInit {
-  /** Can be passed as a route param or @Input() when embedded in a parent */
+  /** Optional @Input — when embedding this component inside a parent */
   @Input() tripId: number | null = null;
 
   entityId: string | null = null;
@@ -109,6 +108,12 @@ export class TripTransactionsComponent implements OnInit {
   failedCount: number = 0;
   totalSeats: number = 0;
 
+  /** True once a valid tripId has been resolved and data has been requested */
+  hasLoaded: boolean = false;
+
+  /** Human-readable reason shown in the empty state when no tripId is available */
+  noTripIdMessage: string = '';
+
   statusOptions: StatusOption[] = [
     { label: 'All Status', value: '' },
     { label: 'Started', value: 'STARTED' },
@@ -116,6 +121,8 @@ export class TripTransactionsComponent implements OnInit {
     { label: 'Failed', value: 'FAILED' },
     { label: 'Pending', value: 'PENDING' },
   ];
+
+  private lastEvent: any;
 
   constructor(
     private dataService: DataService,
@@ -140,7 +147,19 @@ export class TripTransactionsComponent implements OnInit {
       return;
     }
 
-    // Try to read tripId from route params if not provided as @Input
+    // 1. Prefer @Input() from a parent component
+    // 2. Fall back to route navigation state  (router.navigate state object)
+    // 3. Fall back to route param :tripId
+    // 4. If nothing found — show a prompt, do NOT fetch
+    if (!this.tripId) {
+      const navState = this.router.getCurrentNavigation()?.extras?.state
+        ?? history.state;
+
+      if (navState?.['tripId']) {
+        this.tripId = Number(navState['tripId']);
+      }
+    }
+
     if (!this.tripId) {
       const paramId = this.route.snapshot.paramMap.get('tripId');
       if (paramId) {
@@ -148,26 +167,20 @@ export class TripTransactionsComponent implements OnInit {
       }
     }
 
-    if (!this.tripId) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No Trip ID provided.',
-        life: 5000,
-      });
-      return;
+    if (this.tripId) {
+      this.loadTransactions();
+    } else {
+      // No tripId available — show the empty/prompt state, no fetch
+      this.noTripIdMessage =
+        'No Trip ID was provided. Navigate here from a trip row to view its transactions.';
     }
-
-    this.loadTransactions();
   }
-
-  private lastEvent: any;
 
   // ── Data loading ──────────────────────────────────────────────────────────
 
   loadTransactions($event?: any): void {
     this.lastEvent = $event;
-    this.fetchTransactions(false, $event)
+    this.fetchTransactions(false, $event);
   }
 
   fetchTransactions(bypassCache: boolean, $event?: any): void {
@@ -178,15 +191,18 @@ export class TripTransactionsComponent implements OnInit {
       this.rows = $event.rows;
     }
 
-    // const url = `${API_ENDPOINTS.TRIP_TRANSACTIONS}/${this.tripId}`;
-    const params = {
-      tripId: this.tripId
-    }
+    const params = { tripId: this.tripId };
 
     this.loadingStore.start();
+    this.hasLoaded = true;
 
     this.dataService
-      .get<TripTransactionsApiResponse>(API_ENDPOINTS.TRIP_TRANSACTIONS, params, 'trip-transactions', bypassCache)
+      .get<TripTransactionsApiResponse>(
+        `${API_ENDPOINTS.TRIP_TRANSACTIONS}/${this.tripId}`,
+        params,
+        'trip-transactions',
+        bypassCache
+      )
       .subscribe({
         next: (response) => {
           this.allTransactions = response.data;
@@ -214,11 +230,11 @@ export class TripTransactionsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalTransactions = this.allTransactions.length;
-    this.totalRevenue = this.allTransactions.reduce((sum, t) => sum + (t.amount ?? 0), 0);
+    this.totalRevenue = this.allTransactions.reduce((s, t) => s + (t.amount ?? 0), 0);
     this.startedCount = this.allTransactions.filter((t) => t.status === 'STARTED').length;
     this.completedCount = this.allTransactions.filter((t) => t.status === 'COMPLETED').length;
     this.failedCount = this.allTransactions.filter((t) => t.status === 'FAILED').length;
-    this.totalSeats = this.allTransactions.reduce((sum, t) => sum + (t.numberOfSeats ?? 0), 0);
+    this.totalSeats = this.allTransactions.reduce((s, t) => s + (t.numberOfSeats ?? 0), 0);
   }
 
   applyClientSideFilter(): void {
@@ -278,6 +294,10 @@ export class TripTransactionsComponent implements OnInit {
     }
   }
 
+  goBack(): void {
+    this.router.navigate(['/booking/all-trips']);
+  }
+
   // ── Detail dialog ─────────────────────────────────────────────────────────
 
   viewTransactionDetails(transaction: TripTransaction): void {
@@ -315,10 +335,5 @@ export class TripTransactionsComponent implements OnInit {
 
   formatCurrency(amount: number): string {
     return `KES ${amount?.toFixed(2) ?? '0.00'}`;
-  }
-
-  maskPhone(phone: string): string {
-    if (!phone || phone.length < 7) return phone;
-    return phone.slice(0, 6) + '****' + phone.slice(-3);
   }
 }

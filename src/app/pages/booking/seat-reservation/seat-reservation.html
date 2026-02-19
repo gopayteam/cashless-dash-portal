@@ -1,4 +1,4 @@
-<!-- pages/trips/seat-reservations/seat-reservations.html -->
+<!-- pages/trips/seat-reservations/seat-reservation.html -->
 <p-toast position="top-right"></p-toast>
 
 <div class="reservations-container">
@@ -12,55 +12,107 @@
         <i class="pi pi-ticket"></i>
         Seat Reservations
       </h1>
-      <p class="text-muted">
+      <p class="text-muted" *ngIf="tripId">
         Viewing seat reservations for
         <span class="trip-id-pill">Trip #{{ tripId }}</span>
       </p>
+      <p class="text-muted" *ngIf="!tripId">
+        Navigate here from a trip row to load seat reservations
+      </p>
     </div>
 
-    <div class="header-controls">
-      <!-- Search -->
+    <!-- Controls — only shown once a valid tripId is resolved -->
+    <div class="header-controls" *ngIf="tripId">
+
+      <!-- Client-side keyword search — calls onSearchChange() → applyClientSideFilter() -->
       <div class="search-wrapper">
         <i class="pi pi-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Search by username, seat #, ID..." [(ngModel)]="searchTerm"
-          (input)="onSearchChange()" />
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by username, seat #, ID…"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+        />
         <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
           <i class="pi pi-times"></i>
         </button>
       </div>
 
-      <!-- Username Server Filter -->
+      <!--
+        Username / phone number filter.
+        Server-side: calls onUsernameFilterChange() → loadReservations() with
+        username in the POST payload. Optional — send only when non-empty.
+        Placeholder makes clear it accepts a phone number.
+      -->
       <div class="search-wrapper">
-        <i class="pi pi-user search-icon"></i>
-        <input type="text" class="search-input username-filter-input" placeholder="Filter by username..."
-          [(ngModel)]="usernameFilter" (input)="onUsernameFilterChange()" />
-        <button *ngIf="usernameFilter" class="clear-search-btn" (click)="usernameFilter = ''; onUsernameFilterChange()">
+        <i class="pi pi-phone search-icon"></i>
+        <input
+          type="text"
+          class="search-input username-filter-input"
+          placeholder="Phone number (optional)…"
+          [(ngModel)]="usernameFilter"
+          (input)="onUsernameFilterChange()"
+        />
+        <button
+          *ngIf="usernameFilter"
+          class="clear-search-btn"
+          (click)="usernameFilter = ''; onUsernameFilterChange()"
+        >
           <i class="pi pi-times"></i>
         </button>
       </div>
 
-      <!-- Status Filter -->
-      <p-select [options]="reservationStatusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()"
-        placeholder="All Status" styleClass="filter-dropdown"></p-select>
+      <!--
+        Reservation status dropdown.
+        Server-side: calls onStatusChange() → loadReservations() with
+        reservationStatus in the POST payload. Optional — send only when non-empty.
+      -->
+      <p-select
+        [options]="reservationStatusOptions"
+        [(ngModel)]="selectedStatus"
+        (onChange)="onStatusChange()"
+        placeholder="All Status"
+        styleClass="filter-dropdown"
+      ></p-select>
 
-      <!-- Clear All -->
-      <button *ngIf="searchTerm || selectedStatus || usernameFilter" class="clear-all-btn" (click)="clearFilters()"
-        pTooltip="Clear all filters">
+      <!-- Clear all — resets both server-side and client-side filters then reloads -->
+      <button
+        *ngIf="searchTerm || selectedStatus || usernameFilter"
+        class="clear-all-btn"
+        (click)="clearFilters()"
+        pTooltip="Clear all filters"
+      >
         <i class="pi pi-filter-slash"></i>
         Clear
       </button>
 
-      <!-- Refresh -->
+      <!-- Refresh — calls fetchReservations(bypassCache=true) -->
       <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
         <i class="pi pi-refresh" [class.spinning]="loading"></i>
       </button>
+
     </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       NO TRIP ID — prompt state
+  ═══════════════════════════════════════════ -->
+  <div *ngIf="!tripId && !loading" class="prompt-state">
+    <div class="prompt-icon">
+      <i class="pi pi-info-circle"></i>
+    </div>
+    <h3>No Trip Selected</h3>
+    <p>Open the Trips page, find a trip, then click the
+      <strong><i class="pi pi-ticket"></i> Seat Reservations</strong> action button
+      to load its seat reservations here.
+    </p>
   </div>
 
   <!-- ═══════════════════════════════════════════
        SUMMARY STATS
   ═══════════════════════════════════════════ -->
-  <div class="summary-stats">
+  <div class="summary-stats" *ngIf="tripId">
 
     <div class="stat-card">
       <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -107,16 +159,22 @@
   <!-- ═══════════════════════════════════════════
        TABLE CARD
   ═══════════════════════════════════════════ -->
-  <div class="table-card">
+  <div class="table-card" *ngIf="tripId">
 
     <div class="table-toolbar">
       <div class="toolbar-left">
         <span class="record-badge">
           {{ filteredReservations.length }} of {{ totalRecords }} reservations
         </span>
-        <p-paginator [first]="first" [rows]="rows" [totalRecords]="filteredReservations.length"
-          [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
-          style="margin-right: 0"></p-paginator>
+        <p-paginator
+          [first]="first"
+          [rows]="rows"
+          [totalRecords]="filteredReservations.length"
+          [rowsPerPageOptions]="[10, 20, 50, 100]"
+          (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true"
+          style="margin-right: 0"
+        ></p-paginator>
       </div>
     </div>
 
@@ -133,12 +191,17 @@
     </div>
 
     <!-- Table -->
-    <p-table *ngIf="!loading && filteredReservations.length > 0" [value]="reservations"
-      styleClass="data-table p-datatable-gridlines" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+    <p-table
+      *ngIf="!loading && filteredReservations.length > 0"
+      [value]="reservations"
+      styleClass="data-table p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '60rem' }"
+      responsiveLayout="scroll"
+    >
       <ng-template pTemplate="header">
         <tr>
           <th>ID</th>
-          <th>Passenger</th>
+          <th>Passenger (Username / Phone)</th>
           <th>Trip</th>
           <th>Seats Reserved</th>
           <th>Seat Numbers</th>
@@ -155,7 +218,7 @@
             <span class="res-id-badge">#{{ reservation.id }}</span>
           </td>
 
-          <!-- Passenger -->
+          <!-- Passenger — username is the phone number per API notes -->
           <td>
             <div class="passenger-cell">
               <div class="passenger-avatar">
@@ -181,11 +244,14 @@
             </div>
           </td>
 
-          <!-- Seat Numbers -->
+          <!-- Seat Numbers — coloured chips via getSeatChipClass() -->
           <td>
             <div class="seat-chips">
-              <span *ngFor="let seat of reservation.seatNumbers" [class]="'seat-chip ' + getSeatChipClass(seat)"
-                [pTooltip]="'Seat ' + seat">
+              <span
+                *ngFor="let seat of reservation.seatNumbers"
+                [class]="'seat-chip ' + getSeatChipClass(seat)"
+                [pTooltip]="'Seat ' + seat"
+              >
                 {{ seat }}
               </span>
             </div>
@@ -217,9 +283,17 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      DETAIL DIALOG
 ═══════════════════════════════════════════════════════════════════ -->
-<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
-  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '760px' }"
-  (onHide)="closeDetailDialog()">
+<p-dialog
+  [(visible)]="displayDetailDialog"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="custom-dialog"
+  [style]="{ width: '90vw', maxWidth: '760px' }"
+  (onHide)="closeDetailDialog()"
+>
   <ng-template pTemplate="header">
     <div class="dialog-header" *ngIf="selectedReservation">
       <div class="dialog-header-top">
@@ -255,8 +329,8 @@
       </div>
       <div class="dialog-stat">
         <i class="pi pi-th-large"></i>
-        <span class="ds-label">Seat Count</span>
-        <span class="ds-value">{{ selectedReservation.seatNumbers?.length ?? 0 }}</span>
+        <span class="ds-label">Seat Numbers</span>
+        <span class="ds-value">{{ selectedReservation.seatNumbers?.length ?? 0 }} assigned</span>
       </div>
     </div>
 
@@ -269,15 +343,11 @@
           <i class="pi pi-user"></i> Passenger Details
         </h3>
         <div class="detail-item">
-          <label>Username</label>
+          <label>Username / Phone</label>
           <span class="value driver-name-highlight">
-            <i class="pi pi-user"></i>
+            <i class="pi pi-phone"></i>
             {{ selectedReservation.username }}
           </span>
-        </div>
-        <div class="detail-item">
-          <label>Entity ID</label>
-          <span class="value code-value">{{ selectedReservation.entityId }}</span>
         </div>
         <div class="detail-item">
           <label>Reservation ID</label>
@@ -288,7 +358,11 @@
           <span class="value code-value">#{{ selectedReservation.tripId }}</span>
         </div>
         <div class="detail-item">
-          <label>Reservation Status</label>
+          <label>Entity ID</label>
+          <span class="value code-value">{{ selectedReservation.entityId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Status</label>
           <span class="value">
             <span [class]="'status-badge status-' + getStatusClass(selectedReservation.reservationStatus)">
               <i [class]="getStatusIcon(selectedReservation.reservationStatus)"></i>
@@ -310,8 +384,10 @@
         <div class="detail-item">
           <label>Assigned Seat Numbers</label>
           <div class="dialog-seat-chips">
-            <span *ngFor="let seat of selectedReservation.seatNumbers"
-              [class]="'seat-chip seat-chip-lg ' + getSeatChipClass(seat)">
+            <span
+              *ngFor="let seat of selectedReservation.seatNumbers"
+              [class]="'seat-chip seat-chip-lg ' + getSeatChipClass(seat)"
+            >
               <i class="pi pi-ticket"></i>
               Seat {{ seat }}
             </span>

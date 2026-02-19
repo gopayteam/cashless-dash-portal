@@ -16,20 +16,21 @@
     </div>
 
     <div class="header-controls">
-      <!-- Search -->
+
+      <!-- Free-text search (client-side) -->
       <div class="search-wrapper">
         <i class="pi pi-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Search by fleet, route, trip ID..."
-          [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+        <input type="text" class="search-input" placeholder="Search by fleet, route, trip ID…" [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
         <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
           <i class="pi pi-times"></i>
         </button>
       </div>
 
-      <!-- Fleet Number Filter -->
+      <!-- Fleet number — server-side filter, only sent when non-empty -->
       <div class="search-wrapper">
         <i class="pi pi-car search-icon"></i>
-        <input type="text" class="search-input fleet-filter-input" placeholder="Fleet number..."
+        <input type="text" class="search-input fleet-filter-input" placeholder="Filter by fleet number…"
           [(ngModel)]="fleetNumberFilter" (input)="onFleetFilterChange()" />
         <button *ngIf="fleetNumberFilter" class="clear-search-btn"
           (click)="fleetNumberFilter = ''; onFleetFilterChange()">
@@ -37,11 +38,11 @@
         </button>
       </div>
 
-      <!-- Status Filter -->
+      <!-- Trip status — triggers server reload -->
       <p-select [options]="tripStatusOptions" [(ngModel)]="selectedTripStatus" (onChange)="onTripStatusChange()"
         placeholder="All Status" styleClass="filter-dropdown"></p-select>
 
-      <!-- Clear All -->
+      <!-- Clear all filters -->
       <button *ngIf="searchTerm || selectedTripStatus || fleetNumberFilter" class="clear-all-btn"
         (click)="clearFilters()" pTooltip="Clear all filters">
         <i class="pi pi-filter-slash"></i>
@@ -52,6 +53,7 @@
       <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
         <i class="pi pi-refresh" [class.spinning]="loading"></i>
       </button>
+
     </div>
   </div>
 
@@ -135,7 +137,7 @@
       [first]="first" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 50, 100]"
       [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
       styleClass="data-table p-datatable-gridlines" (onLazyLoad)="loadTrips($event)"
-      [tableStyle]="{ 'min-width': '70rem' }" responsiveLayout="scroll">
+      [tableStyle]="{ 'min-width': '80rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Trip ID</th>
@@ -147,6 +149,7 @@
           <th>Occupancy</th>
           <th>Amount</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </ng-template>
 
@@ -229,8 +232,34 @@
             </span>
           </td>
 
+          <!-- ── Actions ── -->
+          <td (click)="$event.stopPropagation()">
+            <div class="action-cell">
+
+              <!-- View details -->
+              <button class="action-btn btn-view" (click)="viewTripDetails(trip)" pTooltip="View details"
+                tooltipPosition="top">
+                <i class="pi pi-eye"></i>
+              </button>
+
+              <!-- Navigate to Transactions -->
+              <button class="action-btn btn-transactions" (click)="viewTransactions(trip, $event)"
+                pTooltip="View Transactions" tooltipPosition="top">
+                <i class="pi pi-credit-card"></i>
+              </button>
+
+              <!-- Navigate to Seat Reservations -->
+              <button class="action-btn btn-reservations" (click)="viewReservations(trip, $event)"
+                pTooltip="View Seat Reservations" tooltipPosition="top">
+                <i class="pi pi-ticket"></i>
+              </button>
+
+            </div>
+          </td>
+
         </tr>
       </ng-template>
+
     </p-table>
 
   </div>
@@ -295,7 +324,7 @@
     <!-- Detail grid -->
     <div class="detail-grid">
 
-      <!-- Left -->
+      <!-- Left: Trip Info -->
       <div class="detail-column">
         <h3 class="column-title">
           <i class="pi pi-info-circle"></i> Trip Information
@@ -334,7 +363,7 @@
         </div>
       </div>
 
-      <!-- Right -->
+      <!-- Right: Route & Schedule -->
       <div class="detail-column">
         <h3 class="column-title">
           <i class="pi pi-map-marker"></i> Route &amp; Schedule
@@ -374,20 +403,24 @@
     </div>
   </div>
 
+  <!-- Dialog footer — Close + navigate to Transactions + Reservations -->
   <ng-template pTemplate="footer">
     <div class="dialog-footer">
-
-      <button class="footer-btn btn-primary" (click)="viewTransactions(selectedTrip!)">
-        <i class="pi pi-info"></i> View Transactions
-      </button>
-
-      <button class="footer-btn btn-primary" (click)="viewReservations(selectedTrip!)">
-        <i class="pi pi-info"></i> View seats reservations
-      </button>
-
       <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
         <i class="pi pi-times"></i> Close
       </button>
+
+      <ng-container *ngIf="selectedTrip">
+        <button class="footer-btn btn-transactions" (click)="viewTransactions(selectedTrip)"
+          pTooltip="View all transactions for this trip">
+          <i class="pi pi-credit-card"></i> Transactions
+        </button>
+
+        <button class="footer-btn btn-reservations" (click)="viewReservations(selectedTrip)"
+          pTooltip="View seat reservations for this trip">
+          <i class="pi pi-ticket"></i> Seat Reservations
+        </button>
+      </ng-container>
     </div>
   </ng-template>
 

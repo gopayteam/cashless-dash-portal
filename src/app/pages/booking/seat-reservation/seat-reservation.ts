@@ -70,7 +70,10 @@ interface ReservationStatusOption {
   providers: [MessageService],
 })
 export class SeatReservationsComponent implements OnInit {
-  /** Can be injected from a parent or read from route params */
+  onUsernameFilterChange() {
+    throw new Error('Method not implemented.');
+  }
+  /** Optional @Input — when embedding this component inside a parent */
   @Input() tripId: number | null = null;
 
   entityId: string | null = null;
@@ -84,10 +87,22 @@ export class SeatReservationsComponent implements OnInit {
   first: number = 0;
   totalRecords: number = 0;
 
-  // Filters
-  searchTerm: string = '';
-  selectedStatus: string = '';
+  // ── Optional server-side filter fields (username = phone number) ────────────
+  /**
+   * When populated, this is sent in the POST body as `username`.
+   * The API notes say it is the phone number of the user.
+   * Only applied when the user has typed something and pressed Search / Enter.
+   */
   usernameFilter: string = '';
+
+  /**
+   * When populated, sent as `reservationStatus` in the POST body.
+   * Only applied when the user picks from the dropdown.
+   */
+  selectedStatus: string = '';
+
+  // Client-side keyword search (does NOT trigger a server call)
+  searchTerm: string = '';
 
   // Detail dialog
   displayDetailDialog: boolean = false;
@@ -100,12 +115,20 @@ export class SeatReservationsComponent implements OnInit {
   failedCount: number = 0;
   totalSeatsReserved: number = 0;
 
+  /** True once a valid tripId has been resolved and first fetch has been triggered */
+  hasLoaded: boolean = false;
+
+  /** Human-readable message shown when no tripId is available */
+  noTripIdMessage: string = '';
+
   reservationStatusOptions: ReservationStatusOption[] = [
     { label: 'All Status', value: '' },
     { label: 'Completed', value: 'COMPLETED' },
     { label: 'Pending', value: 'PENDING' },
     { label: 'Failed', value: 'FAILED' },
   ];
+
+  private lastEvent: any;
 
   constructor(
     private dataService: DataService,
@@ -130,7 +153,18 @@ export class SeatReservationsComponent implements OnInit {
       return;
     }
 
-    // Try route param if @Input not provided
+    // 1. @Input() from a parent component
+    // 2. Router navigation state  (passed via router.navigate state)
+    // 3. Route param :tripId
+    // 4. Nothing found → show prompt, do NOT fetch
+    if (!this.tripId) {
+      const navState =
+        this.router.getCurrentNavigation()?.extras?.state ?? history.state;
+      if (navState?.['tripId']) {
+        this.tripId = Number(navState['tripId']);
+      }
+    }
+
     if (!this.tripId) {
       const paramId = this.route.snapshot.paramMap.get('tripId');
       if (paramId) {
@@ -138,26 +172,19 @@ export class SeatReservationsComponent implements OnInit {
       }
     }
 
-    if (!this.tripId) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No Trip ID provided.',
-        life: 5000,
-      });
-      return;
+    if (this.tripId) {
+      this.loadReservations();
+    } else {
+      this.noTripIdMessage =
+        'No Trip ID was provided. Navigate here from a trip row to view its seat reservations.';
     }
-
-    this.loadReservations();
   }
-
-  private lastEvent: any;
 
   // ── Data loading ──────────────────────────────────────────────────────────
 
   loadReservations($event?: any): void {
     this.lastEvent = $event;
-    this.fetchReservations(false, $event)
+    this.fetchReservations(false, $event);
   }
 
   fetchReservations(bypassCache: boolean, $event?: any): void {
@@ -168,20 +195,22 @@ export class SeatReservationsComponent implements OnInit {
       this.rows = $event.rows;
     }
 
+    // Build payload — username and reservationStatus are optional
     const payload: Record<string, any> = {
       tripId: this.tripId,
       entityId: this.entityId,
     };
 
-    // Optional filters
     if (this.usernameFilter.trim()) {
       payload['username'] = this.usernameFilter.trim();
     }
+
     if (this.selectedStatus) {
       payload['reservationStatus'] = this.selectedStatus;
     }
 
     this.loadingStore.start();
+    this.hasLoaded = true;
 
     this.dataService
       .post<SeatReservationsApiResponse>(
@@ -217,24 +246,16 @@ export class SeatReservationsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalReservations = this.allReservations.length;
-    this.completedCount = this.allReservations.filter(
-      (r) => r.reservationStatus === 'COMPLETED'
-    ).length;
-    this.pendingCount = this.allReservations.filter(
-      (r) => r.reservationStatus === 'PENDING'
-    ).length;
-    this.failedCount = this.allReservations.filter(
-      (r) => r.reservationStatus === 'FAILED'
-    ).length;
-    this.totalSeatsReserved = this.allReservations.reduce(
-      (sum, r) => sum + (r.seatsReserved ?? 0),
-      0
-    );
+    this.completedCount = this.allReservations.filter((r) => r.reservationStatus === 'COMPLETED').length;
+    this.pendingCount = this.allReservations.filter((r) => r.reservationStatus === 'PENDING').length;
+    this.failedCount = this.allReservations.filter((r) => r.reservationStatus === 'FAILED').length;
+    this.totalSeatsReserved = this.allReservations.reduce((s, r) => s + (r.seatsReserved ?? 0), 0);
   }
 
   applyClientSideFilter(): void {
     let filtered = [...this.allReservations];
 
+    // Client-side keyword search only — does NOT re-fetch
     if (this.searchTerm.trim()) {
       const lower = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter(
@@ -246,12 +267,6 @@ export class SeatReservationsComponent implements OnInit {
       );
     }
 
-    if (this.selectedStatus) {
-      filtered = filtered.filter(
-        (r) => r.reservationStatus === this.selectedStatus
-      );
-    }
-
     this.filteredReservations = filtered;
 
     // Client-side page slice
@@ -260,19 +275,33 @@ export class SeatReservationsComponent implements OnInit {
     this.reservations = filtered.slice(start, end);
   }
 
+  /** Client-side keyword search — no server call */
   onSearchChange(): void {
     this.first = 0;
     this.applyClientSideFilter();
   }
 
+  /**
+   * Reservation status changed — re-fetch from server with updated payload.
+   * This is a server-side filter, so it always triggers a new request.
+   */
   onStatusChange(): void {
-    // Server-side filter — reload with the new status in payload
     this.first = 0;
     this.loadReservations();
   }
 
-  onUsernameFilterChange(): void {
-    // Server-side filter — reload with new username in payload
+  /**
+   * Username (phone number) filter applied via the search button or Enter key.
+   * Server-side — re-fetches with the username in the payload.
+   */
+  applyUsernameFilter(): void {
+    this.first = 0;
+    this.loadReservations();
+  }
+
+  /** Clear the username filter and reload */
+  clearUsernameFilter(): void {
+    this.usernameFilter = '';
     this.first = 0;
     this.loadReservations();
   }
@@ -296,6 +325,10 @@ export class SeatReservationsComponent implements OnInit {
     } else {
       this.fetchReservations(true, { first: 0, rows: this.rows });
     }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/booking/all-trips']);
   }
 
   // ── Detail dialog ─────────────────────────────────────────────────────────
@@ -332,7 +365,6 @@ export class SeatReservationsComponent implements OnInit {
   }
 
   getSeatChipClass(seatNumber: number): string {
-    // Simple colour cycling for visual variety
     const colours = ['chip-purple', 'chip-blue', 'chip-green', 'chip-orange', 'chip-pink'];
     return colours[seatNumber % colours.length];
   }

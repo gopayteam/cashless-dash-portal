@@ -20,8 +20,6 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 
-// ── Models ────────────────────────────────────────────────────────────────────
-
 export type TripStatus = 'COMPLETE' | 'PENDING' | 'IN_PROGRESS';
 export type TripType = 'SCHEDULE' | 'CHARTER' | string;
 
@@ -88,6 +86,11 @@ export class AllTripsComponent implements OnInit {
   // Filters
   searchTerm: string = '';
   selectedTripStatus: string = '';
+
+  /**
+   * Fleet number is NOT sent on initial load.
+   * It is only passed to the server once the user has typed something.
+   */
   fleetNumberFilter: string = '';
 
   // Detail dialog
@@ -106,6 +109,8 @@ export class AllTripsComponent implements OnInit {
     { label: 'Pending', value: 'PENDING' },
     { label: 'In Progress', value: 'IN_PROGRESS' },
   ];
+
+  private lastEvent: any;
 
   constructor(
     private dataService: DataService,
@@ -128,16 +133,15 @@ export class AllTripsComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    // Initial load — no fleet number filter applied
     this.loadTrips();
   }
-
-  private lastEvent: any;
 
   // ── Data loading ──────────────────────────────────────────────────────────
 
   loadTrips($event?: any): void {
     this.lastEvent = $event;
-    this.fetchTrips(false, $event)
+    this.fetchTrips(false, $event);
   }
 
   fetchTrips(bypassCache: boolean, $event?: any): void {
@@ -151,23 +155,19 @@ export class AllTripsComponent implements OnInit {
       this.rows = $event.rows;
     }
 
-    // Build query params
     const params: any = {
       entityId: this.entityId!,
-      tripStatus: String('COMPLETE'),
       page: String(page),
       size: String(pageSize),
     };
 
-    if (this.selectedTripStatus) {
-      params.tripStatus = this.selectedTripStatus;
-    }
-    if (this.fleetNumberFilter.trim()) {
-      params['fleetNumber'] = this.fleetNumberFilter.trim();
-    }
+    // Trip status — default to COMPLETE when nothing is selected
+    params.tripStatus = this.selectedTripStatus || 'COMPLETE';
 
-    // const queryString = new URLSearchParams(params).toString();
-    // const url = `${API_ENDPOINTS.ALL_TRIPS}?${queryString}`;
+    // Fleet number is ONLY sent when the user has typed something in the field
+    if (this.fleetNumberFilter.trim()) {
+      params.fleetNumber = this.fleetNumberFilter.trim();
+    }
 
     this.loadingStore.start();
 
@@ -200,15 +200,9 @@ export class AllTripsComponent implements OnInit {
 
   calculateStats(): void {
     this.totalTrips = this.totalRecords;
-    this.completeTrips = this.allTrips.filter(
-      (t) => t.tripStatus === 'COMPLETE'
-    ).length;
-    this.pendingTrips = this.allTrips.filter(
-      (t) => t.tripStatus === 'PENDING'
-    ).length;
-    this.inProgressTrips = this.allTrips.filter(
-      (t) => t.tripStatus === 'IN_PROGRESS'
-    ).length;
+    this.completeTrips = this.allTrips.filter((t) => t.tripStatus === 'COMPLETE').length;
+    this.pendingTrips = this.allTrips.filter((t) => t.tripStatus === 'PENDING').length;
+    this.inProgressTrips = this.allTrips.filter((t) => t.tripStatus === 'IN_PROGRESS').length;
   }
 
   applyClientSideFilter(): void {
@@ -242,7 +236,12 @@ export class AllTripsComponent implements OnInit {
     this.loadTrips();
   }
 
+  /**
+   * Fleet number triggers a server-side reload only when the user types.
+   * If the field is cleared, we reload without it (returning all fleets).
+   */
   onFleetFilterChange(): void {
+    this.first = 0;
     this.loadTrips();
   }
 
@@ -255,6 +254,7 @@ export class AllTripsComponent implements OnInit {
     this.searchTerm = '';
     this.selectedTripStatus = '';
     this.fleetNumberFilter = '';
+    this.first = 0;
     this.loadTrips();
   }
 
@@ -279,47 +279,27 @@ export class AllTripsComponent implements OnInit {
     this.selectedTrip = null;
   }
 
+  // ── Navigation ────────────────────────────────────────────────────────────
+
   viewTransactions(trip: Trip, event?: Event): void {
     event?.stopPropagation();
-
     if (!trip?.tripId) {
       console.error('Trip ID missing', trip);
       return;
     }
-
-    // console.log('Navigating to update admin:', admin.id);
-    // console.log('Admin data being passed:', admin);
-
-    // Pass the complete user object through router state
-    // This ensures the data is immediately available in the update component
     this.router.navigate(['/booking/trip-transactions', trip.tripId], {
-      state: {
-        tripId: trip.tripId,
-        // Add timestamp to ensure fresh state
-        timestamp: Date.now()
-      }
+      state: { tripId: trip.tripId, timestamp: Date.now() },
     });
   }
 
   viewReservations(trip: Trip, event?: Event): void {
     event?.stopPropagation();
-
     if (!trip?.tripId) {
       console.error('Trip ID missing', trip);
       return;
     }
-
-    // console.log('Navigating to update admin:', admin.id);
-    // console.log('Admin data being passed:', admin);
-
-    // Pass the complete user object through router state
-    // This ensures the data is immediately available in the update component
     this.router.navigate(['/booking/seat-reservation', trip.tripId], {
-      state: {
-        tripId: trip.tripId,
-        // Add timestamp to ensure fresh state
-        timestamp: Date.now()
-      }
+      state: { tripId: trip.tripId, timestamp: Date.now() },
     });
   }
 
