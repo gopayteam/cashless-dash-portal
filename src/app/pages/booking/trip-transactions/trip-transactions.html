@@ -1,0 +1,384 @@
+<!-- pages/trips/trip-transactions/trip-transactions.html -->
+<p-toast position="top-right"></p-toast>
+
+<div class="transactions-container">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <div class="transactions-header">
+    <div class="header-content">
+      <h1>
+        <i class="pi pi-credit-card"></i>
+        Trip Transactions
+      </h1>
+      <p class="text-muted">
+        Viewing all transactions for
+        <span class="trip-id-pill">Trip #{{ tripId }}</span>
+      </p>
+    </div>
+
+    <div class="header-controls">
+      <!-- Search -->
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search by name, phone, receipt..." [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Status Filter -->
+      <p-select [options]="statusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()"
+        placeholder="All Status" styleClass="filter-dropdown"></p-select>
+
+      <!-- Clear All -->
+      <button *ngIf="searchTerm || selectedStatus" class="clear-all-btn" (click)="clearFilters()"
+        pTooltip="Clear all filters">
+        <i class="pi pi-filter-slash"></i>
+        Clear
+      </button>
+
+      <!-- Refresh -->
+      <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
+        <i class="pi pi-refresh" [class.spinning]="loading"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SUMMARY STATS
+  ═══════════════════════════════════════════ -->
+  <div class="summary-stats">
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Transactions</span>
+        <span class="stat-value">{{ totalRecords }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-wallet"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Revenue</span>
+        <span class="stat-value revenue">{{ formatCurrency(totalRevenue) }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+        <i class="pi pi-send"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Started</span>
+        <span class="stat-value">{{ startedCount }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Seats</span>
+        <span class="stat-value">{{ totalSeats }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TABLE CARD
+  ═══════════════════════════════════════════ -->
+  <div class="table-card">
+
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <span class="record-badge">
+          {{ filteredTransactions.length }} of {{ totalRecords }} transactions
+        </span>
+        <p-paginator [first]="first" [rows]="rows" [totalRecords]="filteredTransactions.length"
+          [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+          style="margin-right: 0"></p-paginator>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filteredTransactions.length === 0" class="empty-state">
+      <i class="pi pi-credit-card"></i>
+      <h3>No Transactions Found</h3>
+      <p *ngIf="searchTerm || selectedStatus">Try adjusting your filters</p>
+      <p *ngIf="!searchTerm && !selectedStatus">No transactions recorded for this trip</p>
+    </div>
+
+    <!-- Table -->
+    <p-table *ngIf="!loading && filteredTransactions.length > 0" [value]="transactions"
+      styleClass="data-table p-datatable-gridlines" [tableStyle]="{ 'min-width': '65rem' }" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Receipt #</th>
+          <th>Customer</th>
+          <th>Fleet</th>
+          <th>Seats</th>
+          <th>Pickup / Drop-off</th>
+          <th>Amount</th>
+          <th>Board #</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-txn>
+        <tr class="table-row" (click)="viewTransactionDetails(txn)">
+
+          <!-- ID -->
+          <td>
+            <span class="txn-id-badge">#{{ txn.id }}</span>
+          </td>
+
+          <!-- Receipt -->
+          <td>
+            <span class="receipt-code">{{ txn.mpesaReceiptNumber || 'N/A' }}</span>
+          </td>
+
+          <!-- Customer -->
+          <td>
+            <div class="customer-cell">
+              <div class="customer-avatar">
+                {{ txn.customerName?.charAt(0) || '?' }}
+              </div>
+              <div class="customer-info">
+                <span class="customer-name">{{ txn.customerName }}</span>
+                <span class="customer-phone">{{ txn.phoneNumber }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Fleet -->
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              {{ txn.fleetNumber }}
+            </span>
+          </td>
+
+          <!-- Seats -->
+          <td>
+            <div class="seats-bubble">
+              <i class="pi pi-ticket"></i>
+              {{ txn.numberOfSeats }}
+            </div>
+          </td>
+
+          <!-- Pickup / Drop-off -->
+          <td>
+            <div class="stops-cell">
+              <span class="stop-badge pickup-badge">
+                <i class="pi pi-map-marker"></i>
+                {{ txn.pickupId }}
+              </span>
+              <i class="pi pi-arrow-right stop-arrow"></i>
+              <span class="stop-badge dropoff-badge">
+                <i class="pi pi-flag"></i>
+                {{ txn.dropOffId }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Amount -->
+          <td>
+            <span class="amount-cell">{{ formatCurrency(txn.amount) }}</span>
+          </td>
+
+          <!-- Board # -->
+          <td>
+            <span class="board-number">{{ txn.boardNumber }}</span>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span [class]="'status-badge status-' + getStatusClass(txn.status)">
+              <i [class]="getStatusIcon(txn.status)"></i>
+              {{ txn.status | titlecase }}
+            </span>
+          </td>
+
+          <!-- Created -->
+          <td>
+            <div class="date-cell">
+              <span class="date-val">{{ txn.createdAt | date:'dd MMM yy' }}</span>
+              <span class="time-val">{{ txn.createdAt | date:'hh:mm a' }}</span>
+            </div>
+          </td>
+
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DETAIL DIALOG
+═══════════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '860px' }"
+  (onHide)="closeDetailDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header" *ngIf="selectedTransaction">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon">
+          <i class="pi pi-credit-card"></i>
+        </div>
+        <div class="dialog-title-block">
+          <h2 class="dialog-title">Transaction #{{ selectedTransaction.id }}</h2>
+          <div class="dialog-badges">
+            <span [class]="'status-badge status-' + getStatusClass(selectedTransaction.status)">
+              <i [class]="getStatusIcon(selectedTransaction.status)"></i>
+              {{ selectedTransaction.status }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="dialog-body" *ngIf="selectedTransaction">
+
+    <!-- Mini stats -->
+    <div class="dialog-stat-row">
+      <div class="dialog-stat">
+        <i class="pi pi-wallet"></i>
+        <span class="ds-label">Amount</span>
+        <span class="ds-value mono">{{ formatCurrency(selectedTransaction.amount) }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-ticket"></i>
+        <span class="ds-label">Seats</span>
+        <span class="ds-value">{{ selectedTransaction.numberOfSeats }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-car"></i>
+        <span class="ds-label">Fleet</span>
+        <span class="ds-value mono">{{ selectedTransaction.fleetNumber }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-hashtag"></i>
+        <span class="ds-label">Trip ID</span>
+        <span class="ds-value mono">{{ selectedTransaction.tripId }}</span>
+      </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+
+      <!-- Left: Customer Info -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-user"></i> Customer Details
+        </h3>
+        <div class="detail-item">
+          <label>Customer Name</label>
+          <span class="value driver-name-highlight">
+            <i class="pi pi-user"></i>
+            {{ selectedTransaction.customerName }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Username</label>
+          <span class="value mono">{{ selectedTransaction.username }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Phone Number</label>
+          <span class="value contact-value">
+            <i class="pi pi-phone"></i>
+            {{ selectedTransaction.phoneNumber }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Board Number</label>
+          <span class="value">{{ selectedTransaction.boardNumber || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Payment Source</label>
+          <span class="value">{{ selectedTransaction.paymentSource || 'N/A' }}</span>
+        </div>
+      </div>
+
+      <!-- Right: Transaction Info -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-credit-card"></i> Transaction Details
+        </h3>
+        <div class="detail-item">
+          <label>Transaction ID</label>
+          <span class="value code-value">#{{ selectedTransaction.id }}</span>
+        </div>
+        <div class="detail-item">
+          <label>M-Pesa Receipt</label>
+          <span class="value code-value">{{ selectedTransaction.mpesaReceiptNumber || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Fleet Number</label>
+          <span class="value fleet-highlight">
+            <i class="pi pi-car"></i>
+            {{ selectedTransaction.fleetNumber }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Trip ID</label>
+          <span class="value code-value">#{{ selectedTransaction.tripId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Seats Booked</label>
+          <span class="value">{{ selectedTransaction.numberOfSeats }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Amount</label>
+          <span class="value amount-highlight">{{ formatCurrency(selectedTransaction.amount) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Pickup ID</label>
+          <span class="value code-value">{{ selectedTransaction.pickupId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Drop-off ID</label>
+          <span class="value code-value">{{ selectedTransaction.dropOffId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Entity ID</label>
+          <span class="value code-value">{{ selectedTransaction.entityId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Created At</label>
+          <span class="value">{{ selectedTransaction.createdAt | date:'dd MMM yyyy, hh:mm a' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Updated At</label>
+          <span class="value">{{ selectedTransaction.updatedAt | date:'dd MMM yyyy, hh:mm a' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
+        <i class="pi pi-times"></i> Close
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

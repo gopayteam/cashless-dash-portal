@@ -1,0 +1,394 @@
+<!-- pages/trips/all-trips/all-trips.html -->
+<p-toast position="top-right"></p-toast>
+
+<div class="trips-container">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <div class="trips-header">
+    <div class="header-content">
+      <h1>
+        <i class="pi pi-map"></i>
+        All Trips
+      </h1>
+      <p class="text-muted">Monitor and manage all scheduled fleet trips</p>
+    </div>
+
+    <div class="header-controls">
+      <!-- Search -->
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search by fleet, route, trip ID..."
+          [(ngModel)]="searchTerm" (input)="onSearchChange()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Fleet Number Filter -->
+      <div class="search-wrapper">
+        <i class="pi pi-car search-icon"></i>
+        <input type="text" class="search-input fleet-filter-input" placeholder="Fleet number..."
+          [(ngModel)]="fleetNumberFilter" (input)="onFleetFilterChange()" />
+        <button *ngIf="fleetNumberFilter" class="clear-search-btn"
+          (click)="fleetNumberFilter = ''; onFleetFilterChange()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Status Filter -->
+      <p-select [options]="tripStatusOptions" [(ngModel)]="selectedTripStatus" (onChange)="onTripStatusChange()"
+        placeholder="All Status" styleClass="filter-dropdown"></p-select>
+
+      <!-- Clear All -->
+      <button *ngIf="searchTerm || selectedTripStatus || fleetNumberFilter" class="clear-all-btn"
+        (click)="clearFilters()" pTooltip="Clear all filters">
+        <i class="pi pi-filter-slash"></i>
+        Clear
+      </button>
+
+      <!-- Refresh -->
+      <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
+        <i class="pi pi-refresh" [class.spinning]="loading"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SUMMARY STATS
+  ═══════════════════════════════════════════ -->
+  <div class="summary-stats">
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-map"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Trips</span>
+        <span class="stat-value">{{ totalRecords }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Complete</span>
+        <span class="stat-value">{{ completeTrips }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Pending</span>
+        <span class="stat-value">{{ pendingTrips }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+        <i class="pi pi-send"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">In Progress</span>
+        <span class="stat-value">{{ inProgressTrips }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TABLE CARD
+  ═══════════════════════════════════════════ -->
+  <div class="table-card">
+
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <span class="record-badge">
+          {{ filteredTrips.length }} of {{ totalRecords }} trips
+        </span>
+        <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+          [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500]" (onPageChange)="onPageChange($event)"
+          [showCurrentPageReport]="true" style="margin-right: 0"></p-paginator>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filteredTrips.length === 0" class="empty-state">
+      <i class="pi pi-map"></i>
+      <h3>No Trips Found</h3>
+      <p *ngIf="searchTerm || selectedTripStatus || fleetNumberFilter">
+        Try adjusting your filters
+      </p>
+      <p *ngIf="!searchTerm && !selectedTripStatus && !fleetNumberFilter">
+        No trips available at the moment
+      </p>
+    </div>
+
+    <!-- Table -->
+    <p-table *ngIf="!loading && filteredTrips.length > 0" [value]="trips" [lazy]="true" [paginator]="true" [rows]="rows"
+      [first]="first" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 50, 100]"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      styleClass="data-table p-datatable-gridlines" (onLazyLoad)="loadTrips($event)"
+      [tableStyle]="{ 'min-width': '70rem' }" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Trip ID</th>
+          <th>Fleet</th>
+          <th>Route</th>
+          <th>Type</th>
+          <th>Travel Date &amp; Time</th>
+          <th>Seats</th>
+          <th>Occupancy</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-trip>
+        <tr class="table-row" (click)="viewTripDetails(trip)">
+
+          <!-- Trip ID -->
+          <td>
+            <span class="trip-id-badge">#{{ trip.tripId }}</span>
+          </td>
+
+          <!-- Fleet -->
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              {{ trip.fleetNumber }}
+            </span>
+          </td>
+
+          <!-- Route -->
+          <td>
+            <div class="route-cell">
+              <span class="route-name">{{ trip.routeName }}</span>
+              <span class="route-id">Route #{{ trip.route }}</span>
+            </div>
+          </td>
+
+          <!-- Type -->
+          <td>
+            <span [class]="'type-badge ' + getTripTypeClass(trip.tripType)">
+              {{ trip.tripType }}
+            </span>
+          </td>
+
+          <!-- Travel Date & Time -->
+          <td>
+            <div class="datetime-cell">
+              <span class="travel-date">
+                <i class="pi pi-calendar"></i>
+                {{ trip.travelDate | date:'dd MMM yyyy' }}
+              </span>
+              <span class="travel-time">
+                <i class="pi pi-clock"></i>
+                {{ formatTime(trip.travelTime) }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Seats -->
+          <td>
+            <div class="seats-cell">
+              <span class="seats-available">{{ trip.availableSeats }}</span>
+              <span class="seats-divider">/</span>
+              <span class="seats-total">{{ trip.capacity }}</span>
+              <span class="seats-label">avail</span>
+            </div>
+          </td>
+
+          <!-- Occupancy Bar -->
+          <td>
+            <div class="occupancy-cell">
+              <div class="occupancy-bar">
+                <div class="occupancy-fill" [class]="getOccupancyClass(trip)" [style.width.%]="getOccupancy(trip)">
+                </div>
+              </div>
+              <span class="occupancy-pct">{{ getOccupancy(trip) }}%</span>
+            </div>
+          </td>
+
+          <!-- Amount -->
+          <td>
+            <span class="amount-value">KES {{ trip.tripAmount }}</span>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span [class]="'status-badge status-' + getTripStatusClass(trip.tripStatus)">
+              <i [class]="getTripStatusIcon(trip.tripStatus)"></i>
+              {{ trip.tripStatus | titlecase }}
+            </span>
+          </td>
+
+        </tr>
+      </ng-template>
+    </p-table>
+
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DETAIL DIALOG
+═══════════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '800px' }"
+  (onHide)="closeDetailDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header" *ngIf="selectedTrip">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon">
+          <i class="pi pi-map"></i>
+        </div>
+        <div class="dialog-title-block">
+          <h2 class="dialog-title">Trip #{{ selectedTrip.tripId }}</h2>
+          <div class="dialog-badges">
+            <span [class]="'status-badge status-' + getTripStatusClass(selectedTrip.tripStatus)">
+              <i [class]="getTripStatusIcon(selectedTrip.tripStatus)"></i>
+              {{ selectedTrip.tripStatus }}
+            </span>
+            <span [class]="'type-badge ' + getTripTypeClass(selectedTrip.tripType)">
+              {{ selectedTrip.tripType }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="dialog-body" *ngIf="selectedTrip">
+
+    <!-- Mini stat cards -->
+    <div class="dialog-stat-row">
+      <div class="dialog-stat">
+        <i class="pi pi-car"></i>
+        <span class="ds-label">Fleet</span>
+        <span class="ds-value mono">{{ selectedTrip.fleetNumber }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-users"></i>
+        <span class="ds-label">Available Seats</span>
+        <span class="ds-value">{{ selectedTrip.availableSeats }} / {{ selectedTrip.capacity }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-wallet"></i>
+        <span class="ds-label">Fare</span>
+        <span class="ds-value mono">KES {{ selectedTrip.tripAmount }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-chart-bar"></i>
+        <span class="ds-label">Occupancy</span>
+        <span class="ds-value">{{ getOccupancy(selectedTrip) }}%</span>
+      </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+
+      <!-- Left -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-info-circle"></i> Trip Information
+        </h3>
+        <div class="detail-item">
+          <label>Trip ID</label>
+          <span class="value code-value">#{{ selectedTrip.tripId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Trip Type</label>
+          <span class="value">
+            <span [class]="'type-badge ' + getTripTypeClass(selectedTrip.tripType)">
+              {{ selectedTrip.tripType }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Trip Status</label>
+          <span class="value">
+            <span [class]="'status-badge status-' + getTripStatusClass(selectedTrip.tripStatus)">
+              <i [class]="getTripStatusIcon(selectedTrip.tripStatus)"></i>
+              {{ selectedTrip.tripStatus }}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Fleet Number</label>
+          <span class="value fleet-highlight">
+            <i class="pi pi-car"></i>
+            {{ selectedTrip.fleetNumber }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Fare Amount</label>
+          <span class="value amount-highlight">KES {{ selectedTrip.tripAmount }}</span>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-map-marker"></i> Route &amp; Schedule
+        </h3>
+        <div class="detail-item">
+          <label>Route ID</label>
+          <span class="value code-value">{{ selectedTrip.route }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Route Name</label>
+          <span class="value route-name-highlight">{{ selectedTrip.routeName }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Travel Date</label>
+          <span class="value">
+            <i class="pi pi-calendar" style="color:#667eea; margin-right:0.375rem;"></i>
+            {{ selectedTrip.travelDate | date:'EEEE, dd MMM yyyy' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Departure Time</label>
+          <span class="value">
+            <i class="pi pi-clock" style="color:#10b981; margin-right:0.375rem;"></i>
+            {{ formatTime(selectedTrip.travelTime) }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Capacity</label>
+          <span class="value">{{ selectedTrip.capacity }} seats total</span>
+        </div>
+        <div class="detail-item">
+          <label>Available Seats</label>
+          <span class="value">{{ selectedTrip.availableSeats }} remaining</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+
+      <button class="footer-btn btn-primary" (click)="viewTransactions(selectedTrip!)">
+        <i class="pi pi-info"></i> View Transactions
+      </button>
+
+      <button class="footer-btn btn-primary" (click)="viewReservations(selectedTrip!)">
+        <i class="pi pi-info"></i> View seats reservations
+      </button>
+
+      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
+        <i class="pi pi-times"></i> Close
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

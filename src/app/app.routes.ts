@@ -93,6 +93,9 @@ import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts
 import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignment/fund-reassignment';
 import { FleetCollectionsComponent } from './pages/fleet/total-collection/total-collection';
 import { MissedTransactionComponent } from './pages/hidden/missed-transactions/missed-transactions';
+import { AllTripsComponent } from './pages/booking/all-trips/all-trips';
+import { TripTransactionsComponent } from './pages/booking/trip-transactions/trip-transactions';
+import { SeatReservationsComponent } from './pages/booking/seat-reservation/seat-reservation';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -288,6 +291,43 @@ export const routes: Routes = [
       {
         path: 'driver-assignments/pending',
         component: AllPendingDriverAssignmentsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+      /* Booking */
+      {
+        path: 'booking/all-trips',
+        component: AllTripsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+      {
+        path: 'booking/trip-transactions',
+        component: TripTransactionsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+      {
+        path: 'booking/trip-transactions/:tripId',
+        component: TripTransactionsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+
+      {
+        path: 'booking/seat-reservation',
+        component: SeatReservationsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+      {
+        path: 'booking/seat-reservation/:tripId',
+        component: SeatReservationsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
       },

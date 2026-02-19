@@ -1,0 +1,333 @@
+<!-- pages/trips/seat-reservations/seat-reservations.html -->
+<p-toast position="top-right"></p-toast>
+
+<div class="reservations-container">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <div class="reservations-header">
+    <div class="header-content">
+      <h1>
+        <i class="pi pi-ticket"></i>
+        Seat Reservations
+      </h1>
+      <p class="text-muted">
+        Viewing seat reservations for
+        <span class="trip-id-pill">Trip #{{ tripId }}</span>
+      </p>
+    </div>
+
+    <div class="header-controls">
+      <!-- Search -->
+      <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search by username, seat #, ID..." [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
+        <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Username Server Filter -->
+      <div class="search-wrapper">
+        <i class="pi pi-user search-icon"></i>
+        <input type="text" class="search-input username-filter-input" placeholder="Filter by username..."
+          [(ngModel)]="usernameFilter" (input)="onUsernameFilterChange()" />
+        <button *ngIf="usernameFilter" class="clear-search-btn" (click)="usernameFilter = ''; onUsernameFilterChange()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Status Filter -->
+      <p-select [options]="reservationStatusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()"
+        placeholder="All Status" styleClass="filter-dropdown"></p-select>
+
+      <!-- Clear All -->
+      <button *ngIf="searchTerm || selectedStatus || usernameFilter" class="clear-all-btn" (click)="clearFilters()"
+        pTooltip="Clear all filters">
+        <i class="pi pi-filter-slash"></i>
+        Clear
+      </button>
+
+      <!-- Refresh -->
+      <button class="icon-btn" (click)="refresh()" [disabled]="loading" pTooltip="Refresh">
+        <i class="pi pi-refresh" [class.spinning]="loading"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SUMMARY STATS
+  ═══════════════════════════════════════════ -->
+  <div class="summary-stats">
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <i class="pi pi-ticket"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Reservations</span>
+        <span class="stat-value">{{ totalRecords }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Completed</span>
+        <span class="stat-value">{{ completedCount }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+        <i class="pi pi-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Pending</span>
+        <span class="stat-value">{{ pendingCount }}</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total Seats Reserved</span>
+        <span class="stat-value">{{ totalSeatsReserved }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TABLE CARD
+  ═══════════════════════════════════════════ -->
+  <div class="table-card">
+
+    <div class="table-toolbar">
+      <div class="toolbar-left">
+        <span class="record-badge">
+          {{ filteredReservations.length }} of {{ totalRecords }} reservations
+        </span>
+        <p-paginator [first]="first" [rows]="rows" [totalRecords]="filteredReservations.length"
+          [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+          style="margin-right: 0"></p-paginator>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filteredReservations.length === 0" class="empty-state">
+      <i class="pi pi-ticket"></i>
+      <h3>No Seat Reservations Found</h3>
+      <p *ngIf="searchTerm || selectedStatus || usernameFilter">
+        Try adjusting your filters
+      </p>
+      <p *ngIf="!searchTerm && !selectedStatus && !usernameFilter">
+        No seat reservations recorded for this trip
+      </p>
+    </div>
+
+    <!-- Table -->
+    <p-table *ngIf="!loading && filteredReservations.length > 0" [value]="reservations"
+      styleClass="data-table p-datatable-gridlines" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Passenger</th>
+          <th>Trip</th>
+          <th>Seats Reserved</th>
+          <th>Seat Numbers</th>
+          <th>Status</th>
+          <th>Entity</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-reservation>
+        <tr class="table-row" (click)="viewReservationDetails(reservation)">
+
+          <!-- ID -->
+          <td>
+            <span class="res-id-badge">#{{ reservation.id }}</span>
+          </td>
+
+          <!-- Passenger -->
+          <td>
+            <div class="passenger-cell">
+              <div class="passenger-avatar">
+                {{ getUserInitial(reservation.username) }}
+              </div>
+              <span class="passenger-username">{{ reservation.username }}</span>
+            </div>
+          </td>
+
+          <!-- Trip -->
+          <td>
+            <span class="trip-badge">
+              <i class="pi pi-map"></i>
+              #{{ reservation.tripId }}
+            </span>
+          </td>
+
+          <!-- Seats Reserved -->
+          <td>
+            <div class="seats-count-cell">
+              <span class="seats-count-num">{{ reservation.seatsReserved }}</span>
+              <span class="seats-count-label">seat{{ reservation.seatsReserved !== 1 ? 's' : '' }}</span>
+            </div>
+          </td>
+
+          <!-- Seat Numbers -->
+          <td>
+            <div class="seat-chips">
+              <span *ngFor="let seat of reservation.seatNumbers" [class]="'seat-chip ' + getSeatChipClass(seat)"
+                [pTooltip]="'Seat ' + seat">
+                {{ seat }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span [class]="'status-badge status-' + getStatusClass(reservation.reservationStatus)">
+              <i [class]="getStatusIcon(reservation.reservationStatus)"></i>
+              {{ reservation.reservationStatus | titlecase }}
+            </span>
+          </td>
+
+          <!-- Entity -->
+          <td>
+            <span class="entity-id">{{ reservation.entityId }}</span>
+          </td>
+
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DETAIL DIALOG
+═══════════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '760px' }"
+  (onHide)="closeDetailDialog()">
+  <ng-template pTemplate="header">
+    <div class="dialog-header" *ngIf="selectedReservation">
+      <div class="dialog-header-top">
+        <div class="dialog-header-icon">
+          <i class="pi pi-ticket"></i>
+        </div>
+        <div class="dialog-title-block">
+          <h2 class="dialog-title">Reservation #{{ selectedReservation.id }}</h2>
+          <div class="dialog-badges">
+            <span [class]="'status-badge status-' + getStatusClass(selectedReservation.reservationStatus)">
+              <i [class]="getStatusIcon(selectedReservation.reservationStatus)"></i>
+              {{ selectedReservation.reservationStatus }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="dialog-body" *ngIf="selectedReservation">
+
+    <!-- Mini stats -->
+    <div class="dialog-stat-row">
+      <div class="dialog-stat">
+        <i class="pi pi-ticket"></i>
+        <span class="ds-label">Seats Reserved</span>
+        <span class="ds-value">{{ selectedReservation.seatsReserved }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-map"></i>
+        <span class="ds-label">Trip ID</span>
+        <span class="ds-value mono">#{{ selectedReservation.tripId }}</span>
+      </div>
+      <div class="dialog-stat">
+        <i class="pi pi-th-large"></i>
+        <span class="ds-label">Seat Count</span>
+        <span class="ds-value">{{ selectedReservation.seatNumbers?.length ?? 0 }}</span>
+      </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="detail-grid">
+
+      <!-- Left: Passenger Info -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-user"></i> Passenger Details
+        </h3>
+        <div class="detail-item">
+          <label>Username</label>
+          <span class="value driver-name-highlight">
+            <i class="pi pi-user"></i>
+            {{ selectedReservation.username }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Entity ID</label>
+          <span class="value code-value">{{ selectedReservation.entityId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Reservation ID</label>
+          <span class="value code-value">#{{ selectedReservation.id }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Trip ID</label>
+          <span class="value code-value">#{{ selectedReservation.tripId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Reservation Status</label>
+          <span class="value">
+            <span [class]="'status-badge status-' + getStatusClass(selectedReservation.reservationStatus)">
+              <i [class]="getStatusIcon(selectedReservation.reservationStatus)"></i>
+              {{ selectedReservation.reservationStatus }}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: Seat Details -->
+      <div class="detail-column">
+        <h3 class="column-title">
+          <i class="pi pi-th-large"></i> Seat Details
+        </h3>
+        <div class="detail-item">
+          <label>Total Seats Reserved</label>
+          <span class="value seats-count-large">{{ selectedReservation.seatsReserved }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Assigned Seat Numbers</label>
+          <div class="dialog-seat-chips">
+            <span *ngFor="let seat of selectedReservation.seatNumbers"
+              [class]="'seat-chip seat-chip-lg ' + getSeatChipClass(seat)">
+              <i class="pi pi-ticket"></i>
+              Seat {{ seat }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
+        <i class="pi pi-times"></i> Close
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

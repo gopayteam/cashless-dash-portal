@@ -127,6 +127,21 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Pending', icon: 'pi pi-clock', route: '/driver-assignments/pending', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
       { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
     ],
+    '/booking': [
+      {
+        label: 'All Trips', icon: 'pi pi-calendar', route: '/booking/all-trips', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
+      },
+      {
+        label: 'Trip Transactions', icon: 'pi pi-wallet', route: '/booking/trip-transactions', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
+      },
+      {
+        label: 'Seat Reservations',
+        icon: 'pi pi-ticket',
+        route: '/booking/seat-reservation',
+        roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
+      }
+    ],
+
     '/parcel-offices': [
       { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
       { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] }

@@ -90,4 +90,18 @@ export const API_ENDPOINTS = {
   // #####################  DEBUG-ENDPOINTS   #######################
   MISSED_TRANSACTION: '/api/payment/c2b/callback/queue',
 
+
+  // #####################  BOOKING-ENDPOINTS   #######################
+  // ── Trips ────────────────────────────────────────────────────────────────
+  // GET  /api/booking/trip/all/filter/fleet
+  // Params: entityId, tripStatus (optional), fleetNumber (optional), page, size
+  ALL_TRIPS: '/api/booking/trip/all/filter/fleet',
+
+  // GET  /api/booking/trip/scheduled/transactions/:tripId
+  TRIP_TRANSACTIONS: '/api/booking/trip/scheduled/transactions',
+
+  // POST /api/booking/trip/seat/reservations
+  // Body: { tripId, entityId, username? (optional), reservationStatus? (optional) }
+  SEAT_RESERVATIONS: '/api/booking/trip/seat/reservations',
+
 };

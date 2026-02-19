@@ -184,7 +184,7 @@
             </ul>
           </li>
 
-          <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS']">
+          <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_ROUTES']">
             <button class="menu-link" [class.menu-link--active]="isRouteActive('/locations')"
               (click)="navigate('/locations/stages')">
               <span class="menu-link-content">
@@ -192,6 +192,22 @@
                 <span class="menu-text">Locations</span>
               </span>
             </button>
+          </li>
+
+          <!-- Booking Category -->
+          <li *ngIf="hasAuditAccess()">
+            <div class="menu-category">Booking Operations</div>
+            <ul class="menu-items">
+              <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_ROUTES']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/booking')"
+                  (click)="navigate('/booking/all-trips')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-car menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Booking Activities</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
           </li>
 
           <!-- Finance Category -->
