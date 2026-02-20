@@ -32,7 +32,7 @@ export interface SeatReservation {
   tripId: number;
   seatsReserved: number;
   reservationStatus: ReservationStatus;
-  seatNumbers: number[];
+  seatNumbers?: number[];
 }
 
 export interface SeatReservationsApiResponse {

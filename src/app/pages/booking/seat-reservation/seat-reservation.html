@@ -27,13 +27,8 @@
       <!-- Client-side keyword search — calls onSearchChange() → applyClientSideFilter() -->
       <div class="search-wrapper">
         <i class="pi pi-search search-icon"></i>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search by username, seat #, ID…"
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange()"
-        />
+        <input type="text" class="search-input" placeholder="Search by username, seat #, ID…" [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
         <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
           <i class="pi pi-times"></i>
         </button>
@@ -47,18 +42,9 @@
       -->
       <div class="search-wrapper">
         <i class="pi pi-phone search-icon"></i>
-        <input
-          type="text"
-          class="search-input username-filter-input"
-          placeholder="Phone number (optional)…"
-          [(ngModel)]="usernameFilter"
-          (input)="onUsernameFilterChange()"
-        />
-        <button
-          *ngIf="usernameFilter"
-          class="clear-search-btn"
-          (click)="usernameFilter = ''; onUsernameFilterChange()"
-        >
+        <input type="text" class="search-input username-filter-input" placeholder="Phone number (optional)…"
+          [(ngModel)]="usernameFilter" (input)="onUsernameFilterChange()" />
+        <button *ngIf="usernameFilter" class="clear-search-btn" (click)="usernameFilter = ''; onUsernameFilterChange()">
           <i class="pi pi-times"></i>
         </button>
       </div>
@@ -68,21 +54,12 @@
         Server-side: calls onStatusChange() → loadReservations() with
         reservationStatus in the POST payload. Optional — send only when non-empty.
       -->
-      <p-select
-        [options]="reservationStatusOptions"
-        [(ngModel)]="selectedStatus"
-        (onChange)="onStatusChange()"
-        placeholder="All Status"
-        styleClass="filter-dropdown"
-      ></p-select>
+      <p-select [options]="reservationStatusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()"
+        placeholder="All Status" styleClass="filter-dropdown"></p-select>
 
       <!-- Clear all — resets both server-side and client-side filters then reloads -->
-      <button
-        *ngIf="searchTerm || selectedStatus || usernameFilter"
-        class="clear-all-btn"
-        (click)="clearFilters()"
-        pTooltip="Clear all filters"
-      >
+      <button *ngIf="searchTerm || selectedStatus || usernameFilter" class="clear-all-btn" (click)="clearFilters()"
+        pTooltip="Clear all filters">
         <i class="pi pi-filter-slash"></i>
         Clear
       </button>
@@ -166,15 +143,9 @@
         <span class="record-badge">
           {{ filteredReservations.length }} of {{ totalRecords }} reservations
         </span>
-        <p-paginator
-          [first]="first"
-          [rows]="rows"
-          [totalRecords]="filteredReservations.length"
-          [rowsPerPageOptions]="[10, 20, 50, 100]"
-          (onPageChange)="onPageChange($event)"
-          [showCurrentPageReport]="true"
-          style="margin-right: 0"
-        ></p-paginator>
+        <p-paginator [first]="first" [rows]="rows" [totalRecords]="filteredReservations.length"
+          [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+          style="margin-right: 0"></p-paginator>
       </div>
     </div>
 
@@ -191,13 +162,8 @@
     </div>
 
     <!-- Table -->
-    <p-table
-      *ngIf="!loading && filteredReservations.length > 0"
-      [value]="reservations"
-      styleClass="data-table p-datatable-gridlines"
-      [tableStyle]="{ 'min-width': '60rem' }"
-      responsiveLayout="scroll"
-    >
+    <p-table *ngIf="!loading && filteredReservations.length > 0" [value]="reservations"
+      styleClass="data-table p-datatable-gridlines" [tableStyle]="{ 'min-width': '60rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>ID</th>
@@ -247,11 +213,8 @@
           <!-- Seat Numbers — coloured chips via getSeatChipClass() -->
           <td>
             <div class="seat-chips">
-              <span
-                *ngFor="let seat of reservation.seatNumbers"
-                [class]="'seat-chip ' + getSeatChipClass(seat)"
-                [pTooltip]="'Seat ' + seat"
-              >
+              <span *ngFor="let seat of reservation.seatNumbers" [class]="'seat-chip ' + getSeatChipClass(seat)"
+                [pTooltip]="'Seat ' + seat">
                 {{ seat }}
               </span>
             </div>
@@ -283,17 +246,9 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      DETAIL DIALOG
 ═══════════════════════════════════════════════════════════════════ -->
-<p-dialog
-  [(visible)]="displayDetailDialog"
-  [modal]="true"
-  [closable]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [resizable]="false"
-  styleClass="custom-dialog"
-  [style]="{ width: '90vw', maxWidth: '760px' }"
-  (onHide)="closeDetailDialog()"
->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '760px' }"
+  (onHide)="closeDetailDialog()">
   <ng-template pTemplate="header">
     <div class="dialog-header" *ngIf="selectedReservation">
       <div class="dialog-header-top">
@@ -384,10 +339,8 @@
         <div class="detail-item">
           <label>Assigned Seat Numbers</label>
           <div class="dialog-seat-chips">
-            <span
-              *ngFor="let seat of selectedReservation.seatNumbers"
-              [class]="'seat-chip seat-chip-lg ' + getSeatChipClass(seat)"
-            >
+            <span *ngFor="let seat of selectedReservation.seatNumbers"
+              [class]="'seat-chip seat-chip-lg ' + getSeatChipClass(seat)">
               <i class="pi pi-ticket"></i>
               Seat {{ seat }}
             </span>

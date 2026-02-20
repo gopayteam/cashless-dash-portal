@@ -195,7 +195,7 @@
           </li>
 
           <!-- Booking Category -->
-          <li *ngIf="hasAuditAccess()">
+          <li *ngIf="hasAuditAccess() && entityId == 'GS000002'">
             <div class="menu-category">Booking Operations</div>
             <ul class="menu-items">
               <li class="menu-item" *hasRole="['CAN_VIEW_STAGES', 'CAN_VIEW_ROUTES', 'CAN_VIEW_ROUTES']">

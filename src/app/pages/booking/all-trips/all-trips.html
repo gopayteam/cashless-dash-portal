@@ -406,21 +406,19 @@
   <!-- Dialog footer — Close + navigate to Transactions + Reservations -->
   <ng-template pTemplate="footer">
     <div class="dialog-footer">
-      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
-        <i class="pi pi-times"></i> Close
-      </button>
-
       <ng-container *ngIf="selectedTrip">
-        <button class="footer-btn btn-transactions" (click)="viewTransactions(selectedTrip)"
-          pTooltip="View all transactions for this trip">
+        <button class="footer-btn btn-transactions" (click)="viewTransactions(selectedTrip)">
           <i class="pi pi-credit-card"></i> Transactions
         </button>
 
-        <button class="footer-btn btn-reservations" (click)="viewReservations(selectedTrip)"
-          pTooltip="View seat reservations for this trip">
+        <button class="footer-btn btn-reservations" (click)="viewReservations(selectedTrip)">
           <i class="pi pi-ticket"></i> Seat Reservations
         </button>
       </ng-container>
+
+      <button class="footer-btn btn-secondary" (click)="closeDetailDialog()">
+        <i class="pi pi-times"></i> Close
+      </button>
     </div>
   </ng-template>
 
