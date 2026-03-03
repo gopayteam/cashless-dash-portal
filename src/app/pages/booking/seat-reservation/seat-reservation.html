@@ -133,12 +133,21 @@
 
   </div>
 
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="pagination-wrapper">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
+
   <!-- ═══════════════════════════════════════════
        TABLE CARD
   ═══════════════════════════════════════════ -->
   <div class="table-card" *ngIf="tripId">
 
-    <div class="table-toolbar">
+    <!-- <div class="table-toolbar">
       <div class="toolbar-left">
         <span class="record-badge">
           {{ filteredReservations.length }} of {{ totalRecords }} reservations
@@ -147,7 +156,7 @@
           [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
           style="margin-right: 0"></p-paginator>
       </div>
-    </div>
+    </div> -->
 
     <!-- Empty -->
     <div *ngIf="!loading && filteredReservations.length === 0" class="empty-state">

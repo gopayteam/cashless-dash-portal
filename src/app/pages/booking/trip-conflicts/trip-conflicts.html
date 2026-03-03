@@ -1,0 +1,292 @@
+<!-- pages/booking/conflict-dashboard/conflict-dashboard.html -->
+<p-toast position="top-right"></p-toast>
+
+<div class="conflict-page">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <div class="conflict-header">
+    <div class="header-left">
+      <h2>
+        <i class="pi pi-exclamation-triangle"></i>
+        Booking Conflicts
+      </h2>
+      <p class="subtitle">Real-time detection of seat booking issues</p>
+    </div>
+
+    <!-- Trip status — triggers server reload -->
+    <div class="header-actions">
+      <button pButton icon="pi pi-refresh" style="gap: 0.5rem" label="Scan Now" class="p-button-warning"
+        [loading]="scanning" (click)="runScan()" pTooltip="Scan all IN_PROGRESS trips for conflicts"
+        tooltipPosition="bottom">
+      </button>
+      <button pButton icon="pi pi-check-square" style="gap: 0.5rem" label="Resolve All" class="p-button-success"
+        [disabled]="unresolvedConflicts.length === 0" (click)="resolveAll()">
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SUMMARY CARDS
+  ═══════════════════════════════════════════ -->
+  <div class="summary-cards">
+
+    <div class="summary-card high">
+      <div class="card-icon">
+        <i class="pi pi-times-circle"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ countByType('DOUBLE_BOOKING') }}</span>
+        <span class="card-label">Double Bookings</span>
+      </div>
+    </div>
+
+    <div class="summary-card high">
+      <div class="card-icon">
+        <i class="pi pi-ban"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ countByType('OVER_CAPACITY') }}</span>
+        <span class="card-label">Over Capacity</span>
+      </div>
+    </div>
+
+    <div class="summary-card medium">
+      <div class="card-icon">
+        <i class="pi pi-credit-card"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ countByType('ORPHAN_TRANSACTION') }}</span>
+        <span class="card-label">Unmatched Transactions</span>
+      </div>
+    </div>
+
+    <div class="summary-card low">
+      <div class="card-icon">
+        <i class="pi pi-ticket"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ countByType('ORPHAN_RESERVATION') }}</span>
+        <span class="card-label">Unmatched Reservations</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FILTERS
+  ═══════════════════════════════════════════ -->
+  <div class="filter-row">
+    <p-select [options]="typeFilterOptions" [(ngModel)]="selectedType" placeholder="All Types" optionLabel="label"
+      optionValue="value" (onChange)="applyFilter()">
+    </p-select>
+    <p-select [options]="severityFilterOptions" [(ngModel)]="selectedSeverity" placeholder="All Severities"
+      optionLabel="label" optionValue="value" (onChange)="applyFilter()">
+    </p-select>
+
+    <p-select [options]="statusFilterOptions" [(ngModel)]="selectedStatus" placeholder="All Statuses"
+      optionLabel="label" optionValue="value" (onChange)="applyFilter()">
+    </p-select>
+
+    <p-select [options]="tripStatusOptions" [(ngModel)]="selectedTripStatus" (onChange)="runScan()"
+      placeholder="All Status" styleClass="filter-dropdown"></p-select>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       TABLE
+  ═══════════════════════════════════════════ -->
+  <div class="table-card">
+
+    <!-- Empty state -->
+    <div *ngIf="!scanning && filteredConflicts.length === 0" class="empty-state">
+      <i class="pi pi-check-circle"></i>
+      <h3>No Conflicts Detected</h3>
+      <p>All trips look good! Run a scan to check for new issues.</p>
+    </div>
+
+    <p-table *ngIf="filteredConflicts.length > 0" [value]="filteredConflicts" [paginator]="true" [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50, 100]" styleClass="conflict-table p-datatable-gridlines" [loading]="scanning"
+      [tableStyle]="{ 'min-width': '72rem' }" responsiveLayout="scroll">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Type</th>
+          <th>Severity</th>
+          <th>Trip</th>
+          <th>Fleet</th>
+          <th>Route</th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-conflict>
+        <tr [class.resolved-row]="conflict.resolved">
+
+          <!-- Type -->
+          <td>
+            <p-tag [value]="conflictTypeLabel(conflict.type)" [severity]="conflictTypeSeverity(conflict.type)"
+              [rounded]="true">
+            </p-tag>
+          </td>
+
+          <!-- Severity -->
+          <td>
+            <p-tag [value]="conflict.severity" [severity]="severityTagColor(conflict.severity)" [rounded]="true">
+            </p-tag>
+          </td>
+
+          <!-- Trip ID -->
+          <td>
+            <span class="trip-id-badge">#{{ conflict.tripId }}</span>
+          </td>
+
+          <!-- Fleet -->
+          <td>
+            <span class="fleet-badge">
+              <i class="pi pi-car"></i>
+              {{ conflict.fleetNumber }}
+            </span>
+          </td>
+
+          <!-- Route -->
+          <td>{{ conflict.routeName }}</td>
+
+          <!-- Date -->
+          <td>{{ conflict.travelDate }}</td>
+
+          <!-- Description -->
+          <td class="description-cell">
+            <span pTooltip="{{ conflict.description }}" tooltipPosition="top">
+              {{ conflict.description | slice:0:80 }}{{ conflict.description.length > 80 ? '…' : '' }}
+            </span>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag [value]="conflict.resolved ? 'Resolved' : 'Open'"
+              [severity]="conflict.resolved ? 'success' : 'danger'" [rounded]="true">
+            </p-tag>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="action-buttons">
+              <button class="action-btn btn-view" pTooltip="View details" tooltipPosition="top"
+                (click)="viewConflict(conflict)">
+                <i class="pi pi-eye"></i>
+              </button>
+              <button class="action-btn btn-resolve" pTooltip="Mark resolved" tooltipPosition="top"
+                [disabled]="conflict.resolved" (click)="resolveConflict(conflict)">
+                <i class="pi pi-check"></i>
+              </button>
+            </div>
+          </td>
+
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DETAIL DIALOG
+═══════════════════════════════════════════════════════════════════ -->
+<p-dialog [(visible)]="showDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true" [draggable]="false"
+  [resizable]="false" styleClass="conflict-detail-dialog" [style]="{ width: '90vw', maxWidth: '560px' }"
+  header="Conflict Details">
+
+  <div class="conflict-detail" *ngIf="selectedConflict">
+
+    <div class="detail-row">
+      <span class="detail-label">Type</span>
+      <p-tag [value]="conflictTypeLabel(selectedConflict.type)"
+        [severity]="conflictTypeSeverity(selectedConflict.type)">
+      </p-tag>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Severity</span>
+      <p-tag [value]="selectedConflict.severity" [severity]="severityTagColor(selectedConflict.severity)">
+      </p-tag>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Trip ID</span>
+      <span class="trip-id-badge">#{{ selectedConflict.tripId }}</span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Fleet</span>
+      <span class="fleet-badge">
+        <i class="pi pi-car"></i>
+        {{ selectedConflict.fleetNumber }}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Route</span>
+      <span class="detail-value">{{ selectedConflict.routeName }}</span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Travel Date</span>
+      <span class="detail-value">
+        <i class="pi pi-calendar" style="color:#667eea; margin-right:0.375rem;"></i>
+        {{ selectedConflict.travelDate }}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Detected At</span>
+      <span class="detail-value">
+        <i class="pi pi-clock" style="color:#10b981; margin-right:0.375rem;"></i>
+        {{ selectedConflict.detectedAt | date:'medium' }}
+      </span>
+    </div>
+
+    <div class="detail-row">
+      <span class="detail-label">Description</span>
+      <span class="detail-description">{{ selectedConflict.description }}</span>
+    </div>
+
+    <div class="detail-row" *ngIf="selectedConflict.affectedSeats?.length">
+      <span class="detail-label">Affected Seats</span>
+      <div class="seat-chips">
+        <span class="seat-chip" *ngFor="let seat of selectedConflict.affectedSeats">
+          {{ seat }}
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-row" *ngIf="selectedConflict.affectedPassengers?.length">
+      <span class="detail-label">Passengers</span>
+      <div class="passenger-list">
+        <span class="passenger-item" *ngFor="let p of selectedConflict.affectedPassengers">
+          {{ p }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button class="footer-btn btn-secondary" (click)="showDetailDialog = false">
+        <i class="pi pi-times"></i> Close
+      </button>
+      <button class="footer-btn btn-resolve-footer" [disabled]="selectedConflict?.resolved"
+        (click)="resolveConflict(selectedConflict!)">
+        <i class="pi pi-check"></i> Mark Resolved
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>

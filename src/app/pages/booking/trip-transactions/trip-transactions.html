@@ -10,7 +10,7 @@
     <div class="header-content">
       <div class="header-title-row">
         <!-- Back button -->
-        <button class="back-btn" (click)="goBack()" pTooltip="Back to Trips">
+        <button class="back-btn" (click)="goBack()" pTooltip="">
           <i class="pi pi-arrow-left"></i>
         </button>
         <div>
@@ -116,12 +116,21 @@
 
   </div>
 
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="pagination-wrapper">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
+
   <!-- ═══════════════════════════════════════════
        TABLE CARD — only when trip is resolved
   ═══════════════════════════════════════════ -->
   <div class="table-card" *ngIf="hasLoaded">
 
-    <div class="table-toolbar">
+    <!-- <div class="table-toolbar">
       <div class="toolbar-left">
         <span class="record-badge">
           {{ filteredTransactions.length }} of {{ totalRecords }} transactions
@@ -130,7 +139,7 @@
           [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
           style="margin-right: 0"></p-paginator>
       </div>
-    </div>
+    </div> -->
 
     <!-- Empty — after load but no results -->
     <div *ngIf="!loading && filteredTransactions.length === 0" class="empty-state">

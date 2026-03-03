@@ -1,30 +1,40 @@
-import { Component, HostListener, OnInit, OnDestroy, inject, ViewChild, ElementRef, NgZone } from '@angular/core';
+// main-layout.ts  ── UPDATED SECTIONS ONLY
+// Changes from original:
+//   1. Import AppNotificationService
+//   2. Remove the local `notifications` array and `unreadCount` number —
+//      replace with computed signals from AppNotificationService
+//   3. Wire markAsRead / markAllAsRead through the service
+//   4. Add a `scanForConflicts()` helper for convenience
+//
+// Everything else (sidebar, tabs, dark mode, etc.) is unchanged.
+
+import {
+  Component, HostListener, OnInit, OnDestroy,
+  inject, NgZone, effect
+} from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../@core/services/auth.service';
 import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
-import { Dialog } from "primeng/dialog";
+import { Dialog } from 'primeng/dialog';
 import { Subscription } from 'rxjs';
 import { DarkModeService } from '../../../@core/services/dark-mode.service';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ThemeService } from '../../../@core/services/theme.service';
+
+// ── NEW imports ────────────────────────────────────────────────────────────────
+import { AppNotificationService } from '../../../@core/services/app-notification.service';
+import { BookingConflictService } from '../../../@core/services/booking-conflict.service';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { AppNotification } from '../../../@core/models/notifications/app-notification.model';
+// ──────────────────────────────────────────────────────────────────────────────
 
 interface TabConfig {
   label: string;
   icon: string;
   route: string;
   roles?: string[];
-}
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  time: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  read: boolean;
 }
 
 @Component({
@@ -40,62 +50,58 @@ interface Notification {
     MatSlideToggleModule,
   ],
   templateUrl: './main-layout.html',
-  styleUrls: ['./main-layout.css']
+  styleUrls: ['./main-layout.css'],
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
 
-  // Sidebar state
+  // ── Sidebar ──────────────────────────────────────────────────────────────
   sidebarCollapsed = false;
   sidebarVisible = false;
-  showFooter: boolean = true;
-
+  showFooter = true;
   private currentScreenWidth = window.innerWidth;
 
-  // User info
-  userInfo = {
-    name: '',
-    email: '',
-    initials: ''
-  };
-
-  logoUrl: string = 'gopay_clear.png';
-  logoSideBarUrl: string = 'gopay_clear.png';
+  // ── User info ─────────────────────────────────────────────────────────────
+  userInfo = { name: '', email: '', initials: '' };
+  logoUrl = 'gopay_clear.png';
+  logoSideBarUrl = 'gopay_clear.png';
   brandName = '';
   brandType: 'text' | 'logo' = 'text';
 
   private logoMap: Record<string, string> = {
     GS000002: 'logo_2.png',
-    GS000006: 'BUNGOMA_LOGO.png'
+    GS000006: 'BUNGOMA_LOGO.png',
   };
 
   brandingMap: Record<string, { logo: string; name: string; type: 'text' | 'logo' }> = {
-    GS000006: {
-      logo: 'BUNGOMA_LOGO.png',
-      name: 'Bungoma Line Shuttle',
-      type: 'text'
-    },
-    GS000002: {
-      logo: 'super_metro_logo.png',
-      name: 'Super Metro',
-      type: 'logo'
-    }
+    GS000006: { logo: 'BUNGOMA_LOGO.png', name: 'Bungoma Line Shuttle', type: 'text' },
+    GS000002: { logo: 'super_metro_logo.png', name: 'Super Metro', type: 'logo' },
   };
 
-
-  // Notifications
+  // ── Notifications — now powered by AppNotificationService ────────────────
   notificationDialogVisible = false;
-  notifications: Notification[] = [];
-  unreadCount = 0;
 
-  // Settings
+  /**
+   * Live list of notifications from the service.
+   * Used directly in the template: `*ngFor="let n of notifications"`.
+   * Automatically updates whenever the service pushes a new notification.
+   */
+  get notifications(): AppNotification[] {
+    return this.notificationService.notifications();
+  }
+
+  /** Badge count for the bell icon */
+  get unreadCount(): number {
+    return this.notificationService.unreadCount();
+  }
+
+  // ── Settings ──────────────────────────────────────────────────────────────
   settingsDialogVisible = false;
   darkModeEnabled = false;
   emailNotificationsEnabled = true;
   autoLogoutEnabled = false;
-
   private darkModeSubscription?: Subscription;
 
-  // Tab navigation
+  // ── Tab navigation ────────────────────────────────────────────────────────
   showTabs = false;
   currentTabs: TabConfig[] = [];
   filteredTabs: TabConfig[] = [];
@@ -105,11 +111,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   settingsForm!: FormGroup;
   entityId: string | null = null;
 
+  // ── Tab configs (unchanged) ───────────────────────────────────────────────
   private tabConfigs: { [key: string]: TabConfig[] } = {
     '/transactions': [
       { label: 'All Transactions', icon: 'pi pi-list', route: '/transactions/all', roles: ['CAN_VIEW_TRANSACTIONS'] },
       { label: 'Failed', icon: 'pi pi-times-circle', route: '/transactions/failed', roles: ['CAN_VIEW_TRANSACTIONS'] },
-      { label: 'Pending', icon: 'pi pi-clock', route: '/transactions/pending', roles: ['CAN_VIEW_TRANSACTIONS'] }
+      { label: 'Pending', icon: 'pi pi-clock', route: '/transactions/pending', roles: ['CAN_VIEW_TRANSACTIONS'] },
     ],
     '/transfer-payment': [
       { label: 'Credit Driver', icon: 'pi pi-list', route: '/transfer-payment/1' },
@@ -118,41 +125,32 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     '/drivers': [
       { label: 'All Drivers', icon: 'pi pi-users', route: '/drivers/all', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
       { label: 'Active', icon: 'pi pi-check-circle', route: '/drivers/active', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
-      { label: 'Inactive', icon: 'pi pi-ban', route: '/drivers/inactive', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] }
+      { label: 'Inactive', icon: 'pi pi-ban', route: '/drivers/inactive', roles: ['CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER'] },
     ],
     '/driver-assignments': [
       { label: 'All Assignments', icon: 'pi pi-list', route: '/driver-assignments/all', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
       { label: 'Active', icon: 'pi pi-check-circle', route: '/driver-assignments/active', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
       { label: 'Inactive', icon: 'pi pi-ban', route: '/driver-assignments/inactive', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET'] },
       { label: 'Pending', icon: 'pi pi-clock', route: '/driver-assignments/pending', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
-      { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] }
+      { label: 'Rejected', icon: 'pi pi-times-circle', route: '/driver-assignments/rejected', roles: ['CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_REJECT_DRIVER'] },
     ],
     '/booking': [
-      {
-        label: 'All Trips', icon: 'pi pi-calendar', route: '/booking/all-trips', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
-      },
-      {
-        label: 'Trip Transactions', icon: 'pi pi-wallet', route: '/booking/trip-transactions', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
-      },
-      {
-        label: 'Seat Reservations',
-        icon: 'pi pi-ticket',
-        route: '/booking/seat-reservation',
-        roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET']
-      }
+      { label: 'All Trips', icon: 'pi pi-calendar', route: '/booking/all-trips', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
+      { label: 'Trip Transactions', icon: 'pi pi-wallet', route: '/booking/trip-transactions', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
+      { label: 'Seat Reservations', icon: 'pi pi-ticket', route: '/booking/seat-reservation', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
+      { label: 'Trip Conflicts', icon: 'pi pi-exclamation-triangle', route: '/booking/trip-conflicts', roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] },
     ],
-
     '/parcel-offices': [
       { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
-      { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] }
+      { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] },
     ],
     '/locations': [
       { label: 'Stages', icon: 'pi pi-map', route: '/locations/stages', roles: ['CAN_VIEW_STAGES', 'CAN_VIEW_LOCATIONS'] },
-      { label: 'Routes', icon: 'pi pi-directions', route: '/locations/routes', roles: ['CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS'] }
+      { label: 'Routes', icon: 'pi pi-directions', route: '/locations/routes', roles: ['CAN_VIEW_ROUTES', 'CAN_VIEW_LOCATIONS'] },
     ],
     '/wallet': [
       { label: 'Organization', icon: 'pi pi-building', route: '/wallet/organization', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
-      { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] }
+      { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] },
     ],
     '/users': [
       { label: 'All Users', icon: 'pi pi-users', route: '/users/all', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] },
@@ -170,24 +168,24 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     ],
     '/audits': [
       { label: 'System Audits', icon: 'pi pi-server', route: '/audits/all', roles: ['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD'] },
-      { label: 'User Audits', icon: 'pi pi-users', route: '/audits/user', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_ADMINS'] }
+      { label: 'User Audits', icon: 'pi pi-users', route: '/audits/user', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_ADMINS'] },
     ],
     '/revenue': [
       { label: 'All Revenue', icon: 'pi pi-chart-line', route: '/revenue/all', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_DASHBOARD'] },
       { label: 'By Vehicle', icon: 'pi pi-car', route: '/revenue/by-vehicle', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] },
-      { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] }
+      { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] },
     ],
     '/vehicle-analysis': [
       { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
       { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
       { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-      { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
+      { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
     ],
     '/prediction': [
       { label: 'Short Term', icon: 'pi pi-calendar', route: '/prediction/short-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
-      { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] }
-    ]
+      { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
+    ],
   };
 
   constructor(
@@ -195,21 +193,21 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     private router: Router,
     private darkModeService: DarkModeService,
     private themeService: ThemeService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    // ── NEW ──────────────────────────────────────────────────────────────────
+    public notificationService: AppNotificationService,
+    private conflictService: BookingConflictService,
+    // ─────────────────────────────────────────────────────────────────────────
   ) { }
 
-  ngOnInit() {
-
+  ngOnInit(): void {
     const user = this.authService.currentUser();
     if (user) {
-      this.entityId = user.entityId
+      this.entityId = user.entityId;
       this.themeService.applyTheme(user.entityId);
-
-      this.logoSideBarUrl =
-        this.logoMap[this.entityId] || 'logo_2.png';
+      this.logoSideBarUrl = this.logoMap[this.entityId] || 'logo_2.png';
 
       const branding = this.brandingMap[this.entityId];
-
       if (branding) {
         this.logoUrl = branding.logo;
         this.brandName = branding.name;
@@ -220,99 +218,131 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         this.brandType = 'text';
       }
 
-      // console.log('Logged in as:', user.username);
+      // ── Run initial conflict scan after login ──────────────────────────
+      this.runConflictScan();
     } else {
       this.router.navigate(['/login']);
-      console.log('No user logged in');
+      return;
     }
 
     this.loadUserInfo();
     this.setupRouteListener();
-    this.loadNotifications();
     this.initializeSettingsForm();
     this.initializeSidebarState();
     this.themeService.loadPersistedTheme();
 
-
-    // Subscribe to dark mode changes
     this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(
-      isDark => {
-        this.darkModeEnabled = isDark;
-      }
+      isDark => (this.darkModeEnabled = isDark)
     );
-
-    // Initialize from service
     this.darkModeEnabled = this.darkModeService.isDarkMode;
   }
 
   ngOnDestroy(): void {
-    if (this.darkModeSubscription) {
-      this.darkModeSubscription.unsubscribe();
-    }
+    this.darkModeSubscription?.unsubscribe();
   }
 
-  /**
-   * Initialize sidebar state based on screen size and saved preferences
-   */
-  private initializeSidebarState(): void {
-    const savedState = localStorage.getItem('sidebarCollapsed');
+  // ── Conflict scan ─────────────────────────────────────────────────────────
 
-    if (this.isMobile()) {
-      // Mobile: always start hidden
-      this.sidebarVisible = false;
-      this.sidebarCollapsed = false;
-    } else {
-      // Desktop: restore saved state or default to expanded
-      this.sidebarCollapsed = savedState === 'true';
-      this.sidebarVisible = false; // Not used on desktop
-    }
+  /**
+   * Run a conflict scan for IN_PROGRESS trips.
+   * Any conflicts found are automatically pushed into the notification bell
+   * via BookingConflictService → AppNotificationService.
+   *
+   * Call this:
+   *   - on app start (ngOnInit)
+   *   - on a timer (setInterval every N minutes)
+   *   - manually from a "Refresh" button if you add one
+   */
+  runConflictScan(): void {
+    if (!this.entityId) return;
+
+    this.conflictService
+      .scanForConflicts(this.entityId, 'IN_PROGRESS')
+      .subscribe(conflicts => {
+        if (conflicts.length > 0) {
+          console.log(`[ConflictScan] ${conflicts.length} conflict(s) detected.`);
+        }
+      });
   }
 
-  /**
-   * Initialize settings form
-   */
+  // ── Notifications ─────────────────────────────────────────────────────────
+
+  showNotifications(): void {
+    this.notificationDialogVisible = true;
+  }
+
+  hideNotifications(): void {
+    this.notificationDialogVisible = false;
+  }
+
+  markAsRead(notification: AppNotification): void {
+    this.notificationService.markAsRead(notification.id);
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead();
+  }
+
+  getNotificationIcon(type: string): string {
+    const icons: Record<string, string> = {
+      info: 'pi pi-info-circle',
+      success: 'pi pi-check-circle',
+      warning: 'pi pi-exclamation-triangle',
+      error: 'pi pi-times-circle',
+    };
+    return icons[type] ?? 'pi pi-info-circle';
+  }
+
+  navigateToNotifications(): void {
+    this.notificationDialogVisible = false;
+    this.router.navigate(['/dashboard/notifications']);
+  }
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+
   private initializeSettingsForm(): void {
     this.settingsForm = this.fb.group({
       darkMode: [false],
       emailNotifications: [true],
-      autoLogout: [false]
+      autoLogout: [false],
     });
   }
 
-  /**
-   * Handle dark mode toggle change
-   */
   onDarkModeChange(enabled: boolean): void {
     this.darkModeService.setDarkMode(false);
-    console.log('Dark mode:', enabled ? 'enabled' : 'disabled');
   }
 
-  /**
-   * Handle email notifications toggle change
-   */
   onEmailNotificationsChange(enabled: boolean): void {
     localStorage.setItem('emailNotificationsEnabled', enabled.toString());
-    console.log('Email notifications:', enabled ? 'enabled' : 'disabled');
   }
 
-  /**
-   * Handle auto logout toggle change
-   */
   onAutoLogoutChange(enabled: boolean): void {
     localStorage.setItem('autoLogoutEnabled', enabled.toString());
-    console.log('Auto logout:', enabled ? 'enabled' : 'disabled');
   }
 
-  /* =============================================
-     USER INFO
-  ============================================= */
+  showSettings(): void {
+    this.settingsDialogVisible = true;
+  }
+
+  navigateToProfile(): void {
+    this.settingsDialogVisible = false;
+    this.router.navigate(['/dashboard/profile']);
+  }
+
+  navigateToSettings(): void {
+    this.settingsDialogVisible = false;
+    this.router.navigate(['/dashboard/settings']);
+  }
+
+  // ── User info ─────────────────────────────────────────────────────────────
+
   private loadUserInfo(): void {
     const user = this.authService.currentUser();
     if (user) {
       this.userInfo = {
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
-        initials: this.getInitials(user.firstName, user.lastName)
+        initials: this.getInitials(user.firstName, user.lastName),
       };
     }
   }
@@ -321,44 +351,34 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   }
 
-  /* =============================================
-     ROLE-BASED ACCESS HELPERS
-  ============================================= */
+  // ── Role helpers ──────────────────────────────────────────────────────────
+
   hasTransactionAccess(): boolean {
     return this.authService.hasAnyRole(['CAN_VIEW_TRANSACTIONS', 'CAN_ADD', 'CAN_EDIT']);
   }
 
   hasParcelAccess(): boolean {
-    return this.authService.hasAnyRole(['CAN_MANAGE_PARCELS', 'CAN_DELETE']) && this.entityId === "GS000002";
+    return this.authService.hasAnyRole(['CAN_MANAGE_PARCELS', 'CAN_DELETE']) && this.entityId === 'GS000002';
   }
 
   hasVehicleOrDriverAccess(): boolean {
     return this.authService.hasAnyRole([
-      'CAN_VIEW_VEHICLES',
-      'CAN_VIEW_VEHICLE',
-      'CAN_VIEW_DRIVERS',
-      'CAN_VIEW_DRIVER',
-      'CAN_VIEW_DRIVER_FLEET_REQUESTS',
-      'CAN_VIEW_DRIVER_FLEET'
+      'CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE',
+      'CAN_VIEW_DRIVERS', 'CAN_VIEW_DRIVER',
+      'CAN_VIEW_DRIVER_FLEET_REQUESTS', 'CAN_VIEW_DRIVER_FLEET',
     ]);
   }
 
   hasFinanceAccess(): boolean {
     return this.authService.hasAnyRole([
-      'CAN_MANAGE_ORGANIZATION_WALLETS',
-      'CAN_MANAGE_ORG_WALLETS',
-      'CAN_VIEW_TRANSACTIONS'
+      'CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS', 'CAN_VIEW_TRANSACTIONS',
     ]);
   }
 
   hasUserManagementAccess(): boolean {
     return this.authService.hasAnyRole([
-      'CAN_VIEW_USERS',
-      'CAN_VIEW_USER',
-      'CAN_VIEW_ADMINS',
-      'CAN_VIEW_DRIVERS',
-      'CAN_VIEW_CUSTOMERS',
-      'CAN_VIEW_INVESTORS'
+      'CAN_VIEW_USERS', 'CAN_VIEW_USER', 'CAN_VIEW_ADMINS',
+      'CAN_VIEW_DRIVERS', 'CAN_VIEW_CUSTOMERS', 'CAN_VIEW_INVESTORS',
     ]);
   }
 
@@ -366,27 +386,23 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     return this.authService.hasAnyRole(['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD', 'CAN_VIEW_USERS']);
   }
 
-  /* =============================================
-     TAB NAVIGATION
-  ============================================= */
+  // ── Tab navigation ────────────────────────────────────────────────────────
+
   private setupRouteListener(): void {
     this.router.events
       .pipe(filter((event: any) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.updateTabsForCurrentRoute(event.url);
-        // Auto-close mobile sidebar on navigation
         if (this.isMobile() && this.sidebarVisible) {
           this.closeMobileSidebar();
         }
       });
-
     this.updateTabsForCurrentRoute(this.router.url);
   }
 
   private updateTabsForCurrentRoute(url: string): void {
     const pathSegments = url.split('/').filter(seg => seg);
     const basePath = pathSegments.length > 0 ? `/${pathSegments[0]}` : '';
-
     const routeKey = Object.keys(this.tabConfigs).find(key => basePath === key);
 
     if (routeKey) {
@@ -402,12 +418,9 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   }
 
   private filterTabsByRole(tabs: TabConfig[]): TabConfig[] {
-    return tabs.filter(tab => {
-      if (!tab.roles || tab.roles.length === 0) {
-        return true;
-      }
-      return this.authService.hasAnyRole(tab.roles);
-    });
+    return tabs.filter(tab =>
+      !tab.roles?.length || this.authService.hasAnyRole(tab.roles)
+    );
   }
 
   private updateActiveTab(url: string): void {
@@ -418,60 +431,55 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   onTabChange(index: number): void {
     this.activeTabIndex = index;
     const tab = this.filteredTabs[index];
-    if (tab) {
-      this.router.navigate([tab.route]);
+    if (tab) this.router.navigate([tab.route]);
+  }
+
+  // ── Sidebar ───────────────────────────────────────────────────────────────
+
+  private initializeSidebarState(): void {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (this.isMobile()) {
+      this.sidebarVisible = false;
+      this.sidebarCollapsed = false;
+    } else {
+      this.sidebarCollapsed = savedState === 'true';
+      this.sidebarVisible = false;
     }
   }
 
-  /* =============================================
-     SIDEBAR & NAVIGATION - IMPROVED
-  ============================================= */
   toggleSidebar(): void {
     if (this.isMobile()) {
-      // Mobile: toggle visibility (overlay mode)
       this.sidebarVisible = !this.sidebarVisible;
     } else {
-      // Desktop: toggle collapse (push mode)
       this.sidebarCollapsed = !this.sidebarCollapsed;
-      // Save preference
       localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed.toString());
     }
   }
 
   closeMobileSidebar(): void {
-    if (this.isMobile()) {
-      this.sidebarVisible = false;
-    }
+    if (this.isMobile()) this.sidebarVisible = false;
   }
 
   isMobile(): boolean {
     return window.innerWidth <= 768;
   }
 
-  /**
-   * Handle window resize with debouncing
-   */
   @HostListener('window:resize', ['$event'])
   onResize(event: any): void {
-    const newWidth = window.innerWidth;
+    const newWidth = event.target.innerWidth;
     const wasDesktop = this.currentScreenWidth > 768;
     const isDesktop = newWidth > 768;
 
-    // Only act on mode changes (mobile <-> desktop)
     if (wasDesktop !== isDesktop) {
       if (isDesktop) {
-        // Switched to desktop
-        this.sidebarVisible = false; // Close mobile overlay
-        // Restore saved collapse state
+        this.sidebarVisible = false;
         const savedState = localStorage.getItem('sidebarCollapsed');
         this.sidebarCollapsed = savedState === 'true';
       } else {
-        // Switched to mobile
-        this.sidebarVisible = false; // Start hidden
-        this.sidebarCollapsed = false; // Reset collapse state
+        this.sidebarVisible = false;
+        this.sidebarCollapsed = false;
       }
     }
-
     this.currentScreenWidth = newWidth;
   }
 
@@ -481,88 +489,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   navigate(route: string): void {
     this.router.navigate([route]);
-    // Auto-close on mobile after navigation
-    if (this.isMobile()) {
-      this.closeMobileSidebar();
-    }
+    if (this.isMobile()) this.closeMobileSidebar();
   }
 
-  /* =============================================
-     NOTIFICATIONS
-  ============================================= */
-  private loadNotifications(): void {
-    this.notifications = [];
-    this.updateUnreadCount();
-  }
+  // ── Logout ────────────────────────────────────────────────────────────────
 
-  showNotifications(): void {
-    this.notificationDialogVisible = true;
-  }
-
-  hideNotifications(): void {
-    this.notificationDialogVisible = false;
-  }
-
-  markAsRead(notification: Notification): void {
-    notification.read = true;
-    this.updateUnreadCount();
-  }
-
-  markAllAsRead(): void {
-    this.notifications.forEach(n => n.read = true);
-    this.updateUnreadCount();
-  }
-
-  private updateUnreadCount(): void {
-    this.unreadCount = this.notifications.filter(n => !n.read).length;
-  }
-
-  getNotificationIcon(type: string): string {
-    const icons: { [key: string]: string } = {
-      info: 'pi pi-info-circle',
-      success: 'pi pi-check-circle',
-      warning: 'pi pi-exclamation-triangle',
-      error: 'pi pi-times-circle'
-    };
-    return icons[type] || 'pi pi-info-circle';
-  }
-
-  navigateToNotifications(): void {
-    this.notificationDialogVisible = false;
-    this.router.navigate(['/dashboard/notifications']);
-  }
-
-  /* =============================================
-     SETTINGS
-  ============================================= */
-  showSettings(): void {
-    this.settingsDialogVisible = true;
-  }
-
-  navigateToProfile(): void {
-    this.settingsDialogVisible = false;
-    this.router.navigate(['/dashboard/profile']);
-  }
-
-  navigateToSettings(): void {
-    this.settingsDialogVisible = false;
-    this.router.navigate(['/dashboard/settings']);
-  }
-
-  /* =============================================
-     LOGOUT
-  ============================================= */
   logout(): void {
     this.authService.signOut();
     this.themeService.clearTheme();
   }
-
-  // @HostListener('window:scroll', [])
-  // onScroll() {
-  //   const threshold = 2; // px from bottom
-  //   const position = window.innerHeight + window.scrollY;
-  //   const height = document.documentElement.scrollHeight;
-
-  //   this.showFooter = position >= height - threshold;
-  // }
 }

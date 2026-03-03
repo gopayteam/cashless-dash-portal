@@ -96,6 +96,7 @@ import { MissedTransactionComponent } from './pages/hidden/missed-transactions/m
 import { AllTripsComponent } from './pages/booking/all-trips/all-trips';
 import { TripTransactionsComponent } from './pages/booking/trip-transactions/trip-transactions';
 import { SeatReservationsComponent } from './pages/booking/seat-reservation/seat-reservation';
+import { ConflictDashboardComponent } from './pages/booking/trip-conflicts/trip-conflicts';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -331,6 +332,15 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
       },
+
+      {
+        path: 'booking/trip-conflicts',
+        component: ConflictDashboardComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW_DRIVER_FLEET_REQUEST', 'CAN_APPROVE_DRIVER_FLEET'] }
+      },
+
+
 
       /* Locations */
       {
