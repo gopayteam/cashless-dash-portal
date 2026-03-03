@@ -16,6 +16,7 @@ export interface AppNotification {
   metadata?: {
     tripId?: number;
     fleetNumber?: string;
+    tripStatus: string,
     conflictType?: string;
     affectedSeats?: number[];
     affectedPassengers?: string[];

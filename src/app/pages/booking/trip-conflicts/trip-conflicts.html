@@ -1,4 +1,4 @@
-<!-- pages/booking/conflict-dashboard/conflict-dashboard.html -->
+<!-- pages/booking/conflict-dashboard/trip-conflicts.html -->
 <p-toast position="top-right"></p-toast>
 
 <div class="conflict-page">
@@ -15,14 +15,37 @@
       <p class="subtitle">Real-time detection of seat booking issues</p>
     </div>
 
-    <!-- Trip status — triggers server reload -->
     <div class="header-actions">
-      <button pButton icon="pi pi-refresh" style="gap: 0.5rem" label="Scan Now" class="p-button-warning"
-        [loading]="scanning" (click)="runScan()" pTooltip="Scan all IN_PROGRESS trips for conflicts"
+      <!-- Scan trip status selector — determines which trips are scanned server-side -->
+      <p-select
+        [options]="scanTripStatusOptions"
+        [(ngModel)]="selectedScanTripStatus"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Trip Status to Scan"
+        styleClass="scan-status-select">
+      </p-select>
+
+      <button
+        pButton
+        icon="pi pi-search"
+        style="gap: 0.5rem"
+        label="Scan Now"
+        class="p-button-warning"
+        [loading]="scanning"
+        (click)="runScan()"
+        [pTooltip]="'Scan all ' + selectedScanTripStatus + ' trips for conflicts'"
         tooltipPosition="bottom">
       </button>
-      <button pButton icon="pi pi-check-square" style="gap: 0.5rem" label="Resolve All" class="p-button-success"
-        [disabled]="unresolvedConflicts.length === 0" (click)="resolveAll()">
+
+      <button
+        pButton
+        icon="pi pi-check-square"
+        style="gap: 0.5rem"
+        label="Resolve All"
+        class="p-button-success"
+        [disabled]="unresolvedConflicts.length === 0"
+        (click)="resolveAll()">
       </button>
     </div>
   </div>
@@ -78,19 +101,53 @@
        FILTERS
   ═══════════════════════════════════════════ -->
   <div class="filter-row">
-    <p-select [options]="typeFilterOptions" [(ngModel)]="selectedType" placeholder="All Types" optionLabel="label"
-      optionValue="value" (onChange)="applyFilter()">
-    </p-select>
-    <p-select [options]="severityFilterOptions" [(ngModel)]="selectedSeverity" placeholder="All Severities"
-      optionLabel="label" optionValue="value" (onChange)="applyFilter()">
+
+    <!-- Conflict type -->
+    <p-select
+      [options]="typeFilterOptions"
+      [(ngModel)]="selectedType"
+      placeholder="All Types"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="applyFilter()">
     </p-select>
 
-    <p-select [options]="statusFilterOptions" [(ngModel)]="selectedStatus" placeholder="All Statuses"
-      optionLabel="label" optionValue="value" (onChange)="applyFilter()">
+    <!-- Conflict severity -->
+    <p-select
+      [options]="severityFilterOptions"
+      [(ngModel)]="selectedSeverity"
+      placeholder="All Severities"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="applyFilter()">
     </p-select>
 
-    <p-select [options]="tripStatusOptions" [(ngModel)]="selectedTripStatus" (onChange)="runScan()"
-      placeholder="All Status" styleClass="filter-dropdown"></p-select>
+    <!-- Open / Resolved -->
+    <p-select
+      [options]="statusFilterOptions"
+      [(ngModel)]="selectedStatus"
+      placeholder="All Statuses"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="applyFilter()">
+    </p-select>
+
+    <!--
+      Client-side trip-status filter.
+      Filters the already-loaded list by the tripStatus stored on each conflict —
+      does NOT trigger a server re-fetch.
+    -->
+    <p-select
+      [options]="tripStatusFilterOptions"
+      [(ngModel)]="selectedTripStatusFilter"
+      placeholder="All Trip Statuses"
+      optionLabel="label"
+      optionValue="value"
+      (onChange)="applyFilter()"
+      pTooltip="Filter displayed conflicts by the trip status they were detected on"
+      tooltipPosition="bottom">
+    </p-select>
+
   </div>
 
   <!-- ═══════════════════════════════════════════
@@ -105,15 +162,23 @@
       <p>All trips look good! Run a scan to check for new issues.</p>
     </div>
 
-    <p-table *ngIf="filteredConflicts.length > 0" [value]="filteredConflicts" [paginator]="true" [rows]="10"
-      [rowsPerPageOptions]="[10, 25, 50, 100]" styleClass="conflict-table p-datatable-gridlines" [loading]="scanning"
-      [tableStyle]="{ 'min-width': '72rem' }" responsiveLayout="scroll">
+    <p-table
+      *ngIf="filteredConflicts.length > 0"
+      [value]="filteredConflicts"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      styleClass="conflict-table p-datatable-gridlines"
+      [loading]="scanning"
+      [tableStyle]="{ 'min-width': '80rem' }"
+      responsiveLayout="scroll">
 
       <ng-template pTemplate="header">
         <tr>
           <th>Type</th>
           <th>Severity</th>
           <th>Trip</th>
+          <th>Trip Status</th>
           <th>Fleet</th>
           <th>Route</th>
           <th>Date</th>
@@ -128,20 +193,34 @@
 
           <!-- Type -->
           <td>
-            <p-tag [value]="conflictTypeLabel(conflict.type)" [severity]="conflictTypeSeverity(conflict.type)"
+            <p-tag
+              [value]="conflictTypeLabel(conflict.type)"
+              [severity]="conflictTypeSeverity(conflict.type)"
               [rounded]="true">
             </p-tag>
           </td>
 
           <!-- Severity -->
           <td>
-            <p-tag [value]="conflict.severity" [severity]="severityTagColor(conflict.severity)" [rounded]="true">
+            <p-tag
+              [value]="conflict.severity"
+              [severity]="severityTagColor(conflict.severity)"
+              [rounded]="true">
             </p-tag>
           </td>
 
           <!-- Trip ID -->
           <td>
             <span class="trip-id-badge">#{{ conflict.tripId }}</span>
+          </td>
+
+          <!-- Trip Status — stored on the conflict at detection time -->
+          <td>
+            <p-tag
+              [value]="tripStatusLabel(conflict.tripStatus)"
+              [severity]="tripStatusTagColor(conflict.tripStatus)"
+              [rounded]="true">
+            </p-tag>
           </td>
 
           <!-- Fleet -->
@@ -165,22 +244,31 @@
             </span>
           </td>
 
-          <!-- Status -->
+          <!-- Conflict resolve status -->
           <td>
-            <p-tag [value]="conflict.resolved ? 'Resolved' : 'Open'"
-              [severity]="conflict.resolved ? 'success' : 'danger'" [rounded]="true">
+            <p-tag
+              [value]="conflict.resolved ? 'Resolved' : 'Open'"
+              [severity]="conflict.resolved ? 'success' : 'danger'"
+              [rounded]="true">
             </p-tag>
           </td>
 
           <!-- Actions -->
           <td>
             <div class="action-buttons">
-              <button class="action-btn btn-view" pTooltip="View details" tooltipPosition="top"
+              <button
+                class="action-btn btn-view"
+                pTooltip="View details"
+                tooltipPosition="top"
                 (click)="viewConflict(conflict)">
                 <i class="pi pi-eye"></i>
               </button>
-              <button class="action-btn btn-resolve" pTooltip="Mark resolved" tooltipPosition="top"
-                [disabled]="conflict.resolved" (click)="resolveConflict(conflict)">
+              <button
+                class="action-btn btn-resolve"
+                pTooltip="Mark resolved"
+                tooltipPosition="top"
+                [disabled]="conflict.resolved"
+                (click)="resolveConflict(conflict)">
                 <i class="pi pi-check"></i>
               </button>
             </div>
@@ -199,28 +287,47 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      DETAIL DIALOG
 ═══════════════════════════════════════════════════════════════════ -->
-<p-dialog [(visible)]="showDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true" [draggable]="false"
-  [resizable]="false" styleClass="conflict-detail-dialog" [style]="{ width: '90vw', maxWidth: '560px' }"
+<p-dialog
+  [(visible)]="showDetailDialog"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="conflict-detail-dialog"
+  [style]="{ width: '90vw', maxWidth: '560px' }"
   header="Conflict Details">
 
   <div class="conflict-detail" *ngIf="selectedConflict">
 
     <div class="detail-row">
       <span class="detail-label">Type</span>
-      <p-tag [value]="conflictTypeLabel(selectedConflict.type)"
+      <p-tag
+        [value]="conflictTypeLabel(selectedConflict.type)"
         [severity]="conflictTypeSeverity(selectedConflict.type)">
       </p-tag>
     </div>
 
     <div class="detail-row">
       <span class="detail-label">Severity</span>
-      <p-tag [value]="selectedConflict.severity" [severity]="severityTagColor(selectedConflict.severity)">
+      <p-tag
+        [value]="selectedConflict.severity"
+        [severity]="severityTagColor(selectedConflict.severity)">
       </p-tag>
     </div>
 
     <div class="detail-row">
       <span class="detail-label">Trip ID</span>
       <span class="trip-id-badge">#{{ selectedConflict.tripId }}</span>
+    </div>
+
+    <!-- Trip status at the time of detection -->
+    <div class="detail-row">
+      <span class="detail-label">Trip Status</span>
+      <p-tag
+        [value]="tripStatusLabel(selectedConflict.tripStatus)"
+        [severity]="tripStatusTagColor(selectedConflict.tripStatus)">
+      </p-tag>
     </div>
 
     <div class="detail-row">
@@ -275,6 +382,31 @@
       </div>
     </div>
 
+    <!-- Quick navigation buttons -->
+    <div class="detail-row navigation-row">
+      <span class="detail-label">Investigate</span>
+      <div class="navigation-buttons">
+        <button
+          pButton
+          icon="pi pi-credit-card"
+          label="View Transactions"
+          class="p-button-outlined p-button-info p-button-sm"
+          pTooltip="Open trip transactions for trip #{{ selectedConflict.tripId }}"
+          tooltipPosition="top"
+          (click)="goToTransactions(selectedConflict)">
+        </button>
+        <button
+          pButton
+          icon="pi pi-ticket"
+          label="View Reservations"
+          class="p-button-outlined p-button-secondary p-button-sm"
+          pTooltip="Open seat reservations for trip #{{ selectedConflict.tripId }}"
+          tooltipPosition="top"
+          (click)="goToReservations(selectedConflict)">
+        </button>
+      </div>
+    </div>
+
   </div>
 
   <ng-template pTemplate="footer">
@@ -282,7 +414,9 @@
       <button class="footer-btn btn-secondary" (click)="showDetailDialog = false">
         <i class="pi pi-times"></i> Close
       </button>
-      <button class="footer-btn btn-resolve-footer" [disabled]="selectedConflict?.resolved"
+      <button
+        class="footer-btn btn-resolve-footer"
+        [disabled]="selectedConflict?.resolved"
         (click)="resolveConflict(selectedConflict!)">
         <i class="pi pi-check"></i> Mark Resolved
       </button>

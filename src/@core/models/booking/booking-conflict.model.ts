@@ -1,4 +1,33 @@
-// models/booking-conflict.model.ts
+// models/booking/booking-conflict.model.ts
+
+export type ConflictType =
+  | 'DOUBLE_BOOKING'
+  | 'OVER_CAPACITY'
+  | 'ORPHAN_TRANSACTION'
+  | 'ORPHAN_RESERVATION';
+
+export type TripStatus = 'COMPLETE' | 'PENDING' | 'IN_PROGRESS';
+
+export interface SeatConflict {
+  conflictId: string;
+  type: ConflictType;
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  tripId: number;
+  fleetNumber: string;
+  routeName: string;
+  travelDate: string;
+
+  /** The status of the trip at the time the conflict was detected */
+  tripStatus: TripStatus | string;
+
+  description: string;
+  affectedSeats?: number[];
+  affectedPassengers?: string[];
+  detectedAt: Date;
+  resolved: boolean;
+}
+
+// ── API response shapes ────────────────────────────────────────────────────
 
 export interface Trip {
   tripId: number;
@@ -8,7 +37,7 @@ export interface Trip {
   tripType: string;
   availableSeats: number;
   capacity: number;
-  tripStatus: string;
+  tripStatus: TripStatus | string;
   travelDate: string;
   travelTime: string;
   tripAmount: string;
@@ -45,31 +74,6 @@ export interface SeatReservation {
   reservationStatus: 'PENDING' | 'COMPLETED' | 'FAILED';
   seatNumbers: number[];
 }
-
-// ─── Conflict Types ───────────────────────────────────────────────────────────
-
-export type ConflictType =
-  | 'DOUBLE_BOOKING'       // Same seat assigned to 2+ passengers
-  | 'OVER_CAPACITY'        // Total reservations exceed vehicle capacity
-  | 'ORPHAN_TRANSACTION'   // Transaction exists but no matching reservation
-  | 'ORPHAN_RESERVATION';  // Reservation exists but no matching transaction
-
-export interface SeatConflict {
-  conflictId: string;         // unique id for deduplication
-  type: ConflictType;
-  severity: 'HIGH' | 'MEDIUM' | 'LOW';
-  tripId: number;
-  fleetNumber: string;
-  routeName: string;
-  travelDate: string;
-  description: string;
-  affectedSeats?: number[];
-  affectedPassengers?: string[];
-  detectedAt: Date;
-  resolved: boolean;
-}
-
-// ─── API Responses ────────────────────────────────────────────────────────────
 
 export interface TripsApiResponse {
   status: number;

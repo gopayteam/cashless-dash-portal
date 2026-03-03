@@ -29,15 +29,6 @@ export class BookingConflictService {
 
   // ── Public API ─────────────────────────────────────────────────────────────
 
-  /**
-   * Run a full conflict scan for all trips matching the given filters.
-   * Fetches trips → then for each trip fetches transactions + reservations
-   * → analyses for conflicts → pushes notifications for any new ones found.
-   *
-   * @param entityId    Your entity identifier
-   * @param tripStatus  Trip status filter (default: IN_PROGRESS)
-   * @param fleetNumber Optional fleet filter
-   */
   scanForConflicts(
     entityId: string,
     tripStatus: string = 'IN_PROGRESS',
@@ -47,7 +38,6 @@ export class BookingConflictService {
       switchMap(trips => {
         if (!trips.length) return of([]);
 
-        // For each trip, fetch transactions + reservations in parallel
         const tripAnalyses$ = trips.map(trip => this.analyseTrip(trip, entityId));
 
         return forkJoin(tripAnalyses$).pipe(
@@ -65,10 +55,6 @@ export class BookingConflictService {
     );
   }
 
-  /**
-   * Analyse a single trip and return any conflicts found.
-   * Useful for checking one specific trip on demand.
-   */
   analyseTrip(trip: Trip, entityId: string): Observable<SeatConflict[]> {
     return forkJoin({
       transactions: this.fetchTransactions(trip.tripId),
@@ -84,23 +70,19 @@ export class BookingConflictService {
     );
   }
 
-  /** Return all conflicts detected so far */
   getAllConflicts(): SeatConflict[] {
     return [...this.detectedConflicts];
   }
 
-  /** Return only unresolved conflicts */
   getUnresolvedConflicts(): SeatConflict[] {
     return this.detectedConflicts.filter(c => !c.resolved);
   }
 
-  /** Mark a conflict as resolved */
   resolveConflict(conflictId: string): void {
     const conflict = this.detectedConflicts.find(c => c.conflictId === conflictId);
     if (conflict) conflict.resolved = true;
   }
 
-  /** Clear all stored conflicts */
   clearConflicts(): void {
     this.detectedConflicts = [];
   }
@@ -155,6 +137,7 @@ export class BookingConflictService {
       fleetNumber: trip.fleetNumber,
       routeName: trip.routeName,
       travelDate: trip.travelDate,
+      tripStatus: trip.tripStatus,   // ← captured from the trip
       description: `Double booking detected on seat(s) ${doubleBookedSeats.join(', ')} — ` +
         `${allAffectedPassengers.size} passengers affected on trip #${trip.tripId} (${trip.fleetNumber}).`,
       affectedSeats: doubleBookedSeats,
@@ -178,6 +161,7 @@ export class BookingConflictService {
       fleetNumber: trip.fleetNumber,
       routeName: trip.routeName,
       travelDate: trip.travelDate,
+      tripStatus: trip.tripStatus,   // ← captured from the trip
       description: `Trip #${trip.tripId} (${trip.fleetNumber}) is over capacity: ` +
         `${totalReservedSeats} seats reserved but vehicle capacity is ${trip.capacity} (${excess} excess).`,
       detectedAt: new Date(),
@@ -203,6 +187,7 @@ export class BookingConflictService {
         fleetNumber: trip.fleetNumber,
         routeName: trip.routeName,
         travelDate: trip.travelDate,
+        tripStatus: trip.tripStatus,   // ← captured from the trip
         description: `Trip #${trip.tripId}: transaction ${orphan.mpesaReceiptNumber} ` +
           `for ${orphan.customerName} (${orphan.phoneNumber}) has no matching seat reservation.`,
         affectedPassengers: [orphan.username],
@@ -228,6 +213,7 @@ export class BookingConflictService {
         fleetNumber: trip.fleetNumber,
         routeName: trip.routeName,
         travelDate: trip.travelDate,
+        tripStatus: trip.tripStatus,   // ← captured from the trip
         description: `Trip #${trip.tripId}: seat reservation for ${orphan.username} ` +
           `(seats ${orphan.seatNumbers.join(', ')}) has no matching payment transaction.`,
         affectedSeats: orphan.seatNumbers,
@@ -271,6 +257,7 @@ export class BookingConflictService {
       metadata: {
         tripId: conflict.tripId,
         fleetNumber: conflict.fleetNumber,
+        tripStatus: conflict.tripStatus,
         conflictType: conflict.type,
         affectedSeats: conflict.affectedSeats,
         affectedPassengers: conflict.affectedPassengers,
@@ -278,7 +265,7 @@ export class BookingConflictService {
     });
   }
 
-  // ── Data fetching — using DataService to match app-wide fetching pattern ───
+  // ── Data fetching ──────────────────────────────────────────────────────────
 
   private fetchTrips(
     entityId: string,
@@ -292,7 +279,6 @@ export class BookingConflictService {
       size: '100',
     };
 
-    // Fleet number only sent when provided — mirrors your fetchTrips() logic
     if (fleetNumber?.trim()) {
       params['fleetNumber'] = fleetNumber.trim();
     }
@@ -300,38 +286,38 @@ export class BookingConflictService {
     return this.dataService
       .get<TripsApiResponse>(API_ENDPOINTS.ALL_TRIPS, params, 'conflict-scan-trips', true)
       .pipe(
-        map(res => (res.status === 0 ? res.data : [])),
+        // Fix: API returns 200 for success, not 0
+        map(res => (res.status === 200 ? res.data : [])),
         catchError(() => of([]))
       );
   }
 
   private fetchTransactions(tripId: number): Observable<TripTransaction[]> {
-    // Mirrors your fetchTransactions(): GET TRIP_TRANSACTIONS/:tripId
     return this.dataService
       .get<TransactionsApiResponse>(
         `${API_ENDPOINTS.TRIP_TRANSACTIONS}/${tripId}`,
         { tripId },
-        'conflict-scan-transactions',
+        // Fix: unique cache key per trip to avoid cross-trip cache collisions
+        `conflict-scan-transactions-${tripId}`,
         true
       )
       .pipe(
-        map(res => (res.status === 0 ? res.data : [])),
+        map(res => (res.status === 200 ? res.data : [])),
         catchError(() => of([]))
       );
   }
 
   private fetchReservations(tripId: number, entityId: string): Observable<SeatReservation[]> {
-    // No username/reservationStatus filter — fetch all reservations for the trip
-    // Mirrors your fetchReservations() POST payload shape
     return this.dataService
       .post<ReservationsApiResponse>(
         API_ENDPOINTS.SEAT_RESERVATIONS,
         { tripId, entityId },
-        'conflict-scan-reservations',
+        // Fix: unique cache key per trip to avoid cross-trip cache collisions
+        `conflict-scan-reservations-${tripId}`,
         true
       )
       .pipe(
-        map(res => (res.status === 0 ? res.data : [])),
+        map(res => (res.status === 200 ? res.data : [])),
         catchError(() => of([]))
       );
   }

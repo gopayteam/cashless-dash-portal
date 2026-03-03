@@ -1,1 +1,197 @@
-<p>notifications works!</p>
+<!-- pages/notifications/notifications.html -->
+<p-toast position="top-right"></p-toast>
+
+<div class="notif-page">
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <div class="notif-header">
+    <div class="header-left">
+      <h1>
+        <i class="pi pi-bell"></i>
+        Notifications
+      </h1>
+      <p class="subtitle">
+        {{ unreadCount > 0 ? unreadCount + ' unread notification' + (unreadCount > 1 ? 's' : '') : 'All caught up!' }}
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button class="hdr-btn btn-mark-read" [disabled]="unreadCount === 0" (click)="markAllAsRead()"
+        pTooltip="Mark all as read" tooltipPosition="bottom">
+        <i class="pi pi-check-square"></i>
+        Mark all read
+      </button>
+      <button class="hdr-btn btn-clear" [disabled]="allNotifications.length === 0" (click)="clearAll()"
+        pTooltip="Clear all notifications" tooltipPosition="bottom">
+        <i class="pi pi-trash"></i>
+        Clear all
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SUMMARY CARDS
+  ═══════════════════════════════════════════ -->
+  <div class="summary-cards">
+
+    <div class="summary-card total" (click)="setFilter('all')" [class.active]="activeFilter === 'all'">
+      <div class="card-icon">
+        <i class="pi pi-bell"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ allNotifications.length }}</span>
+        <span class="card-label">Total</span>
+      </div>
+    </div>
+
+    <div class="summary-card unread" (click)="setFilter('unread')" [class.active]="activeFilter === 'unread'">
+      <div class="card-icon">
+        <i class="pi pi-circle-fill"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ unreadCount }}</span>
+        <span class="card-label">Unread</span>
+      </div>
+    </div>
+
+    <div class="summary-card errors" (click)="setFilter('error')" [class.active]="activeFilter === 'error'">
+      <div class="card-icon">
+        <i class="pi pi-times-circle"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ errorCount }}</span>
+        <span class="card-label">Critical</span>
+      </div>
+    </div>
+
+    <div class="summary-card warnings" (click)="setFilter('warning')" [class.active]="activeFilter === 'warning'">
+      <div class="card-icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ warningCount }}</span>
+        <span class="card-label">Warnings</span>
+      </div>
+    </div>
+
+    <div class="summary-card info" (click)="setFilter('info')" [class.active]="activeFilter === 'info'">
+      <div class="card-icon">
+        <i class="pi pi-info-circle"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-value">{{ infoCount }}</span>
+        <span class="card-label">Info</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FILTER TABS
+  ═══════════════════════════════════════════ -->
+  <div class="filter-tabs">
+    <button class="tab-btn" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">All</button>
+    <button class="tab-btn" [class.active]="activeFilter === 'unread'" (click)="setFilter('unread')">Unread</button>
+    <button class="tab-btn" [class.active]="activeFilter === 'error'" (click)="setFilter('error')">Critical</button>
+    <button class="tab-btn" [class.active]="activeFilter === 'warning'" (click)="setFilter('warning')">Warnings</button>
+    <button class="tab-btn" [class.active]="activeFilter === 'info'" (click)="setFilter('info')">Info</button>
+    <button class="tab-btn" [class.active]="activeFilter === 'success'" (click)="setFilter('success')">Success</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       NOTIFICATION LIST
+  ═══════════════════════════════════════════ -->
+  <div class="notif-list-card">
+
+    <!-- Empty state -->
+    <div *ngIf="filteredNotifications.length === 0" class="empty-state">
+      <div class="empty-icon-wrap">
+        <i class="pi pi-bell-slash"></i>
+      </div>
+      <h3>No notifications here</h3>
+      <p *ngIf="activeFilter === 'all'">You're all caught up! Conflicts and system alerts will appear here.</p>
+      <p *ngIf="activeFilter !== 'all'">No {{ activeFilter }} notifications at the moment.</p>
+      <button class="hdr-btn btn-mark-read" style="margin-top: 1rem" (click)="setFilter('all')">
+        <i class="pi pi-arrow-left"></i> View all
+      </button>
+    </div>
+
+    <!-- Notification items -->
+    <div class="notif-list" *ngIf="filteredNotifications.length > 0">
+      <div class="notif-item" *ngFor="let n of filteredNotifications; trackBy: trackById" [class.unread]="!n.read"
+        [class.clickable]="!!n.metadata?.conflictType" (click)="handleNotificationClick(n)">
+
+        <!-- Left: type indicator stripe + icon -->
+        <div class="notif-type-col">
+          <div class="type-stripe" [class]="'stripe-' + n.type"></div>
+          <div class="type-icon-wrap" [class]="'icon-' + n.type">
+            <i [class]="getTypeIcon(n.type)"></i>
+          </div>
+        </div>
+
+        <!-- Centre: content -->
+        <div class="notif-content">
+          <div class="notif-top-row">
+            <span class="notif-title">{{ n.title }}</span>
+            <div class="notif-meta">
+              <span class="type-badge" [class]="'badge-' + n.type">{{ getTypeLabel(n.type) }}</span>
+              <span class="notif-time">
+                <i class="pi pi-clock"></i>
+                {{ n.time }}
+              </span>
+            </div>
+          </div>
+
+          <p class="notif-message">{{ n.message }}</p>
+
+          <!-- Conflict metadata chips -->
+          <div class="notif-chips" *ngIf="n.metadata">
+            <span class="chip chip-fleet" *ngIf="n.metadata.fleetNumber">
+              <i class="pi pi-car"></i> {{ n.metadata.fleetNumber }}
+            </span>
+            <span class="chip chip-trip" *ngIf="n.metadata.tripId">
+              <i class="pi pi-map"></i> Trip #{{ n.metadata.tripId }}
+            </span>
+            <span class="chip chip-seats" *ngIf="n.metadata.affectedSeats?.length">
+              <i class="pi pi-ticket"></i>
+              Seats: {{ n.metadata.affectedSeats!.join(', ') }}
+            </span>
+            <span class="chip chip-nav" *ngIf="n.metadata.conflictType">
+              <i class="pi pi-arrow-right"></i> View conflict
+            </span>
+          </div>
+        </div>
+
+        <!-- Right: actions -->
+        <div class="notif-actions">
+          <span class="unread-dot" *ngIf="!n.read" pTooltip="Unread" tooltipPosition="left"></span>
+
+          <button class="icon-action-btn btn-read" *ngIf="!n.read" pTooltip="Mark as read" tooltipPosition="left"
+            (click)="markAsRead(n, $event)">
+            <i class="pi pi-check"></i>
+          </button>
+
+          <button class="icon-action-btn btn-remove" pTooltip="Dismiss" tooltipPosition="left"
+            (click)="remove(n, $event)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- List footer -->
+    <div class="list-footer" *ngIf="filteredNotifications.length > 0">
+      <span class="footer-count">
+        Showing {{ filteredNotifications.length }} of {{ allNotifications.length }} notifications
+      </span>
+      <button class="hdr-btn btn-mark-read" (click)="markAllAsRead()" [disabled]="unreadCount === 0">
+        <i class="pi pi-check-square"></i> Mark all read
+      </button>
+    </div>
+
+  </div>
+
+</div>
