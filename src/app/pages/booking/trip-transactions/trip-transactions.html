@@ -33,32 +33,18 @@
     <div class="header-controls" *ngIf="hasLoaded">
       <div class="search-wrapper">
         <i class="pi pi-search search-icon"></i>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search by name, phone, receipt…"
-          [(ngModel)]="searchTerm"
-          (input)="onSearchChange()"
-        />
+        <input type="text" class="search-input" placeholder="Search by name, phone, receipt…" [(ngModel)]="searchTerm"
+          (input)="onSearchChange()" />
         <button *ngIf="searchTerm" class="clear-search-btn" (click)="clearSearch()">
           <i class="pi pi-times"></i>
         </button>
       </div>
 
-      <p-select
-        [options]="statusOptions"
-        [(ngModel)]="selectedStatus"
-        (onChange)="onStatusChange()"
-        placeholder="All Status"
-        styleClass="filter-dropdown"
-      ></p-select>
+      <p-select [options]="statusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange()"
+        placeholder="All Status" styleClass="filter-dropdown"></p-select>
 
-      <button
-        *ngIf="searchTerm || selectedStatus"
-        class="clear-all-btn"
-        (click)="clearFilters()"
-        pTooltip="Clear all filters"
-      >
+      <button *ngIf="searchTerm || selectedStatus" class="clear-all-btn" (click)="clearFilters()"
+        pTooltip="Clear all filters">
         <i class="pi pi-filter-slash"></i>
         Clear
       </button>
@@ -140,15 +126,9 @@
         <span class="record-badge">
           {{ filteredTransactions.length }} of {{ totalRecords }} transactions
         </span>
-        <p-paginator
-          [first]="first"
-          [rows]="rows"
-          [totalRecords]="filteredTransactions.length"
-          [rowsPerPageOptions]="[10, 20, 50, 100]"
-          (onPageChange)="onPageChange($event)"
-          [showCurrentPageReport]="true"
-          style="margin-right: 0"
-        ></p-paginator>
+        <p-paginator [first]="first" [rows]="rows" [totalRecords]="filteredTransactions.length"
+          [rowsPerPageOptions]="[10, 20, 50, 100]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+          style="margin-right: 0"></p-paginator>
       </div>
     </div>
 
@@ -161,13 +141,8 @@
     </div>
 
     <!-- Table -->
-    <p-table
-      *ngIf="!loading && filteredTransactions.length > 0"
-      [value]="transactions"
-      styleClass="data-table p-datatable-gridlines"
-      [tableStyle]="{ 'min-width': '65rem' }"
-      responsiveLayout="scroll"
-    >
+    <p-table *ngIf="!loading && filteredTransactions.length > 0" [value]="transactions"
+      styleClass="data-table p-datatable-gridlines" [tableStyle]="{ 'min-width': '65rem' }" responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>ID</th>
@@ -177,9 +152,9 @@
           <th>Seats</th>
           <th>Pickup / Drop-off</th>
           <th>Amount</th>
-          <th>Board #</th>
+          <!-- <th>Board #</th> -->
           <th>Status</th>
-          <th>Created</th>
+          <!-- <th>Created</th> -->
         </tr>
       </ng-template>
 
@@ -238,9 +213,9 @@
             <span class="amount-cell">{{ formatCurrency(txn.amount) }}</span>
           </td>
 
-          <td>
+          <!-- <td>
             <span class="board-number">{{ txn.boardNumber }}</span>
-          </td>
+          </td> -->
 
           <td>
             <span [class]="'status-badge status-' + getStatusClass(txn.status)">
@@ -249,12 +224,12 @@
             </span>
           </td>
 
-          <td>
+          <!-- <td>
             <div class="date-cell">
               <span class="date-val">{{ txn.createdAt | date:'dd MMM yy' }}</span>
               <span class="time-val">{{ txn.createdAt | date:'hh:mm a' }}</span>
             </div>
-          </td>
+          </td> -->
 
         </tr>
       </ng-template>
@@ -269,17 +244,9 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      DETAIL DIALOG
 ═══════════════════════════════════════════════════════════════════ -->
-<p-dialog
-  [(visible)]="displayDetailDialog"
-  [modal]="true"
-  [closable]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [resizable]="false"
-  styleClass="custom-dialog"
-  [style]="{ width: '90vw', maxWidth: '860px' }"
-  (onHide)="closeDetailDialog()"
->
+<p-dialog [(visible)]="displayDetailDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" styleClass="custom-dialog" [style]="{ width: '90vw', maxWidth: '860px' }"
+  (onHide)="closeDetailDialog()">
   <ng-template pTemplate="header">
     <div class="dialog-header" *ngIf="selectedTransaction">
       <div class="dialog-header-top">
@@ -388,7 +355,8 @@
         <div class="detail-item">
           <label>Pickup ID → Drop-off ID</label>
           <span class="value">
-            <span class="stop-badge pickup-badge"><i class="pi pi-map-marker"></i> {{ selectedTransaction.pickupId }}</span>
+            <span class="stop-badge pickup-badge"><i class="pi pi-map-marker"></i> {{ selectedTransaction.pickupId
+              }}</span>
             &nbsp;<i class="pi pi-arrow-right"></i>&nbsp;
             <span class="stop-badge dropoff-badge"><i class="pi pi-flag"></i> {{ selectedTransaction.dropOffId }}</span>
           </span>

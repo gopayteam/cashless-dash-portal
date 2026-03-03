@@ -92,12 +92,36 @@
 
   </div>
 
+  <div class="action-container ">
+    <div class="export-buttons-group" style="margin-left: auto; margin-bottom: 2rem;">
+      <button pButton icon="pi pi-file-excel" style="gap: 0.5rem" label="Excel"
+        class="p-button-success export-action-btn" [disabled]="assignments.length === 0 || isExporting"
+        [loading]="isExporting" (click)="exportToExcel()" pTooltip="Export to Excel" tooltipPosition="bottom">
+      </button>
+      <button pButton icon="pi pi-file" style="gap: 0.5rem" label="CSV" class="p-button-help export-action-btn"
+        [disabled]="assignments.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
+        pTooltip="Export to CSV" tooltipPosition="bottom">
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="pagination-wrapper">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 20, 50, 100, 300, 500, 1000]" (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} assignments">
+    </p-paginator>
+  </div>
+
+
+
   <!-- ═══════════════════════════════════════════
        TABLE CARD
   ═══════════════════════════════════════════ -->
   <div class="table-card">
 
-    <div class="table-toolbar">
+    <!-- <div class="table-toolbar">
       <div class="toolbar-left">
         <span class="record-badge">
           {{ filteredAssignments.length }} of {{ totalRecords }} assignments
@@ -108,9 +132,7 @@
           [showCurrentPageReport]="true" style="margin-right: 0">
         </p-paginator>
       </div>
-
-      <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
-    </div>
+    </div> -->
 
     <!-- Loading -->
     <!-- <div *ngIf="loading" class="loading-overlay">

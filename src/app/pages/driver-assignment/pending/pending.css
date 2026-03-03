@@ -780,3 +780,12 @@
     flex: 1;
   }
 }
+
+.action-container {
+  display: flex;
+}
+
+.export-buttons-group {
+  margin-left: auto;
+  margin-bottom: 2rem;
+}

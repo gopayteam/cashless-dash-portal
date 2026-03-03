@@ -29,6 +29,19 @@
     </div>
   </div>
 
+  <div class="action-container ">
+    <div class="export-buttons-group" style="margin-left: auto; margin-bottom: 2rem;">
+      <button pButton icon="pi pi-file-excel" style="gap: 0.5rem" label="Excel" class="p-button-success export-action-btn"
+        [disabled]="assignments.length === 0 || isExporting" [loading]="isExporting" (click)="exportToExcel()"
+        pTooltip="Export to Excel" tooltipPosition="bottom">
+      </button>
+      <button pButton icon="pi pi-file" style="gap: 0.5rem" label="CSV" class="p-button-help export-action-btn"
+        [disabled]="assignments.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
+        pTooltip="Export to CSV" tooltipPosition="bottom">
+      </button>
+    </div>
+  </div>
+
   <!-- ─── Stats ────────────────────────────────────────────────────────────── -->
   <!-- <div class="stats-grid">
     <div class="stat-card">

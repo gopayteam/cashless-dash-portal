@@ -22,6 +22,7 @@
 @import './global/_paginator.css';
 @import './global/_tab_menu.css';
 @import './global/_toast.css';
+@import './global/_action_button.css';
 
 /* Import layout styles */
 @import './layout/_topbar.css';

@@ -19,7 +19,11 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
-
+import * as XLSX from 'xlsx';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { PaginatorModule } from "primeng/paginator";
 interface ApprovalStatusOption {
   label: string;
   value: string;
@@ -44,12 +48,18 @@ interface ApprovalFilterOption {
     DialogModule,
     InputTextModule,
     SelectModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    MessageModule,
+    ToastModule,
+    PaginatorModule
   ],
   templateUrl: './inactive.html',
-  styleUrls: ['./inactive.css'],
+  styleUrls: ['./inactive.css', '../../../../styles/global/_toast.css'],
+  providers: [MessageService],
 })
 export class AllInactiveDriverAssignmentsComponent implements OnInit {
+  isExporting = false;
+
   entityId: string | null = null;
   assignments: InactiveDriverAssignment[] = [];
   allAssignments: InactiveDriverAssignment[] = [];
@@ -92,6 +102,7 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -250,7 +261,149 @@ export class AllInactiveDriverAssignmentsComponent implements OnInit {
     return `${assignment.firstName} ${assignment.lastName}`;
   }
 
+  onPageChange(event: any): void {
+    console.log('Page change event:', event);
+    this.loadAssignments(event);
+  }
+
   refresh(): void {
     this.loadAssignments();
+  }
+
+  exportToExcel(): void {
+    if (this.assignments.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No assignments to export',
+        life: 3000
+      });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      const exportData = this.assignments.map(a => ({
+        'First Name': a.firstName,
+        'Last Name': a.lastName,
+        'Username': a.username,
+        'Phone Number': a.phoneNumber,
+        'Fleet Number': a.fleetNumber,
+        'Registration Number': a.registrationNumber,
+        'Investor Number': a.investorNumber,
+        'Marshal Number': a.marshalNumber,
+        'Status': a.status,
+        'Start Date': a.startDate ? new Date(a.startDate).toLocaleDateString() : 'N/A',
+        'End Date': a.endDate ? new Date(a.endDate).toLocaleDateString() : 'N/A',
+        'Allowed Active Days': a.allowedActiveDays,
+        'Created On': a.createdOn ? new Date(a.createdOn).toLocaleString() : 'N/A',
+        'Created By': a.createBy,
+      }));
+
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+
+      ws['!cols'] = [
+        { wch: 15 }, // First Name
+        { wch: 15 }, // Last Name
+        { wch: 20 }, // Username
+        { wch: 15 }, // Phone Number
+        { wch: 15 }, // Fleet Number
+        { wch: 20 }, // Registration Number
+        { wch: 18 }, // Investor Number
+        { wch: 16 }, // Marshal Number
+        { wch: 12 }, // Status
+        { wch: 15 }, // Start Date
+        { wch: 15 }, // End Date
+        { wch: 20 }, // Allowed Active Days
+        { wch: 20 }, // Created On
+        { wch: 20 }, // Created By
+      ];
+
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Inactive Drivers');
+
+      const filename = `inactive_driver_assignments_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, filename);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Assignments exported to Excel successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to export to Excel:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export assignments to Excel',
+        life: 4000
+      });
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  exportToCSV(): void {
+    if (this.assignments.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No assignments to export',
+        life: 3000
+      });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      const exportData = this.assignments.map(a => ({
+        'First Name': a.firstName,
+        'Last Name': a.lastName,
+        'Username': a.username,
+        'Phone Number': a.phoneNumber,
+        'Fleet Number': a.fleetNumber,
+        'Registration Number': a.registrationNumber,
+        'Investor Number': a.investorNumber,
+        'Marshal Number': a.marshalNumber,
+        'Status': a.status,
+        'Start Date': a.startDate ? new Date(a.startDate).toLocaleDateString() : 'N/A',
+        'End Date': a.endDate ? new Date(a.endDate).toLocaleDateString() : 'N/A',
+        'Allowed Active Days': a.allowedActiveDays,
+        'Created On': a.createdOn ? new Date(a.createdOn).toLocaleString() : 'N/A',
+        'Created By': a.createBy,
+      }));
+
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const filename = `inactive_driver_assignments_${new Date().toISOString().split('T')[0]}.csv`;
+
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Assignments exported to CSV successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to export to CSV:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export assignments to CSV',
+        life: 4000
+      });
+    } finally {
+      this.isExporting = false;
+    }
   }
 }

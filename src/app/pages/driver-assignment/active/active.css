@@ -701,3 +701,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.action-container {
+  display: flex;
+}
+
+.export-buttons-group {
+  margin-left: auto;
+  margin-bottom: 2rem;
+}
