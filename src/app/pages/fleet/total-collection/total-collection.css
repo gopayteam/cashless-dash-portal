@@ -850,7 +850,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
+  font-weight: 200;
 }
 
 .list-fleet-cell i {
@@ -858,13 +858,13 @@
 }
 
 .amount-cell {
-  font-weight: 700;
+  font-weight: 300;
   color: var(--text-primary);
 }
 
 .pct-cell {
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 300;
 }
 
 .bar-cell {
@@ -892,7 +892,7 @@
   padding: 0.25rem 0.6rem;
   border-radius: 99px;
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 300;
 }
 
 /* ─────────────────────────────────────────────
