@@ -211,3 +211,36 @@
   padding: 1rem 2rem;
   border-top: 1px solid var(--border-color);
 }
+
+.transactions-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.hidden-export-trigger {
+  font-size: 0.8rem;
+  opacity: 0.15;
+  transition: opacity 0.2s ease;
+}
+
+.transactions-title:hover .hidden-export-trigger {
+  opacity: 0.4;
+}
+
+.export-animated {
+  animation: fadeSlideIn 0.25s ease forwards;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

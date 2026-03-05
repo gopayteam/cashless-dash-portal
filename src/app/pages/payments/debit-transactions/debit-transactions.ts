@@ -23,6 +23,11 @@ import { Router } from '@angular/router';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
+import * as XLSX from 'xlsx';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
 @Component({
   selector: 'app-debit-transactions',
   standalone: true,
@@ -40,13 +45,16 @@ import { formatDateLocal } from '../../../../@core/utils/date-time.util';
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    MessageModule,
+    ToastModule,
   ],
   templateUrl: './debit-transactions.html',
   styleUrls: [
     './debit-transactions.css',
     '../../../../styles/modules/_transactions.css'
   ],
+  providers: [MessageService]
 })
 export class DebitTransactionsComponent implements OnInit {
   entityId: string | null = null;
@@ -66,10 +74,19 @@ export class DebitTransactionsComponent implements OnInit {
   displayDetailDialog: boolean = false;
   selectedTransaction: PaymentRecord | null = null;
 
+  isExporting: boolean = false;
+
+  showExportButtons: boolean = false;
+
+  toggleExport(): void {
+    this.showExportButtons = !this.showExportButtons;
+  }
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
+    private messageService: MessageService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -212,5 +229,144 @@ export class DebitTransactionsComponent implements OnInit {
 
   refresh(): void {
     this.fetchTransactions(true);
+  }
+
+  exportToExcel(): void {
+    if (this.transactions.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No transactions to export',
+        life: 3000
+      });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      const exportData = this.transactions.map(t => ({
+        'M-Pesa Receipt': t.mpesaReceiptNumber,
+        'Customer Name': t.customerName || 'N/A',
+        'Fleet Number': t.fleetNumber,
+        'Transaction Type': t.transactionType,
+        'Payment Status': t.paymentStatus,
+        'Amount (KES)': t.assignedAmount,
+        'Trip ID': t.tripId || 'N/A',
+        'Pickup': t.pickup || 'N/A',
+        'Drop Off': t.dropOff || 'N/A',
+        'Driver Username': t.activeDriverUsername || 'N/A',
+        'Created At': new Date(t.createdAt).toLocaleString(),
+        'Updated At': new Date(t.updatedAt).toLocaleString(),
+      }));
+
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+
+      ws['!cols'] = [
+        { wch: 20 }, // M-Pesa Receipt
+        { wch: 22 }, // Customer Name
+        { wch: 14 }, // Fleet Number
+        { wch: 18 }, // Transaction Type
+        { wch: 16 }, // Payment Status
+        { wch: 14 }, // Amount
+        { wch: 12 }, // Trip ID
+        { wch: 20 }, // Pickup
+        { wch: 20 }, // Drop Off
+        { wch: 22 }, // Driver Username
+        { wch: 22 }, // Created At
+        { wch: 22 }, // Updated At
+      ];
+
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Debit Transactions');
+
+      const [start, end] = this.dateRange;
+      const startDate = start ? formatDateLocal(start) : 'all';
+      const endDate = end ? formatDateLocal(end) : 'time';
+      const filename = `debit_transactions_${startDate}_to_${endDate}.xlsx`;
+
+      XLSX.writeFile(wb, filename);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Transactions exported to Excel successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to export to Excel:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export transactions to Excel',
+        life: 4000
+      });
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  exportToCSV(): void {
+    if (this.transactions.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'No transactions to export',
+        life: 3000
+      });
+      return;
+    }
+
+    try {
+      this.isExporting = true;
+
+      const exportData = this.transactions.map(t => ({
+        'M-Pesa Receipt': t.mpesaReceiptNumber,
+        'Customer Name': t.customerName || 'N/A',
+        'Fleet Number': t.fleetNumber,
+        'Transaction Type': t.transactionType,
+        'Payment Status': t.paymentStatus,
+        'Amount (KES)': t.assignedAmount,
+        'Trip ID': t.tripId || 'N/A',
+        'Pickup': t.pickup || 'N/A',
+        'Drop Off': t.dropOff || 'N/A',
+        'Driver Username': t.activeDriverUsername || 'N/A',
+        'Created At': new Date(t.createdAt).toLocaleString(),
+        'Updated At': new Date(t.updatedAt).toLocaleString(),
+      }));
+
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+      const csv = XLSX.utils.sheet_to_csv(ws);
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+
+      const [start, end] = this.dateRange;
+      const startDate = start ? formatDateLocal(start) : 'all';
+      const endDate = end ? formatDateLocal(end) : 'time';
+      const filename = `debit_transactions_${startDate}_to_${endDate}.csv`;
+
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Transactions exported to CSV successfully',
+        life: 4000
+      });
+    } catch (error) {
+      console.error('Failed to export to CSV:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export transactions to CSV',
+        life: 4000
+      });
+    } finally {
+      this.isExporting = false;
+    }
   }
 }
