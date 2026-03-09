@@ -103,14 +103,14 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
     const payload: ChatRequest = {
       entityId: this.entityId!,
       sessionId: this.sessionId ?? undefined,
-      message: text,
+      text: text,
     };
 
     this.dataService
       .post<ChatResponse>(AI_ENDPOINTS.CHAT_SEND, payload, 'chatbot')
       .subscribe({
         next: (res) => {
-          this.sessionId = res.sessionId;
+          this.sessionId = res.data.conversation_id;
           this.messages.update(msgs =>
             msgs.map(m => m.id === userMsg.id ? { ...m, status: 'delivered' } : m)
           );
@@ -118,7 +118,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
           const assistantMsg: ChatMessage = {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: res.reply,
+            content: res.data.response,
             timestamp: new Date(),
             status: 'delivered',
           };

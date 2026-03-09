@@ -2,7 +2,23 @@
 // AI Services — Shared TypeScript Models
 // ============================================================
 
-// ── Chat ────────────────────────────────────────────────────
+
+// ── Generic API Envelope ─────────────────────────────────────────────────────
+
+export interface ApiMeta {
+  request_id: string;
+  service: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  meta: ApiMeta;
+}
+
+
+// ── Chat ─────────────────────────────────────────────────────────────────────
+
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type MessageStatus = 'sending' | 'delivered' | 'error';
 
@@ -20,19 +36,104 @@ export interface ChatMessage {
 export interface ChatRequest {
   entityId: string;
   sessionId?: string;
-  message: string;
+  text: string;
   useRag?: boolean;
 }
 
-export interface ChatResponse {
-  sessionId: string;
-  reply: string;
-  intentDetected?: string;
-  confidence?: number;
-  sources?: RagSource[];
+export interface ChatResponseData {
+  conversation_id: string | null;
+  message: string;
+  response: string;
+  intent: string;
+  confidence: number;
+  sources: RagSource[];
+  workflow: string | null;
+  tokens_used: number | null;
+  rag_source_used: string | null;
+  latency_ms: number | null;
+  created_at: string;
 }
 
-// ── RAG ─────────────────────────────────────────────────────
+export type ChatResponse = ApiResponse<ChatResponseData>;
+
+
+// ── Intents ───────────────────────────────────────────────────────────────────
+
+export interface TrainingPhrase {
+  id?: string;
+  text: string;
+}
+
+export interface FetchApiIntent {
+  intents: Intent[];
+}
+
+export interface Intent {
+  tag: string;
+  patterns: string[];
+  responses: string[];
+
+  // UI optional fields
+  id?: string;
+  displayName?: string;
+  description?: string;
+  isActive?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IntentCreateRequest {
+  name: string;
+  displayName: string;
+  tag: string;
+  patterns: string[];
+  responses: string[];
+  trainingPhrases: string[];
+  description?: string;
+}
+
+export interface IntentUpdateRequest extends Partial<IntentCreateRequest> {
+  isActive?: boolean;
+}
+
+
+// ── Model / Training ──────────────────────────────────────────────────────────
+
+export interface ModelStatus {
+  status: 'ready' | 'training' | 'loading' | 'error' | 'not_trained';
+  accuracy?: number;
+  device: string;
+  tags: string[];
+  totalIntents: number;
+  totalPhrases: number;
+  lastTrainedAt?: Date;
+  trainingDurationMs?: number;
+}
+
+export interface ModelStatusResponse {
+  model: {
+    loaded: boolean;
+    device: string;
+    vocab_size: number;
+    num_tags: number;
+    tags: string[];
+  };
+  intent_store: {
+    source: string;
+    intents: number;
+    tags: string[];
+  };
+}
+
+export interface RetrainResponse {
+  jobId: string;
+  status: 'queued' | 'running';
+  message: string;
+}
+
+
+// ── RAG ───────────────────────────────────────────────────────────────────────
+
 export interface RagSource {
   documentId: string;
   title: string;
@@ -53,52 +154,9 @@ export interface RagQueryResponse {
   processingTimeMs: number;
 }
 
-// ── Intents ─────────────────────────────────────────────────
-export interface TrainingPhrase {
-  id?: string;
-  text: string;
-}
 
-export interface Intent {
-  id: string;
-  name: string;
-  displayName: string;
-  description?: string;
-  trainingPhrases: TrainingPhrase[];
-  responses: string[];
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// ── FAQ ───────────────────────────────────────────────────────────────────────
 
-export interface IntentCreateRequest {
-  name: string;
-  displayName: string;
-  description?: string;
-  trainingPhrases: string[];
-  responses: string[];
-}
-
-export interface IntentUpdateRequest extends Partial<IntentCreateRequest> {
-  isActive?: boolean;
-}
-
-export interface ModelStatus {
-  status: 'ready' | 'training' | 'error' | 'not_trained';
-  accuracy?: number;
-  totalIntents: number;
-  totalPhrases: number;
-  lastTrainedAt?: Date;
-  trainingDurationMs?: number;
-}
-
-export interface RetrainResponse {
-  jobId: string;
-  status: 'queued' | 'running';
-  message: string;
-}
-
-// ── FAQ / Documents ──────────────────────────────────────────
 export interface FaqEntry {
   id: string;
   question: string;
@@ -116,6 +174,9 @@ export interface FaqCreateRequest {
   category?: string;
   tags?: string[];
 }
+
+
+// ── Documents ─────────────────────────────────────────────────────────────────
 
 export interface RagDocument {
   id: string;

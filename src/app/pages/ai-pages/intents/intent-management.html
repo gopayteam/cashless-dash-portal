@@ -98,27 +98,28 @@
         <tr class="clickable-row" (click)="openEdit(intent)">
           <td>
             <div class="intent-name-cell">
-              <span class="intent-display-name">{{ intent.displayName }}</span>
+              <span class="intent-display-name">{{ intent.tag }}</span>
               <span *ngIf="intent.description" class="intent-description">{{ intent.description }}</span>
             </div>
           </td>
           <td>
-            <code class="intent-key">{{ intent.name }}</code>
+            <code class="intent-key">{{ intent.tag }}</code>
           </td>
           <td>
             <div class="phrase-chips">
-              <span class="phrase-chip" *ngFor="let p of intent.trainingPhrases ?? [] | slice:0:2">
-                {{ p.text | slice:0:24 }}{{ p.text.length > 24 ? '…' : '' }}
+              <span class="phrase-chip" *ngFor="let p of intent.patterns | slice:0:2">
+                {{ p | slice:0:24 }}{{ p.length > 24 ? '…' : '' }}
               </span>
-              <span class="more-chip" *ngIf="intent.trainingPhrases.length > 2">
-                +{{ intent.trainingPhrases.length - 2 }} more
+
+              <span class="more-chip" *ngIf="intent.patterns?.length > 2">
+                +{{ intent.patterns.length - 2 }} more
               </span>
             </div>
           </td>
           <td>
             <span class="response-count">
               <i class="pi pi-comment"></i>
-              {{ intent.responses.length }}
+              {{ intent.responses?.length || 0 }}
             </span>
           </td>
           <td (click)="$event.stopPropagation()">
@@ -160,7 +161,7 @@
 
   <!-- ══ CREATE / EDIT DIALOG ══════════════════════════════════ -->
   <p-dialog [(visible)]="showDialog" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true"
-    [dismissableMask]="true" [style]="{ width: '90vw', maxWidth: '680px' }" styleClass="intent-dialog"
+    [dismissableMask]="true" [style]="{ width: '90vw', maxWidth: '680px' }" styleClass="custom-dialog"
     [header]="dialogTitle">
 
     <div class="dialog-form">

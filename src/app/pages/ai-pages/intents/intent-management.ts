@@ -24,8 +24,9 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { AI_ENDPOINTS } from '../../../../@core/models/ai/ai.endpoints';
 import {
+  FetchApiIntent,
   Intent, IntentCreateRequest, IntentUpdateRequest,
-  ModelStatus, RetrainResponse
+  ModelStatus, ModelStatusResponse, RetrainResponse
 } from '../../../../@core/models/ai/ai.models';
 
 @Component({
@@ -80,6 +81,11 @@ export class IntentManagementComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) { }
 
+  get loading() {
+    return this.loadingStore.loading;
+  }
+
+
   ngOnInit(): void {
     this.loadIntents();
     this.loadModelStatus();
@@ -89,10 +95,12 @@ export class IntentManagementComponent implements OnInit {
   loadIntents(): void {
     this.loadingStore.start();
     this.dataService
-      .getWithoutParams<{ data: Intent[] }>(AI_ENDPOINTS.INTENT_LIST, 'intents', true, true)
+      .getWithoutParams<FetchApiIntent>(AI_ENDPOINTS.INTENT_LIST, 'intents', true, true)
       .subscribe({
         next: (res) => {
-          this.intents = res.data ?? (res as any);
+          // Handle both { data: { intents: [] } } and other formats
+          const rawData = res?.intents || res;
+          this.intents = Array.isArray(rawData) ? rawData : [];
           this.applyFilter();
           this.loadingStore.stop();
           this.cdr.detectChanges();
@@ -101,17 +109,28 @@ export class IntentManagementComponent implements OnInit {
           console.error('Failed to load intents', err);
           this.loadingStore.stop();
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load intents.', life: 3000 });
-        },
+        }
       });
   }
 
   loadModelStatus(): void {
     this.isLoadingStatus.set(true);
     this.dataService
-      .getWithoutParams<ModelStatus>(AI_ENDPOINTS.INTENT_MODEL_STATUS, 'intents', true, true)
+      .getWithoutParams<ModelStatusResponse>(AI_ENDPOINTS.INTENT_MODEL_STATUS, 'intents', true, true)
       .subscribe({
         next: (res) => {
-          this.modelStatus.set(res);
+          if (res && res.model && res.intent_store) {
+            const model = res.model;
+            const intent_store = res.intent_store;
+            // Map the complex backend response to our UI signal
+            this.modelStatus.set({
+              status: model.loaded ? 'ready' : 'loading',
+              totalIntents: intent_store.intents,
+              device: model.device,
+              tags: model.tags,
+              totalPhrases: 0
+            });
+          }
           this.isLoadingStatus.set(false);
           this.cdr.detectChanges();
         },
@@ -123,14 +142,18 @@ export class IntentManagementComponent implements OnInit {
 
   // ── Filter ──────────────────────────────────────────────────
   applyFilter(): void {
+    if (!Array.isArray(this.intents)) {
+      this.filteredIntents = [];
+      return;
+    }
     if (!this.searchTerm.trim()) {
       this.filteredIntents = [...this.intents];
       return;
     }
     const q = this.searchTerm.toLowerCase();
     this.filteredIntents = this.intents.filter(i =>
-      i.displayName.toLowerCase().includes(q) ||
-      i.name.toLowerCase().includes(q) ||
+      i.displayName?.toLowerCase().includes(q) ||
+      i.tag?.toLowerCase().includes(q) ||
       i.description?.toLowerCase().includes(q)
     );
   }
@@ -147,13 +170,19 @@ export class IntentManagementComponent implements OnInit {
   openEdit(intent: Intent): void {
     this.isEditing = true;
     this.dialogTitle = 'Edit Intent';
-    this.editingId = intent.id;
+    this.editingId = intent.tag;
+
+    // Safely handle both TrainingPhrase objects and plain strings
+    const phraseStrings = (intent.patterns || []).map(p =>
+      typeof p === 'string' ? p : p
+    );
+
     this.form = {
-      name: intent.name,
-      displayName: intent.displayName,
+      name: intent.tag,
+      displayName: intent.tag,
       description: intent.description ?? '',
-      trainingPhrases: intent.trainingPhrases.map(p => p.text).join('\n'),
-      responses: intent.responses.join('\n'),
+      trainingPhrases: phraseStrings.join('\n'),
+      responses: (intent.responses || []).join('\n'),
     };
     this.showDialog = true;
   }
@@ -173,6 +202,8 @@ export class IntentManagementComponent implements OnInit {
       description: this.form.description || undefined,
       trainingPhrases: phrases,
       responses,
+      tag: this.form.displayName,
+      patterns: phrases
     };
 
     this.isSaving = true;
@@ -206,7 +237,7 @@ export class IntentManagementComponent implements OnInit {
       header: 'Delete Intent',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
-      accept: () => this.deleteIntent(intent.id),
+      accept: () => this.deleteIntent(intent.tag),
     });
   }
 
@@ -284,6 +315,4 @@ export class IntentManagementComponent implements OnInit {
       default: return 'pi pi-circle';
     }
   }
-
-  get loading() { return this.loadingStore.loading; }
 }

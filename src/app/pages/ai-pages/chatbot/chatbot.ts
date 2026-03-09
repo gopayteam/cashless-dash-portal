@@ -101,7 +101,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
     const payload: ChatRequest = {
       entityId: this.entityId!,
       sessionId: this.sessionId ?? undefined,
-      message: text,
+      text: text,
       useRag: this.useRag(),
     };
 
@@ -109,7 +109,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
       .post<ChatResponse>(AI_ENDPOINTS.CHAT_SEND, payload, 'chatbot', true, true)
       .subscribe({
         next: (res) => {
-          this.sessionId = res.sessionId;
+          this.sessionId = res.data.conversation_id;
 
           // mark user message delivered
           this.messages.update(msgs =>
@@ -119,12 +119,12 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
           const assistantMsg: ChatMessage = {
             id: crypto.randomUUID(),
             role: 'assistant',
-            content: res.reply,
+            content: res.data.response,
             timestamp: new Date(),
             status: 'delivered',
-            sources: res.sources,
-            intentDetected: res.intentDetected,
-            confidence: res.confidence,
+            sources: res.data.sources,
+            intentDetected: res.data.intent,
+            confidence: res.data.confidence,
           };
 
           this.messages.update(msgs => [...msgs, assistantMsg]);
