@@ -4,6 +4,7 @@ import { MOCK_DB } from './mock-db';
 
 @Injectable({ providedIn: 'root' })
 export class MockApiService {
+
   get(endpoint: string): Observable<any> {
     switch (endpoint) {
       case '/api/payment/passenger/manifest':
@@ -19,7 +20,7 @@ export class MockApiService {
         return of(MOCK_DB.stats_per_category).pipe(delay(500));
 
       default:
-        console.warn(`MockApiService: Unknown endpoint ${endpoint}`);
+        console.warn(`MockApiService GET: Unknown endpoint ${endpoint}`);
         return of(null);
     }
   }
@@ -30,8 +31,35 @@ export class MockApiService {
         return of(MOCK_DB.recent_transactions).pipe(delay(500));
 
       default:
-        console.warn(`MockApiService: Unknown endpoint ${endpoint}`);
+        console.warn(`MockApiService POST: Unknown endpoint ${endpoint}`);
         return of(null);
     }
+  }
+
+  put(endpoint: string, payload: any): Observable<any> {
+    console.log('Mock PUT', endpoint, payload);
+    return of({ success: true }).pipe(delay(500));
+  }
+
+  putWithParams(
+    endpoint: string,
+    payload: any,
+    params?: Record<string, any>
+  ): Observable<any> {
+    console.log('Mock PUT WITH PARAMS', endpoint, payload, params);
+    return of({ success: true }).pipe(delay(500));
+  }
+
+  delete(endpoint: string): Observable<any> {
+    console.log('Mock DELETE', endpoint);
+    return of({ success: true }).pipe(delay(500));
+  }
+
+  deleteWithParams(
+    endpoint: string,
+    params?: Record<string, any>
+  ): Observable<any> {
+    console.log('Mock DELETE WITH PARAMS', endpoint, params);
+    return of({ success: true }).pipe(delay(500));
   }
 }

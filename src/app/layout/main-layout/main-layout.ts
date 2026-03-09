@@ -186,6 +186,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
     ],
+
+    '/ai': [
+      { label: 'AI Assistant', icon: 'pi pi-comments', route: '/ai/chatbot' },
+      { label: 'Knowledge Query', icon: 'pi pi-database', route: '/ai/rag' },
+      { label: 'Intent Manager', icon: 'pi pi-tag', route: '/ai/intents' },
+      { label: 'Knowledge Base', icon: 'pi pi-book', route: '/ai/knowledge-base' },
+    ],
   };
 
   constructor(

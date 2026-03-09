@@ -1,0 +1,166 @@
+<!-- pages/rag/rag-query.component.html -->
+<p-toast></p-toast>
+
+<div class="rag-page">
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <div class="rag-header">
+    <div class="header-left">
+      <div class="rag-icon"><i class="pi pi-database"></i></div>
+      <div>
+        <h1>Knowledge Base Query</h1>
+        <p class="text-muted">Ask questions — answers are grounded in your indexed documents & FAQs</p>
+      </div>
+    </div>
+    <div class="view-switcher">
+      <button
+        class="view-btn"
+        [class.active]="viewMode() === 'research'"
+        (click)="setViewMode('research')"
+        pTooltip="Research view — show answer + sources" tooltipPosition="bottom">
+        <i class="pi pi-list"></i> Research
+      </button>
+      <button
+        class="view-btn"
+        [class.active]="viewMode() === 'chat'"
+        (click)="setViewMode('chat')"
+        pTooltip="Chat view — answer only" tooltipPosition="bottom">
+        <i class="pi pi-comment"></i> Chat
+      </button>
+    </div>
+  </div>
+
+  <div class="rag-body">
+
+    <!-- ══ LEFT: Query + Result ══════════════════════════════ -->
+    <div class="rag-main">
+
+      <!-- Query Box -->
+      <p-card styleClass="query-card card">
+        <div class="query-area">
+          <textarea
+            class="query-textarea"
+            placeholder="Ask a question about your payments, fleet, or trips…"
+            [(ngModel)]="queryText"
+            (keydown)="onKeyDown($event)"
+            rows="3"
+            [disabled]="isLoading()">
+          </textarea>
+          <div class="query-controls">
+            <div class="topk-control">
+              <label>Top K results: <strong>{{ topK }}</strong></label>
+              <p-slider [(ngModel)]="topK" [min]="1" [max]="20" styleClass="topk-slider"></p-slider>
+            </div>
+            <button
+              class="query-submit-btn"
+              [disabled]="!queryText.trim() || isLoading()"
+              (click)="submitQuery()">
+              <span *ngIf="!isLoading()"><i class="pi pi-search"></i> Search</span>
+              <span *ngIf="isLoading()"><p-progressSpinner styleClass="inline-spinner" strokeWidth="5"></p-progressSpinner> Searching…</span>
+            </button>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Result -->
+      <div class="result-area" *ngIf="currentResult()">
+
+        <!-- ── Chat View ── -->
+        <p-card styleClass="result-card card" *ngIf="viewMode() === 'chat'">
+          <div class="chat-result">
+            <div class="answer-avatar"><i class="pi pi-database"></i></div>
+            <div class="answer-bubble">
+              <p>{{ currentResult()!.answer }}</p>
+              <span class="answer-meta">
+                <i class="pi pi-clock"></i>
+                {{ formatMs(currentResult()!.processingTimeMs) }}
+                · {{ currentResult()!.sources.length }} sources
+              </span>
+            </div>
+          </div>
+        </p-card>
+
+        <!-- ── Research View ── -->
+        <div *ngIf="viewMode() === 'research'" class="research-view">
+
+          <!-- Answer Panel -->
+          <p-card styleClass="card answer-panel">
+            <div class="answer-header">
+              <i class="pi pi-check-circle answer-icon"></i>
+              <div>
+                <h3>Answer</h3>
+                <span class="answer-meta">
+                  Processed in {{ formatMs(currentResult()!.processingTimeMs) }}
+                  · {{ currentResult()!.sources.length }} sources used
+                </span>
+              </div>
+            </div>
+            <p-divider></p-divider>
+            <p class="answer-text">{{ currentResult()!.answer }}</p>
+          </p-card>
+
+          <!-- Sources Panel -->
+          <p-card styleClass="card sources-panel" *ngIf="currentResult()!.sources.length > 0">
+            <div class="sources-header">
+              <h3><i class="pi pi-book"></i> Sources <span class="count-badge">{{ currentResult()!.sources.length }}</span></h3>
+            </div>
+            <div class="source-list">
+              <div class="source-card" *ngFor="let src of currentResult()!.sources">
+                <div class="source-card-header">
+                  <div class="source-title-row">
+                    <i [class]="src.sourceType === 'faq' ? 'pi pi-question-circle' : 'pi pi-file-pdf'"></i>
+                    <span class="source-title">{{ src.title }}</span>
+                    <span [class]="'score-pill ' + getScoreClass(src.score)">
+                      {{ (src.score * 100).toFixed(0) }}% match
+                    </span>
+                  </div>
+                  <span class="source-type-tag">{{ src.sourceType | uppercase }}</span>
+                </div>
+                <p class="source-excerpt">{{ src.excerpt }}</p>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+      </div>
+
+      <!-- Empty state -->
+      <div class="rag-empty" *ngIf="!currentResult() && !isLoading()">
+        <i class="pi pi-search empty-icon"></i>
+        <h3>Ask your knowledge base</h3>
+        <p>Type a question above and press Search to get answers grounded in your indexed data.</p>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT: History ════════════════════════════════════ -->
+    <aside class="rag-sidebar">
+      <div class="sidebar-top">
+        <h4>Query History</h4>
+        <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger"
+          *ngIf="history().length > 0" (click)="clearHistory()"
+          pTooltip="Clear history" tooltipPosition="top">
+        </button>
+      </div>
+
+      <div class="history-empty" *ngIf="history().length === 0">
+        <i class="pi pi-history"></i>
+        <p>No queries yet</p>
+      </div>
+
+      <div class="history-list">
+        <div
+          class="history-item"
+          *ngFor="let item of history(); trackBy: trackById"
+          (click)="loadFromHistory(item)">
+          <i class="pi pi-search hist-icon"></i>
+          <div class="hist-content">
+            <p class="hist-query">{{ item.query | slice:0:60 }}{{ item.query.length > 60 ? '…' : '' }}</p>
+            <span class="hist-time">{{ item.timestamp | date:'hh:mm a' }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>

@@ -1,0 +1,104 @@
+<!-- components/chat-widget/chat-widget.component.html -->
+
+<!-- ══ FAB BUTTON ════════════════════════════════════════════ -->
+<div class="widget-fab-wrap" [class.bottom-left]="position === 'bottom-left'">
+  <button
+    class="widget-fab"
+    (click)="toggle()"
+    [pTooltip]="isOpen() ? '' : 'Open Assistant'"
+    tooltipPosition="left">
+    <i [class]="isOpen() ? 'pi pi-times' : 'pi pi-comments'"></i>
+    <span class="unread-badge" *ngIf="unreadCount() > 0 && !isOpen()">
+      {{ unreadCount() }}
+    </span>
+  </button>
+</div>
+
+<!-- ══ WIDGET PANEL ══════════════════════════════════════════ -->
+<div
+  class="widget-panel"
+  [class.open]="isOpen()"
+  [class.bottom-left]="position === 'bottom-left'">
+
+  <!-- Header -->
+  <div class="widget-header">
+    <div class="widget-header-left">
+      <div class="widget-avatar"><i class="pi pi-android"></i></div>
+      <div>
+        <p class="widget-name">GoPay Assistant</p>
+        <p class="widget-status">{{ isTyping() ? 'Typing…' : 'Online' }}</p>
+      </div>
+    </div>
+    <div class="widget-header-actions">
+      <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-plain"
+        pTooltip="Clear chat" tooltipPosition="bottom"
+        (click)="clearWidget()"></button>
+      <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-plain"
+        (click)="close()"></button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="widget-messages">
+
+    <ng-container *ngFor="let msg of messages(); trackBy: trackByMessage">
+
+      <!-- Assistant -->
+      <div class="wmsg-row assistant-row" *ngIf="msg.role === 'assistant'">
+        <div class="wmsg-avatar assistant"><i class="pi pi-android"></i></div>
+        <div class="wmsg-bubble assistant-bubble">
+          <p>{{ msg.content }}</p>
+          <span class="wmsg-time">{{ formatTime(msg.timestamp) }}</span>
+        </div>
+      </div>
+
+      <!-- User -->
+      <div class="wmsg-row user-row" *ngIf="msg.role === 'user'">
+        <div class="wmsg-bubble user-bubble">
+          <p>{{ msg.content }}</p>
+          <div class="wmsg-meta">
+            <span class="wmsg-time">{{ formatTime(msg.timestamp) }}</span>
+            <i [class]="msg.status === 'delivered' ? 'pi pi-check-circle wstatus-ok'
+                        : msg.status === 'error' ? 'pi pi-times-circle wstatus-err'
+                        : 'pi pi-clock wstatus-pending'"></i>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+    <!-- Typing indicator -->
+    <div class="wmsg-row assistant-row" *ngIf="isTyping()">
+      <div class="wmsg-avatar assistant"><i class="pi pi-android"></i></div>
+      <div class="wmsg-bubble assistant-bubble typing">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <div #widgetMessagesEnd></div>
+  </div>
+
+  <!-- Input -->
+  <div class="widget-input-area">
+    <textarea
+      class="widget-textarea"
+      placeholder="Type a message…"
+      [(ngModel)]="inputText"
+      (keydown)="onKeyDown($event)"
+      rows="1"
+      [disabled]="isTyping()">
+    </textarea>
+    <button
+      class="widget-send-btn"
+      [disabled]="!inputText.trim() || isTyping()"
+      (click)="sendMessage()">
+      <i class="pi pi-send"></i>
+    </button>
+  </div>
+
+  <div class="widget-footer">
+    <i class="pi pi-lock"></i> Secured via GoPay Gateway
+  </div>
+</div>

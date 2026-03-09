@@ -1,0 +1,172 @@
+<!-- pages/chatbot/chatbot.component.html -->
+<p-toast></p-toast>
+
+<div class="chatbot-page">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <i class="pi pi-comments"></i>
+      </div>
+      <div>
+        <h2>GoPay AI</h2>
+        <span class="brand-sub">Assistant</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="sidebar-label">Mode</p>
+      <button
+        class="mode-toggle"
+        [class.rag-active]="useRag()"
+        (click)="toggleRag()"
+        pTooltip="Toggle knowledge-base augmented responses"
+        tooltipPosition="right">
+        <i [class]="useRag() ? 'pi pi-database' : 'pi pi-comment'"></i>
+        <span>{{ useRag() ? 'RAG Mode' : 'Chat Mode' }}</span>
+        <span class="mode-badge" [class.on]="useRag()">{{ useRag() ? 'ON' : 'OFF' }}</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section" *ngIf="sessionId">
+      <p class="sidebar-label">Session</p>
+      <div class="session-chip">
+        <i class="pi pi-circle-fill session-dot"></i>
+        <span class="session-id">{{ sessionId | slice:0:16 }}…</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button
+        pButton
+        icon="pi pi-trash"
+        label="Clear Chat"
+        class="p-button-text p-button-danger clear-btn"
+        [disabled]="!hasMessages"
+        (click)="clearChat()">
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN CHAT ═════════════════════════════════════════════ -->
+  <div class="chat-main">
+
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="chat-header-info">
+        <div class="avatar-online">
+          <div class="header-avatar"><i class="pi pi-android"></i></div>
+          <span class="online-dot"></span>
+        </div>
+        <div>
+          <h3>GoPay Assistant</h3>
+          <span class="status-text">{{ isTyping() ? 'Typing…' : 'Online' }}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span *ngIf="useRag()" class="rag-pill">
+          <i class="pi pi-database"></i> RAG Active
+        </span>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <div class="messages-area">
+      <div class="messages-inner">
+
+        <ng-container *ngFor="let msg of messages(); trackBy: trackByMessage">
+
+          <!-- ── assistant message ── -->
+          <div class="message-row assistant-row" *ngIf="msg.role === 'assistant'">
+            <div class="msg-avatar assistant-avatar">
+              <i class="pi pi-android"></i>
+            </div>
+            <div class="message-bubble assistant-bubble">
+              <p class="message-text">{{ msg.content }}</p>
+
+              <!-- RAG sources -->
+              <div class="sources-block" *ngIf="msg.sources && msg.sources.length > 0">
+                <p class="sources-label"><i class="pi pi-book"></i> Sources</p>
+                <div class="source-chip" *ngFor="let src of msg.sources">
+                  <i [class]="src.sourceType === 'faq' ? 'pi pi-question-circle' : 'pi pi-file'"></i>
+                  <span>{{ src.title }}</span>
+                  <span class="score-badge">{{ (src.score * 100).toFixed(0) }}%</span>
+                </div>
+              </div>
+
+              <!-- intent -->
+              <div class="intent-tag" *ngIf="msg.intentDetected">
+                <i class="pi pi-tag"></i>
+                {{ msg.intentDetected }}
+                <span *ngIf="msg.confidence" class="conf">{{ (msg.confidence * 100).toFixed(0) }}%</span>
+              </div>
+
+              <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
+            </div>
+          </div>
+
+          <!-- ── user message ── -->
+          <div class="message-row user-row" *ngIf="msg.role === 'user'">
+            <div class="message-bubble user-bubble">
+              <p class="message-text">{{ msg.content }}</p>
+              <div class="user-meta">
+                <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
+                <i
+                  [class]="msg.status === 'delivered' ? 'pi pi-check-circle status-ok'
+                           : msg.status === 'error'   ? 'pi pi-times-circle status-err'
+                           : 'pi pi-clock status-pending'">
+                </i>
+              </div>
+            </div>
+            <div class="msg-avatar user-avatar">
+              <i class="pi pi-user"></i>
+            </div>
+          </div>
+
+        </ng-container>
+
+        <!-- Typing indicator -->
+        <div class="message-row assistant-row" *ngIf="isTyping()">
+          <div class="msg-avatar assistant-avatar"><i class="pi pi-android"></i></div>
+          <div class="message-bubble assistant-bubble typing-bubble">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+
+        <div #messagesEnd></div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="input-row">
+        <textarea
+          #messageInput
+          class="chat-textarea"
+          placeholder="Type your message… (Enter to send, Shift+Enter for new line)"
+          [(ngModel)]="inputText"
+          (keydown)="onKeyDown($event)"
+          rows="1"
+          [disabled]="isTyping()">
+        </textarea>
+        <button
+          class="send-btn"
+          [class.sending]="isTyping()"
+          [disabled]="!inputText.trim() || isTyping()"
+          (click)="sendMessage()"
+          pTooltip="Send message"
+          tooltipPosition="top">
+          <i class="pi pi-send"></i>
+        </button>
+      </div>
+      <p class="input-hint">
+        <i class="pi pi-shield"></i>
+        Messages are processed through your GoPay gateway
+      </p>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,216 @@
+<!-- pages/intents/intent-management.component.html -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="intents-page">
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="page-icon intent-icon"><i class="pi pi-tag"></i></div>
+      <div>
+        <h1>Intent Management</h1>
+        <p class="text-muted">Manage training phrases, responses and retrain your NLU model</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button pButton icon="pi pi-plus" label="New Intent" class="p-button-primary" (click)="openCreate()">
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ MODEL STATUS CARD ═════════════════════════════════════ -->
+  <div class="status-row">
+    <p-card styleClass="status-card card">
+      <div class="status-inner" *ngIf="!isLoadingStatus(); else statusLoading">
+        <div class="status-left">
+          <div class="status-indicator" [class]="'status-' + (modelStatus()?.status ?? 'not_trained')">
+            <i [class]="getStatusIcon(modelStatus()?.status)"></i>
+          </div>
+          <div>
+            <p class="status-label">Model Status</p>
+            <h3 class="status-value">{{ modelStatus()?.status ?? 'Unknown' | titlecase }}</h3>
+          </div>
+        </div>
+
+        <div class="status-stats" *ngIf="modelStatus()">
+          <div class="stat">
+            <span class="stat-value">{{ modelStatus()!.totalIntents }}</span>
+            <span class="stat-label">Intents</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ modelStatus()!.totalPhrases }}</span>
+            <span class="stat-label">Phrases</span>
+          </div>
+          <div class="stat" *ngIf="modelStatus()!.accuracy !== undefined">
+            <span class="stat-value">{{ (modelStatus()!.accuracy! * 100).toFixed(1) }}%</span>
+            <span class="stat-label">Accuracy</span>
+          </div>
+          <div class="stat" *ngIf="modelStatus()!.lastTrainedAt">
+            <span class="stat-value">{{ modelStatus()!.lastTrainedAt | date:'dd MMM' }}</span>
+            <span class="stat-label">Last Trained</span>
+          </div>
+        </div>
+
+        <button pButton [icon]="isRetraining() ? 'pi pi-spin pi-spinner' : 'pi pi-refresh'" label="Retrain Model"
+          class="p-button-outlined retrain-btn" [loading]="isRetraining()" [disabled]="isRetraining()"
+          (click)="triggerRetrain()">
+        </button>
+      </div>
+      <ng-template #statusLoading>
+        <div class="status-loading"><i class="pi pi-spin pi-spinner"></i> Loading model status…</div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- ══ TABLE ══════════════════════════════════════════════════ -->
+  <p-card styleClass="card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Intents <span class="count-badge">{{ filteredIntents.length }}</span></h3>
+      </div>
+      <div class="search-wrap">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search intents…" [(ngModel)]="searchTerm" (input)="applyFilter()"
+            class="search-input" />
+        </span>
+      </div>
+    </div>
+
+    <p-table [value]="filteredIntents" [loading]="loading()" [paginator]="true" [rows]="15"
+      [rowsPerPageOptions]="[15, 30, 50]" styleClass="data-table" [tableStyle]="{'min-width':'40rem'}"
+      responsiveLayout="scroll">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Display Name</th>
+          <th>Intent Key</th>
+          <th>Phrases</th>
+          <th>Responses</th>
+          <th>Status</th>
+          <th>Updated</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-intent>
+        <tr class="clickable-row" (click)="openEdit(intent)">
+          <td>
+            <div class="intent-name-cell">
+              <span class="intent-display-name">{{ intent.displayName }}</span>
+              <span *ngIf="intent.description" class="intent-description">{{ intent.description }}</span>
+            </div>
+          </td>
+          <td>
+            <code class="intent-key">{{ intent.name }}</code>
+          </td>
+          <td>
+            <div class="phrase-chips">
+              <span class="phrase-chip" *ngFor="let p of intent.trainingPhrases ?? [] | slice:0:2">
+                {{ p.text | slice:0:24 }}{{ p.text.length > 24 ? '…' : '' }}
+              </span>
+              <span class="more-chip" *ngIf="intent.trainingPhrases.length > 2">
+                +{{ intent.trainingPhrases.length - 2 }} more
+              </span>
+            </div>
+          </td>
+          <td>
+            <span class="response-count">
+              <i class="pi pi-comment"></i>
+              {{ intent.responses.length }}
+            </span>
+          </td>
+          <td (click)="$event.stopPropagation()">
+            <button class="active-toggle" [class.active]="intent.isActive" (click)="toggleActive(intent)"
+              [pTooltip]="intent.isActive ? 'Click to deactivate' : 'Click to activate'" tooltipPosition="top">
+              <span class="toggle-dot"></span>
+              {{ intent.isActive ? 'Active' : 'Inactive' }}
+            </button>
+          </td>
+          <td>
+            <span class="date-muted">{{ intent.updatedAt | date:'dd MMM yyyy' }}</span>
+          </td>
+          <td (click)="$event.stopPropagation()">
+            <div class="action-buttons">
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit"
+                tooltipPosition="top" (click)="openEdit(intent)"></button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                pTooltip="Delete" tooltipPosition="top" (click)="confirmDelete(intent)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="pi pi-tag"></i>
+              <h3>No Intents Found</h3>
+              <p>Create your first intent to get started</p>
+              <button pButton icon="pi pi-plus" label="Create Intent" class="p-button-outlined"
+                (click)="openCreate()"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- ══ CREATE / EDIT DIALOG ══════════════════════════════════ -->
+  <p-dialog [(visible)]="showDialog" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true"
+    [dismissableMask]="true" [style]="{ width: '90vw', maxWidth: '680px' }" styleClass="intent-dialog"
+    [header]="dialogTitle">
+
+    <div class="dialog-form">
+      <div class="form-row two-col">
+        <div class="form-field">
+          <label>Display Name <span class="required">*</span></label>
+          <input pInputText [(ngModel)]="form.displayName" placeholder="e.g. Check Balance" />
+        </div>
+        <div class="form-field">
+          <label>Intent Key <span class="hint">(auto-generated if blank)</span></label>
+          <input pInputText [(ngModel)]="form.name" placeholder="e.g. check_balance" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Description</label>
+        <input pInputText [(ngModel)]="form.description" placeholder="Optional description" />
+      </div>
+
+      <div class="form-field">
+        <label>
+          Training Phrases
+          <span class="hint"> — one per line</span>
+        </label>
+        <textarea class="form-textarea" [(ngModel)]="form.trainingPhrases" rows="6"
+          placeholder="What is my balance?&#10;Show me my account balance&#10;How much do I have?">
+        </textarea>
+        <p class="field-hint">
+          <i class="pi pi-info-circle"></i>
+          Add at least 5–10 varied phrases for accurate intent detection.
+        </p>
+      </div>
+
+      <div class="form-field">
+        <label>
+          Responses
+          <span class="hint"> — one per line</span>
+        </label>
+        <textarea class="form-textarea" [(ngModel)]="form.responses" rows="4"
+          placeholder="Your current balance is {balance}.&#10;I'll check your balance right away.">
+        </textarea>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" icon="pi pi-times" iconPos="right" class="p-button-text"
+        (click)="showDialog = false"></button>
+      <button pButton [label]="isEditing ? 'Save Changes' : 'Create Intent'" icon="pi pi-check" iconPos="right"
+        [loading]="isSaving" (click)="saveIntent()"></button>
+    </ng-template>
+  </p-dialog>
+
+</div>

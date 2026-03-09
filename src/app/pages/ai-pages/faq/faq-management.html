@@ -1,0 +1,229 @@
+<!-- pages/faq/faq-management.component.html -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="faq-page">
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="page-icon faq-icon"><i class="pi pi-book"></i></div>
+      <div>
+        <h1>Knowledge Base</h1>
+        <p class="text-muted">Manage FAQ entries and documents used for RAG retrieval</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TABS ══════════════════════════════════════════════════ -->
+  <p-tabs [(value)]="activeTab">
+
+    <p-tablist>
+      <p-tab value="0">FAQs</p-tab>
+      <p-tab value="1">Documents</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+
+      <!-- ──────────── FAQ TAB ──────────── -->
+      <p-tabpanel value="0">
+        <ng-template pTemplate="header">
+          <span class="tab-header">
+            <i class="pi pi-question-circle"></i>
+            FAQs
+            <span class="tab-count">{{ faqs.length }}</span>
+          </span>
+        </ng-template>
+
+        <div class="tab-content">
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="Search FAQs…" [(ngModel)]="faqSearchTerm"
+                  (input)="applyFaqFilter()" class="search-input" />
+              </span>
+            </div>
+            <div class="toolbar-right">
+              <button pButton icon="pi pi-sync" label="Re-embed All" class="p-button-outlined p-button-secondary"
+                pTooltip="Re-ingest all FAQs into the vector store" tooltipPosition="bottom" (click)="ingestFaqs()">
+              </button>
+              <button pButton icon="pi pi-plus" label="Add FAQ" class="p-button-primary" (click)="openCreateFaq()">
+              </button>
+            </div>
+          </div>
+
+          <!-- FAQ Grid -->
+          <div class="faq-grid" *ngIf="filteredFaqs.length > 0; else faqEmpty">
+            <div class="faq-card" *ngFor="let faq of filteredFaqs">
+              <div class="faq-card-header">
+                <div class="faq-q-icon"><i class="pi pi-question"></i></div>
+                <div class="faq-meta">
+                  <span class="category-tag" *ngIf="faq.category">{{ faq.category }}</span>
+                  <span class="date-muted">{{ faq.updatedAt | date:'dd MMM yyyy' }}</span>
+                </div>
+                <div class="faq-actions">
+                  <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit"
+                    (click)="openEditFaq(faq)"></button>
+                  <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                    pTooltip="Delete" (click)="confirmDeleteFaq(faq)"></button>
+                </div>
+              </div>
+
+              <p class="faq-question">{{ faq.question }}</p>
+              <p class="faq-answer">{{ faq.answer | slice:0:180 }}{{ faq.answer.length > 180 ? '…' : '' }}</p>
+
+              <div class="faq-tags" *ngIf="faq.tags && faq.tags.length > 0">
+                <span class="tag-chip" *ngFor="let tag of faq.tags">{{ tag }}</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #faqEmpty>
+            <div class="empty-state">
+              <i class="pi pi-question-circle"></i>
+              <h3>No FAQs Yet</h3>
+              <p>Add your first FAQ entry to start building your knowledge base</p>
+              <button pButton icon="pi pi-plus" label="Add First FAQ" class="p-button-outlined"
+                (click)="openCreateFaq()"></button>
+            </div>
+          </ng-template>
+        </div>
+      </p-tabpanel>
+
+      <!-- ──────────── DOCUMENTS TAB ──────────── -->
+      <p-tabpanel value="1">
+        <ng-template pTemplate="header">
+          <span class="tab-header">
+            <i class="pi pi-file"></i>
+            Documents
+            <span class="tab-count">{{ documents.length }}</span>
+          </span>
+        </ng-template>
+
+        <div class="tab-content">
+
+          <!-- Upload Zone -->
+          <div class="upload-zone" [class.drag-over]="isDragOver()" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()" (drop)="onDrop($event)" (click)="triggerFileInput()">
+            <input #fileInput type="file" hidden accept=".pdf,.txt,.doc,.docx" (change)="onFileSelected($event)" />
+            <div class="upload-inner" *ngIf="!isUploading()">
+              <div class="upload-icon"><i class="pi pi-cloud-upload"></i></div>
+              <h3>Drop your document here</h3>
+              <p>or <span class="browse-link">browse files</span></p>
+              <p class="supported">PDF, TXT, DOC, DOCX supported</p>
+            </div>
+            <div class="upload-inner" *ngIf="isUploading()">
+              <div class="upload-icon uploading"><i class="pi pi-spin pi-spinner"></i></div>
+              <h3>Uploading…</h3>
+              <p-progressBar [value]="uploadProgress()" styleClass="upload-progress"></p-progressBar>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="toolbar" style="margin-top:1.25rem">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" placeholder="Search documents…" [(ngModel)]="docSearchTerm"
+                (input)="applyDocFilter()" class="search-input" />
+            </span>
+          </div>
+
+          <!-- Documents Table -->
+          <p-table [value]="filteredDocs" [paginator]="true" [rows]="10" styleClass="data-table"
+            responsiveLayout="scroll" [tableStyle]="{'min-width':'36rem'}"
+            *ngIf="filteredDocs.length > 0; else docEmpty">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Chunks</th>
+                <th>Status</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-doc>
+              <tr>
+                <td>
+                  <div class="doc-name-cell">
+                    <i [class]="getMimeIcon(doc.mimeType) + ' doc-type-icon'"></i>
+                    <span class="doc-name">{{ doc.originalName }}</span>
+                  </div>
+                </td>
+                <td><span class="size-text">{{ formatSize(doc.sizeBytes) }}</span></td>
+                <td>
+                  <span class="chunk-count" *ngIf="doc.chunkCount">
+                    <i class="pi pi-th-large"></i> {{ doc.chunkCount }}
+                  </span>
+                  <span *ngIf="!doc.chunkCount" class="text-muted">—</span>
+                </td>
+                <td>
+                  <span [class]="'doc-status status-' + doc.status">
+                    <i [class]="doc.status === 'indexed' ? 'pi pi-check-circle'
+                              : doc.status === 'processing' ? 'pi pi-spin pi-spinner'
+                              : 'pi pi-times-circle'"></i>
+                    {{ doc.status | titlecase }}
+                  </span>
+                </td>
+                <td><span class="date-muted">{{ doc.uploadedAt | date:'dd MMM yyyy' }}</span></td>
+                <td>
+                  <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                    pTooltip="Delete document" tooltipPosition="top" (click)="confirmDeleteDoc(doc)"></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+          <ng-template #docEmpty>
+            <div class="empty-state" style="margin-top:1.5rem">
+              <i class="pi pi-file"></i>
+              <h3>No Documents Indexed</h3>
+              <p>Upload a document above to add it to the knowledge base</p>
+            </div>
+          </ng-template>
+
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- ══ FAQ DIALOG ═════════════════════════════════════════════ -->
+<p-dialog [(visible)]="showFaqDialog" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true"
+  [dismissableMask]="true" [style]="{ width: '90vw', maxWidth: '660px' }" styleClass="faq-dialog"
+  [header]="faqDialogTitle">
+
+  <div class="dialog-form">
+    <div class="form-field">
+      <label>Question <span class="required">*</span></label>
+      <textarea class="form-textarea" [(ngModel)]="faqForm.question" rows="2"
+        placeholder="e.g. How do I check my balance?"></textarea>
+    </div>
+    <div class="form-field">
+      <label>Answer <span class="required">*</span></label>
+      <textarea class="form-textarea" [(ngModel)]="faqForm.answer" rows="4"
+        placeholder="Provide a clear, concise answer…"></textarea>
+    </div>
+    <div class="form-row two-col">
+      <div class="form-field">
+        <label>Category <span class="hint">(optional)</span></label>
+        <input pInputText [(ngModel)]="faqForm.category" placeholder="e.g. Payments" />
+      </div>
+      <div class="form-field">
+        <label>Tags <span class="hint">(comma-separated)</span></label>
+        <input pInputText [(ngModel)]="faqForm.tags" placeholder="e.g. balance, account" />
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" iconPos="right" class="p-button-text"
+      (click)="showFaqDialog = false"></button>
+    <button pButton [label]="isEditingFaq ? 'Save Changes' : 'Add FAQ'" icon="pi pi-check" iconPos="right"
+      [loading]="isSavingFaq" (click)="saveFaq()"></button>
+  </ng-template>
+</p-dialog>

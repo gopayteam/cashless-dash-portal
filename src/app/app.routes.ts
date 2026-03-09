@@ -97,6 +97,7 @@ import { AllTripsComponent } from './pages/booking/all-trips/all-trips';
 import { TripTransactionsComponent } from './pages/booking/trip-transactions/trip-transactions';
 import { SeatReservationsComponent } from './pages/booking/seat-reservation/seat-reservation';
 import { ConflictDashboardComponent } from './pages/booking/trip-conflicts/trip-conflicts';
+import { AI_ROUTES } from './pages/ai-pages/ai.routes';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -762,6 +763,12 @@ export const routes: Routes = [
         component: BroadcastComponent2,
         canActivate: [roleGuard],
         data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'ai',
+        children: AI_ROUTES,
+        canActivate: [AuthGuard],   // add your guard
       },
 
       /* Default protected redirect */

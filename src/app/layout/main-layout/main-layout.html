@@ -304,6 +304,25 @@
               </li>
             </ul>
           </li>
+
+
+          <li *ngIf="hasAuditAccess()">
+            <div class="menu-category">Audits</div>
+            <ul class="menu-items">
+              <li class="menu-item" *hasRole="['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/ai')"
+                  (click)="navigate('/ai/chatbot')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-users menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">AI</span>
+                  </span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+
+
         </ul>
       </nav>
     </div>
