@@ -39,6 +39,7 @@ import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/dat
 import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../../../@core/services/theme.service';
+import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget";
 
 @Component({
   imports: [
@@ -56,6 +57,7 @@ import { ThemeService } from '../../../../@core/services/theme.service';
     TableModule,
     TooltipModule,
     A11yModule,
+    ChatWidgetComponent
   ],
   standalone: true,
   selector: 'app-dashboard',

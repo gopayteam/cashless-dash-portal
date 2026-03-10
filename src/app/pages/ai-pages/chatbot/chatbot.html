@@ -17,12 +17,8 @@
 
     <div class="sidebar-section">
       <p class="sidebar-label">Mode</p>
-      <button
-        class="mode-toggle"
-        [class.rag-active]="useRag()"
-        (click)="toggleRag()"
-        pTooltip="Toggle knowledge-base augmented responses"
-        tooltipPosition="right">
+      <button class="mode-toggle" [class.rag-active]="useRag()" (click)="toggleRag()"
+        pTooltip="Toggle knowledge-base augmented responses" tooltipPosition="right">
         <i [class]="useRag() ? 'pi pi-database' : 'pi pi-comment'"></i>
         <span>{{ useRag() ? 'RAG Mode' : 'Chat Mode' }}</span>
         <span class="mode-badge" [class.on]="useRag()">{{ useRag() ? 'ON' : 'OFF' }}</span>
@@ -38,13 +34,8 @@
     </div>
 
     <div class="sidebar-footer">
-      <button
-        pButton
-        icon="pi pi-trash"
-        label="Clear Chat"
-        class="p-button-text p-button-danger clear-btn"
-        [disabled]="!hasMessages"
-        (click)="clearChat()">
+      <button pButton icon="pi pi-trash" label="Clear Chat" class="p-button-text p-button-danger clear-btn"
+        [disabled]="!hasMessages" (click)="clearChat()">
       </button>
     </div>
   </aside>
@@ -61,21 +52,23 @@
         </div>
         <div>
           <h3>GoPay Assistant</h3>
-          <span class="status-text">{{ isTyping() ? 'Typing…' : 'Online' }}</span>
+          <span class="status-text">{{ chatService.isTyping() ? 'Typing…' : 'Online' }}</span>
         </div>
       </div>
+
       <div class="header-actions">
         <span *ngIf="useRag()" class="rag-pill">
           <i class="pi pi-database"></i> RAG Active
         </span>
       </div>
+
     </header>
 
     <!-- Messages -->
     <div class="messages-area">
       <div class="messages-inner">
 
-        <ng-container *ngFor="let msg of messages(); trackBy: trackByMessage">
+        <ng-container *ngFor="let msg of chatService.messages(); trackBy: trackByMessage">
 
           <!-- ── assistant message ── -->
           <div class="message-row assistant-row" *ngIf="msg.role === 'assistant'">
@@ -112,8 +105,7 @@
               <p class="message-text">{{ msg.content }}</p>
               <div class="user-meta">
                 <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
-                <i
-                  [class]="msg.status === 'delivered' ? 'pi pi-check-circle status-ok'
+                <i [class]="msg.status === 'delivered' ? 'pi pi-check-circle status-ok'
                            : msg.status === 'error'   ? 'pi pi-times-circle status-err'
                            : 'pi pi-clock status-pending'">
                 </i>
@@ -143,22 +135,12 @@
     <!-- Input -->
     <div class="chat-input-area">
       <div class="input-row">
-        <textarea
-          #messageInput
-          class="chat-textarea"
-          placeholder="Type your message… (Enter to send, Shift+Enter for new line)"
-          [(ngModel)]="inputText"
-          (keydown)="onKeyDown($event)"
-          rows="1"
-          [disabled]="isTyping()">
+        <textarea #messageInput class="chat-textarea"
+          placeholder="Type your message… (Enter to send, Shift+Enter for new line)" [(ngModel)]="inputText"
+          (keydown)="onKeyDown($event)" rows="1" [disabled]="isTyping()">
         </textarea>
-        <button
-          class="send-btn"
-          [class.sending]="isTyping()"
-          [disabled]="!inputText.trim() || isTyping()"
-          (click)="sendMessage()"
-          pTooltip="Send message"
-          tooltipPosition="top">
+        <button class="send-btn" [class.sending]="isTyping()" [disabled]="!inputText.trim() || isTyping()"
+          (click)="sendMessage()" pTooltip="Send message" tooltipPosition="top">
           <i class="pi pi-send"></i>
         </button>
       </div>

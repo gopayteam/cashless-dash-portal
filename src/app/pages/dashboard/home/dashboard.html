@@ -74,35 +74,21 @@
     <!-- Using global .card class -->
     <p-card header="Organizations Performance" styleClass="stat-card card">
       <div class="chart-container">
-        <p-chart
-          *ngIf="chartData"
-          type="line"
-          [data]="chartData"
-          [options]="chartOptions"
-          height="300px"
-        ></p-chart>
+        <p-chart *ngIf="chartData" type="line" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
       </div>
     </p-card>
 
     <!-- Pie Chart -->
     <p-card header="Total Amount Per Category" styleClass="stat-card card">
       <div class="chart-container">
-        <p-chart
-          *ngIf="pieChartData"
-          type="pie"
-          [data]="pieChartData"
-          [options]="pieChartOptions"
-          height="300px"
-        ></p-chart>
+        <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions"
+          height="300px"></p-chart>
       </div>
 
       <!-- Dynamic Legend -->
       <div class="category-legend" *ngIf="pieChartData">
         <div class="legend-item" *ngFor="let label of pieChartData.labels; let i = index">
-          <span
-            class="legend-dot"
-            [style.background]="pieChartData.datasets[0].backgroundColor[i]"
-          ></span>
+          <span class="legend-dot" [style.background]="pieChartData.datasets[0].backgroundColor[i]"></span>
           <span class="legend-label">{{ label }}</span>
           <span class="legend-value">
             Ksh {{ pieChartData.datasets[0].data[i] | number : '1.2-2' }}
@@ -115,22 +101,11 @@
   <!-- ================= RECENT TRANSACTIONS ================= -->
   <p-card header="Recent Transactions" styleClass="stat-card card">
     <!-- Using global .data-table class -->
-    <p-table
-      [value]="recentTransactions"
-      [lazy]="true"
-      [paginator]="true"
-      [rows]="rows"
-      [first]="first"
-      [loading]="loading()"
-      [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
-      (onLazyLoad)="loadTransactions($event)"
-      styleClass="data-table"
-      [tableStyle]="{ 'min-width': '60rem' }"
-      responsiveLayout="scroll"
-    >
+    <p-table [value]="recentTransactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+      [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      (onLazyLoad)="loadTransactions($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }"
+      responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
           <th>Transaction ID</th>
@@ -182,4 +157,6 @@
       </ng-template>
     </p-table>
   </p-card>
+
+  <app-chat-widget />
 </div>

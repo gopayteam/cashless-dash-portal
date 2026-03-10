@@ -11,10 +11,11 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { DataService } from '../../../../@core/api/data.service';
-import { AuthService } from '../../../../@core/services/auth.service';
-import { AI_ENDPOINTS } from '../../../../@core/models/ai//ai.endpoints';
-import { ChatMessage, ChatRequest, ChatResponse } from '../../../../@core/models/ai/ai.models';
+import { DataService } from '../../../@core/api/data.service';
+import { AuthService } from '../../../@core/services/auth.service';
+import { AI_ENDPOINTS } from '../../../@core/models/ai/ai.endpoints';
+import { ChatMessage, ChatRequest, ChatResponse } from '../../../@core/models/ai/ai.models';
+import { ChatService } from '../../../@core/services/chat.service';
 
 @Component({
   selector: 'app-chat-widget',
@@ -53,6 +54,7 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   constructor(
     private dataService: DataService,
     private authService: AuthService,
+    public chatService: ChatService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
   ) { }
@@ -60,7 +62,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     const user = this.authService.currentUser();
     if (user) this.entityId = user.entityId;
-    this.messages.set([this.welcomeMessage]);
+    this.messages = this.chatService.messages;
+    this.isTyping = this.chatService.isTyping;
   }
 
   ngAfterViewChecked(): void {
@@ -83,64 +86,19 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   }
 
   sendMessage(): void {
-    const text = this.inputText.trim();
-    if (!text || this.isTyping()) return;
 
-    const userMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: text,
-      timestamp: new Date(),
-      status: 'sending',
-    };
+  const text = this.inputText.trim();
+  if (!text) return;
 
-    this.messages.update(msgs => [...msgs, userMsg]);
-    this.inputText = '';
-    this.isTyping.set(true);
-    this.shouldScroll = true;
-    this.cdr.detectChanges();
+  this.chatService.sendMessage(text);
 
-    const payload: ChatRequest = {
-      entityId: this.entityId!,
-      sessionId: this.sessionId ?? undefined,
-      text: text,
-    };
+  this.inputText = '';
+  this.shouldScroll = true;
 
-    this.dataService
-      .post<ChatResponse>(AI_ENDPOINTS.CHAT_SEND, payload, 'chatbot')
-      .subscribe({
-        next: (res) => {
-          this.sessionId = res.data.conversation_id;
-          this.messages.update(msgs =>
-            msgs.map(m => m.id === userMsg.id ? { ...m, status: 'delivered' } : m)
-          );
-
-          const assistantMsg: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: res.data.response,
-            timestamp: new Date(),
-            status: 'delivered',
-          };
-
-          this.messages.update(msgs => [...msgs, assistantMsg]);
-          this.isTyping.set(false);
-          this.shouldScroll = true;
-
-          if (!this.isOpen()) {
-            this.unreadCount.update(v => v + 1);
-          }
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.messages.update(msgs =>
-            msgs.map(m => m.id === userMsg.id ? { ...m, status: 'error' } : m)
-          );
-          this.isTyping.set(false);
-          this.cdr.detectChanges();
-        },
-      });
+  if (!this.isOpen()) {
+    this.unreadCount.update(v => v + 1);
   }
+}
 
   onKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -150,10 +108,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   }
 
   clearWidget(): void {
-    this.messages.set([this.welcomeMessage]);
-    this.sessionId = null;
-    this.unreadCount.set(0);
-  }
+  this.chatService.clear();
+}
 
   private scrollToBottom(): void {
     try {

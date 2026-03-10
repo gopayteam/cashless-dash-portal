@@ -18,6 +18,7 @@ import { DataService } from '../../../../@core/api/data.service';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { ChatMessage, ChatRequest, ChatResponse, MessageRole } from '../../../../@core/models/ai/ai.models';
 import { AI_ENDPOINTS } from '../../../../@core/models/ai/ai.endpoints';
+import { ChatService } from '../../../../@core/services/chat.service';
 
 
 @Component({
@@ -39,6 +40,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   entityId: string | null = null;
   sessionId: string | null = null;
 
+
   messages = signal<ChatMessage[]>([]);
   inputText = '';
   isTyping = signal(false);
@@ -57,6 +59,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   constructor(
     private dataService: DataService,
     private authService: AuthService,
+    public chatService: ChatService,
     private messageService: MessageService,
     private cdr: ChangeDetectorRef,
   ) { }
@@ -66,7 +69,8 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
     if (user) {
       this.entityId = user.entityId;
     }
-    this.messages.set([this.welcomeMessage]);
+    this.messages = this.chatService.messages;
+    this.isTyping = this.chatService.isTyping;
   }
 
   ngAfterViewChecked(): void {
@@ -82,69 +86,10 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
 
   sendMessage(): void {
     const text = this.inputText.trim();
-    if (!text || this.isTyping()) return;
+    if (!text) return;
 
-    const userMsg: ChatMessage = {
-      id: crypto.randomUUID(),
-      role: 'user',
-      content: text,
-      timestamp: new Date(),
-      status: 'sending',
-    };
-
-    this.messages.update(msgs => [...msgs, userMsg]);
+    this.chatService.sendMessage(text, this.useRag());
     this.inputText = '';
-    this.isTyping.set(true);
-    this.shouldScrollToBottom = true;
-    this.cdr.detectChanges();
-
-    const payload: ChatRequest = {
-      entityId: this.entityId!,
-      sessionId: this.sessionId ?? undefined,
-      text: text,
-      useRag: this.useRag(),
-    };
-
-    this.dataService
-      .post<ChatResponse>(AI_ENDPOINTS.CHAT_SEND, payload, 'chatbot', true, true)
-      .subscribe({
-        next: (res) => {
-          this.sessionId = res.data.conversation_id;
-
-          // mark user message delivered
-          this.messages.update(msgs =>
-            msgs.map(m => m.id === userMsg.id ? { ...m, status: 'delivered' } : m)
-          );
-
-          const assistantMsg: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: res.data.response,
-            timestamp: new Date(),
-            status: 'delivered',
-            sources: res.data.sources,
-            intentDetected: res.data.intent,
-            confidence: res.data.confidence,
-          };
-
-          this.messages.update(msgs => [...msgs, assistantMsg]);
-          this.isTyping.set(false);
-          this.shouldScrollToBottom = true;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Chat error', err);
-          this.messages.update(msgs =>
-            msgs.map(m => m.id === userMsg.id ? { ...m, status: 'error' } : m)
-          );
-          this.isTyping.set(false);
-          this.messageService.add({
-            severity: 'error', summary: 'Error',
-            detail: 'Failed to send message. Please try again.', life: 3000,
-          });
-          this.cdr.detectChanges();
-        },
-      });
   }
 
   onKeyDown(event: KeyboardEvent): void {
@@ -167,9 +112,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   }
 
   clearChat(): void {
-    this.messages.set([this.welcomeMessage]);
-    this.sessionId = null;
-    this.isTyping.set(false);
+    this.chatService.clear();
   }
 
   private scrollToBottom(): void {

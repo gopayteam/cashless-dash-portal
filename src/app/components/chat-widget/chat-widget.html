@@ -2,11 +2,7 @@
 
 <!-- ══ FAB BUTTON ════════════════════════════════════════════ -->
 <div class="widget-fab-wrap" [class.bottom-left]="position === 'bottom-left'">
-  <button
-    class="widget-fab"
-    (click)="toggle()"
-    [pTooltip]="isOpen() ? '' : 'Open Assistant'"
-    tooltipPosition="left">
+  <button class="widget-fab" (click)="toggle()" [pTooltip]="isOpen() ? '' : 'Open Assistant'" tooltipPosition="left">
     <i [class]="isOpen() ? 'pi pi-times' : 'pi pi-comments'"></i>
     <span class="unread-badge" *ngIf="unreadCount() > 0 && !isOpen()">
       {{ unreadCount() }}
@@ -15,10 +11,7 @@
 </div>
 
 <!-- ══ WIDGET PANEL ══════════════════════════════════════════ -->
-<div
-  class="widget-panel"
-  [class.open]="isOpen()"
-  [class.bottom-left]="position === 'bottom-left'">
+<div class="widget-panel" [class.open]="isOpen()" [class.bottom-left]="position === 'bottom-left'">
 
   <!-- Header -->
   <div class="widget-header">
@@ -26,22 +19,20 @@
       <div class="widget-avatar"><i class="pi pi-android"></i></div>
       <div>
         <p class="widget-name">GoPay Assistant</p>
-        <p class="widget-status">{{ isTyping() ? 'Typing…' : 'Online' }}</p>
+        <p class="widget-status">{{ chatService.isTyping() ? 'Typing…' : 'Online' }}</p>
       </div>
     </div>
     <div class="widget-header-actions">
-      <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-plain"
-        pTooltip="Clear chat" tooltipPosition="bottom"
-        (click)="clearWidget()"></button>
-      <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-plain"
-        (click)="close()"></button>
+      <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-plain" pTooltip="Clear chat"
+        tooltipPosition="bottom" (click)="clearWidget()"></button>
+      <button pButton icon="pi pi-times" class="p-button-text p-button-sm p-button-plain" (click)="close()"></button>
     </div>
   </div>
 
   <!-- Messages -->
   <div class="widget-messages">
 
-    <ng-container *ngFor="let msg of messages(); trackBy: trackByMessage">
+    <ng-container *ngFor="let msg of chatService.messages(); trackBy: trackByMessage">
 
       <!-- Assistant -->
       <div class="wmsg-row assistant-row" *ngIf="msg.role === 'assistant'">
@@ -82,18 +73,10 @@
 
   <!-- Input -->
   <div class="widget-input-area">
-    <textarea
-      class="widget-textarea"
-      placeholder="Type a message…"
-      [(ngModel)]="inputText"
-      (keydown)="onKeyDown($event)"
-      rows="1"
-      [disabled]="isTyping()">
+    <textarea class="widget-textarea" placeholder="Type a message…" [(ngModel)]="inputText"
+      (keydown)="onKeyDown($event)" rows="1" [disabled]="isTyping()">
     </textarea>
-    <button
-      class="widget-send-btn"
-      [disabled]="!inputText.trim() || isTyping()"
-      (click)="sendMessage()">
+    <button class="widget-send-btn" [disabled]="!inputText.trim() || isTyping()" (click)="sendMessage()">
       <i class="pi pi-send"></i>
     </button>
   </div>

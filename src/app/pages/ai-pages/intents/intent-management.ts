@@ -128,7 +128,7 @@ export class IntentManagementComponent implements OnInit {
               totalIntents: intent_store.intents,
               device: model.device,
               tags: model.tags,
-              totalPhrases: 0
+              totalPhrases: model.vocab_size
             });
           }
           this.isLoadingStatus.set(false);
@@ -314,5 +314,10 @@ export class IntentManagementComponent implements OnInit {
       case 'not_trained': return 'pi pi-exclamation-circle';
       default: return 'pi pi-circle';
     }
+  }
+
+  truncate(text: any, limit: number = 24): string {
+    if (!text) return '';
+    return text.length > limit ? text.slice(0, limit) + '…' : text;
   }
 }
