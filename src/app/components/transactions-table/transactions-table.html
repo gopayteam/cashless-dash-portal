@@ -93,9 +93,14 @@
         appendTo="body">
       </p-select>
 
-      <button class="export-btn" (click)="exportCsv()" pTooltip="Export CSV" tooltipPosition="top">
-        <i class="pi pi-download"></i> Export
-      </button>
+      <div class="export-group">
+        <button class="export-btn" (click)="exportCsv()" pTooltip="Export CSV" tooltipPosition="top">
+          <i class="pi pi-file"></i> CSV
+        </button>
+        <button class="export-btn export-btn-excel" (click)="exportExcel()" pTooltip="Export Excel (.xlsx)" tooltipPosition="top">
+          <i class="pi pi-file-excel"></i> Excel
+        </button>
+      </div>
 
     </div>
   </div>

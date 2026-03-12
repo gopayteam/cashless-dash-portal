@@ -11,13 +11,15 @@
       <p class="va-subtitle">Analyse and compare fleet earnings across time periods</p>
     </div>
 
+
+
     <div class="va-header-right">
 
-      <!-- DAY date control -->
+      <!-- DAY -->
       <ng-container *ngIf="activeTabValue === 'day'">
-        <div class="header-date-group">
-          <span class="header-date-label">Date</span>
-          <mat-form-field appearance="outline" class="hdr-date-field">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Date</label>
+          <mat-form-field appearance="outline" class="date-range-field">
             <input matInput [matDatepicker]="dayPicker" [(ngModel)]="dayDate" placeholder="Pick a date" />
             <mat-datepicker-toggle matSuffix [for]="dayPicker"></mat-datepicker-toggle>
             <mat-datepicker #dayPicker></mat-datepicker>
@@ -25,57 +27,81 @@
         </div>
       </ng-container>
 
-      <!-- WEEK date control -->
+
+      <!-- WEEK -->
       <ng-container *ngIf="activeTabValue === 'week'">
-        <div class="header-date-group">
-          <span class="header-date-label">Week Range</span>
-          <mat-form-field appearance="outline" class="hdr-range-field">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Week Range</label>
+          <mat-form-field appearance="outline" class="date-range-field">
             <mat-date-range-input [rangePicker]="weekRangePicker">
               <input matStartDate placeholder="Start date" [(ngModel)]="weekStartDate"
                 (dateChange)="onWeekStartChange()" />
-              <input matEndDate placeholder="End (auto)" [(ngModel)]="weekEndDate" [readonly]="true" />
+              <input matEndDate placeholder="End date" [(ngModel)]="weekEndDate" [readonly]="true" />
             </mat-date-range-input>
             <mat-datepicker-toggle matSuffix [for]="weekRangePicker"></mat-datepicker-toggle>
             <mat-date-range-picker #weekRangePicker></mat-date-range-picker>
           </mat-form-field>
-          <span class="week-range-badge" *ngIf="weekStartDate">
+          <!-- <span class="week-range-badge" *ngIf="weekStartDate">
             {{ weekRangeLabel }} · 7 days
-          </span>
+          </span> -->
         </div>
+
+
+
       </ng-container>
 
-      <!-- MONTH date controls -->
+
+      <!-- MONTH -->
       <ng-container *ngIf="activeTabValue === 'month'">
-        <div class="header-date-group">
-          <span class="header-date-label">Month &amp; Year</span>
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Month &amp; Year</label>
           <div class="header-date-row">
-            <mat-form-field appearance="outline" class="hdr-select-field">
-              <mat-select [(ngModel)]="monthMonth" placeholder="Month">
-                <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+            <mat-form-field appearance="outline" class="date-select-field">
+              <mat-select [(ngModel)]="monthMonth" placeholder="Month" style="margin-left: 0.5rem;">
+                <mat-option *ngFor="let m of months" [value]="m.value">
+                  {{ m.label }}
+                </mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field appearance="outline" class="hdr-select-field hdr-year">
-              <mat-select [(ngModel)]="monthYear" placeholder="Year">
-                <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+
+            <mat-form-field appearance="outline" class="date-select-field">
+              <mat-select [(ngModel)]="monthYear" placeholder="Year" style="margin-left: 0.5rem;">
+                <mat-option *ngFor="let y of years" [value]="y.value">
+                  {{ y.label }}
+                </mat-option>
               </mat-select>
             </mat-form-field>
           </div>
         </div>
+
       </ng-container>
 
-      <!-- YEAR date control -->
+
+      <!-- YEAR -->
       <ng-container *ngIf="activeTabValue === 'year'">
-        <div class="header-date-group">
-          <span class="header-date-label">Year</span>
-          <mat-form-field appearance="outline" class="hdr-select-field hdr-year">
-            <mat-select [(ngModel)]="yearYear" placeholder="Year">
-              <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Year</label>
+          <mat-form-field appearance="outline" class="date-select-field">
+            <mat-select [(ngModel)]="yearYear" placeholder="Select year" style="margin: 0.5rem; margin-right: -1.5rem;">
+              <mat-option *ngFor="let y of years" [value]="y.value">
+                {{ y.label }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
         </div>
+
       </ng-container>
 
     </div>
+  </div>
+
+  <!-- Selected chips -->
+  <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
+    <span *ngFor="let fn of selectedFleets; let i = index" style="gap: 0.5rem" class="fleet-chip"
+      [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
+      <i class="pi pi-car"></i> {{ fn }}
+      <!-- <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span> -->
+    </span>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════
@@ -112,15 +138,6 @@
               </div>
             </ng-template>
           </p-multiSelect>
-
-          <!-- Selected chips -->
-          <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
-            <span *ngFor="let fn of selectedFleets; let i = index" class="fleet-chip"
-              [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
-              <i class="pi pi-car"></i> {{ fn }}
-              <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span>
-            </span>
-          </div>
         </div>
 
         <!-- Run Analysis -->
@@ -152,17 +169,13 @@
         <h3>Analysis Results — {{ analysisResult.period }}</h3>
       </div>
     </div>
-
-    <!-- Charts / summary panel -->
     <app-vehicle-analysis-panel [data]="analysisResult" [loading]="analysisLoading" />
-
-    <!-- ── Transaction table (shown once data is loaded) ────────────────── -->
-    <app-vehicle-transaction-table *ngIf="!analysisLoading && analysisResult"
-      [transactions]="analysisResult?.data?.manifest ?? []" [period]="analysisResult.period"
-      [loading]="analysisLoading">
-    </app-vehicle-transaction-table>
-
   </p-card>
+
+  <!-- ── Transaction table (shown once data is loaded) ────────────────── -->
+  <app-vehicle-transaction-table *ngIf="!analysisLoading && analysisResult" [transactions]="analysisResult.transactions"
+    [period]="analysisResult.period" [loading]="analysisLoading">
+  </app-vehicle-transaction-table>
 
   <!-- ══════════════════════════════════════════════════════════
        EMPTY STATE

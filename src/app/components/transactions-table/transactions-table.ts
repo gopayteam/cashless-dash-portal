@@ -13,6 +13,10 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectModule } from 'primeng/select';
+
+// SheetJS (xlsx) — install with: npm install xlsx
+// Then import like this in Angular:
+import * as XLSX from 'xlsx';
 import { PaymentRecord } from '../../../@core/models/transactions/transactions.models';
 
 type SortField = keyof PaymentRecord;
@@ -74,7 +78,7 @@ export class VehicleTransactionTableComponent implements OnChanges {
     }
   }
 
-  // ── Pagination computed ───────────────────────────────────────────────────
+  // ── Pagination ────────────────────────────────────────────────────────────
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.filtered.length / this.pageSize));
   }
@@ -93,7 +97,7 @@ export class VehicleTransactionTableComponent implements OnChanges {
   get firstRow(): number { return this.filtered.length ? this.currentPage * this.pageSize + 1 : 0; }
   get lastRow(): number { return Math.min((this.currentPage + 1) * this.pageSize, this.filtered.length); }
 
-  // ── Footer totals (across ALL filtered rows) ──────────────────────────────
+  // ── Footer totals (ALL filtered rows, not just current page) ─────────────
   get totalCredit(): number {
     return this.filtered
       .filter(t => t.transactionType === 'CREDIT')
@@ -117,15 +121,9 @@ export class VehicleTransactionTableComponent implements OnChanges {
   get debitCount(): number { return this.filtered.filter(t => t.transactionType === 'DEBIT').length; }
 
   // ── Actions ───────────────────────────────────────────────────────────────
-  onSearch(): void {
-    this.currentPage = 0;
-    this._apply();
-  }
+  onSearch(): void { this.currentPage = 0; this._apply(); }
 
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.onSearch();
-  }
+  clearSearch(): void { this.searchTerm = ''; this.onSearch(); }
 
   toggleStatusFilter(s: PaymentRecord['paymentStatus']): void {
     this.activeStatusFilter = this.activeStatusFilter === s ? '' : s;
@@ -153,20 +151,21 @@ export class VehicleTransactionTableComponent implements OnChanges {
     this.cdr.markForCheck();
   }
 
-  onPageSizeChange(): void {
-    this.currentPage = 0;
-    this._apply();
-  }
+  onPageSizeChange(): void { this.currentPage = 0; this._apply(); }
 
-  exportCsv(): void {
+  // ── Export ────────────────────────────────────────────────────────────────
+
+  /** Builds the rows array shared by both CSV and Excel exports */
+  private _exportRows(): { headers: string[]; rows: (string | number)[][] } {
     const headers = [
-      'M-Pesa Receipt', 'Date', 'Fleet', 'Driver',
+      'M-Pesa Receipt', 'Date', 'Updated At', 'Fleet', 'Driver',
       'Customer', 'Pickup', 'Drop-off', 'Trip ID',
       'Type', 'Amount (KES)', 'Status',
     ];
     const rows = this.filtered.map(t => [
       t.mpesaReceiptNumber,
       this.fmtDate(t.createdAt),
+      this.fmtDate(t.updatedAt),
       t.fleetNumber,
       t.activeDriverUsername ?? '',
       t.customerName ?? '',
@@ -174,16 +173,66 @@ export class VehicleTransactionTableComponent implements OnChanges {
       t.dropOff ?? '',
       t.tripId ?? '',
       t.transactionType,
-      t.assignedAmount.toFixed(2),
+      t.assignedAmount,        // raw number for Excel (formatted string for CSV)
       t.paymentStatus,
     ]);
-    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `payments_${this.period || 'export'}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    return { headers, rows };
+  }
+
+  exportCsv(): void {
+    const { headers, rows } = this._exportRows();
+    // Format the amount as a string for CSV
+    const csvRows = rows.map(r => r.map((v, i) =>
+      i === 10 ? (v as number).toFixed(2) : String(v)
+    ));
+    const csv = [headers, ...csvRows]
+      .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    this._download(
+      new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
+      `payments_${this.period || 'export'}.csv`,
+    );
+  }
+
+  exportExcel(): void {
+    const { headers, rows } = this._exportRows();
+
+    // Build worksheet data: header row + data rows
+    const wsData = [headers, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // ── Column widths ──────────────────────────────────────────────────────
+    ws['!cols'] = [
+      { wch: 20 }, // Receipt
+      { wch: 20 }, // Date
+      { wch: 20 }, // Updated At
+      { wch: 12 }, // Fleet
+      { wch: 22 }, // Driver
+      { wch: 22 }, // Customer
+      { wch: 22 }, // Pickup
+      { wch: 22 }, // Drop-off
+      { wch: 18 }, // Trip ID
+      { wch: 10 }, // Type
+      { wch: 14 }, // Amount
+      { wch: 10 }, // Status
+    ];
+
+    // ── Number format for Amount column (column index 10, letter K) ────────
+    const amountColLetter = XLSX.utils.encode_col(10); // 'K'
+    const range = XLSX.utils.decode_range(ws['!ref'] ?? 'A1');
+    for (let row = range.s.r + 1; row <= range.e.r; row++) {
+      const cellRef = `${amountColLetter}${row + 1}`;
+      if (ws[cellRef]) {
+        ws[cellRef].z = '#,##0.00';  // Excel number format
+      }
+    }
+
+    // ── Workbook ───────────────────────────────────────────────────────────
+    const wb = XLSX.utils.book_new();
+    const sheetName = `Payments ${this.period || 'Export'}`.slice(0, 31); // Excel sheet name limit
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    XLSX.writeFile(wb, `payments_${this.period || 'export'}.xlsx`);
   }
 
   // ── Display helpers ───────────────────────────────────────────────────────
@@ -221,10 +270,17 @@ export class VehicleTransactionTableComponent implements OnChanges {
   }
 
   // ── Private ───────────────────────────────────────────────────────────────
+  private _download(blob: Blob, filename: string): void {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
   private _apply(): void {
     let data = [...this.transactions];
 
-    // Free-text search
     const q = this.searchTerm.toLowerCase().trim();
     if (q) {
       data = data.filter(t =>
@@ -238,17 +294,14 @@ export class VehicleTransactionTableComponent implements OnChanges {
       );
     }
 
-    // Status pill filter
     if (this.activeStatusFilter) {
       data = data.filter(t => t.paymentStatus === this.activeStatusFilter);
     }
 
-    // Type pill filter
     if (this.activeTypeFilter) {
       data = data.filter(t => t.transactionType === this.activeTypeFilter);
     }
 
-    // Sort
     data.sort((a, b) => {
       const av = a[this.sortField] ?? '';
       const bv = b[this.sortField] ?? '';
