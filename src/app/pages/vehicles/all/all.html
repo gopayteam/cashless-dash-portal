@@ -106,6 +106,7 @@
           <th>Status</th>
           <th>Investor</th>
           <th>Marshal</th>
+          <th> Details </th>
         </tr>
       </ng-template>
 
@@ -158,6 +159,14 @@
             <div class="contact-cell">
               <i class="pi pi-phone"></i>
               <span>{{ vehicle.marshalNumber }}</span>
+            </div>
+          </td>
+
+          <td>
+            <div>
+              <button pButton icon="pi pi-chart-line" class="p-button-rounded p-button-text p-button-sm"
+                pTooltip="Analyse Vehicle" tooltipPosition="top"
+                (click)="openAnalysisModal(vehicle); $event.stopPropagation()"></button>
             </div>
           </td>
         </tr>
@@ -456,4 +465,7 @@
         (click)="closeDetailDialog()"></button>
     </ng-template>
   </p-dialog>
+
+  <app-vehicle-analysis-modal [vehicle]="selectedVehicleForAnalysis" [entityId]="entityId ?? ''"
+    [(visible)]="displayAnalysisModal" />
 </div>

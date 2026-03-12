@@ -1,0 +1,618 @@
+/* pages/vehicle-analysis/vehicle-analysis.css */
+
+/* ══════════════════════════════════════════════
+   BASE CONTAINER
+   ══════════════════════════════════════════════ */
+.va-container {
+  padding: 1.75rem 2rem;
+  background-color: var(--light-bg, #f5f6fa);
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER — title left | date controls right
+   ══════════════════════════════════════════════ */
+.va-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  min-height: 64px;
+}
+
+.va-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.va-title {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.va-subtitle {
+  font-size: 0.875rem;
+  color: #718096;
+  margin: 0;
+}
+
+/* Header date controls — right side */
+.va-header-right {
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+}
+
+.header-date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: flex-end;
+}
+
+.header-date-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.header-date-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Header date fields — compact 40px height */
+.hdr-date-field {
+  width: 180px;
+}
+
+.hdr-range-field {
+  width: 270px;
+}
+
+.hdr-select-field {
+  width: 140px;
+}
+
+.hdr-year {
+  width: 100px;
+}
+
+::ng-deep .va-header-right .mat-mdc-text-field-wrapper {
+  background: #ffffff !important;
+  border-radius: 8px !important;
+}
+
+::ng-deep .va-header-right .mat-mdc-form-field-infix {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+  min-height: 40px !important;
+}
+
+::ng-deep .va-header-right .mdc-notched-outline__leading,
+::ng-deep .va-header-right .mdc-notched-outline__notch,
+::ng-deep .va-header-right .mdc-notched-outline__trailing {
+  border-color: #e2e8f0 !important;
+}
+
+::ng-deep .va-header-right .mat-mdc-form-field:hover .mdc-notched-outline__leading,
+::ng-deep .va-header-right .mat-mdc-form-field:hover .mdc-notched-outline__notch,
+::ng-deep .va-header-right .mat-mdc-form-field:hover .mdc-notched-outline__trailing {
+  border-color: #667eea !important;
+}
+
+::ng-deep .va-header-right .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .va-header-right .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .va-header-right .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #667eea !important;
+}
+
+.week-range-badge {
+  font-size: 0.75rem;
+  color: #667eea;
+  font-weight: 600;
+  background: #667eea12;
+  border: 1px solid #667eea28;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  text-align: right;
+}
+
+/* ══════════════════════════════════════════════
+   FILTER CARD
+   ══════════════════════════════════════════════ */
+.va-filter-card ::ng-deep .p-card-body,
+.va-filter-card ::ng-deep .p-card-content {
+  padding: 0 !important;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+  padding: 0 1rem;
+  overflow: hidden;
+}
+
+/* Vertical divider between tabs and filters */
+.filter-divider {
+  width: 1px;
+  height: 28px;
+  background: #e2e8f0;
+  margin: 0 1rem;
+  flex-shrink: 0;
+}
+
+/* RIGHT side: fleet selector + run button */
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+/* ── Fleet selector in filter bar ─────────── */
+.fleet-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  position: relative;
+}
+
+.fleet-multiselect {
+  min-width: 260px;
+  max-width: 340px;
+}
+
+::ng-deep .fleet-multiselect.p-multiselect {
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  height: 40px !important;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+::ng-deep .fleet-multiselect.p-multiselect:hover {
+  border-color: #667eea !important;
+}
+
+::ng-deep .fleet-multiselect.p-multiselect.p-focus,
+::ng-deep .fleet-multiselect.p-multiselect:focus-within {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px #667eea20 !important;
+  outline: none !important;
+}
+
+::ng-deep .fleet-multiselect .p-multiselect-label-container {
+  background: #ffffff !important;
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .fleet-multiselect .p-multiselect-label {
+  background: #ffffff !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.865rem;
+  color: #4a5568;
+  line-height: 38px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+::ng-deep .fleet-multiselect .p-multiselect-trigger {
+  background: #ffffff !important;
+  border: none !important;
+  color: #a0aec0;
+  width: 2.25rem;
+  border-radius: 0 8px 8px 0 !important;
+}
+
+/* Dropdown overlay panel */
+::ng-deep .p-multiselect-overlay {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  overflow: hidden;
+}
+
+::ng-deep .p-multiselect-header {
+  background: #f7fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+::ng-deep .p-multiselect-filter-container {
+  background: #f7fafc !important;
+}
+
+.fleet-option-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fleet-option-icon {
+  color: #667eea;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+::ng-deep .p-multiselect-option {
+  padding: 0.5rem 0.9rem !important;
+  font-size: 0.865rem !important;
+  background: #ffffff !important;
+  transition: background 0.1s;
+}
+
+::ng-deep .p-multiselect-option:hover {
+  background: #f0f3ff !important;
+  color: #667eea !important;
+}
+
+::ng-deep .p-multiselect-option.p-selected {
+  background: #eef0fd !important;
+  color: #667eea !important;
+  font-weight: 600;
+}
+
+::ng-deep .fleet-multiselect .p-checkbox .p-checkbox-box.p-highlight {
+  background: #667eea !important;
+  border-color: #667eea !important;
+}
+
+/* Fleet chips — shown below filter bar */
+
+.fleet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1.5px solid var(--chip-color, #667eea);
+  color: var(--chip-color, #667eea);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: white;
+}
+
+.fleet-count-badge {
+  background: #667eea22;
+  color: #667eea;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+/* ── Run button ───────────────────────────── */
+.run-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  border-radius: 8px !important;
+  height: 40px !important;
+  padding: 0 1.25rem !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35) !important;
+  transition: box-shadow 0.2s, transform 0.15s, opacity 0.2s !important;
+}
+
+.run-btn:not(:disabled):hover {
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.run-btn:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3) !important;
+}
+
+.run-btn:disabled {
+  opacity: 0.42 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* ══════════════════════════════════════════════
+   PRIMENG TABS — inside filter bar
+   Pill-style, no underlines, no borders
+   ══════════════════════════════════════════════ */
+.filter-tabs {
+  flex-shrink: 0;
+}
+
+::ng-deep .filter-tabs .p-tabs,
+::ng-deep .filter-tabs .p-tabpanels {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+::ng-deep .filter-tabs .p-tablist {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  gap: 2px;
+}
+
+::ng-deep .filter-tabs .p-tablist-tab-list {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  gap: 2px;
+  align-items: center;
+}
+
+::ng-deep .filter-tabs .p-tab {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  padding: 0.4rem 0.9rem !important;
+  font-size: 0.855rem !important;
+  font-weight: 600 !important;
+  color: #718096 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+  height: 34px;
+}
+
+::ng-deep .filter-tabs .p-tab:focus,
+::ng-deep .filter-tabs .p-tab:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .filter-tabs .p-tab:hover:not(.p-tab-active) {
+  color: #667eea !important;
+  background: #f0f3ff !important;
+}
+
+::ng-deep .filter-tabs .p-tab.p-tab-active {
+  color: #667eea !important;
+  background: #eef0fd !important;
+}
+
+::ng-deep .filter-tabs .p-tab.p-tab-active i {
+  color: #667eea !important;
+}
+
+::ng-deep .filter-tabs .p-tab:not(.p-tab-active) i {
+  color: #cbd5e0;
+}
+
+::ng-deep .filter-tabs .p-tablist-active-bar {
+  display: none !important;
+}
+
+/* ══════════════════════════════════════════════
+   RESULTS PANEL
+   ══════════════════════════════════════════════ */
+.results-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.results-period-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #667eea;
+  background: #eef0fd;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  flex-shrink: 0;
+}
+
+.results-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+/* ══════════════════════════════════════════════
+   EMPTY STATE
+   ══════════════════════════════════════════════ */
+.cta-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5rem 2rem;
+  gap: 0.75rem;
+}
+
+.cta-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #667eea18 0%, #764ba218 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.cta-icon-wrap i {
+  font-size: 2rem;
+  color: #667eea;
+}
+
+.cta-empty h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #4a5568;
+}
+
+.cta-empty>p {
+  max-width: 360px;
+  font-size: 0.875rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+.cta-steps {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cta-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #718096;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+}
+
+.cta-step i {
+  font-size: 0.75rem;
+  color: #a0aec0;
+}
+
+.cta-arrow {
+  font-size: 0.7rem;
+  color: #cbd5e0;
+}
+
+/* ══════════════════════════════════════════════
+   MATERIAL GLOBAL OVERRIDES
+   ══════════════════════════════════════════════ */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: #ffffff !important;
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .va-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .va-header-right {
+    align-items: flex-start;
+  }
+
+  .header-date-group {
+    align-items: flex-start;
+  }
+
+  .hdr-date-field,
+  .hdr-range-field {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .va-container {
+    padding: 1rem;
+  }
+
+  .va-title {
+    font-size: 1.35rem;
+  }
+
+  .filter-bar {
+    height: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .filter-divider {
+    display: none;
+  }
+
+  .filter-right {
+    width: 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+
+  .fleet-select-wrapper {
+    width: 100%;
+  }
+
+  .fleet-multiselect {
+    min-width: unset;
+    max-width: 100%;
+  }
+
+  .run-btn {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  .hdr-date-field,
+  .hdr-range-field,
+  .hdr-select-field {
+    width: 100% !important;
+  }
+
+  .header-date-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .hdr-select-field.hdr-year {
+    width: 100px !important;
+  }
+}

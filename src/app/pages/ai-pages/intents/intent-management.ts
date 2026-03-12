@@ -22,7 +22,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { DataService } from '../../../../@core/api/data.service';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
-import { AI_ENDPOINTS } from '../../../../@core/models/ai/ai.endpoints';
+import { AI_ENDPOINTS } from '../../../../@core/api/endpoints/AI_ENDPOINTS';
 import {
   FetchApiIntent,
   Intent, IntentCreateRequest, IntentUpdateRequest,

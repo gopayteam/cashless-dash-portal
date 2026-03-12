@@ -13,7 +13,7 @@ import { MessageService } from 'primeng/api';
 
 import { DataService } from '../../../@core/api/data.service';
 import { AuthService } from '../../../@core/services/auth.service';
-import { AI_ENDPOINTS } from '../../../@core/models/ai/ai.endpoints';
+import { AI_ENDPOINTS } from '../../../@core/api/endpoints/AI_ENDPOINTS';
 import { ChatMessage, ChatRequest, ChatResponse } from '../../../@core/models/ai/ai.models';
 import { ChatService } from '../../../@core/services/chat.service';
 
@@ -87,18 +87,18 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
 
   sendMessage(): void {
 
-  const text = this.inputText.trim();
-  if (!text) return;
+    const text = this.inputText.trim();
+    if (!text) return;
 
-  this.chatService.sendMessage(text);
+    this.chatService.sendMessage(text);
 
-  this.inputText = '';
-  this.shouldScroll = true;
+    this.inputText = '';
+    this.shouldScroll = true;
 
-  if (!this.isOpen()) {
-    this.unreadCount.update(v => v + 1);
+    if (!this.isOpen()) {
+      this.unreadCount.update(v => v + 1);
+    }
   }
-}
 
   onKeyDown(event: KeyboardEvent): void {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -108,8 +108,8 @@ export class ChatWidgetComponent implements OnInit, AfterViewChecked {
   }
 
   clearWidget(): void {
-  this.chatService.clear();
-}
+    this.chatService.clear();
+  }
 
   private scrollToBottom(): void {
     try {

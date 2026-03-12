@@ -23,6 +23,7 @@ import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+import { VehicleAnalysisModalComponent } from '../../../components/vehicle-analysis/vehicle-analysis-modal/vehicle-analysis-modal';
 
 interface StatusOption {
   label: string;
@@ -53,6 +54,7 @@ interface VehicleFeesApiResponse {
     ActionButtonComponent,
     MessageModule,
     ToastModule,
+    VehicleAnalysisModalComponent
   ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
@@ -96,6 +98,21 @@ export class AllVehiclesComponent implements OnInit {
     { label: 'Inactive', value: 'INACTIVE' },
     { label: 'Maintenance', value: 'MAINTENANCE' },
   ];
+
+  displayAnalysisModal = false;
+  selectedVehicleForAnalysis: Vehicle | null = null;
+
+
+  // Add this method:
+  openAnalysisModal(vehicle: Vehicle, event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.selectedVehicleForAnalysis = vehicle;
+    this.displayAnalysisModal = true;
+  }
+
+  closeAnalysisModal(): void {
+    this.displayAnalysisModal = false;
+  }
 
   constructor(
     private dataService: DataService,

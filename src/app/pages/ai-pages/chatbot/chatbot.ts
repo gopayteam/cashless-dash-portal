@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { DataService } from '../../../../@core/api/data.service';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { ChatMessage, ChatRequest, ChatResponse, MessageRole } from '../../../../@core/models/ai/ai.models';
-import { AI_ENDPOINTS } from '../../../../@core/models/ai/ai.endpoints';
+import { AI_ENDPOINTS } from '../../../../@core/api/endpoints/AI_ENDPOINTS';
 import { ChatService } from '../../../../@core/services/chat.service';
 
 

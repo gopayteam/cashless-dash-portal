@@ -3,19 +3,15 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout';
 import { DashboardComponent } from './pages/dashboard/home/dashboard';
 import { StatsComponent } from './pages/dashboard/stats/stats';
 import { ReportsComponent } from './pages/dashboard/reports/reports';
-import { DailyAnalysisComponent } from './pages/vehicle-analysis/daily/daily';
-import { WeeklyAnalysisComponent } from './pages/vehicle-analysis/weekly/weekly';
-import { MonthlyAnalysisComponent } from './pages/vehicle-analysis/monthly/monthly';
-import { YearlyAnalysisComponent } from './pages/vehicle-analysis/yearly/yearly';
-import { ShortTermPredictionComponent } from './pages/prediction/short-term/short-term';
-import { PredictionTrendsComponent } from './pages/prediction/trends/trends';
-import { LongTermPredictionComponent } from './pages/prediction/long-term/long-term';
+import { ShortTermPredictionComponent } from './pages/ai-pages/prediction/short-term/short-term';
+import { PredictionTrendsComponent } from './pages/ai-pages/prediction/trends/trends';
+import { LongTermPredictionComponent } from './pages/ai-pages/prediction/long-term/long-term';
 import { FailedTransactionsComponent } from './pages/transactions/failed/failed';
 import { PendingTransactionsComponent } from './pages/transactions/pending/pending';
 import { AllTransactionsComponent } from './pages/transactions/all/all';
-import { RevenueComponent } from './pages/revenue/all/all';
-import { RevenueByVehicleComponent } from './pages/revenue/by-vehicle/by-vehicle';
-import { RevenueByLocationComponent } from './pages/revenue/by-location/by-location';
+import { RevenueComponent } from './pages/ai-pages/revenue/all/all';
+import { RevenueByVehicleComponent } from './pages/ai-pages/revenue/by-vehicle/by-vehicle';
+import { RevenueByLocationComponent } from './pages/ai-pages/revenue/by-location/by-location';
 import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
@@ -98,6 +94,7 @@ import { TripTransactionsComponent } from './pages/booking/trip-transactions/tri
 import { SeatReservationsComponent } from './pages/booking/seat-reservation/seat-reservation';
 import { ConflictDashboardComponent } from './pages/booking/trip-conflicts/trip-conflicts';
 import { AI_ROUTES } from './pages/ai-pages/ai.routes';
+import { VehicleAnalysisComponent } from './pages/vehicle-analysis/vehicle-analysis';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -407,32 +404,6 @@ export const routes: Routes = [
         component: ObligationsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS'] }
-      },
-
-      /* Analysis */
-      {
-        path: 'vehicle-analysis/daily',
-        component: DailyAnalysisComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
-      },
-      {
-        path: 'vehicle-analysis/weekly',
-        component: WeeklyAnalysisComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
-      },
-      {
-        path: 'vehicle-analysis/monthly',
-        component: MonthlyAnalysisComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
-      },
-      {
-        path: 'vehicle-analysis/yearly',
-        component: YearlyAnalysisComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] }
       },
 
       /* Prediction */
@@ -769,6 +740,12 @@ export const routes: Routes = [
         path: 'ai',
         children: AI_ROUTES,
         canActivate: [AuthGuard],   // add your guard
+      },
+
+      {
+        path: 'vehicle-analysis',
+        component: VehicleAnalysisComponent,
+        canActivate: [AuthGuard],
       },
 
       /* Default protected redirect */

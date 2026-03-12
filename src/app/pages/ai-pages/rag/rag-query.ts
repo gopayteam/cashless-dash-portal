@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { DataService } from '../../../../@core/api/data.service';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { RagQueryRequest, RagQueryResponse } from '../../../../@core/models/ai/ai.models';
-import { AI_ENDPOINTS } from '../../../../@core/models/ai/ai.endpoints';
+import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 
 export type ViewMode = 'chat' | 'research';
 
@@ -77,7 +77,7 @@ export class RagQueryComponent implements OnInit {
     };
 
     this.dataService
-      .post<RagQueryResponse>(AI_ENDPOINTS.RAG_QUERY, payload, 'rag')
+      .post<RagQueryResponse>(API_ENDPOINTS.RAG_QUERY, payload, 'rag')
       .subscribe({
         next: (res) => {
           this.currentResult.set(res);

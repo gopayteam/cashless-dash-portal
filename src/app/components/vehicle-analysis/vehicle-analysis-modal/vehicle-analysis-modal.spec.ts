@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Weekly } from './weekly';
+import { VehicleAnalysisModal } from './vehicle-analysis-modal';
 
-describe('Weekly', () => {
-  let component: Weekly;
-  let fixture: ComponentFixture<Weekly>;
+describe('VehicleAnalysisModal', () => {
+  let component: VehicleAnalysisModal;
+  let fixture: ComponentFixture<VehicleAnalysisModal>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Weekly]
+      imports: [VehicleAnalysisModal]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Weekly);
+    fixture = TestBed.createComponent(VehicleAnalysisModal);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

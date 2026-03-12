@@ -175,12 +175,12 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'By Vehicle', icon: 'pi pi-car', route: '/revenue/by-vehicle', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] },
       { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] },
     ],
-    '/vehicle-analysis': [
-      { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-      { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-      { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-      { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-    ],
+    // '/vehicle-analysis': [
+    //   { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+    //   { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+    //   { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+    //   { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
+    // ],
     '/prediction': [
       { label: 'Short Term', icon: 'pi pi-calendar', route: '/prediction/short-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },

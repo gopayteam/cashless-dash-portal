@@ -1,3 +1,6 @@
+import { AI_ENDPOINTS } from "./endpoints/AI_ENDPOINTS";
+import { EDA_ENDPOINTS } from "./endpoints/EDA_ENDPOINTS";
+
 export const API_ENDPOINTS = {
   // #####################  AUTHENTICATION SUB-ENDPOINTS   #######################
   AUTH_LOGIN: '/api/v1/auth/login',
@@ -104,4 +107,6 @@ export const API_ENDPOINTS = {
   // Body: { tripId, entityId, username? (optional), reservationStatus? (optional) }
   SEAT_RESERVATIONS: '/api/booking/trip/seat/reservations',
 
+  ...EDA_ENDPOINTS,
+  ...AI_ENDPOINTS,
 };

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Yearly } from './yearly';
+import { VehicleAnalysisPanel } from './vehicle-analysis-panel';
 
-describe('Yearly', () => {
-  let component: Yearly;
-  let fixture: ComponentFixture<Yearly>;
+describe('VehicleAnalysisPanel', () => {
+  let component: VehicleAnalysisPanel;
+  let fixture: ComponentFixture<VehicleAnalysisPanel>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Yearly]
+      imports: [VehicleAnalysisPanel]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Yearly);
+    fixture = TestBed.createComponent(VehicleAnalysisPanel);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { DataService } from '../api/data.service';
 import { AuthService } from './auth.service';
-import { AI_ENDPOINTS } from '../models/ai/ai.endpoints';
+import { AI_ENDPOINTS } from '../api/endpoints/AI_ENDPOINTS';
 import { ChatMessage, ChatRequest, ChatResponse } from '../models/ai/ai.models';
 
 @Injectable({ providedIn: 'root' })
