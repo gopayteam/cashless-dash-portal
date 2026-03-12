@@ -1,0 +1,319 @@
+<!-- vehicle-transaction-table.component.html -->
+<div class="txn-wrap">
+
+  <!-- ════════════════════════════════════════════════
+       TOOLBAR
+       ════════════════════════════════════════════════ -->
+  <div class="txn-toolbar">
+
+    <!-- Left: title + filter pills -->
+    <div class="txn-toolbar-left">
+
+      <h4 class="txn-title">
+        <i class="pi pi-wallet"></i>
+        Payments
+        <span class="count-badge" *ngIf="filtered.length">{{ filtered.length | number }}</span>
+      </h4>
+
+      <!-- Status pills -->
+      <div class="pill-group">
+        <button class="pill"
+          [class.pill-active-all]="activeStatusFilter === '' && activeTypeFilter === ''"
+          (click)="toggleStatusFilter('PAID'); toggleTypeFilter('DEBIT')">
+          All
+        </button>
+
+        <button class="pill pill-paid"
+          [class.active]="activeStatusFilter === 'PAID'"
+          (click)="toggleStatusFilter('PAID')">
+          <span class="dot dot-paid"></span> Paid
+          <span class="pill-num">{{ paidCount }}</span>
+        </button>
+
+        <button class="pill pill-pending"
+          [class.active]="activeStatusFilter === 'PENDING'"
+          (click)="toggleStatusFilter('PENDING')">
+          <span class="dot dot-pending"></span> Pending
+          <span class="pill-num">{{ pendingCount }}</span>
+        </button>
+
+        <button class="pill pill-failed"
+          [class.active]="activeStatusFilter === 'FAILED'"
+          (click)="toggleStatusFilter('FAILED')">
+          <span class="dot dot-failed"></span> Failed
+          <span class="pill-num">{{ failedCount }}</span>
+        </button>
+      </div>
+
+      <!-- Separator -->
+      <div class="pill-sep"></div>
+
+      <!-- Type pills -->
+      <div class="pill-group">
+        <button class="pill pill-credit"
+          [class.active]="activeTypeFilter === 'CREDIT'"
+          (click)="toggleTypeFilter('CREDIT')">
+          <i class="pi pi-arrow-down-left"></i> Credit
+          <span class="pill-num">{{ creditCount }}</span>
+        </button>
+
+        <button class="pill pill-debit"
+          [class.active]="activeTypeFilter === 'DEBIT'"
+          (click)="toggleTypeFilter('DEBIT')">
+          <i class="pi pi-arrow-up-right"></i> Debit
+          <span class="pill-num">{{ debitCount }}</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Right: search + page size + export -->
+    <div class="txn-toolbar-right">
+
+      <div class="search-wrap">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Receipt, fleet, driver, customer…"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch()" />
+        <button class="search-clear" *ngIf="searchTerm" (click)="clearSearch()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <p-select
+        [options]="pageSizeOptions"
+        [(ngModel)]="pageSize"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="page-size-select"
+        (onChange)="onPageSizeChange()"
+        appendTo="body">
+      </p-select>
+
+      <button class="export-btn" (click)="exportCsv()" pTooltip="Export CSV" tooltipPosition="top">
+        <i class="pi pi-download"></i> Export
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       TABLE
+       ════════════════════════════════════════════════ -->
+  <div class="table-scroll">
+    <table class="txn-table" aria-label="Payment records">
+
+      <!-- ── Head ── -->
+      <thead>
+        <tr>
+          <th class="col-idx">#</th>
+
+          <th class="sortable" (click)="onSort('createdAt')">
+            Date <i [class]="sortIcon('createdAt')"></i>
+          </th>
+
+          <th class="sortable" (click)="onSort('mpesaReceiptNumber')">
+            M-Pesa Receipt <i [class]="sortIcon('mpesaReceiptNumber')"></i>
+          </th>
+
+          <th class="sortable" (click)="onSort('fleetNumber')">
+            Fleet <i [class]="sortIcon('fleetNumber')"></i>
+          </th>
+
+          <th class="sortable" (click)="onSort('activeDriverUsername')">
+            Driver <i [class]="sortIcon('activeDriverUsername')"></i>
+          </th>
+
+          <th class="sortable" (click)="onSort('customerName')">
+            Customer <i [class]="sortIcon('customerName')"></i>
+          </th>
+
+          <th>Pickup</th>
+          <th>Drop-off</th>
+
+          <th class="sortable" (click)="onSort('transactionType')">
+            Type <i [class]="sortIcon('transactionType')"></i>
+          </th>
+
+          <th class="sortable col-right" (click)="onSort('assignedAmount')">
+            Amount (KES) <i [class]="sortIcon('assignedAmount')"></i>
+          </th>
+
+          <th class="sortable" (click)="onSort('paymentStatus')">
+            Status <i [class]="sortIcon('paymentStatus')"></i>
+          </th>
+        </tr>
+      </thead>
+
+      <!-- ── Body ── -->
+      <tbody>
+
+        <!-- Loading skeleton -->
+        <ng-container *ngIf="loading">
+          <tr class="skel-row" *ngFor="let _ of [1,2,3,4,5,6,7,8]">
+            <td colspan="11"><div class="skel-line"></div></td>
+          </tr>
+        </ng-container>
+
+        <!-- Empty state -->
+        <tr *ngIf="!loading && paged.length === 0">
+          <td colspan="11">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <span *ngIf="searchTerm || activeStatusFilter || activeTypeFilter">
+                No records match your filters.
+              </span>
+              <span *ngIf="!searchTerm && !activeStatusFilter && !activeTypeFilter">
+                No payment records found for this period.
+              </span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Data rows -->
+        <tr *ngFor="let rec of paged; let i = index" class="data-row">
+
+          <td class="col-idx dim">{{ rowIdx(i) }}</td>
+
+          <!-- Date -->
+          <td class="col-date">
+            <span class="date-main">{{ fmtDate(rec.createdAt) }}</span>
+          </td>
+
+          <!-- Receipt -->
+          <td class="col-mono" [pTooltip]="rec.mpesaReceiptNumber" tooltipPosition="top">
+            {{ rec.mpesaReceiptNumber }}
+          </td>
+
+          <!-- Fleet -->
+          <td>
+            <span class="fleet-badge">{{ rec.fleetNumber }}</span>
+          </td>
+
+          <!-- Driver -->
+          <td class="dim" [pTooltip]="rec.activeDriverUsername || ''" tooltipPosition="top">
+            {{ truncate(rec.activeDriverUsername, 16) }}
+          </td>
+
+          <!-- Customer -->
+          <td class="dim" [pTooltip]="rec.customerName || ''" tooltipPosition="top">
+            {{ truncate(rec.customerName, 16) }}
+          </td>
+
+          <!-- Pickup -->
+          <td class="col-location dim" [pTooltip]="rec.pickup || ''" tooltipPosition="top">
+            <i class="pi pi-map-marker loc-icon loc-pickup" *ngIf="rec.pickup"></i>
+            {{ truncate(rec.pickup, 18) }}
+          </td>
+
+          <!-- Drop-off -->
+          <td class="col-location dim" [pTooltip]="rec.dropOff || ''" tooltipPosition="top">
+            <i class="pi pi-map-marker loc-icon loc-drop" *ngIf="rec.dropOff"></i>
+            {{ truncate(rec.dropOff, 18) }}
+          </td>
+
+          <!-- Transaction type -->
+          <td>
+            <span class="type-badge"
+              [class.type-credit]="rec.transactionType === 'CREDIT'"
+              [class.type-debit]="rec.transactionType === 'DEBIT'">
+              <i class="pi"
+                [class.pi-arrow-down-left]="rec.transactionType === 'CREDIT'"
+                [class.pi-arrow-up-right]="rec.transactionType === 'DEBIT'">
+              </i>
+              {{ rec.transactionType }}
+            </span>
+          </td>
+
+          <!-- Amount -->
+          <td class="col-right">
+            <span class="amount"
+              [class.amount-credit]="rec.transactionType === 'CREDIT'"
+              [class.amount-debit]="rec.transactionType === 'DEBIT'">
+              {{ rec.transactionType === 'DEBIT' ? '−' : '+' }}{{ fmtAmount(rec.assignedAmount) }}
+            </span>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag
+              [value]="rec.paymentStatus"
+              [severity]="statusSeverity(rec.paymentStatus)"
+              styleClass="status-tag">
+            </p-tag>
+          </td>
+
+        </tr>
+      </tbody>
+
+      <!-- ── Footer totals ── -->
+      <tfoot *ngIf="!loading && filtered.length > 0">
+        <tr class="footer-row">
+          <td colspan="8" class="footer-label">
+            <i class="pi pi-sigma"></i>
+            Totals — {{ filtered.length | number }} records
+          </td>
+
+          <!-- Type breakdown -->
+          <td class="footer-type-summary">
+            <span class="type-badge type-credit">+{{ fmtAmount(totalCredit) }}</span>
+            <span class="type-badge type-debit">−{{ fmtAmount(totalDebit) }}</span>
+          </td>
+
+          <!-- Net total -->
+          <td class="col-right footer-net">
+            {{ fmtAmount(totalAssigned) }}
+          </td>
+
+          <td></td>
+        </tr>
+      </tfoot>
+
+    </table>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       PAGINATION BAR
+       ════════════════════════════════════════════════ -->
+  <div class="pag-bar" *ngIf="!loading && filtered.length > 0">
+
+    <span class="pag-info">
+      Showing <strong>{{ firstRow }}–{{ lastRow }}</strong>
+      of <strong>{{ filtered.length | number }}</strong> records
+    </span>
+
+    <div class="pag-controls">
+      <button class="pag-btn" [disabled]="currentPage === 0"
+        (click)="goToPage(0)" pTooltip="First" tooltipPosition="top">
+        <i class="pi pi-angle-double-left"></i>
+      </button>
+
+      <button class="pag-btn" [disabled]="currentPage === 0"
+        (click)="goToPage(currentPage - 1)">
+        <i class="pi pi-angle-left"></i>
+      </button>
+
+      <button *ngFor="let p of pageNumbers"
+        class="pag-btn pag-num"
+        [class.pag-active]="p === currentPage"
+        (click)="goToPage(p)">
+        {{ p + 1 }}
+      </button>
+
+      <button class="pag-btn" [disabled]="currentPage >= totalPages - 1"
+        (click)="goToPage(currentPage + 1)">
+        <i class="pi pi-angle-right"></i>
+      </button>
+
+      <button class="pag-btn" [disabled]="currentPage >= totalPages - 1"
+        (click)="goToPage(totalPages - 1)" pTooltip="Last" tooltipPosition="top">
+        <i class="pi pi-angle-double-right"></i>
+      </button>
+    </div>
+
+  </div>
+
+</div>

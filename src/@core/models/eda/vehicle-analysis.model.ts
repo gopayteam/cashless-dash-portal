@@ -10,7 +10,7 @@ import { PaymentRecord } from "../transactions/transactions.models";
 export interface VehicleAnalysisBaseRequest {
   entityId: string;
   fleetNumbers: string[];          // 1–5 fleet numbers
-  transactions?: PaymentRecord[];  // Optional: send client-fetched data directly
+  transactions: PaymentRecord[];  // Optional: send client-fetched data directly
 }
 
 export interface DayAnalysisRequest extends VehicleAnalysisBaseRequest {
@@ -65,7 +65,7 @@ export type DataSource = 'payload' | 'database' | 'api' | 'csv' | 'none';
 
 export interface VehicleAnalysisResponse {
   period: string;
-  periodType: PeriodType;
+  periodType: PeriodType;         // 'day' | 'week' | 'month' | 'year'
   fleetSummaries: FleetSummary[];
   earningsChart: ChartData;       // Line chart
   tripsChart: ChartData;          // Bar chart
@@ -74,6 +74,8 @@ export interface VehicleAnalysisResponse {
   totalRevenue: number;
   totalTrips: number;
   dataSource: DataSource;
+  fleetNumbers: string[];
+  transactions: PaymentRecord[];
 }
 
 // ─────────────────────────────────────────────

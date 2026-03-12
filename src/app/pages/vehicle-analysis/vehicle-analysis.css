@@ -92,6 +92,7 @@
   width: 100px;
 }
 
+/*
 ::ng-deep .va-header-right .mat-mdc-text-field-wrapper {
   background: #ffffff !important;
   border-radius: 8px !important;
@@ -120,6 +121,123 @@
 ::ng-deep .va-header-right .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
   border-color: #667eea !important;
 }
+ */
+
+/* ══════════════════════════════════════════════
+   HEADER DATE PICKERS — GRADIENT STYLE
+   Uses standardized filter-item-gradient system
+   ══════════════════════════════════════════════ */
+.va-header-right {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header-date-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.date-date-field,
+.date-range-field,
+.date-select-field {
+  width: 260px;
+}
+
+.week-range-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.week-range-badge {
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+.filter-item-gradient {
+  transition: transform 0.2s ease;
+}
+
+.filter-item-gradient:hover {
+  transform: translateY(-1px);
+}
+
+.va-header-right .filter-item {
+  min-width: 240px;
+}
+
+::ng-deep .va-header-right .date-range-field.mat-mdc-form-field {
+  width: 100%;
+  max-width: 280px;
+}
+
+/* Gradient container */
+::ng-deep .va-header-right .filter-item-gradient .mat-mdc-text-field-wrapper {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+}
+
+/* Remove outline border */
+::ng-deep .va-header-right .filter-item-gradient .mdc-notched-outline {
+  display: none;
+}
+
+/* Hover */
+::ng-deep .va-header-right .filter-item-gradient:hover .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color, #c82333);
+  box-shadow: 0 4px 12px rgba(200, 35, 51, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Focus */
+::ng-deep .va-header-right .filter-item-gradient.mat-focused .mat-mdc-text-field-wrapper,
+::ng-deep .va-header-right .filter-item-gradient .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: var(--secondary-color, #c82333);
+  box-shadow: 0 6px 16px rgba(200, 35, 51, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Input styling */
+::ng-deep .va-header-right .mat-mdc-input-element {
+  color: var(--primary-color, #0e2c5a);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Placeholder */
+::ng-deep .va-header-right .mat-mdc-input-element::placeholder {
+  color: #adb5bd;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+/* Calendar icon */
+::ng-deep .va-header-right .mat-datepicker-toggle {
+  color: var(--secondary-color, #c82333);
+}
+
+/* Icon hover */
+::ng-deep .va-header-right .mat-mdc-icon-button:hover {
+  background: rgba(200, 35, 51, 0.08);
+  border-radius: 8px;
+}
+
+/* Compact header height */
+::ng-deep .va-header-right .mat-mdc-form-field-infix {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  min-height: 40px !important;
+}
+
+
 
 .week-range-badge {
   font-size: 0.75rem;
@@ -279,6 +397,10 @@
 }
 
 /* Fleet chips — shown below filter bar */
+.fleet-chip {
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
 
 .fleet-chip {
   display: inline-flex;

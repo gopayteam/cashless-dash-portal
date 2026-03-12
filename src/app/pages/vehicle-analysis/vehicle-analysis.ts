@@ -26,6 +26,7 @@ import { API_ENDPOINTS } from '../../../@core/api/endpoints';
 import { VehicleAnalysisPanelComponent } from '../../components/vehicle-analysis/vehicle-analysis-panel/vehicle-analysis-panel';
 import { Vehicle } from '../../../@core/models/vehicle/vehicle.model';
 import { VehicleApiResponse } from '../../../@core/models/vehicle/vehicle_reponse.model';
+import { VehicleTransactionTableComponent } from "../../components/transactions-table/transactions-table";
 
 type PeriodTab = 'day' | 'week' | 'month' | 'year';
 
@@ -53,7 +54,8 @@ const MONTHS: MonthOption[] = [
     MatDatepickerModule, MatFormFieldModule, MatInputModule,
     MatSelectModule, MatNativeDateModule,
     VehicleAnalysisPanelComponent,
-  ],
+    VehicleTransactionTableComponent
+],
   templateUrl: './vehicle-analysis.html',
   styleUrls: ['./vehicle-analysis.css', '../../../styles/global/_toast.css'],
 })
@@ -114,7 +116,7 @@ export class VehicleAnalysisComponent implements OnInit {
   private _loadVehicles(): void {
     const payload = { entityId: this.entityId, page: 0, size: 500 };
     this.dataService
-      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles')
+      .post<VehicleApiResponse>(API_ENDPOINTS.ALL_VEHICLES, payload, 'vehicles', false)
       .subscribe({
         next: (res) => {
           this.allVehicles = res.data;

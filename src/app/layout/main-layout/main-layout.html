@@ -90,6 +90,16 @@
                 </button>
               </li>
 
+              <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/vehicle-analysis')"
+                  (click)="navigate('/vehicle-analysis')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-chart-line menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <span class="menu-text">Fleet Analysis</span>
+                  </span>
+                </button>
+              </li>
+
               <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/transfer-payment')"
                   (click)="navigate('/transfer-payment/1')">
@@ -158,16 +168,6 @@
                   <span class="menu-link-content">
                     <i class="pi pi-car menu-icon" style="color: rgb(125, 3, 3)"></i>
                     <span class="menu-text">Vehicles</span>
-                  </span>
-                </button>
-              </li>
-
-              <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
-                <button class="menu-link" [class.menu-link--active]="isRouteActive('/vehicle-analysis')"
-                  (click)="navigate('/vehicle-analysis')">
-                  <span class="menu-link-content">
-                    <i class="pi pi-chart-line menu-icon" style="color: rgb(125, 3, 3)"></i>
-                    <span class="menu-text">Vehicles Analysis</span>
                   </span>
                 </button>
               </li>

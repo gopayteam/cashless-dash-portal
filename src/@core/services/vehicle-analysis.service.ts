@@ -163,7 +163,7 @@ export class VehicleAnalysisService {
     fleetNumbers: string[],
     startDate: string,
     endDate: string,
-    pageSize = 1000,
+    pageSize = 6000,
   ): Observable<PaymentRecord[]> {
     // Fetch one page covering the full range for all fleets combined.
     // The payload filter on the EDA side will split by fleetNumber.
@@ -177,7 +177,7 @@ export class VehicleAnalysisService {
     };
 
     return this.dataService
-      .post<PaymentsApiResponse>(EDA_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', true)
+      .post<PaymentsApiResponse>(EDA_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', false)
       .pipe(
         map((response) => {
           const all: PaymentRecord[] = response.data?.manifest ?? (response as any).data ?? [];

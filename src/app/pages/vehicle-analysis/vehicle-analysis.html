@@ -11,8 +11,6 @@
       <p class="va-subtitle">Analyse and compare fleet earnings across time periods</p>
     </div>
 
-
-
     <div class="va-header-right">
 
       <!-- DAY date control -->
@@ -80,15 +78,6 @@
     </div>
   </div>
 
-  <!-- Selected chips -->
-  <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
-    <span *ngFor="let fn of selectedFleets; let i = index" style="gap: 0.5rem" class="fleet-chip"
-      [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
-      <i class="pi pi-car"></i> {{ fn }}
-      <!-- <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span> -->
-    </span>
-  </div>
-
   <!-- ══════════════════════════════════════════════════════════
        FILTER BAR — Tabs | Fleet selector | Run button
        ══════════════════════════════════════════════════════════ -->
@@ -124,14 +113,14 @@
             </ng-template>
           </p-multiSelect>
 
-          <!-- Selected chips
+          <!-- Selected chips -->
           <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
             <span *ngFor="let fn of selectedFleets; let i = index" class="fleet-chip"
               [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
               <i class="pi pi-car"></i> {{ fn }}
               <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span>
             </span>
-          </div> -->
+          </div>
         </div>
 
         <!-- Run Analysis -->
@@ -163,7 +152,16 @@
         <h3>Analysis Results — {{ analysisResult.period }}</h3>
       </div>
     </div>
+
+    <!-- Charts / summary panel -->
     <app-vehicle-analysis-panel [data]="analysisResult" [loading]="analysisLoading" />
+
+    <!-- ── Transaction table (shown once data is loaded) ────────────────── -->
+    <app-vehicle-transaction-table *ngIf="!analysisLoading && analysisResult"
+      [transactions]="analysisResult?.data?.manifest ?? []" [period]="analysisResult.period"
+      [loading]="analysisLoading">
+    </app-vehicle-transaction-table>
+
   </p-card>
 
   <!-- ══════════════════════════════════════════════════════════
