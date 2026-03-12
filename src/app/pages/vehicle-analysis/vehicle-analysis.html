@@ -1,0 +1,187 @@
+<!-- pages/vehicle-analysis/vehicle-analysis.html -->
+<div class="va-container">
+  <p-toast />
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER — Title left | Date controls right (dynamic by tab)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="va-header">
+    <div class="va-header-left">
+      <h1 class="va-title">Vehicle Performance Analysis</h1>
+      <p class="va-subtitle">Analyse and compare fleet earnings across time periods</p>
+    </div>
+
+
+
+    <div class="va-header-right">
+
+      <!-- DAY date control -->
+      <ng-container *ngIf="activeTabValue === 'day'">
+        <div class="header-date-group">
+          <span class="header-date-label">Date</span>
+          <mat-form-field appearance="outline" class="hdr-date-field">
+            <input matInput [matDatepicker]="dayPicker" [(ngModel)]="dayDate" placeholder="Pick a date" />
+            <mat-datepicker-toggle matSuffix [for]="dayPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dayPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <!-- WEEK date control -->
+      <ng-container *ngIf="activeTabValue === 'week'">
+        <div class="header-date-group">
+          <span class="header-date-label">Week Range</span>
+          <mat-form-field appearance="outline" class="hdr-range-field">
+            <mat-date-range-input [rangePicker]="weekRangePicker">
+              <input matStartDate placeholder="Start date" [(ngModel)]="weekStartDate"
+                (dateChange)="onWeekStartChange()" />
+              <input matEndDate placeholder="End (auto)" [(ngModel)]="weekEndDate" [readonly]="true" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="weekRangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #weekRangePicker></mat-date-range-picker>
+          </mat-form-field>
+          <span class="week-range-badge" *ngIf="weekStartDate">
+            {{ weekRangeLabel }} · 7 days
+          </span>
+        </div>
+      </ng-container>
+
+      <!-- MONTH date controls -->
+      <ng-container *ngIf="activeTabValue === 'month'">
+        <div class="header-date-group">
+          <span class="header-date-label">Month &amp; Year</span>
+          <div class="header-date-row">
+            <mat-form-field appearance="outline" class="hdr-select-field">
+              <mat-select [(ngModel)]="monthMonth" placeholder="Month">
+                <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="hdr-select-field hdr-year">
+              <mat-select [(ngModel)]="monthYear" placeholder="Year">
+                <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- YEAR date control -->
+      <ng-container *ngIf="activeTabValue === 'year'">
+        <div class="header-date-group">
+          <span class="header-date-label">Year</span>
+          <mat-form-field appearance="outline" class="hdr-select-field hdr-year">
+            <mat-select [(ngModel)]="yearYear" placeholder="Year">
+              <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <!-- Selected chips -->
+  <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
+    <span *ngFor="let fn of selectedFleets; let i = index" style="gap: 0.5rem" class="fleet-chip"
+      [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
+      <i class="pi pi-car"></i> {{ fn }}
+      <!-- <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span> -->
+    </span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FILTER BAR — Tabs | Fleet selector | Run button
+       ══════════════════════════════════════════════════════════ -->
+  <p-card styleClass="stat-card card va-filter-card">
+    <div class="filter-bar">
+
+      <!-- LEFT: Tabs -->
+      <p-tabs [value]="activeTabValue" (valueChange)="onTabChange($event)" class="filter-tabs">
+        <p-tablist>
+          <p-tab value="day"><i class="pi pi-sun"></i> Day</p-tab>
+          <p-tab value="week"><i class="pi pi-calendar"></i> Week</p-tab>
+          <p-tab value="month"><i class="pi pi-chart-bar"></i> Month</p-tab>
+          <p-tab value="year"><i class="pi pi-chart-line"></i> Year</p-tab>
+        </p-tablist>
+      </p-tabs>
+
+      <!-- DIVIDER -->
+      <div class="filter-divider"></div>
+
+      <!-- RIGHT: Fleet selector + Run button -->
+      <div class="filter-right">
+
+        <!-- Fleet multi-select -->
+        <div class="fleet-select-wrapper">
+          <p-multiSelect [options]="fleetOptions" [(ngModel)]="selectedFleets" optionLabel="label" optionValue="value"
+            placeholder="Select fleets..." [filter]="true" [autofocusFilter]="true" filterPlaceholder="Search..."
+            [showClear]="true" (onChange)="onFleetSelectionChange()" styleClass="fleet-multiselect" appendTo="body">
+            <ng-template pTemplate="item" let-opt>
+              <div class="fleet-option-item">
+                <i class="pi pi-car fleet-option-icon"></i>
+                <span>{{ opt.label }}</span>
+              </div>
+            </ng-template>
+          </p-multiSelect>
+
+          <!-- Selected chips
+          <div class="fleet-chips" *ngIf="selectedFleets.length > 0">
+            <span *ngFor="let fn of selectedFleets; let i = index" class="fleet-chip"
+              [style.--chip-color]="['#667eea','#f5576c','#4facfe','#43e97b','#fa709a'][i % 5]">
+              <i class="pi pi-car"></i> {{ fn }}
+              <span class="fleet-count-badge">{{ selectedFleets.length }}/{{ MAX_FLEETS }}</span>
+            </span>
+          </div> -->
+        </div>
+
+        <!-- Run Analysis -->
+        <button pButton icon="pi pi-play" label="Run Analysis" class="run-btn"
+          [disabled]="!canAnalyse || analysisLoading" [loading]="analysisLoading" (click)="runAnalysis()">
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Invisible tab panels (no content — results appear in the results card) -->
+    <p-tabs [value]="activeTabValue" style="display:none">
+      <p-tabpanels>
+        <p-tabpanel value="day"></p-tabpanel>
+        <p-tabpanel value="week"></p-tabpanel>
+        <p-tabpanel value="month"></p-tabpanel>
+        <p-tabpanel value="year"></p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </p-card>
+
+  <!-- ══════════════════════════════════════════════════════════
+       RESULTS
+       ══════════════════════════════════════════════════════════ -->
+  <p-card styleClass="stat-card card" *ngIf="analysisLoading || analysisResult">
+    <div class="results-header" *ngIf="!analysisLoading && analysisResult">
+      <div class="results-header-left">
+        <span class="results-period-badge">{{ activeTabValue | titlecase }}</span>
+        <h3>Analysis Results — {{ analysisResult.period }}</h3>
+      </div>
+    </div>
+    <app-vehicle-analysis-panel [data]="analysisResult" [loading]="analysisLoading" />
+  </p-card>
+
+  <!-- ══════════════════════════════════════════════════════════
+       EMPTY STATE
+       ══════════════════════════════════════════════════════════ -->
+  <div class="cta-empty" *ngIf="!analysisLoading && !analysisResult">
+    <div class="cta-icon-wrap">
+      <i class="pi pi-chart-line"></i>
+    </div>
+    <h3>Ready to Analyse</h3>
+    <p>Select one or more fleet numbers, choose a time period, then click Run Analysis.</p>
+    <div class="cta-steps">
+      <span class="cta-step"><i class="pi pi-car"></i> Select fleets</span>
+      <i class="pi pi-arrow-right cta-arrow"></i>
+      <span class="cta-step"><i class="pi pi-calendar"></i> Choose period</span>
+      <i class="pi pi-arrow-right cta-arrow"></i>
+      <span class="cta-step"><i class="pi pi-play"></i> Run Analysis</span>
+    </div>
+  </div>
+
+</div>
