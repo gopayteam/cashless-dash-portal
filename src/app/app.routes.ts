@@ -95,6 +95,7 @@ import { SeatReservationsComponent } from './pages/booking/seat-reservation/seat
 import { ConflictDashboardComponent } from './pages/booking/trip-conflicts/trip-conflicts';
 import { AI_ROUTES } from './pages/ai-pages/ai.routes';
 import { VehicleAnalysisComponent } from './pages/vehicle-analysis/vehicle-analysis';
+import { PaymentRequestComponent } from './pages/payments/payment-request/payment-request';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -745,6 +746,18 @@ export const routes: Routes = [
       {
         path: 'vehicle-analysis',
         component: VehicleAnalysisComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'payment-request',
+        component: PaymentRequestComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'payment-request:fleetNumber',
+        component: PaymentRequestComponent,
         canActivate: [AuthGuard],
       },
 

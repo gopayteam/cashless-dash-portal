@@ -1,0 +1,256 @@
+<!-- payment-request.component.html -->
+<p-toast position="top-right" />
+
+<div class="pr-page" [ngClass]="entityConfig.cssClass">
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       LEFT — Brand panel
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="pr-brand">
+    <div class="pr-brand__inner">
+      <!-- Logo -->
+      <div class="pr-brand__logo-wrap">
+        <img src="gopay_clear.png" alt="GoPay Logo" class="pr-brand__logo" #logoImg
+          (error)="logoImg.style.display='none'; logoFallback.style.display='flex'" />
+        <!-- Fallback inline SVG wordmark -->
+        <div class="pr-brand__logo-fallback" #logoFallback style="display:none;">
+          <svg width="150" height="56" viewBox="0 0 150 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="6" width="72" height="44" rx="22" fill="#d42b2b" />
+            <text x="38" y="33" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="20"
+              fill="white">GO</text>
+            <rect x="60" y="6" width="88" height="44" rx="22" fill="rgba(255,255,255,0.15)" />
+            <text x="104" y="33" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="20"
+              fill="white">PAY</text>
+            <polygon points="140,28 150,21 150,35" fill="#f5821f" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Entity name -->
+      <div class="pr-brand__entity-name">{{ entityConfig.name }}</div>
+
+      <div class="pr-brand__divider"></div>
+
+      <p class="pr-brand__tagline">{{ entityConfig.tagline }}</p>
+
+      <!-- Security note -->
+      <div class="pr-brand__secure">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        SSL Secured · Powered by M-Pesa
+      </div>
+    </div>
+
+    <!-- Decorative circles -->
+    <span class="pr-brand__deco pr-brand__deco--1"></span>
+    <span class="pr-brand__deco pr-brand__deco--2"></span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       RIGHT — Form panel
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="pr-form-panel">
+
+    <!-- Entity badge (top-right corner) -->
+    <div class="pr-entity-badge">
+      <span class="pr-entity-badge__dot"></span>
+      {{ entityConfig.name }}
+    </div>
+
+    <div class="pr-card">
+
+      <!-- ── FORM VIEW ─────────────────────────────────────────── -->
+      <ng-container *ngIf="viewState === 'form'">
+        <h1 class="pr-card__heading">Pay for your ride</h1>
+        <p class="pr-card__subheading">
+          Enter your details below to receive an M-Pesa STK push
+        </p>
+
+        <!-- Phone number -->
+        <div class="pr-field" [class.pr-field--error]="touchedPhone && phoneErrorMsg">
+          <label class="pr-field__label" for="phoneNumber">M-Pesa Phone Number</label>
+          <div class="pr-field__input-wrap">
+            <span class="pr-field__icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" />
+              </svg>
+            </span>
+            <input id="phoneNumber" class="pr-field__input" type="tel" inputmode="numeric"
+              placeholder="e.g. 0712 345 678" maxlength="12" autocomplete="tel" [(ngModel)]="phoneNumber"
+              (blur)="touchedPhone = true" />
+          </div>
+          <span class="pr-field__error" *ngIf="touchedPhone && phoneErrorMsg">
+            {{ phoneErrorMsg }}
+          </span>
+        </div>
+
+        <!-- Fleet — LOCKED (QR code flow) -->
+        <div class="pr-field" *ngIf="fleetLockedFromQr">
+          <label class="pr-field__label">Fleet Vehicle</label>
+          <div class="pr-fleet-locked">
+            <span class="pr-fleet-locked__icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+            </span>
+            <span class="pr-fleet-locked__number">{{ lockedFleetNumber }}</span>
+            <span class="pr-fleet-locked__badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Pre-filled via QR
+            </span>
+          </div>
+        </div>
+
+        <!-- Fleet — DROPDOWN (manual flow) -->
+        <div class="pr-field" *ngIf="!fleetLockedFromQr" [class.pr-field--error]="touchedFleet && fleetErrorMsg">
+          <label class="pr-field__label" for="vehicleDropdown">Fleet Vehicle</label>
+
+          <!-- Loading skeleton -->
+          <div class="pr-fleet-loading" *ngIf="vehiclesLoading">
+            <p-progressSpinner styleClass="pr-fleet-spinner" strokeWidth="4" />
+            <span>Loading vehicles…</span>
+          </div>
+
+          <!-- Error fallback -->
+          <div class="pr-fleet-error" *ngIf="!vehiclesLoading && vehiclesLoadError">
+            <span>Could not load vehicles.</span>
+            <button class="pr-fleet-retry" (click)="retryLoadVehicles()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10" />
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+              </svg>
+              Retry
+            </button>
+          </div>
+
+          <!-- Dropdown -->
+          <p-select *ngIf="!vehiclesLoading && !vehiclesLoadError" inputId="vehicleDropdown" [options]="vehicleOptions"
+            [(ngModel)]="selectedVehicle" optionLabel="label" optionValue="value" placeholder="Select a vehicle…"
+            [filter]="true" filterBy="label" filterPlaceholder="Search fleet or registration…" styleClass="pr-dropdown"
+            [showClear]="true" (onChange)="touchedFleet = true">
+          </p-select>
+          <span class="pr-field__error" *ngIf="touchedFleet && fleetErrorMsg">
+            {{ fleetErrorMsg }}
+          </span>
+        </div>
+
+        <!-- Trip ID + Amount -->
+        <div class="pr-field-row">
+
+          <div class="pr-field" [class.pr-field--error]="touchedTrip && tripErrorMsg">
+            <label class="pr-field__label" for="tripId">Trip ID</label>
+            <div class="pr-field__input-wrap">
+              <span class="pr-field__icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+              </span>
+              <input id="tripId" class="pr-field__input" type="number" inputmode="numeric" placeholder="e.g. 1" min="1"
+                [(ngModel)]="tripId" (blur)="touchedTrip = true" />
+            </div>
+            <span class="pr-field__error" *ngIf="touchedTrip && tripErrorMsg">
+              {{ tripErrorMsg }}
+            </span>
+          </div>
+
+          <div class="pr-field" [class.pr-field--error]="touchedAmt && amountErrorMsg">
+            <label class="pr-field__label" for="amount">Amount (KES)</label>
+            <div class="pr-field__input-wrap">
+              <span class="pr-field__prefix">KES</span>
+              <input id="amount" class="pr-field__input pr-field__input--prefixed" type="number" inputmode="numeric"
+                placeholder="0" min="1" [(ngModel)]="amount" (blur)="touchedAmt = true" />
+            </div>
+            <span class="pr-field__error" *ngIf="touchedAmt && amountErrorMsg">
+              {{ amountErrorMsg }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Booking type toggle -->
+        <div class="pr-field">
+          <label class="pr-field__label">Booking Type</label>
+          <div class="pr-toggle-group">
+            <button type="button" class="pr-toggle-btn" [class.pr-toggle-btn--active]="bookingType === 'NOW'"
+              (click)="setBookingType('NOW')">
+              Now
+            </button>
+            <button type="button" class="pr-toggle-btn" [disabled]="!scheduleEnabled"
+              [class.pr-toggle-btn--active]="bookingType === 'SCHEDULED'"
+              (click)="scheduleEnabled && setBookingType('SCHEDULED')">
+              Scheduled
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="pr-submit-btn" [class.pr-submit-btn--loading]="loading()" [disabled]="loading()"
+          (click)="submitPayment()">
+          <span *ngIf="!loading()" class="pr-submit-btn__text">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            Request Payment
+          </span>
+          <span *ngIf="loading()" class="pr-submit-btn__text">
+            <span class="pr-btn-spinner"></span>
+            Processing…
+          </span>
+        </button>
+
+        <!-- M-Pesa note -->
+        <div class="pr-mpesa-note">
+          <span class="pr-mpesa-note__logo">M</span>
+          You will receive an M-Pesa prompt on your phone. Enter your PIN to confirm.
+        </div>
+      </ng-container>
+
+      <!-- ── SUCCESS VIEW ──────────────────────────────────────── -->
+      <div class="pr-status" *ngIf="viewState === 'success'">
+        <div class="pr-status__icon pr-status__icon--success">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <h2 class="pr-status__title">Check your phone!</h2>
+        <p class="pr-status__message">{{ successMessage }}</p>
+        <button class="pr-retry-btn" (click)="resetForm()">Make Another Payment</button>
+      </div>
+
+      <!-- ── ERROR VIEW ────────────────────────────────────────── -->
+      <div class="pr-status" *ngIf="viewState === 'error'">
+        <div class="pr-status__icon pr-status__icon--error">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h2 class="pr-status__title">Payment Failed</h2>
+        <p class="pr-status__message">{{ errorMessage }}</p>
+        <button class="pr-retry-btn" (click)="resetForm()">Try Again</button>
+      </div>
+
+    </div><!-- /pr-card -->
+  </div><!-- /pr-form-panel -->
+
+</div><!-- /pr-page -->

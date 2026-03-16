@@ -1,0 +1,41 @@
+/* month-analysis-tab.component.css */
+.tab-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 0 0.5rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.month-year-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.month-field { min-width: 160px; }
+.year-field  { min-width: 120px; }
+
+.run-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  color: white !important;
+  padding: 0.65rem 1.5rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  height: 46px;
+  white-space: nowrap;
+}
+
+.run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+  .tab-controls { flex-direction: column; align-items: flex-start; }
+  .month-year-row { flex-direction: column; }
+  .run-btn { width: 100%; }
+}

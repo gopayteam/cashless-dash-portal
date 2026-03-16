@@ -107,6 +107,8 @@ export const API_ENDPOINTS = {
   // Body: { tripId, entityId, username? (optional), reservationStatus? (optional) }
   SEAT_RESERVATIONS: '/api/booking/trip/seat/reservations',
 
+  PAYMENT_REQUEST: '/api/payment/prompt/stk',
+
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,
 };

@@ -1,0 +1,16 @@
+<!-- day-analysis-tab.component.html -->
+<div class="tab-controls">
+  <div class="control-group">
+    <label class="filter-label">Select Date</label>
+    <mat-form-field appearance="outline" class="date-field">
+      <mat-label>Date</mat-label>
+      <input matInput [matDatepicker]="dayPicker" [(ngModel)]="date" />
+      <mat-datepicker-toggle matIconSuffix [for]="dayPicker" />
+      <mat-datepicker #dayPicker />
+    </mat-form-field>
+  </div>
+  <button pButton icon="pi pi-play" label="Run Day Analysis" class="run-btn"
+    [disabled]="!canAnalyse || loading" (click)="run()"></button>
+</div>
+
+<app-vehicle-analysis-panel [data]="result" [loading]="loading" />

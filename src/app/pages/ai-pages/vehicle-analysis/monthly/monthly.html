@@ -1,0 +1,24 @@
+<!-- month-analysis-tab.component.html -->
+<div class="tab-controls">
+  <div class="control-group">
+    <label class="filter-label">Select Month &amp; Year</label>
+    <div class="month-year-row">
+      <mat-form-field appearance="outline" class="month-field">
+        <mat-label>Month</mat-label>
+        <mat-select [(ngModel)]="selectedMonth">
+          <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="year-field">
+        <mat-label>Year</mat-label>
+        <mat-select [(ngModel)]="selectedYear">
+          <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <button pButton icon="pi pi-play" label="Run Month Analysis" class="run-btn"
+    [disabled]="!canAnalyse || loading" (click)="run()"></button>
+</div>
+
+<app-vehicle-analysis-panel [data]="result" [loading]="loading" />

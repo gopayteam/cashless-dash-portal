@@ -1,0 +1,100 @@
+/* week-analysis-tab.component.css */
+.tab-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 0 0.5rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.range-note {
+  font-size: 0.75rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-left: 0.35rem;
+  background: #667eea18;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.date-range-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.date-field {
+  min-width: 180px;
+}
+
+.end-locked input {
+  color: #888 !important;
+  cursor: default;
+}
+
+.range-arrow {
+  color: #667eea;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.week-range-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.83rem;
+  color: #667eea;
+  font-weight: 700;
+  background: #667eea12;
+  border: 1px solid #667eea33;
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+}
+
+.day-count {
+  color: #999;
+  font-weight: 400;
+}
+
+.run-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  color: white !important;
+  padding: 0.65rem 1.5rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  height: 46px;
+  white-space: nowrap;
+}
+
+.run-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .tab-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-range-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .range-arrow {
+    transform: rotate(90deg);
+  }
+
+  .run-btn {
+    width: 100%;
+  }
+}
