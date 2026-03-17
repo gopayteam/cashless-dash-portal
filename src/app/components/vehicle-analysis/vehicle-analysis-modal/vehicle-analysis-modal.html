@@ -2,124 +2,115 @@
 
 <p-dialog [(visible)]="visible" [modal]="true" [closable]="true" [dismissableMask]="true" [draggable]="false"
   [resizable]="false" styleClass="va-modal" [style]="{ width: '95vw', maxWidth: '1200px' }" (onHide)="onDialogHide()">
-  <!-- ── Dialog Header ─────────────────── -->
+
   <ng-template pTemplate="header">
     <div class="modal-header">
       <div class="modal-title-row">
-        <div class="vehicle-avatar">
-          <i class="pi pi-car"></i>
-        </div>
+        <div class="vehicle-avatar"><i class="pi pi-car"></i></div>
         <div class="modal-title-info">
           <h2 class="modal-title">Vehicle Analysis</h2>
           <span class="modal-subtitle" *ngIf="vehicle">
-            {{ vehicle.fleetNumber }}
-            <span class="sep">·</span>
-            {{ vehicle.registrationNumber }}
-            <span class="sep">·</span>
-            {{ vehicle.stageName }}
+            {{ vehicle.fleetNumber }} <span class="sep">·</span> {{ vehicle.registrationNumber }}
           </span>
         </div>
       </div>
     </div>
   </ng-template>
 
-  <!-- ── Tab view ──────────────────────── -->
   <div class="modal-body" *ngIf="vehicle">
     <p-tabs [value]="activeTabValue" (valueChange)="onTabChange($event)">
 
-      <!-- ── Tab list ───────────────────── -->
-      <p-tablist>
-        <p-tab value="day"><i class="pi pi-sun"></i> Day</p-tab>
-        <p-tab value="week"><i class="pi pi-calendar"></i> Week</p-tab>
-        <p-tab value="month"><i class="pi pi-chart-bar"></i> Month</p-tab>
-        <p-tab value="year"><i class="pi pi-chart-line"></i> Year</p-tab>
-      </p-tablist>
+      <div class="analysis-control-header">
+        <p-tablist class="grow">
+          <p-tab value="day"><i class="pi pi-sun"></i> Day</p-tab>
+          <p-tab value="week"><i class="pi pi-calendar"></i> Week</p-tab>
+          <p-tab value="month"><i class="pi pi-chart-bar"></i> Month</p-tab>
+          <p-tab value="year"><i class="pi pi-chart-line"></i> Year</p-tab>
+        </p-tablist>
 
-      <!-- ── Tab panels ─────────────────── -->
-      <p-tabpanels>
+        <div class="header-actions">
 
-        <!-- ── DAY ────────────────────────── -->
-        <p-tabpanel value="day">
-          <div class="tab-date-bar">
-            <mat-form-field appearance="outline" class="date-field">
-              <mat-label>Date</mat-label>
-              <input matInput [matDatepicker]="dp" [(ngModel)]="dayDate" />
-              <mat-datepicker-toggle matIconSuffix [for]="dp" />
-              <mat-datepicker #dp />
-            </mat-form-field>
-            <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
-              (click)="runAnalysis('day')"></button>
+          <div class="va-header-right flex align-items-center gap-3">
+
+            <ng-container *ngIf="activeTabValue === 'day'">
+              <div class="filter-item-gradient filter-item">
+                <label class="filter-label">Date</label>
+                <mat-form-field appearance="outline" class="date-range-field">
+                  <input matInput [matDatepicker]="dayPicker" [(ngModel)]="dayDate" placeholder="Pick a date" />
+                  <mat-datepicker-toggle matSuffix [for]="dayPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #dayPicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTabValue === 'week'">
+              <div class="filter-item-gradient filter-item">
+                <label class="filter-label">Week Range</label>
+                <mat-form-field appearance="outline" class="date-range-field">
+                  <mat-date-range-input [rangePicker]="weekRangePicker">
+                    <input matStartDate placeholder="Start date" [(ngModel)]="weekStartDate"
+                      (dateChange)="onWeekStartChange()" />
+                    <input matEndDate placeholder="End date" [(ngModel)]="weekEndDate" [readonly]="true" />
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle matSuffix [for]="weekRangePicker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #weekRangePicker></mat-date-range-picker>
+                </mat-form-field>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTabValue === 'month'">
+              <div class="filter-item-gradient filter-item">
+                <label class="filter-label">Month &amp; Year</label>
+                <div class="header-date-row">
+                  <mat-form-field appearance="outline" class="date-select-field">
+                    <mat-select [(ngModel)]="monthMonth" placeholder="Month">
+                      <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="date-select-field">
+                    <mat-select [(ngModel)]="monthYear" placeholder="Year">
+                      <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTabValue === 'year'">
+              <div class="filter-item-gradient filter-item">
+                <label class="filter-label">Year</label>
+                <mat-form-field appearance="outline" class="date-select-field">
+                  <mat-select [(ngModel)]="yearYear" placeholder="Select year">
+                    <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </ng-container>
           </div>
+        </div>
+      </div>
+
+      <p-tabpanels>
+        <p-tabpanel value="day">
           <app-vehicle-analysis-panel [data]="results['day']" [loading]="loading && activeTabValue === 'day'" />
         </p-tabpanel>
-
-        <!-- ── WEEK ───────────────────────── -->
         <p-tabpanel value="week">
-          <div class="tab-date-bar">
-            <div class="week-field-group">
-              <mat-form-field appearance="outline" class="date-field">
-                <mat-label>Any day in the week</mat-label>
-                <input matInput [matDatepicker]="wp" [(ngModel)]="weekDate" />
-                <mat-datepicker-toggle matIconSuffix [for]="wp" />
-                <mat-datepicker #wp />
-              </mat-form-field>
-              <span class="week-range-badge" *ngIf="weekDate">
-                <i class="pi pi-arrow-right"></i>
-                {{ weekRangeLabel }}
-              </span>
-            </div>
-            <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
-              (click)="runAnalysis('week')"></button>
-          </div>
           <app-vehicle-analysis-panel [data]="results['week']" [loading]="loading && activeTabValue === 'week'" />
         </p-tabpanel>
-
-        <!-- ── MONTH ──────────────────────── -->
         <p-tabpanel value="month">
-          <div class="tab-date-bar">
-            <mat-form-field appearance="outline" class="small-field">
-              <mat-label>Month</mat-label>
-              <mat-select [(ngModel)]="monthMonth">
-                <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="small-field">
-              <mat-label>Year</mat-label>
-              <mat-select [(ngModel)]="monthYear">
-                <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
-              (click)="runAnalysis('month')"></button>
-          </div>
           <app-vehicle-analysis-panel [data]="results['month']" [loading]="loading && activeTabValue === 'month'" />
         </p-tabpanel>
-
-        <!-- ── YEAR ───────────────────────── -->
         <p-tabpanel value="year">
-          <div class="filter-item-gradient filter-item">
-            <label class="filter-label">Year</label>
-            <div class="tab-date-bar">
-              <mat-form-field appearance="outline" class="small-field">
-                <mat-label>Year</mat-label>
-                <mat-select [(ngModel)]="yearYear">
-                  <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-              <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
-                (click)="runAnalysis('year')"></button>
-            </div>
-          </div>
           <app-vehicle-analysis-panel [data]="results['year']" [loading]="loading && activeTabValue === 'year'" />
         </p-tabpanel>
-
       </p-tabpanels>
     </p-tabs>
   </div>
 
-  <!-- ── Footer ────────────────────────── -->
   <ng-template pTemplate="footer">
-    <button pButton label="Close" icon="pi pi-times" class="p-button-text" iconPos="right" style="gap: 0.5rem"
-      (click)="close()"></button>
+    <button pButton icon="pi pi-bolt" label="Analyse" class="modal-run-btn" [disabled]="loading"
+      (click)="runAnalysis(activeTabValue)">
+    </button>
   </ng-template>
 </p-dialog>

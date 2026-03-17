@@ -51,7 +51,7 @@ const MONTHS: MonthOption[] = [
     VehicleAnalysisPanelComponent,
   ],
   templateUrl: './vehicle-analysis-modal.html',
-  styleUrl: './vehicle-analysis-modal.css',
+  styleUrls: ['./vehicle-analysis-modal.css', '../../../../styles/global/_toast.css'],
 })
 export class VehicleAnalysisModalComponent implements OnChanges, OnDestroy {
   /** The vehicle to analyse. Setting this triggers a reset. */
@@ -70,6 +70,11 @@ export class VehicleAnalysisModalComponent implements OnChanges, OnDestroy {
   // Per-tab date inputs
   dayDate: Date = new Date();
   weekDate: Date = new Date();
+
+  // Default: End is today, Start is 6 days ago (Total 7 days)
+  weekEndDate: Date = new Date();
+  weekStartDate: Date = this._addDays(new Date(), -6);
+
   monthYear: number = new Date().getFullYear();
   monthMonth: number = new Date().getMonth() + 1;
   yearYear: number = new Date().getFullYear();
@@ -115,6 +120,18 @@ export class VehicleAnalysisModalComponent implements OnChanges, OnDestroy {
 
   onTabChange(value: any): void {
     this.activeTabValue = value as PeriodType;
+  }
+
+  onWeekStartChange(): void {
+    if (this.weekStartDate) {
+      // When user picks a start date, the end date is always +6 days
+      this.weekEndDate = this._addDays(new Date(this.weekStartDate), 6);
+
+      // Also update weekDate if your service uses it as the anchor
+      this.weekDate = new Date(this.weekStartDate);
+
+      this.cdr.markForCheck();
+    }
   }
 
   // ─────────────────────────────────────────────
@@ -190,10 +207,8 @@ export class VehicleAnalysisModalComponent implements OnChanges, OnDestroy {
   // ─────────────────────────────────────────────
 
   get weekRangeLabel(): string {
-    const start = new Date(this.analysisService.getWeekStart(this.weekDate));
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    return `${this._fmt(start)} → ${this._fmt(end)}`;
+    if (!this.weekStartDate || !this.weekEndDate) return '';
+    return `${this._fmt(this.weekStartDate)} → ${this._fmt(this.weekEndDate)}`;
   }
 
   private _fmt(d: Date): string {
@@ -203,5 +218,28 @@ export class VehicleAnalysisModalComponent implements OnChanges, OnDestroy {
   private _buildYears(): YearOption[] {
     const now = new Date().getFullYear();
     return Array.from({ length: 5 }, (_, i) => ({ label: String(now - i), value: now - i }));
+  }
+
+  private _addDays(d: Date, days: number): Date {
+    const result = new Date(d);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+  private _currentWeekMonday(): Date {
+    const today = new Date();
+    const day = today.getDay(); // 0 = Sun
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    return monday;
+  }
+
+  private _buildYearOptions(): YearOption[] {
+    const current = new Date().getFullYear();
+    return Array.from({ length: 5 }, (_, i) => ({
+      label: String(current - i),
+      value: current - i,
+    }));
   }
 }
