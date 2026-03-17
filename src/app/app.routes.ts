@@ -115,6 +115,15 @@ export const routes: Routes = [
     ]
   },
 
+  {
+    path: 'fare',
+    children: [
+      { path: 'payment-request', component: PaymentRequestComponent },
+      { path: 'payment', component: PaymentRequestComponent },
+      { path: '', redirectTo: 'payment-request', pathMatch: 'full' }
+    ]
+  },
+
   /* =======================
      PROTECTED (AUTH REQUIRED)
   ======================= */
@@ -750,12 +759,12 @@ export const routes: Routes = [
       },
 
       {
-        path: 'payment-request',
+        path: 'user-payment-request',
         component: PaymentRequestComponent,
       },
 
       {
-        path: 'payment-request:fleetNumber',
+        path: 'user-payment-request:fleetNumber',
         component: PaymentRequestComponent,
       },
 

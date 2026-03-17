@@ -131,7 +131,7 @@ export class AllVehiclesComponent implements OnInit {
     this.selectedVehicleForQr = vehicle;
 
     // Use the environment variable here
-    const baseUrl = environment.dashboardUrl;
+    const baseUrl = environment.farePaymentUrl;
 
     this.qrCodeData = `${baseUrl}?fleetNumber=${vehicle.fleetNumber}&entityId=${vehicle.entityId}`;
 
