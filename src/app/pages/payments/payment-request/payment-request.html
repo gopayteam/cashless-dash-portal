@@ -91,7 +91,15 @@
 
         <!-- Fleet — LOCKED (QR code flow) -->
         <div class="pr-field" *ngIf="fleetLockedFromQr">
-          <label class="pr-field__label">Fleet Vehicle</label>
+          <div style="display: flex; justify-content: space-between;">
+            <label class="pr-field__label">Fleet Vehicle</label>
+            <span *ngIf="selectedVehicle"
+              class="flex align-items-center gap-1 px-2 py-1 border-round bg-green-100 text-green-700 text-xs font-semibold"
+              pTooltip="This vehicle is active and verified in our system" tooltipPosition="top">
+              <i class="pi pi-check-circle"></i>
+              VERIFIED
+            </span>
+          </div>
           <div class="pr-fleet-locked">
             <span class="pr-fleet-locked__icon">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -103,6 +111,7 @@
               </svg>
             </span>
             <span class="pr-fleet-locked__number">{{ lockedFleetNumber }}</span>
+
             <span class="pr-fleet-locked__badge">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                 stroke-linecap="round" stroke-linejoin="round">

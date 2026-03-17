@@ -752,13 +752,11 @@ export const routes: Routes = [
       {
         path: 'payment-request',
         component: PaymentRequestComponent,
-        canActivate: [AuthGuard],
       },
 
       {
         path: 'payment-request:fleetNumber',
         component: PaymentRequestComponent,
-        canActivate: [AuthGuard],
       },
 
       /* Default protected redirect */

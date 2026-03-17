@@ -25,6 +25,10 @@ import { ToastModule } from 'primeng/toast';
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 import { VehicleAnalysisModalComponent } from '../../../components/vehicle-analysis/vehicle-analysis-modal/vehicle-analysis-modal';
 
+import { QRCodeComponent } from 'angularx-qrcode';
+import { SafeUrl } from '@angular/platform-browser';
+import { environment } from '../../../../environments/environment';
+
 interface StatusOption {
   label: string;
   value: string;
@@ -54,7 +58,8 @@ interface VehicleFeesApiResponse {
     ActionButtonComponent,
     MessageModule,
     ToastModule,
-    VehicleAnalysisModalComponent
+    VehicleAnalysisModalComponent,
+    QRCodeComponent,
   ],
   templateUrl: './all.html',
   styleUrls: ['./all.css'],
@@ -101,6 +106,7 @@ export class AllVehiclesComponent implements OnInit {
 
   displayAnalysisModal = false;
   selectedVehicleForAnalysis: Vehicle | null = null;
+  window: any;
 
 
   // Add this method:
@@ -112,6 +118,35 @@ export class AllVehiclesComponent implements OnInit {
 
   closeAnalysisModal(): void {
     this.displayAnalysisModal = false;
+  }
+
+  // Add these new state variables
+  displayQrDialog: boolean = false;
+  qrCodeData: string = '';
+  selectedVehicleForQr: Vehicle | null = null;
+
+  // Method to open QR Dialog and build the URL
+  openQrModal(vehicle: Vehicle, event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.selectedVehicleForQr = vehicle;
+
+    // Use the environment variable here
+    const baseUrl = environment.dashboardUrl;
+
+    this.qrCodeData = `${baseUrl}?fleetNumber=${vehicle.fleetNumber}&entityId=${vehicle.entityId}`;
+
+    this.displayQrDialog = true;
+  }
+
+  // Method to download the QR code as an image for printing
+  downloadQrCode() {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `QR_${this.selectedVehicleForQr?.fleetNumber}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0); // High quality
+      link.click();
+    }
   }
 
   constructor(
@@ -141,6 +176,8 @@ export class AllVehiclesComponent implements OnInit {
     }
 
     this.loadVehicles();
+
+
   }
 
   loadVehicles($event?: any): void {

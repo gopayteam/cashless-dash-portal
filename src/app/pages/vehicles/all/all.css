@@ -662,3 +662,17 @@
     text-align: center;
   }
 }
+
+.qr-wrapper {
+  background: white;
+  display: inline-block;
+  border: 1px solid #eee;
+}
+
+.qr-dialog .p-dialog-content {
+  display: flex;
+  background: white;
+  background-color: white;
+  flex-direction: column;
+  align-items: center;
+}

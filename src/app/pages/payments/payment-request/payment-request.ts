@@ -101,7 +101,7 @@ export type ViewState = 'form' | 'success' | 'error';
     ProgressSpinnerModule,
   ],
   templateUrl: './payment-request.html',
-  styleUrls: ['./payment-request.css'],
+  styleUrls: ['./payment-request.css', '../../../../styles/global/_toast.css'],
   providers: [MessageService],
 })
 export class PaymentRequestComponent implements OnInit {
@@ -126,6 +126,13 @@ export class PaymentRequestComponent implements OnInit {
       primaryColor: '#1a3a6b', // '#b91c1c',
       secondaryColor: '#d42b2b', //'#f59e0b',
       cssClass: 'entity-bungoma-line',
+    },
+    UNKNOWN: {
+      name: 'Gopay Client',
+      tagline: 'Connecting clients · Reliable',
+      primaryColor: '#1a3a6b', // '#b91c1c',
+      secondaryColor: '#d42b2b', //'#f59e0b',
+      cssClass: 'entity-super-metro',
     },
   };
 
@@ -179,6 +186,23 @@ export class PaymentRequestComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) { }
 
+  sendMessage(phone: string, amount: string, fleet: string): void {
+    this.dataService.post(
+      '/api/v1/messaging/payment-request',
+      {
+        phoneNumber: phone,
+        amount: this.amount,
+        fleetNumber: fleet
+      },
+      'sms',
+      true,
+      true,
+    ).subscribe({
+      next: () => console.log('SMS sent'),
+      error: (err) => console.error('SMS failed', err)
+    });
+  }
+
   // ── Lifecycle ─────────────────────────────────────────────────────
   ngOnInit(): void {
 
@@ -186,8 +210,9 @@ export class PaymentRequestComponent implements OnInit {
     if (user) {
       this.entityId = user.entityId
     } else {
-      this.router.navigate(['/login']);
+      // this.router.navigate(['/login']);
       console.log('No user logged in');
+      this.entityId = 'GS000002'
     }
 
     // 1. Resolve entityId from route param → query param → default
@@ -199,7 +224,7 @@ export class PaymentRequestComponent implements OnInit {
 
     if (this.entityId)
       this.entityConfig =
-        this.ENTITY_CONFIGS[this.entityId] ?? this.ENTITY_CONFIGS['GS000006'];
+        this.ENTITY_CONFIGS[this.entityId] ?? this.ENTITY_CONFIGS['UNKNOWN'];
 
     this.applyEntityTheme();
 
@@ -223,9 +248,10 @@ export class PaymentRequestComponent implements OnInit {
     }
 
     // 4. Only fetch vehicles list when fleet is NOT locked via QR
-    if (!this.fleetLockedFromQr) {
-      this.fetchVehicles(false);
-    }
+    // if (!this.fleetLockedFromQr) {
+    //   this.fetchVehicles(false);
+    // }
+    this.fetchVehicles(false);
   }
 
   // ── Apply entity CSS class + CSS variables ────────────────────────
@@ -263,6 +289,30 @@ export class PaymentRequestComponent implements OnInit {
         next: (response) => {
           // Only show ACTIVE vehicles
           this.vehicles = response.data.filter(v => v.status === 'ACTIVE');
+
+          // --- VERIFICATION LOGIC START ---
+          if (this.fleetLockedFromQr) {
+            const validVehicle = this.vehicles.find(
+              v => v.fleetNumber.toUpperCase() === this.lockedFleetNumber
+            );
+
+            if (!validVehicle) {
+              // Fleet number from QR doesn't exist or isn't ACTIVE
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Invalid Vehicle',
+                detail: `Vehicle ${this.lockedFleetNumber} is not recognized or is inactive.`,
+                sticky: true
+              });
+              // Optional: unlock the fleet so they can pick a correct one manually
+              this.fleetLockedFromQr = false;
+            } else {
+              // Found it! Set it as the selected vehicle to get full details (like registration)
+              this.selectedVehicle = validVehicle;
+            }
+          }
+          // --- VERIFICATION LOGIC END ---
+
           this.vehicleOptions = this.vehicles.map(v => ({
             label: `${v.fleetNumber}  ·  ${v.registrationNumber}  (${v.stageName})`,
             value: v,
@@ -383,6 +433,7 @@ export class PaymentRequestComponent implements OnInit {
             `An M-Pesa prompt has been sent to ${phone}.` +
             `Enter your PIN to complete the KES ${Number(this.amount).toLocaleString()} payment.`;
           this.viewState = 'success';
+          this.sendMessage(phone, String(this.amount), fleet)
           this.cdr.detectChanges();
           this.loadingStore.stop();
         },

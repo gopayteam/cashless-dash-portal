@@ -97,15 +97,18 @@
 
         <!-- ── YEAR ───────────────────────── -->
         <p-tabpanel value="year">
-          <div class="tab-date-bar">
-            <mat-form-field appearance="outline" class="small-field">
-              <mat-label>Year</mat-label>
-              <mat-select [(ngModel)]="yearYear">
-                <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
-              (click)="runAnalysis('year')"></button>
+          <div class="filter-item-gradient filter-item">
+            <label class="filter-label">Year</label>
+            <div class="tab-date-bar">
+              <mat-form-field appearance="outline" class="small-field">
+                <mat-label>Year</mat-label>
+                <mat-select [(ngModel)]="yearYear">
+                  <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button pButton icon="pi pi-play" label="Analyse" class="modal-run-btn" [disabled]="loading"
+                (click)="runAnalysis('year')"></button>
+            </div>
           </div>
           <app-vehicle-analysis-panel [data]="results['year']" [loading]="loading && activeTabValue === 'year'" />
         </p-tabpanel>

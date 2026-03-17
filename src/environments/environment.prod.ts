@@ -3,4 +3,5 @@ export const environment = {
   production: true,
   useMockApi: false,
   apiBaseUrl: 'https://api.gopay.ke',
+  dashboardUrl: 'https://dashboard.gopay.ke/payment-request',
 };

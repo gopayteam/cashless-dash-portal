@@ -6,8 +6,8 @@
 
 /* ── CSS Variable defaults (overridden per entity via JS) ──────── */
 :host {
-  --entity-primary: #1a3a6b;
-  --entity-secondary: #d42b2b;
+  --entity-primary: var(--primary-color);
+  --entity-secondary: var(--secondary-color);
   --bg: #f0f4fb;
   --card-bg: #ffffff;
   --border: #e2e8f4;
