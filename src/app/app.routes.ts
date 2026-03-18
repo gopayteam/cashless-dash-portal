@@ -96,6 +96,7 @@ import { ConflictDashboardComponent } from './pages/booking/trip-conflicts/trip-
 import { AI_ROUTES } from './pages/ai-pages/ai.routes';
 import { VehicleAnalysisComponent } from './pages/vehicle-analysis/vehicle-analysis';
 import { PaymentRequestComponent } from './pages/payments/payment-request/payment-request';
+import { MarshalPerformanceComponent } from './pages/performance/marshall/marshall-performance/marshall-performance';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -761,11 +762,20 @@ export const routes: Routes = [
       {
         path: 'user-payment-request',
         component: PaymentRequestComponent,
+        // canActivate: [AuthGuard],
       },
 
       {
         path: 'user-payment-request:fleetNumber',
         component: PaymentRequestComponent,
+        // canActivate: [AuthGuard],
+      },
+
+      // ##########################################################################
+      {
+        path: 'performance/marshal',
+        component: MarshalPerformanceComponent,
+        canActivate: [AuthGuard],
       },
 
       /* Default protected redirect */

@@ -1,0 +1,233 @@
+<!-- pages/marshal-performance/marshal-performance.component.html -->
+<div class="marshal-container">
+
+  <!-- ================= HEADER ================= -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Marshal Performance</h1>
+      <p class="text-muted">Track and review individual marshal activity and fleet collections.</p>
+    </div>
+
+    <div class="filter-item-gradient filter-item">
+      <label class="filter-label">Select Date Range</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+          <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker (closed)="onDateRangeChange()"></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <!-- Side-by-side when a marshal is selected, full-width otherwise -->
+  <div class="layout-grid" [class.detail-open]="selectedMarshal">
+
+    <!-- ── Marshal List ── -->
+    <p-card styleClass="stat-card card marshal-list-card">
+      <ng-template pTemplate="header">
+        <div class="card-header-row">
+          <span class="card-title">All Marshals</span>
+          <span class="record-count" *ngIf="marshalTotal > 0">{{ marshalTotal }} total</span>
+        </div>
+      </ng-template>
+
+      <!-- Loading skeleton rows -->
+      <div class="skeleton-list" *ngIf="marshalLoading">
+        <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-text">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line narrow"></div>
+          </div>
+          <div class="skeleton-amount"></div>
+        </div>
+      </div>
+
+      <!-- Marshal cards list -->
+      <div class="marshal-list" *ngIf="!marshalLoading">
+        <div
+          *ngFor="let marshal of marshals"
+          class="marshal-row"
+          [class.active]="selectedMarshal?.marshalPhoneNumber === marshal.marshalPhoneNumber"
+          (click)="selectMarshal(marshal)"
+          tabindex="0"
+          (keyup.enter)="selectMarshal(marshal)"
+          [attr.aria-label]="'View details for ' + marshal.marshalName"
+        >
+          <!-- Avatar -->
+          <div class="marshal-avatar" [ngClass]="getPerformanceClass(marshal.amountCollected)">
+            {{ getInitials(marshal.marshalName) }}
+          </div>
+
+          <!-- Info -->
+          <div class="marshal-info">
+            <span class="marshal-name">{{ marshal.marshalName }}</span>
+            <span class="marshal-phone">
+              <i class="pi pi-phone"></i> {{ marshal.marshalPhoneNumber }}
+            </span>
+          </div>
+
+          <!-- Stats -->
+          <div class="marshal-stats">
+            <div class="stat-pill">
+              <i class="pi pi-car"></i>
+              <span>{{ marshal.approvedVehicleCount }}</span>
+            </div>
+            <div class="marshal-amount" [ngClass]="getPerformanceClass(marshal.amountCollected)">
+              Ksh {{ marshal.amountCollected | number:'1.2-2' }}
+            </div>
+          </div>
+
+          <i class="pi pi-chevron-right row-arrow"></i>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" *ngIf="marshals.length === 0">
+          <i class="pi pi-users"></i>
+          <p>No marshals found for the selected period.</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="custom-paginator" *ngIf="marshalTotal > marshalRows && !marshalLoading">
+        <button
+          pButton
+          icon="pi pi-chevron-left"
+          class="p-button-text p-button-sm"
+          [disabled]="marshalFirst === 0"
+          (click)="loadMarshals({ first: marshalFirst - marshalRows, rows: marshalRows })"
+        ></button>
+        <span class="page-info">
+          {{ marshalFirst + 1 }}–{{ minOf(marshalFirst + marshalRows, marshalTotal) }} of {{ marshalTotal }}
+        </span>
+        <button
+          pButton
+          icon="pi pi-chevron-right"
+          class="p-button-text p-button-sm"
+          [disabled]="marshalFirst + marshalRows >= marshalTotal"
+          (click)="loadMarshals({ first: marshalFirst + marshalRows, rows: marshalRows })"
+        ></button>
+      </div>
+    </p-card>
+
+    <!-- ── Detail Panel ── -->
+    <div class="detail-panel" *ngIf="selectedMarshal" [@slideIn]>
+      <p-card styleClass="stat-card card">
+        <ng-template pTemplate="header">
+          <div class="card-header-row">
+            <div class="detail-header-left">
+              <button
+                pButton
+                icon="pi pi-arrow-left"
+                class="p-button-text p-button-sm back-btn"
+                pTooltip="Back to list"
+                (click)="clearSelection()"
+              ></button>
+              <div class="detail-marshal-info">
+                <div class="detail-avatar" [ngClass]="getPerformanceClass(selectedMarshal.amountCollected)">
+                  {{ getInitials(selectedMarshal.marshalName) }}
+                </div>
+                <div>
+                  <span class="detail-marshal-name">{{ selectedMarshal.marshalName }}</span>
+                  <span class="detail-marshal-sub">
+                    <i class="pi pi-phone"></i> {{ selectedMarshal.marshalPhoneNumber }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="detail-summary-badges">
+              <div class="summary-badge vehicles">
+                <i class="pi pi-car"></i>
+                <span>{{ selectedMarshal.approvedVehicleCount }} Vehicles</span>
+              </div>
+              <div class="summary-badge amount">
+                <i class="pi pi-wallet"></i>
+                <span>Ksh {{ selectedMarshal.amountCollected | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+
+        <!-- Detail loading -->
+        <div class="skeleton-list" *ngIf="detailLoading">
+          <div class="skeleton-row" *ngFor="let i of [1,2,3]">
+            <div class="skeleton-avatar small"></div>
+            <div class="skeleton-text">
+              <div class="skeleton-line wide"></div>
+            </div>
+            <div class="skeleton-amount"></div>
+          </div>
+        </div>
+
+        <!-- Detail table -->
+        <p-table
+          *ngIf="!detailLoading"
+          [value]="detailRecords"
+          [lazy]="true"
+          [paginator]="true"
+          [rows]="detailRows"
+          [first]="detailFirst"
+          [totalRecords]="detailTotal"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+          (onLazyLoad)="loadDetail($event)"
+          styleClass="data-table detail-table"
+          [tableStyle]="{ 'min-width': '30rem' }"
+          responsiveLayout="scroll"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>Fleet Number</th>
+              <th>Entity</th>
+              <th class="text-right">Amount Collected</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-record let-rowIndex="rowIndex">
+            <tr>
+              <td class="row-index">{{ detailFirst + rowIndex + 1 }}</td>
+              <td>
+                <span class="vehicle-badge">
+                  <i class="pi pi-car"></i>
+                  {{ record.fleetNumber }}
+                </span>
+              </td>
+              <td>
+                <span class="badge badge-credit">{{ record.entityId }}</span>
+              </td>
+              <td class="amount-cell text-right">
+                Ksh {{ record.amountCollected | number:'1.2-2' }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Empty state inside table -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">
+                <div class="empty-state table-empty">
+                  <i class="pi pi-inbox"></i>
+                  <p>No fleet records for this marshal in the selected period.</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- ── Placeholder when no marshal selected ── -->
+    <div class="detail-placeholder" *ngIf="!selectedMarshal">
+      <div class="placeholder-content">
+        <i class="pi pi-user-edit"></i>
+        <p>Select a marshal from the list to view their detailed fleet performance.</p>
+      </div>
+    </div>
+
+  </div>
+</div>

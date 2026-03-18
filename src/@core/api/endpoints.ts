@@ -109,6 +109,9 @@ export const API_ENDPOINTS = {
 
   PAYMENT_REQUEST: '/api/payment/prompt/stk',
 
+  MARSHAL_PERFORMANCE: '/api/v1/org/approvals/marshal/perfomance',
+  MARSHAL_PERFORMANCE_DETAILS: '/api/v1/org/approvals/marshal/perfomance/detail',
+
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,
 };
