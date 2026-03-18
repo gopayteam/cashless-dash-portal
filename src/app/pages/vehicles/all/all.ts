@@ -27,7 +27,8 @@ import { VehicleAnalysisModalComponent } from '../../../components/vehicle-analy
 
 import { QRCodeComponent } from 'angularx-qrcode';
 import { SafeUrl } from '@angular/platform-browser';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../../../environments/environment.prod';
+// import { environment } from '../../../../environments/environment';
 
 interface StatusOption {
   label: string;
@@ -130,8 +131,11 @@ export class AllVehiclesComponent implements OnInit {
     event?.stopPropagation();
     this.selectedVehicleForQr = vehicle;
 
+    const prodUrl = 'https://dashboard.gopay.ke/fare/payment-request';
+    const devUrl = 'http://localhost:4200/fare/payment-request';
+
     // Use the environment variable here
-    const baseUrl = environment.farePaymentUrl;
+    const baseUrl = `${environment.dashboardBaseUrl}/fare/payment-request`;
 
     this.qrCodeData = `${baseUrl}?fleetNumber=${vehicle.fleetNumber}&entityId=${vehicle.entityId}`;
 

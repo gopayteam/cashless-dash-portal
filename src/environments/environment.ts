@@ -4,11 +4,11 @@
 
 export const environment = {
   hmr: false,
-  useMockApi: false,
   production: false,
-  farePaymentUrl: 'http://localhost:4200/fare/payment-request',
+  useMockApi: false,
   apiBaseUrl: 'https://api.gopay.ke', //'http://localhost:4200',
-  aiBaseUrl: 'http://localhost:8000'
+  aiBaseUrl: 'http://localhost:8000',
+  dashboardBaseUrl: 'http://localhost:4200'
 };
 
 /*
