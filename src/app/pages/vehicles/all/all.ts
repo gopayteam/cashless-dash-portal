@@ -63,7 +63,7 @@ interface VehicleFeesApiResponse {
     QRCodeComponent,
   ],
   templateUrl: './all.html',
-  styleUrls: ['./all.css'],
+  styleUrls: ['./all.css', '../../../../styles/global/_toast.css'],
   providers: [MessageService]
 })
 export class AllVehiclesComponent implements OnInit {
