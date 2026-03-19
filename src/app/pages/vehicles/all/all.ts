@@ -143,13 +143,206 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   // Method to download the QR code as an image for printing
-  downloadQrCode() {
-    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-    if (canvas) {
+  // downloadQrCode() {
+  //   const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+  //   if (canvas) {
+  //     const link = document.createElement('a');
+  //     link.download = `QR_${this.selectedVehicleForQr?.fleetNumber}.png`;
+  //     link.href = canvas.toDataURL('image/png', 1.0); // High quality
+  //     link.click();
+  //   }
+  // }
+
+  downloadQrCode(): void {
+    const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
+    if (!qrCanvas) return;
+
+    const vehicle = this.selectedVehicleForQr;
+    const fleetNumber = vehicle?.fleetNumber ?? 'Unknown Fleet';
+    const regNumber = vehicle?.registrationNumber ?? 'Unknown Reg';
+    const entityId = vehicle?.entityId ?? '';
+
+    // ── Brand config per entity ──────────────────────────────────────────
+    interface BrandConfig {
+      headerGradientStart: string;
+      headerGradientEnd: string;
+      accentColor: string;
+      footerType: 'image' | 'text';
+      footerImagePath?: string;
+      footerText?: string;
+      footerTextPrimary?: string;
+      footerTextSecondary?: string;
+    }
+
+    const brandConfig: BrandConfig = (() => {
+      switch (entityId) {
+        case 'GS000002': // Super Metro
+          return {
+            headerGradientStart: '#F47B20',
+            headerGradientEnd: '#2E3192',
+            accentColor: '#F47B20',
+            footerType: 'image',
+            footerImagePath: '/super_metro_logo.png',
+          };
+
+        case 'GS000006': // Bungoma Line
+          return {
+            headerGradientStart: '#1B5E20', // orange from their branding
+            headerGradientEnd: '#EF6C00',   // dark brown from their branding
+            accentColor: '#FB8C00',
+            footerType: 'text',
+            footerTextPrimary: 'Bungoma Line',
+            footerTextSecondary: 'Shuttle',
+            footerTextPrimaryColor: '#1B5E20',
+            footerTextSecondaryColor: '#EF6C00',
+          } as any;
+
+        default: // GoPay fallback
+          return {
+            headerGradientStart: '#1E88E5',
+            headerGradientEnd: '#0D47A1',
+            accentColor: '#1E88E5',
+            footerType: 'image',
+            footerImagePath: '/gopay_clear.png',
+          };
+      }
+    })();
+
+    // ── Canvas dimensions ─────────────────────────────────────────────────
+    const padding = 24;
+    const headerHeight = 80;
+    const footerHeight = 90;
+    const totalWidth = qrCanvas.width + padding * 2;
+    const totalHeight = qrCanvas.height + headerHeight + footerHeight + padding * 2;
+
+    const offscreen = document.createElement('canvas');
+    offscreen.width = totalWidth;
+    offscreen.height = totalHeight;
+    const ctx = offscreen.getContext('2d')!;
+
+    // ── Draw function (called directly or after image load) ───────────────
+    const drawAndDownload = (logoImage?: HTMLImageElement) => {
+
+      // White background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+      // Header gradient with rounded top corners
+      const radius = 12;
+      const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
+      headerGradient.addColorStop(0, brandConfig.headerGradientStart);
+      headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
+      ctx.fillStyle = headerGradient;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(totalWidth - radius, 0);
+      ctx.quadraticCurveTo(totalWidth, 0, totalWidth, radius);
+      ctx.lineTo(totalWidth, headerHeight);
+      ctx.lineTo(0, headerHeight);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Header: Fleet Number
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(fleetNumber, totalWidth / 2, headerHeight * 0.42);
+
+      // Header: Registration / Plate Number
+      ctx.font = '16px Arial, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText(regNumber, totalWidth / 2, headerHeight * 0.75);
+
+      // QR Code
+      ctx.drawImage(qrCanvas, padding, headerHeight + padding);
+
+      // Thin accent divider above footer
+      const qrBottom = headerHeight + padding + qrCanvas.height;
+      ctx.fillStyle = brandConfig.accentColor;
+      ctx.fillRect(0, qrBottom + 8, totalWidth, 3);
+
+      // ── Footer ────────────────────────────────────────────────────────
+      if (brandConfig.footerType === 'image' && logoImage) {
+        // Image logo (Super Metro or GoPay)
+        const maxLogoWidth = 180;
+        const scale = Math.min(
+          maxLogoWidth / logoImage.naturalWidth,
+          (footerHeight - 24) / logoImage.naturalHeight
+        );
+        const logoW = logoImage.naturalWidth * scale;
+        const logoH = logoImage.naturalHeight * scale;
+        const logoX = (totalWidth - logoW) / 2;
+        const logoY = qrBottom + 18;
+        ctx.drawImage(logoImage, logoX, logoY, logoW, logoH);
+
+      } else if (brandConfig.footerType === 'text') {
+        // Styled text logo (Bungoma Line)
+        const config = brandConfig as any;
+        const centerX = totalWidth / 2;
+        const baseY = qrBottom + 44;
+
+        // "Bungoma Line" in bold orange
+        ctx.font = 'bold 26px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = config.footerTextPrimaryColor ?? '#E87722';
+
+        // Measure each word to color them individually
+        const primaryWord = 'Bungoma';
+        const secondaryWord = 'Line';
+        const spacer = ' ';
+
+        const primaryWidth = ctx.measureText(primaryWord).width;
+        const spacerWidth = ctx.measureText(spacer).width;
+        const secondaryWidth = ctx.measureText(secondaryWord).width;
+        const totalTextWidth = primaryWidth + spacerWidth + secondaryWidth;
+
+        let startX = centerX - totalTextWidth / 2;
+
+        // "Bungoma" — orange
+        ctx.textAlign = 'left';
+        ctx.fillStyle = config.footerTextPrimaryColor ?? '#EF6C00';
+        ctx.fillText(primaryWord, startX, baseY);
+        startX += primaryWidth + spacerWidth;
+
+        // "Line" — dark brown
+        ctx.fillStyle = config.footerTextSecondaryColor ?? '#2E7D32';
+        ctx.fillText(secondaryWord, startX, baseY);
+
+        // "Shuttle" subtitle
+        ctx.font = '14px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = config.footerTextSecondaryColor ?? '#1B5E20';
+        ctx.fillText('Shuttle', centerX, baseY + 22);
+      }
+
+      // Bottom accent bar
+      const accentGradient = ctx.createLinearGradient(0, 0, totalWidth, 0);
+      accentGradient.addColorStop(0, brandConfig.headerGradientStart);
+      accentGradient.addColorStop(1, brandConfig.headerGradientEnd);
+      ctx.fillStyle = accentGradient;
+      ctx.fillRect(0, totalHeight - 6, totalWidth, 6);
+
+      // Trigger download
       const link = document.createElement('a');
-      link.download = `QR_${this.selectedVehicleForQr?.fleetNumber}.png`;
-      link.href = canvas.toDataURL('image/png', 1.0); // High quality
+      link.download = `QR_${fleetNumber}_${regNumber}.png`;
+      link.href = offscreen.toDataURL('image/png', 1.0);
       link.click();
+    };
+
+    // ── Load logo image or draw directly ──────────────────────────────────
+    if (brandConfig.footerType === 'image' && brandConfig.footerImagePath) {
+      const logo = new Image();
+      logo.src = brandConfig.footerImagePath;
+      logo.onload = () => drawAndDownload(logo);
+      logo.onerror = () => {
+        console.warn(`Logo failed to load (${brandConfig.footerImagePath}), downloading without logo.`);
+        drawAndDownload();
+      };
+    } else {
+      // Text footer — draw immediately, no image loading needed
+      drawAndDownload();
     }
   }
 
