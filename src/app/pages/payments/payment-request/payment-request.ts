@@ -30,7 +30,7 @@ export interface PaymentPayload {
   amount: string;
   fleetNumber: string;
   username: string;
-  tripId: number;
+  tripId: number | null;
   bookingType: 'NOW' | 'SCHEDULED';
   paymentSource: string;
   entityId: string;
@@ -356,16 +356,16 @@ export class PaymentRequestComponent implements OnInit {
     return this.effectiveFleetNumber.trim().length > 0;
   }
 
-  get tripValid(): boolean {
-    return this.tripId !== null && this.tripId > 0;
-  }
+  // get tripValid(): boolean {
+  //   return this.tripId !== null && this.tripId > 0;
+  // }
 
   get amountValid(): boolean {
     return this.amount !== null && this.amount >= 1;
   }
 
   get formValid(): boolean {
-    return this.phoneValid && this.fleetValid && this.tripValid && this.amountValid;
+    return this.phoneValid && this.fleetValid  && this.amountValid; //&& this.tripValid
   }
 
   get phoneErrorMsg(): string {
@@ -381,11 +381,11 @@ export class PaymentRequestComponent implements OnInit {
     return '';
   }
 
-  get tripErrorMsg(): string {
-    if (!this.touchedTrip) return '';
-    if (!this.tripValid) return 'Enter a valid trip ID (must be > 0)';
-    return '';
-  }
+  // get tripErrorMsg(): string {
+  //   if (!this.touchedTrip) return '';
+  //   if (!this.tripValid) return 'Enter a valid trip ID (must be > 0)';
+  //   return '';
+  // }
 
   get amountErrorMsg(): string {
     if (!this.touchedAmt) return '';
@@ -415,8 +415,8 @@ export class PaymentRequestComponent implements OnInit {
       amount: String(this.amount),
       fleetNumber: fleet,
       username: phone,
-      tripId: this.tripId!,
-      bookingType: this.bookingType,
+      tripId: null, //this.tripId!,
+      bookingType: 'NOW', //this.bookingType,
       paymentSource: 'APP_BOOKING',
       entityId: this.entityId!,
       paymentType: 'PROMPT',

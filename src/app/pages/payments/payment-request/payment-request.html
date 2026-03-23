@@ -160,7 +160,7 @@
         <!-- Trip ID + Amount -->
         <div class="pr-field-row">
 
-          <div class="pr-field" [class.pr-field--error]="touchedTrip && tripErrorMsg">
+          <!-- <div class="pr-field" [class.pr-field--error]="touchedTrip && tripErrorMsg">
             <label class="pr-field__label" for="tripId">Trip ID</label>
             <div class="pr-field__input-wrap">
               <span class="pr-field__icon">
@@ -176,14 +176,14 @@
             <span class="pr-field__error" *ngIf="touchedTrip && tripErrorMsg">
               {{ tripErrorMsg }}
             </span>
-          </div>
+          </div> -->
 
           <div class="pr-field" [class.pr-field--error]="touchedAmt && amountErrorMsg">
             <label class="pr-field__label" for="amount">Amount (KES)</label>
             <div class="pr-field__input-wrap">
               <span class="pr-field__prefix">KES</span>
               <input id="amount" class="pr-field__input pr-field__input--prefixed" type="number" inputmode="numeric"
-                placeholder="0" min="1" [(ngModel)]="amount" (blur)="touchedAmt = true" />
+                placeholder="0" min="2" [(ngModel)]="amount" (blur)="touchedAmt = true" />
             </div>
             <span class="pr-field__error" *ngIf="touchedAmt && amountErrorMsg">
               {{ amountErrorMsg }}
@@ -192,7 +192,7 @@
         </div>
 
         <!-- Booking type toggle -->
-        <div class="pr-field">
+        <!-- <div class="pr-field">
           <label class="pr-field__label">Booking Type</label>
           <div class="pr-toggle-group">
             <button type="button" class="pr-toggle-btn" [class.pr-toggle-btn--active]="bookingType === 'NOW'"
@@ -205,7 +205,7 @@
               Scheduled
             </button>
           </div>
-        </div>
+        </div> -->
 
         <!-- Submit -->
         <button class="pr-submit-btn" [class.pr-submit-btn--loading]="loading()" [disabled]="loading()"
