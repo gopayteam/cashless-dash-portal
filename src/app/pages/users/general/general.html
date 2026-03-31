@@ -401,12 +401,22 @@
     </div>
 
     <ng-template pTemplate="footer">
+      <!-- 🔑 Reset PIN -->
       <button pButton icon="pi pi-key" class="p-button-rounded p-button-text p-button-sm" pTooltip="Send Recovery Pin"
         tooltipPosition="top" [disabled]="!selectedUser?.phoneNumber"
-        (click)="selectedUser && sendResetPinPhone(selectedUser); $event.stopPropagation()"></button>
+        (click)="selectedUser && sendResetPinPhone(selectedUser); $event.stopPropagation()">
+      </button>
 
+      <!-- 🗑️ Delete User -->
+      <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-text p-button-sm"
+        pTooltip="Delete User" tooltipPosition="top" [disabled]="!selectedUser"
+        (click)="selectedUser && deleteUser(selectedUser); $event.stopPropagation()">
+      </button>
+
+      <!-- ❌ Close -->
       <button pButton label="Close" icon="pi pi-times" class="p-button-text" iconPos="right" style="gap: 0.5rem;"
-        (click)="closeDetailDialog()"></button>
+        (click)="closeDetailDialog()">
+      </button>
     </ng-template>
 
 
@@ -414,4 +424,8 @@
   </p-dialog>
 
   <p-toast position="top-right"></p-toast>
+
+  <p-confirmDialog [style]="{ width: '420px' }" acceptButtonStyleClass="p-button-danger"
+    rejectButtonStyleClass="p-button-text">
+  </p-confirmDialog>
 </div>

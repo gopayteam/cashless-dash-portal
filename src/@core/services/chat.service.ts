@@ -3,6 +3,7 @@ import { DataService } from '../api/data.service';
 import { AuthService } from './auth.service';
 import { AI_ENDPOINTS } from '../api/endpoints/AI_ENDPOINTS';
 import { ChatMessage, ChatRequest, ChatResponse } from '../models/ai/ai.models';
+import { finalize } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -53,29 +54,49 @@ export class ChatService {
 
     return this.dataService
       .post<ChatResponse>(AI_ENDPOINTS.CHAT_SEND, payload, 'chatbot', true, true)
-      .subscribe(res => {
+      .pipe(
+        finalize(() => this.isTyping.set(false)) // 🔥 always runs
+      )
+      .subscribe({
+        next: (res) => {
+          this.sessionId = res.data.conversation_id;
 
-        this.sessionId = res.data.conversation_id;
+          this.messages.update(msgs =>
+            msgs.map(m =>
+              m.id === userMsg.id ? { ...m, status: 'delivered' } : m
+            )
+          );
 
-        this.messages.update(msgs =>
-          msgs.map(m =>
-            m.id === userMsg.id ? { ...m, status: 'delivered' } : m
-          )
-        );
+          const assistant: ChatMessage = {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: res.data.response,
+            timestamp: new Date(),
+            status: 'delivered',
+            sources: res.data.sources,
+            intentDetected: res.data.intent,
+            confidence: res.data.confidence,
+          };
 
-        const assistant: ChatMessage = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: res.data.response,
-          timestamp: new Date(),
-          status: 'delivered',
-          sources: res.data.sources,
-          intentDetected: res.data.intent,
-          confidence: res.data.confidence,
-        };
+          this.messages.update(m => [...m, assistant]);
+        },
 
-        this.messages.update(m => [...m, assistant]);
-        this.isTyping.set(false);
+        error: (err) => {
+          console.error('Chat error:', err);
+
+          this.messages.update(msgs =>
+            msgs.map(m =>
+              m.id === userMsg.id ? { ...m, status: 'delivered' as const } : m
+            )
+          );
+
+          // this.messageService.add({
+          //   severity: 'error',
+          //   summary: 'Chat Error',
+          //   detail: 'Server unreachable. Please try again.',
+          //   life: 4000
+          // });
+        }
       });
   }
 

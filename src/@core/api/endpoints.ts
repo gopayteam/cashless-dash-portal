@@ -7,6 +7,7 @@ export const API_ENDPOINTS = {
   AUTH_LOGOUT: '/api/auth/logout',
   AUTH_REFRESH: '/api/auth/refresh-token',
   REFRESH_TOKEN: '',
+
   // REGISTER: '/api/v1/auth/register',
   REGISTER_USER: '/api/v1/auth/register',
   UPDATE_USER: '/api/v1/org/users/update',
@@ -16,6 +17,8 @@ export const API_ENDPOINTS = {
 
   SEND_RESET_PASSWORD: '/api/v1/auth/forgot-password',
   RBAC_ROLES: '/api/v1/org/rbac/profiles/view',
+
+  DELETE_USER: '/api/v1/org/users/delete/user',
 
   // #####################  DASHBOARD SUB-ENDPOINTS   #######################
   ALL_PAYMENTS: '/api/payment/passenger/manifest',

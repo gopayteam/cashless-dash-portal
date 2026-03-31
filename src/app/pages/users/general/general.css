@@ -1,0 +1,267 @@
+/* _confirm-dialog.css
+   ─────────────────────────────────────────────────────────────────
+   Global PrimeNG ConfirmDialog override — Gopay dark navy/red brand.
+   Import this in your component's styleUrls array OR in styles.css.
+   All selectors use ::ng-deep so they pierce PrimeNG's shadow DOM.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── CSS Variables (mirrors payment-request palette) ────────────── */
+:root {
+  --cd-primary: #1a3a6b;
+  /* deep navy */
+  --cd-secondary: #d42b2b;
+  /* gopay red */
+  --cd-accent: #f5821f;
+  /* warm orange accent */
+  --cd-bg: #0d1f3c;
+  /* darkest navy */
+  --cd-surface: #162d54;
+  /* card surface */
+  --cd-border: rgba(255, 255, 255, 0.09);
+  --cd-text: #ffffff;
+  --cd-text-muted: rgba(255, 255, 255, 0.55);
+  --cd-radius: 18px;
+  --cd-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MASK / BACKDROP
+══════════════════════════════════════════════════════════════════ */
+::ng-deep .p-dialog-mask {
+  background: rgba(5, 12, 30, 0.72) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DIALOG CONTAINER
+══════════════════════════════════════════════════════════════════ */
+::ng-deep .p-confirmdialog {
+  border-radius: var(--cd-radius) !important;
+  border: 1px solid var(--cd-border) !important;
+  background: var(--cd-bg) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 8px 32px rgba(212, 43, 43, 0.12) !important;
+  overflow: hidden !important;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif !important;
+  min-width: 380px !important;
+  max-width: 460px !important;
+
+  /* Entry animation */
+  animation: cd-enter 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+
+@keyframes cd-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Top accent stripe — red danger signal */
+::ng-deep .p-confirmdialog::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cd-primary), var(--cd-secondary), var(--cd-accent));
+  border-radius: var(--cd-radius) var(--cd-radius) 0 0;
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════════════════════ */
+::ng-deep .p-confirmdialog .p-dialog-header {
+  background: var(--cd-bg) !important;
+  border-bottom: 1px solid var(--cd-border) !important;
+  padding: 1.4rem 1.6rem 1.1rem !important;
+  border-radius: var(--cd-radius) var(--cd-radius) 0 0 !important;
+}
+
+::ng-deep .p-confirmdialog .p-dialog-header .p-dialog-title {
+  font-family: 'Syne', 'Segoe UI', sans-serif !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  color: var(--cd-text) !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Close button in header */
+::ng-deep .p-confirmdialog .p-dialog-header .p-dialog-header-icon {
+  color: var(--cd-text-muted) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  width: 30px !important;
+  height: 30px !important;
+  transition: background var(--cd-transition), color var(--cd-transition) !important;
+}
+
+::ng-deep .p-confirmdialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--cd-text) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CONTENT AREA
+══════════════════════════════════════════════════════════════════ */
+::ng-deep .p-confirmdialog .p-dialog-content {
+  background: var(--cd-surface) !important;
+  padding: 1.75rem 1.6rem !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 1.1rem !important;
+}
+
+/* Warning / confirm icon */
+::ng-deep .p-confirmdialog .p-dialog-content .p-confirm-dialog-icon {
+  font-size: 1.6rem !important;
+  color: var(--cd-secondary) !important;
+  margin-top: 0.1rem !important;
+  flex-shrink: 0 !important;
+
+  /* Pulsing glow ring */
+  width: 48px !important;
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: rgba(212, 43, 43, 0.12) !important;
+  border: 1.5px solid rgba(212, 43, 43, 0.25) !important;
+  animation: cd-icon-pulse 2.4s ease-in-out infinite !important;
+}
+
+@keyframes cd-icon-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 43, 43, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 43, 43, 0.0);
+  }
+}
+
+/* Message text */
+::ng-deep .p-confirmdialog .p-dialog-content .p-confirm-dialog-message {
+  font-size: 0.9rem !important;
+  color: var(--cd-text-muted) !important;
+  line-height: 1.65 !important;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif !important;
+  flex: 1 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FOOTER / BUTTONS
+══════════════════════════════════════════════════════════════════ */
+::ng-deep .p-confirmdialog .p-dialog-footer {
+  background: var(--cd-bg) !important;
+  border-top: 1px solid var(--cd-border) !important;
+  padding: 1rem 1.6rem 1.4rem !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0.65rem !important;
+  border-radius: 0 0 var(--cd-radius) var(--cd-radius) !important;
+}
+
+/* ── Reject / Cancel button ──────────────────────────────────────── */
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button.p-button-text,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-reject {
+  background: transparent !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--cd-text-muted) !important;
+  border-radius: 10px !important;
+  padding: 0.55rem 1.2rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em !important;
+  transition: background var(--cd-transition), border-color var(--cd-transition), color var(--cd-transition) !important;
+  cursor: pointer !important;
+}
+
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button.p-button-text:hover,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-reject:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: var(--cd-text) !important;
+}
+
+/* ── Accept / Danger button ──────────────────────────────────────── */
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button-danger,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-accept {
+  background: var(--cd-secondary) !important;
+  border: none !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 0.55rem 1.35rem !important;
+  font-family: 'Syne', 'Segoe UI', sans-serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform var(--cd-transition), box-shadow var(--cd-transition) !important;
+  cursor: pointer !important;
+}
+
+/* Shimmer overlay */
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button-danger::before,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-accept::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 60%) !important;
+  pointer-events: none !important;
+}
+
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button-danger:hover,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-accept:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(212, 43, 43, 0.42) !important;
+}
+
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button-danger:active,
+::ng-deep .p-confirmdialog .p-dialog-footer .p-confirm-dialog-accept:active {
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
+
+/* Button icons */
+::ng-deep .p-confirmdialog .p-dialog-footer .p-button .p-button-icon {
+  font-size: 0.8rem !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RESPONSIVE — narrow screens
+══════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  ::ng-deep .p-confirmdialog {
+    min-width: unset !important;
+    width: calc(100vw - 2rem) !important;
+    margin: 1rem !important;
+    border-radius: 14px !important;
+  }
+
+  ::ng-deep .p-confirmdialog .p-dialog-footer {
+    flex-direction: column-reverse !important;
+  }
+
+  ::ng-deep .p-confirmdialog .p-dialog-footer .p-button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}

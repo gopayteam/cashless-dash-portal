@@ -25,5 +25,5 @@ export const MY_DATE_FORMATS = {
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }],
 })
 export class App {
-  protected readonly title = signal('prime');
+  protected readonly title = signal('cashless-dash-portal');
 }

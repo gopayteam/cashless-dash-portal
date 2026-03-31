@@ -21,6 +21,8 @@ import { ActionButtonComponent } from "../../../components/action-button/action-
 import { MessageService } from 'primeng/api';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface ProfileOption {
   label: string;
@@ -59,6 +61,7 @@ interface StatusOption {
     ActionButtonComponent,
     MessageModule,
     ToastModule,
+    ConfirmDialogModule,
   ],
   templateUrl: './general.html',
   styleUrls: [
@@ -68,6 +71,7 @@ interface StatusOption {
     '../../../../styles/modules/_filter_actions.css',
     '../../../../styles/global/_toast.css',
   ],
+  providers: [MessageService, ConfirmationService]
 })
 export class GeneralUserComponent implements OnInit {
   entityId: string | null = null;
@@ -144,6 +148,7 @@ export class GeneralUserComponent implements OnInit {
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -386,6 +391,94 @@ export class GeneralUserComponent implements OnInit {
     } else {
       this.fetchUsers(true, { first: 0, rows: this.rows });
     }
+  }
+
+  deleteUser(user: User): void {
+    if (!user?.username) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Missing Data',
+        detail: 'User username is missing.'
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${this.getFullName(user)}?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Yes, Delete',
+      rejectLabel: 'Cancel',
+
+      accept: () => {
+        const payload = {
+          entityId: this.entityId,
+          username: user.username
+        };
+
+        interface DeleteResponse {
+          status: number;
+          message: string;
+          data: any[];
+          totalRecords: number;
+        }
+
+        this.loadingStore.start();
+
+        this.dataService
+          .post<DeleteResponse>(
+            API_ENDPOINTS.DELETE_USER,
+            payload,
+            'delete-general-user',
+            true,
+          )
+          .subscribe({
+            next: (response) => {
+              if (response.status === 0) {
+                // ✅ Success toast
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Deleted',
+                  detail: response.message || 'User deleted successfully.'
+                });
+
+                // ⚡ Optimistic UI update (remove locally)
+                this.allUsers = this.allUsers.filter(
+                  u => u.username !== user.username
+                );
+
+                this.totalRecords = this.totalRecords - 1;
+
+                // Recalculate stats + filters
+                this.calculateStats();
+                this.applyClientSideFilter();
+
+                // Close dialog if deleted user was open
+                if (this.selectedUser?.username === user.username) {
+                  this.closeDetailDialog();
+                }
+
+                this.cdr.detectChanges();
+              } else {
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Failed',
+                  detail: response.message || 'Delete failed.'
+                });
+              }
+            },
+            error: (error) => {
+              console.error('Delete error:', error);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'System Error',
+                detail: 'Server is unreachable. Try again later.'
+              });
+            },
+            complete: () => this.loadingStore.stop()
+          });
+      }
+    });
   }
 
   sendResetPinPhone(user: User): void {
