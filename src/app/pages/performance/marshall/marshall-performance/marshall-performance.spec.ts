@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MarshallPerformance } from './marshall-performance';
+import { MarshalPerformanceComponent as MarshallPerformance } from './marshall-performance';
 
 describe('MarshallPerformance', () => {
   let component: MarshallPerformance;

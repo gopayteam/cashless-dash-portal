@@ -22,6 +22,39 @@
   </div>
 
   <!-- ================= MAIN LAYOUT ================= -->
+
+  <!-- ================= SUMMARY STATS ================= -->
+  <div class="summary-stats-bar" *ngIf="!marshalLoading && marshals.length > 0">
+    <div class="summary-stat-card">
+      <span class="summary-stat-label">Total collected</span>
+      <span class="summary-stat-value">Ksh {{ summaryTotalCollected | number:'1.2-2' }}</span>
+      <span class="summary-stat-sub">across {{ summaryActiveCount }} marshals shown</span>
+    </div>
+
+    <div class="summary-stat-card">
+      <span class="summary-stat-label">Vehicles approved</span>
+      <span class="summary-stat-value">{{ summaryTotalVehicles | number }}</span>
+      <span class="summary-stat-sub">total fleet processed</span>
+    </div>
+
+    <div class="summary-stat-card">
+      <span class="summary-stat-label">Active marshals</span>
+      <span class="summary-stat-value">{{ summaryActiveCount }}</span>
+      <span class="summary-stat-sub">in this page</span>
+    </div>
+
+    <div class="summary-stat-card" *ngIf="summaryTopMarshal">
+      <span class="summary-stat-label">Top marshal</span>
+      <div class="summary-top-marshal">
+        <div class="summary-top-avatar">{{ getInitials(summaryTopMarshal.marshalName) }}</div>
+        <div class="summary-top-info">
+          <span class="summary-top-name">{{ summaryTopMarshal.marshalName }}</span>
+          <span class="summary-top-amount">Ksh {{ summaryTopMarshal.amountCollected | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Side-by-side when a marshal is selected, full-width otherwise -->
   <div class="layout-grid" [class.detail-open]="selectedMarshal">
 
@@ -48,15 +81,10 @@
 
       <!-- Marshal cards list -->
       <div class="marshal-list" *ngIf="!marshalLoading">
-        <div
-          *ngFor="let marshal of marshals"
-          class="marshal-row"
+        <div *ngFor="let marshal of marshals" class="marshal-row"
           [class.active]="selectedMarshal?.marshalPhoneNumber === marshal.marshalPhoneNumber"
-          (click)="selectMarshal(marshal)"
-          tabindex="0"
-          (keyup.enter)="selectMarshal(marshal)"
-          [attr.aria-label]="'View details for ' + marshal.marshalName"
-        >
+          (click)="selectMarshal(marshal)" tabindex="0" (keyup.enter)="selectMarshal(marshal)"
+          [attr.aria-label]="'View details for ' + marshal.marshalName">
           <!-- Avatar -->
           <div class="marshal-avatar" [ngClass]="getPerformanceClass(marshal.amountCollected)">
             {{ getInitials(marshal.marshalName) }}
@@ -93,23 +121,14 @@
 
       <!-- Pagination -->
       <div class="custom-paginator" *ngIf="marshalTotal > marshalRows && !marshalLoading">
-        <button
-          pButton
-          icon="pi pi-chevron-left"
-          class="p-button-text p-button-sm"
-          [disabled]="marshalFirst === 0"
-          (click)="loadMarshals({ first: marshalFirst - marshalRows, rows: marshalRows })"
-        ></button>
+        <button pButton icon="pi pi-chevron-left" class="p-button-text p-button-sm" [disabled]="marshalFirst === 0"
+          (click)="loadMarshals({ first: marshalFirst - marshalRows, rows: marshalRows })"></button>
         <span class="page-info">
           {{ marshalFirst + 1 }}–{{ minOf(marshalFirst + marshalRows, marshalTotal) }} of {{ marshalTotal }}
         </span>
-        <button
-          pButton
-          icon="pi pi-chevron-right"
-          class="p-button-text p-button-sm"
+        <button pButton icon="pi pi-chevron-right" class="p-button-text p-button-sm"
           [disabled]="marshalFirst + marshalRows >= marshalTotal"
-          (click)="loadMarshals({ first: marshalFirst + marshalRows, rows: marshalRows })"
-        ></button>
+          (click)="loadMarshals({ first: marshalFirst + marshalRows, rows: marshalRows })"></button>
       </div>
     </p-card>
 
@@ -119,13 +138,8 @@
         <ng-template pTemplate="header">
           <div class="card-header-row">
             <div class="detail-header-left">
-              <button
-                pButton
-                icon="pi pi-arrow-left"
-                class="p-button-text p-button-sm back-btn"
-                pTooltip="Back to list"
-                (click)="clearSelection()"
-              ></button>
+              <button pButton icon="pi pi-arrow-left" class="p-button-text p-button-sm back-btn" pTooltip="Back to list"
+                (click)="clearSelection()"></button>
               <div class="detail-marshal-info">
                 <div class="detail-avatar" [ngClass]="getPerformanceClass(selectedMarshal.amountCollected)">
                   {{ getInitials(selectedMarshal.marshalName) }}
@@ -163,22 +177,11 @@
         </div>
 
         <!-- Detail table -->
-        <p-table
-          *ngIf="!detailLoading"
-          [value]="detailRecords"
-          [lazy]="true"
-          [paginator]="true"
-          [rows]="detailRows"
-          [first]="detailFirst"
-          [totalRecords]="detailTotal"
-          [rowsPerPageOptions]="[5, 10, 20]"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
-          (onLazyLoad)="loadDetail($event)"
-          styleClass="data-table detail-table"
-          [tableStyle]="{ 'min-width': '30rem' }"
-          responsiveLayout="scroll"
-        >
+        <p-table *ngIf="!detailLoading" [value]="detailRecords" [lazy]="true" [paginator]="true" [rows]="detailRows"
+          [first]="detailFirst" [totalRecords]="detailTotal" [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
+          [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+          (onLazyLoad)="loadDetail($event)" styleClass="data-table detail-table" [tableStyle]="{ 'min-width': '30rem' }"
+          responsiveLayout="scroll">
           <ng-template pTemplate="header">
             <tr>
               <th>#</th>

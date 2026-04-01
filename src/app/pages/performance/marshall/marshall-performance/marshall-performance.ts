@@ -86,7 +86,7 @@ export class MarshalPerformanceComponent implements OnInit {
 
   // ── Marshal list ───────────────────────────────────────────────────────────
   marshals: MarshalPerformance[] = [];
-  marshalRows = 10;
+  marshalRows = 30;
   marshalFirst = 0;
   marshalTotal = 0;
   marshalLoading = false;
@@ -241,5 +241,23 @@ export class MarshalPerformanceComponent implements OnInit {
     if (amount >= 5000) return 'perf-high';
     if (amount >= 2000) return 'perf-mid';
     return 'perf-low';
+  }
+
+
+  get summaryTotalCollected(): number {
+    return this.marshals.reduce((sum, m) => sum + m.amountCollected, 0);
+  }
+
+  get summaryTotalVehicles(): number {
+    return this.marshals.reduce((sum, m) => sum + m.approvedVehicleCount, 0);
+  }
+
+  get summaryActiveCount(): number {
+    return this.marshals.length;
+  }
+
+  get summaryTopMarshal(): MarshalPerformance | null {
+    if (!this.marshals.length) return null;
+    return this.marshals.reduce((top, m) => m.amountCollected > top.amountCollected ? m : top);
   }
 }
