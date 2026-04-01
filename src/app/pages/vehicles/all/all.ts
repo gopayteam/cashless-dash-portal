@@ -228,7 +228,7 @@ export class AllVehiclesComponent implements OnInit {
       ctx.fillRect(0, 0, totalWidth, totalHeight);
 
       // Header gradient with rounded top corners
-      const radius = 12;
+      const radius = 0;
       const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
       headerGradient.addColorStop(0, brandConfig.headerGradientStart);
       headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
