@@ -131,7 +131,7 @@ export class AllVehiclesComponent implements OnInit {
     event?.stopPropagation();
     this.selectedVehicleForQr = vehicle;
 
-    const prodUrl = 'https://dashboard.gopay.ke/fare/payment-request';
+    const prodUrl = 'https://passenger.gopay.ke/fare/payment-request';
     const devUrl = 'http://localhost:4200/fare/payment-request';
 
     // Use the environment variable here
