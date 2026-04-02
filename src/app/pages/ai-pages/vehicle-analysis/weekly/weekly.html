@@ -7,7 +7,7 @@
       <!-- Start date — freely pickable -->
       <mat-form-field appearance="outline" class="date-field">
         <mat-label>Start Date</mat-label>
-        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate"
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" [max]=" today"
           (dateChange)="onStartChange()" />
         <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
         <mat-datepicker #startPicker />
@@ -18,8 +18,7 @@
       <!-- End date — auto-calculated, read-only -->
       <mat-form-field appearance="outline" class="date-field end-locked">
         <mat-label>End Date (auto)</mat-label>
-        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate"
-          [min]="endMin" [max]="endMax" readonly />
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" [min]="endMin" [max]="endMax" readonly />
         <mat-datepicker-toggle matIconSuffix [for]="endPicker" [disabled]="true" />
         <mat-datepicker #endPicker [disabled]="true" />
       </mat-form-field>
@@ -32,8 +31,8 @@
     </span>
   </div>
 
-  <button pButton icon="pi pi-play" label="Run Week Analysis" class="run-btn"
-    [disabled]="!canAnalyse || loading" (click)="run()"></button>
+  <button pButton icon="pi pi-play" label="Run Week Analysis" class="run-btn" [disabled]="!canAnalyse || loading"
+    (click)="run()"></button>
 </div>
 
 <app-vehicle-analysis-panel [data]="result" [loading]="loading" />

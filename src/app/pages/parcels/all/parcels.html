@@ -157,6 +157,58 @@
     </p-card>
   </div>
 
+
+  <!-- ================= AGGREGATE VALUE CARD ================= -->
+  <p-card styleClass="stat-card card" *ngIf="aggregateCards.length > 0">
+    <div class="aggregate-header">
+      <h3>Parcel Value Summary</h3>
+      <p class="text-muted">Totals across {{ allAggregateParcels.length | number }} parcels in selected date range</p>
+    </div>
+
+    <!-- Status Filter Tabs -->
+    <div class="aggregate-tabs">
+      <button *ngFor="let card of aggregateCards"
+        [class]="'agg-tab ' + (aggregateFilter === card.status ? 'agg-tab-active' : '')"
+        (click)="aggregateFilter = card.status">
+        <i [class]="'pi ' + card.icon"></i>
+        {{ card.label }}
+        <span class="agg-tab-count">{{ card.count | number }}</span>
+      </button>
+    </div>
+
+    <!-- Selected Status Summary -->
+    <ng-container *ngFor="let card of aggregateCards">
+      <div class="aggregate-values-grid" *ngIf="aggregateFilter === card.status">
+        <div class="agg-value-item">
+          <span class="agg-value-label">Aggregate Parcel Value</span>
+          <span class="agg-value-amount">
+            <span class="currency">Ksh</span>
+            {{ card.totalValue | number: '1.2-2' }}
+          </span>
+          <span class="agg-value-desc">Declared value of goods</span>
+        </div>
+        <div class="agg-value-item">
+          <span class="agg-value-label">Aggregate Service Charge</span>
+          <span class="agg-value-amount">
+            <span class="currency">Ksh</span>
+            {{ card.totalServiceCharge | number: '1.2-2' }}
+          </span>
+          <span class="agg-value-desc">Fees collected</span>
+        </div>
+        <div class="agg-value-item agg-value-total">
+          <span class="agg-value-label">Total Revenue</span>
+          <span class="agg-value-amount">
+            <span class="currency">Ksh</span>
+            {{ card.totalAmount | number: '1.2-2' }}
+          </span>
+          <span class="agg-value-desc">Combined total</span>
+        </div>
+      </div>
+    </ng-container>
+  </p-card>
+
+  <br>
+
   <!-- ================= PARCELS TABLE ================= -->
   <p-card styleClass="stat-card card">
     <div class="table-header">
@@ -194,7 +246,8 @@
           <th>Amount</th>
           <th class="hide-mobile">Payment Method</th>
           <th>Status</th>
-          <!-- <th>Receipt</th> -->
+          <th>Parcel Value</th>
+          <th>Service Charge</th>
         </tr>
       </ng-template>
 
@@ -272,6 +325,15 @@
               <span class="badge-text">{{ parcel.parcelStatus.replace('_', ' ') }}</span>
             </span>
           </td>
+
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ parcel.value | number : '1.2-2' }}</span>
+          </td>
+
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ parcel.serviceCharge | number : '1.2-2' }}</span>
+          </td>
+
 
           <!-- <td>
             <button pButton icon="pi pi-file-pdf" class="p-button-rounded p-button-text receipt-btn"

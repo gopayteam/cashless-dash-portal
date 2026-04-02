@@ -906,3 +906,117 @@
     display: none;
   }
 }
+
+
+/* ===== AGGREGATE CARD ===== */
+.aggregate-header {
+  margin-bottom: 1rem;
+}
+
+.aggregate-header h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.aggregate-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--surface-border);
+  padding-bottom: 0.75rem;
+}
+
+.agg-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 2rem;
+  border: 1px solid var(--surface-border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+  transition: all 0.2s;
+}
+
+.agg-tab:hover {
+  background: var(--surface-hover);
+}
+
+.agg-tab-active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.agg-tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 1rem;
+  padding: 0 0.4rem;
+  font-size: 0.75rem;
+}
+
+.agg-tab:not(.agg-tab-active) .agg-tab-count {
+  background: var(--surface-200);
+  color: var(--text-color-secondary);
+}
+
+.aggregate-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .aggregate-values-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.agg-value-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface-50);
+  border-radius: 0.75rem;
+  border: 1px solid var(--surface-border);
+}
+
+.agg-value-total {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
+.agg-value-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-color-secondary);
+}
+
+.agg-value-amount {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.agg-value-total .agg-value-amount {
+  color: var(--primary-color);
+}
+
+.agg-value-amount .currency {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-right: 0.25rem;
+  opacity: 0.7;
+}
+
+.agg-value-desc {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}

@@ -55,7 +55,7 @@ const MONTHS: MonthOption[] = [
     MatSelectModule, MatNativeDateModule,
     VehicleAnalysisPanelComponent,
     VehicleTransactionTableComponent
-],
+  ],
   templateUrl: './vehicle-analysis.html',
   styleUrls: ['./vehicle-analysis.css', '../../../styles/global/_toast.css'],
 })
@@ -75,8 +75,14 @@ export class VehicleAnalysisComponent implements OnInit {
   dayDate: Date = new Date();
 
   // Week — start is user-picked, end is always start + 6 days
-  weekStartDate: Date = this._currentWeekMonday();
-  weekEndDate: Date = this._addDays(this._currentWeekMonday(), 6);
+  // weekStartDate: Date = this._currentWeekMonday();
+  // weekEndDate: Date = this._addDays(this._currentWeekMonday(), 6);
+  private _today(): Date {
+    return new Date();
+  }
+
+  weekEndDate: Date = this._today();
+  weekStartDate: Date = this._addDays(this._today(), -6);
 
   // Month
   monthYear: number = new Date().getFullYear();
@@ -106,6 +112,13 @@ export class VehicleAnalysisComponent implements OnInit {
     const user = this.authService.currentUser();
     if (!user) { this.router.navigate(['/login']); return; }
     this.entityId = user.entityId;
+
+    // ✅ Set default week = last 7 days ending today
+    const today = new Date();
+    this.weekEndDate = today;
+    this.weekStartDate = this._addDays(today, -6);
+
+
     this._loadVehicles();
   }
 

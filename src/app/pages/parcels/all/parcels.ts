@@ -80,6 +80,10 @@ export class ParcelsComponent implements OnInit {
   // Stats Cards
   statsCards: any[] = [];
 
+  aggregateCards: any[] = [];
+  aggregateFilter: Parcel['parcelStatus'] | 'ALL' = 'ALL';
+  allAggregateParcels: Parcel[] = [];
+
   // Stages
   stages: Stage[] = [];
   sourceStages: Stage[] = [];
@@ -203,6 +207,8 @@ export class ParcelsComponent implements OnInit {
 
           // Load parcels after stages are loaded
           this.loadParcels({ first: 0, rows: this.rows });
+
+          this.fetchParcelAggregates();
         },
         error: (err) => {
           console.error('Failed to load stages', err);
@@ -297,6 +303,79 @@ export class ParcelsComponent implements OnInit {
       });
   }
 
+  fetchParcelAggregates(): void {
+    const [start, end] = this.filters.dateRange;
+    if (!start || !end) return;
+
+    const payload: any = {
+      entityId: this.entityId,
+      page: 0,
+      size: 6000,
+      paymentStatus: 'PAID',
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
+      sort: 'createdAt,DESC',
+    };
+
+    this.dataService
+      .post<ParcelsAPiResponse>(API_ENDPOINTS.ALL_PARCELS, payload, 'parcel-aggregates')
+      .subscribe({
+        next: (response) => {
+          this.allAggregateParcels = response.parcels;
+          this.computeAggregates();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load aggregate parcels', err);
+        },
+
+      });
+  }
+
+  computeAggregates(): void {
+    const statuses: (Parcel['parcelStatus'] | 'ALL')[] = [
+      'ALL', 'REGISTERED', 'IN_TRANSIT', 'ARRIVED', 'COLLECTED', 'CANCELLED'
+    ];
+
+    const statusLabels: Record<string, string> = {
+      ALL: 'All',
+      REGISTERED: 'Registered',
+      IN_TRANSIT: 'In Transit',
+      ARRIVED: 'Arrived',
+      COLLECTED: 'Collected',
+      CANCELLED: 'Cancelled',
+    };
+
+    const statusIcons: Record<string, string> = {
+      ALL: 'pi-list',
+      REGISTERED: 'pi-box',
+      IN_TRANSIT: 'pi-truck',
+      ARRIVED: 'pi-inbox',
+      COLLECTED: 'pi-check-circle',
+      CANCELLED: 'pi-times-circle',
+    };
+
+    this.aggregateCards = statuses.map(status => {
+      const filtered = status === 'ALL'
+        ? this.allAggregateParcels
+        : this.allAggregateParcels.filter(p => p.parcelStatus === status);
+
+      const totalValue = filtered.reduce((sum, p) => sum + (parseFloat(p.value as any) || 0), 0);
+      const totalServiceCharge = filtered.reduce((sum, p) => sum + (p.serviceCharge || 0), 0);
+      const totalAmount = filtered.reduce((sum, p) => sum + (p.amount || 0), 0)
+
+      return {
+        status,
+        label: statusLabels[status],
+        icon: statusIcons[status],
+        count: filtered.length,
+        totalValue,
+        totalServiceCharge,
+        totalAmount,
+      };
+    });
+  }
+
 
   /**
    * Search by parcel number using API endpoint
@@ -367,6 +446,7 @@ export class ParcelsComponent implements OnInit {
   applyFilters(): void {
     this.first = 0;
     this.loadParcels({ first: 0, rows: this.rows });
+    this.fetchParcelAggregates();  // re-fetch when filters change
   }
 
   /** Handle date range change from calendar */
@@ -375,6 +455,7 @@ export class ParcelsComponent implements OnInit {
       const [start, end] = this.filters.dateRange;
       if (start && end) {
         this.loadParcels({ first: 0, rows: this.rows });
+        this.fetchParcelAggregates();  // re-fetch when date range changes
       }
     }
   }
@@ -393,6 +474,7 @@ export class ParcelsComponent implements OnInit {
     // Reload data from server with reset filters
     this.first = 0;
     this.loadParcels({ first: 0, rows: this.rows });
+    this.fetchParcelAggregates();
   }
 
   onParcelNumberChange(): void {
@@ -693,11 +775,11 @@ export class ParcelsComponent implements OnInit {
 
       // Generate filename with date range
       const [start, end] = this.filters.dateRange;
-      const startDate = start ?  formatDateLocal(start) : 'all';
-      const endDate = end ?  formatDateLocal(end) : 'time';
+      const startDate = start ? formatDateLocal(start) : 'all';
+      const endDate = end ? formatDateLocal(end) : 'time';
       const filename = `parcels_${startDate}_to_${endDate}.csv`;
 
-      
+
 
       link.href = URL.createObjectURL(blob);
       link.download = filename;
