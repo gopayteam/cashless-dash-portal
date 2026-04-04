@@ -26,6 +26,7 @@ import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 import { VehicleAnalysisModalComponent } from '../../../components/vehicle-analysis/vehicle-analysis-modal/vehicle-analysis-modal';
 
 import { QRCodeComponent } from 'angularx-qrcode';
+import jsPDF from 'jspdf';
 import { SafeUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment.prod';
 // import { environment } from '../../../../environments/environment';
@@ -107,7 +108,6 @@ export class AllVehiclesComponent implements OnInit {
 
   displayAnalysisModal = false;
   selectedVehicleForAnalysis: Vehicle | null = null;
-  window: any;
 
 
   // Add this method:
@@ -590,6 +590,190 @@ export class AllVehiclesComponent implements OnInit {
   refreshVehicles(): void {
     const event = this.lastEvent || { first: 0, rows: this.rows };
     this.fetchVehicles(true, event);
+  }
+
+  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+    return new Promise((resolve) => {
+      const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
+      if (!qrCanvas) { resolve(null); return; }
+
+      const vehicle = this.selectedVehicleForQr;
+      const fleetNumber = vehicle?.fleetNumber ?? 'Unknown Fleet';
+      const regNumber = vehicle?.registrationNumber ?? 'Unknown Reg';
+      const entityId = vehicle?.entityId ?? '';
+
+      interface BrandConfig {
+        headerGradientStart: string;
+        headerGradientEnd: string;
+        accentColor: string;
+        footerType: 'image' | 'text';
+        footerImagePath?: string;
+        footerTextPrimary?: string;
+        footerTextSecondary?: string;
+        footerTextPrimaryColor?: string;
+        footerTextSecondaryColor?: string;
+      }
+
+      const brandConfig: BrandConfig = (() => {
+        switch (entityId) {
+          case 'GS000002':
+            return {
+              headerGradientStart: '#F47B20', headerGradientEnd: '#2E3192',
+              accentColor: '#F47B20', footerType: 'image', footerImagePath: '/super_metro_logo.png',
+            };
+          case 'GS000006':
+            return {
+              headerGradientStart: '#1B5E20', headerGradientEnd: '#EF6C00',
+              accentColor: '#FB8C00', footerType: 'text',
+              footerTextPrimary: 'Bungoma', footerTextSecondary: 'Line',
+              footerTextPrimaryColor: '#EF6C00', footerTextSecondaryColor: '#2E7D32',
+            };
+          default:
+            return {
+              headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
+              accentColor: '#1E88E5', footerType: 'image', footerImagePath: '/gopay_clear.png',
+            };
+        }
+      })();
+
+      const padding = 24;
+      const headerHeight = 80;
+      const footerHeight = 90;
+      const totalWidth = qrCanvas.width + padding * 2;
+      const totalHeight = qrCanvas.height + headerHeight + footerHeight + padding * 2;
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = totalWidth;
+      offscreen.height = totalHeight;
+      const ctx = offscreen.getContext('2d')!;
+
+      const draw = (logoImage?: HTMLImageElement) => {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+        const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
+        headerGradient.addColorStop(0, brandConfig.headerGradientStart);
+        headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = headerGradient;
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.lineTo(totalWidth, 0);
+        ctx.lineTo(totalWidth, headerHeight); ctx.lineTo(0, headerHeight);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 22px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(fleetNumber, totalWidth / 2, headerHeight * 0.42);
+        ctx.font = '16px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(regNumber, totalWidth / 2, headerHeight * 0.75);
+
+        ctx.drawImage(qrCanvas, padding, headerHeight + padding);
+
+        const qrBottom = headerHeight + padding + qrCanvas.height;
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillRect(0, qrBottom + 8, totalWidth, 3);
+
+        if (brandConfig.footerType === 'image' && logoImage) {
+          const maxLogoWidth = 180;
+          const scale = Math.min(maxLogoWidth / logoImage.naturalWidth, (footerHeight - 24) / logoImage.naturalHeight);
+          const logoW = logoImage.naturalWidth * scale;
+          const logoH = logoImage.naturalHeight * scale;
+          ctx.drawImage(logoImage, (totalWidth - logoW) / 2, qrBottom + 18, logoW, logoH);
+        } else if (brandConfig.footerType === 'text') {
+          const centerX = totalWidth / 2;
+          const baseY = qrBottom + 44;
+          ctx.font = 'bold 26px Arial, sans-serif';
+          const primaryWidth = ctx.measureText(brandConfig.footerTextPrimary!).width;
+          const spacerWidth = ctx.measureText(' ').width;
+          let startX = centerX - (primaryWidth + spacerWidth + ctx.measureText(brandConfig.footerTextSecondary!).width) / 2;
+          ctx.textAlign = 'left';
+          ctx.fillStyle = brandConfig.footerTextPrimaryColor!;
+          ctx.fillText(brandConfig.footerTextPrimary!, startX, baseY);
+          startX += primaryWidth + spacerWidth;
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText(brandConfig.footerTextSecondary!, startX, baseY);
+          ctx.font = '14px Arial, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText('Shuttle', centerX, baseY + 22);
+        }
+
+        const accentGradient = ctx.createLinearGradient(0, 0, totalWidth, 0);
+        accentGradient.addColorStop(0, brandConfig.headerGradientStart);
+        accentGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = accentGradient;
+        ctx.fillRect(0, totalHeight - 6, totalWidth, 6);
+
+        resolve(offscreen);
+      };
+
+      if (brandConfig.footerType === 'image' && brandConfig.footerImagePath) {
+        const logo = new Image();
+        logo.src = brandConfig.footerImagePath;
+        logo.onload = () => draw(logo);
+        logo.onerror = () => draw();
+      } else {
+        draw();
+      }
+    });
+  }
+
+  async downloadQrAsPdf(): Promise<void> {
+    const canvas = await this.buildBrandedQrCanvas();
+    if (!canvas) return;
+
+    const vehicle = this.selectedVehicleForQr;
+    const fleetNumber = vehicle?.fleetNumber ?? 'Unknown';
+    const regNumber = vehicle?.registrationNumber ?? 'Unknown';
+
+    const imgData = canvas.toDataURL('image/png', 1.0);
+
+    // Scale canvas px to mm (96dpi assumption)
+    const pxToMm = 0.264583;
+    const imgWidthMm = canvas.width * pxToMm;
+    const imgHeightMm = canvas.height * pxToMm;
+
+    const pdf = new jsPDF({
+      orientation: imgWidthMm > imgHeightMm ? 'landscape' : 'portrait',
+      unit: 'mm',
+      format: [imgWidthMm, imgHeightMm],
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidthMm, imgHeightMm);
+    pdf.save(`QR_${fleetNumber}_${regNumber}.pdf`);
+  }
+
+  async printQrCode(): Promise<void> {
+    const canvas = await this.buildBrandedQrCanvas();
+    if (!canvas) return;
+
+    const imgData = canvas.toDataURL('image/png', 1.0);
+
+    const printWindow = window.open('', '_blank', 'width=600,height=700');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>QR Code - ${this.selectedVehicleForQr?.fleetNumber}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f5f5f5; }
+          img { max-width: 100%; height: auto; display: block; }
+          @media print { body { background: white; } }
+        </style>
+      </head>
+      <body>
+        <img src="${imgData}" />
+        <script>
+          window.onload = function() { window.print(); window.onafterprint = function() { window.close(); }; };
+        </script>
+      </body>
+    </html>
+  `);
+    printWindow.document.close();
   }
 
 

@@ -486,10 +486,10 @@
       </div>
 
       <div class="flex gap-2 justify-content-center">
-        <button pButton label="Download PNG" style="gap: 0.5rem" icon="pi pi-download"
-          (click)="downloadQrCode()"></button>
+        <button pButton label="Download PDF" style="gap: 0.5rem" icon="pi pi-download"
+          (click)="downloadQrAsPdf()"></button>
         <button pButton label="Print" style="gap: 0.5rem" icon="pi pi-print" class="p-button-outlined"
-          (click)="window.print()"></button>
+          (click)="printQrCode()"></button>
       </div>
 
       <p class="mt-3 text-xs text-secondary">URL: {{ qrCodeData }}</p>
