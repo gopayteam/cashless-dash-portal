@@ -1020,3 +1020,49 @@
   font-size: 0.75rem;
   color: var(--text-color-secondary);
 }
+
+/* Aggregate skeleton */
+.aggregate-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.agg-skeleton-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.agg-skeleton-tab {
+  height: 2.25rem;
+  width: 90px;
+  border-radius: 8px;
+}
+
+.agg-skeleton-value {
+  height: 80px;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      var(--surface-200, #e9ecef) 25%,
+      var(--surface-100, #f8f9fa) 50%,
+      var(--surface-200, #e9ecef) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+}

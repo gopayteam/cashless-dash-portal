@@ -15,7 +15,9 @@
           <input matEndDate placeholder="End date" [(ngModel)]="filters.dateRange[1]" />
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker>
+        <!-- <mat-date-range-picker #picker (closed)="loadParcels({ first: 0, rows: rows })"></mat-date-range-picker> -->
+        <mat-date-range-picker #picker
+          (closed)="loadParcels({ first: 0, rows: rows }); fetchParcelAggregates()"></mat-date-range-picker>
       </mat-form-field>
     </div>
   </div>
@@ -159,52 +161,67 @@
 
 
   <!-- ================= AGGREGATE VALUE CARD ================= -->
-  <p-card styleClass="stat-card card" *ngIf="aggregateCards.length > 0">
+  <p-card styleClass="stat-card card" *ngIf="aggregateCards.length > 0 || isAggregateLoading">
     <div class="aggregate-header">
-      <h3>Parcel Value Summary</h3>
+      <h3>Parcel Value Summary (Declared value of goods)</h3>
       <p class="text-muted">Totals across {{ allAggregateParcels.length | number }} parcels in selected date range</p>
     </div>
 
-    <!-- Status Filter Tabs -->
-    <div class="aggregate-tabs">
-      <button *ngFor="let card of aggregateCards"
-        [class]="'agg-tab ' + (aggregateFilter === card.status ? 'agg-tab-active' : '')"
-        (click)="aggregateFilter = card.status">
-        <i [class]="'pi ' + card.icon"></i>
-        {{ card.label }}
-        <span class="agg-tab-count">{{ card.count | number }}</span>
-      </button>
-    </div>
-
-    <!-- Selected Status Summary -->
-    <ng-container *ngFor="let card of aggregateCards">
-      <div class="aggregate-values-grid" *ngIf="aggregateFilter === card.status">
-        <div class="agg-value-item">
-          <span class="agg-value-label">Aggregate Parcel Value</span>
-          <span class="agg-value-amount">
-            <span class="currency">Ksh</span>
-            {{ card.totalValue | number: '1.2-2' }}
-          </span>
-          <span class="agg-value-desc">Declared value of goods</span>
+    <!-- SKELETON while loading -->
+    <ng-container *ngIf="isAggregateLoading; else aggregateContent">
+      <div class="aggregate-skeleton">
+        <!-- Fake tabs -->
+        <div class="agg-skeleton-tabs">
+          <div class="agg-skeleton-tab shimmer" *ngFor="let i of [1,2,3,4,5,6]"></div>
         </div>
-        <div class="agg-value-item">
-          <span class="agg-value-label">Aggregate Service Charge</span>
-          <span class="agg-value-amount">
-            <span class="currency">Ksh</span>
-            {{ card.totalServiceCharge | number: '1.2-2' }}
-          </span>
-          <span class="agg-value-desc">Fees collected</span>
-        </div>
-        <div class="agg-value-item agg-value-total">
-          <span class="agg-value-label">Total Revenue</span>
-          <span class="agg-value-amount">
-            <span class="currency">Ksh</span>
-            {{ card.totalAmount | number: '1.2-2' }}
-          </span>
-          <span class="agg-value-desc">Combined total</span>
+        <!-- Fake value cards -->
+        <div class="aggregate-values-grid">
+          <div class="agg-skeleton-value shimmer" *ngFor="let i of [1,2,3]"></div>
         </div>
       </div>
     </ng-container>
+
+    <!-- ACTUAL CONTENT -->
+    <ng-template #aggregateContent>
+      <div class="aggregate-tabs">
+        <button *ngFor="let card of aggregateCards"
+          [class]="'agg-tab ' + (aggregateFilter === card.status ? 'agg-tab-active' : '')"
+          (click)="aggregateFilter = card.status">
+          <i [class]="'pi ' + card.icon"></i>
+          {{ card.label }}
+          <span class="agg-tab-count">{{ card.count | number }}</span>
+        </button>
+      </div>
+
+      <ng-container *ngFor="let card of aggregateCards">
+        <div class="aggregate-values-grid" *ngIf="aggregateFilter === card.status">
+          <div class="agg-value-item">
+            <span class="agg-value-label">Aggregate Parcel Value</span>
+            <span class="agg-value-amount">
+              <span class="currency">Ksh</span>
+              {{ card.totalValue | number: '1.2-2' }}
+            </span>
+            <!-- <span class="agg-value-desc">Declared value of goods</span> -->
+          </div>
+          <!-- <div class="agg-value-item">
+            <span class="agg-value-label">Aggregate Service Charge</span>
+            <span class="agg-value-amount">
+              <span class="currency">Ksh</span>
+              {{ card.totalServiceCharge | number: '1.2-2' }}
+            </span>
+            <span class="agg-value-desc">Fees collected</span>
+          </div>
+          <div class="agg-value-item agg-value-total">
+            <span class="agg-value-label">Total Revenue</span>
+            <span class="agg-value-amount">
+              <span class="currency">Ksh</span>
+              {{ card.totalAmount | number: '1.2-2' }}
+            </span>
+            <span class="agg-value-desc">Combined total</span>
+          </div> -->
+        </div>
+      </ng-container>
+    </ng-template>
   </p-card>
 
   <br>

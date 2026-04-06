@@ -84,6 +84,8 @@ export class ParcelsComponent implements OnInit {
   aggregateFilter: Parcel['parcelStatus'] | 'ALL' = 'ALL';
   allAggregateParcels: Parcel[] = [];
 
+  isAggregateLoading = false;
+
   // Stages
   stages: Stage[] = [];
   sourceStages: Stage[] = [];
@@ -307,6 +309,8 @@ export class ParcelsComponent implements OnInit {
     const [start, end] = this.filters.dateRange;
     if (!start || !end) return;
 
+    this.isAggregateLoading = true;
+
     const payload: any = {
       entityId: this.entityId,
       page: 0,
@@ -316,6 +320,20 @@ export class ParcelsComponent implements OnInit {
       endDate: formatDateLocal(end),
       sort: 'createdAt,DESC',
     };
+
+    // ← Mirror all active filters, same as fetchParcels()
+    if (this.filters.sourceId) {
+      payload.sourceId = this.filters.sourceId;
+    }
+    if (this.filters.destinationId) {
+      payload.destinationId = this.filters.destinationId;
+    }
+    if (this.filters.paymentMethod) {
+      payload.paymentMethod = this.filters.paymentMethod;
+    }
+    if (this.filters.parcelStatus) {
+      payload.parcelStatus = this.filters.parcelStatus;
+    }
 
     this.dataService
       .post<ParcelsAPiResponse>(API_ENDPOINTS.ALL_PARCELS, payload, 'parcel-aggregates')
@@ -327,8 +345,12 @@ export class ParcelsComponent implements OnInit {
         },
         error: (err) => {
           console.error('Failed to load aggregate parcels', err);
+          this.isAggregateLoading = false;
         },
-
+        complete: () => {
+          this.isAggregateLoading = false;
+          this.cdr.detectChanges();
+        }
       });
   }
 
