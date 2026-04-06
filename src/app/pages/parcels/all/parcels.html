@@ -196,7 +196,7 @@
       <ng-container *ngFor="let card of aggregateCards">
         <div class="aggregate-values-grid" *ngIf="aggregateFilter === card.status">
           <div class="agg-value-item">
-            <span class="agg-value-label">Aggregate Parcel Value</span>
+            <span class="agg-value-label">Sum of Parcels Value</span>
             <span class="agg-value-amount">
               <span class="currency">Ksh</span>
               {{ card.totalValue | number: '1.2-2' }}
