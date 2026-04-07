@@ -163,7 +163,7 @@
   <!-- ================= AGGREGATE VALUE CARD ================= -->
   <p-card styleClass="stat-card card" *ngIf="aggregateCards.length > 0 || isAggregateLoading">
     <div class="aggregate-header">
-      <h3>Parcel Value Summary (Declared value of goods)</h3>
+      <h3>Parcel Value Summary</h3>
       <p class="text-muted">Totals across {{ allAggregateParcels.length | number }} parcels in selected date range</p>
     </div>
 
@@ -201,28 +201,195 @@
               <span class="currency">Ksh</span>
               {{ card.totalValue | number: '1.2-2' }}
             </span>
-            <!-- <span class="agg-value-desc">Declared value of goods</span> -->
+            <span class="agg-value-desc">Declared value of goods</span>
           </div>
           <!-- <div class="agg-value-item">
-            <span class="agg-value-label">Aggregate Service Charge</span>
+            <span class="agg-value-label">Service Charge</span>
             <span class="agg-value-amount">
               <span class="currency">Ksh</span>
               {{ card.totalServiceCharge | number: '1.2-2' }}
             </span>
-            <span class="agg-value-desc">Fees collected</span>
-          </div>
+            <span class="agg-value-desc">Fees collected for {{ allAggregateParcels.length | number }}
+              parcels</span>
+          </div> -->
           <div class="agg-value-item agg-value-total">
-            <span class="agg-value-label">Total Revenue</span>
+            <span class="agg-value-label">Total Amount</span>
             <span class="agg-value-amount">
               <span class="currency">Ksh</span>
               {{ card.totalAmount | number: '1.2-2' }}
             </span>
             <span class="agg-value-desc">Combined total</span>
-          </div> -->
+          </div>
         </div>
       </ng-container>
     </ng-template>
   </p-card>
+
+  <br>
+
+  <!-- ================= VALUE BREAKDOWN ================= -->
+  <p-card styleClass="stat-card card" *ngIf="valueBuckets.length > 0">
+    <!-- Toggle Header -->
+    <div class="breakdown-header" (click)="showValueBreakdown = !showValueBreakdown" style="cursor:pointer;">
+      <div>
+        <h3>Parcel Value Breakdown</h3>
+        <p class="text-muted">Identify high-value parcels driving aggregate totals</p>
+      </div>
+      <i [class]="'pi ' + (showValueBreakdown ? 'pi-chevron-up' : 'pi-chevron-down')" style="font-size:1.2rem;"></i>
+    </div>
+
+    <!-- Expandable Content -->
+    <div *ngIf="showValueBreakdown" class="breakdown-content">
+      <p-table [value]="valueBuckets" styleClass="data-table" [tableStyle]="{ 'min-width': '40rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Value Range</th>
+            <th>Parcel Count</th>
+            <th>Total Declared Value</th>
+            <th>Total Amount Paid</th>
+            <th>% of Grand Total</th>
+            <th></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-bucket>
+          <tr>
+            <td>
+              <span class="bucket-label">{{ bucket.label }}</span>
+            </td>
+            <td>
+              <span class="bucket-count">{{ bucket.count | number }}</span>
+            </td>
+            <td class="amount-cell">
+              <span [class]="bucket.min >= 100000 ? 'amount amount-danger' : 'amount'">
+                Ksh {{ bucket.totalValue | number: '1.2-2' }}
+              </span>
+            </td>
+            <td class="amount-cell">
+              <span class="amount">Ksh {{ bucket.totalAmount | number: '1.2-2' }}</span>
+            </td>
+            <td>
+              <div class="percentage-bar-wrapper">
+                <div class="percentage-bar"
+                  [style.width]="((bucket.totalValue / (valueBuckets | totalValue)) * 100 | number: '1.0-0') + '%'"
+                  [class]="bucket.min >= 100000 ? 'bar-danger' : bucket.min >= 50000 ? 'bar-warning' : 'bar-safe'">
+                </div>
+                <span class="percentage-label">
+                  {{ (bucket.totalValue / (valueBuckets | totalValue)) * 100 | number: '1.1-1' }}%
+                </span>
+              </div>
+            </td>
+            <td>
+              <button pButton icon="pi pi-eye" label="View" class="p-button-text p-button-sm"
+                (click)="openBucketParcels(bucket)" pTooltip="View parcels in this range" tooltipPosition="left">
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>{{ allAggregateParcels.length | number }}</strong></td>
+            <td class="amount-cell">
+              <strong class="amount">Ksh {{ (valueBuckets | totalValue) | number: '1.2-2' }}</strong>
+            </td>
+            <td class="amount-cell">
+              <strong class="amount">Ksh {{ (valueBuckets | totalAmount) | number: '1.2-2' }}</strong>
+            </td>
+            <td colspan="2"></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+
+  <!-- ================= BUCKET PARCELS DIALOG ================= -->
+  <p-dialog [(visible)]="showBucketParcels" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '95vw', maxWidth: '1100px' }">
+
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon"><i class="pi pi-chart-bar"></i></div>
+          <div class="dialog-title-section">
+            <h2>{{ selectedBucket?.label }}</h2>
+            <span class="receipt-number-large">{{ selectedBucket?.count | number }} parcels</span>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <p-table *ngIf="selectedBucket" [value]="selectedBucket.parcels" [paginator]="true" [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]" styleClass="data-table" [tableStyle]="{ 'min-width': '50rem' }"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Parcel Number</th>
+          <th>Sender</th>
+          <th>Receiver</th>
+          <th>Route</th>
+          <th>Declared Value</th>
+          <th>Service Charge</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-parcel>
+        <tr>
+          <td><span class="receipt-number">{{ parcel.parcelNumber }}</span></td>
+          <td>
+            <div class="customer-info">
+              <span class="customer-name">{{ parcel.senderName }}</span>
+              <span class="customer-phone">{{ parcel.senderPhoneNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="customer-info">
+              <span class="customer-name">{{ parcel.receiverName }}</span>
+              <span class="customer-phone">{{ parcel.receiverPhoneNumber }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="route-cell">
+              <span class="route-text">{{ parcel.sourceName }}</span>
+              <i class="pi pi-arrow-right route-arrow"></i>
+              <span class="route-text">{{ parcel.destinationName }}</span>
+            </div>
+          </td>
+          <td class="amount-cell">
+            <span class="amount amount-danger">Ksh {{ parcel.value | number: '1.2-2' }}</span>
+          </td>
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ parcel.serviceCharge | number: '1.2-2' }}</span>
+          </td>
+          <td>
+            <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
+              {{ parcel.parcelStatus.replace('_', ' ') }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Close" icon="pi pi-times" iconPos="right" class="p-button-text"
+        (click)="closeBucketParcels()">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <br>
+
+  <!-- ─── Pagination Controls (Top) ────────────────────────────────────────── -->
+  <div class="paginator">
+    <p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords"
+      [rowsPerPageOptions]="[10, 50, 100, 500, 1000, 2000, 3000, 4000, 5000, 6000]" (onPageChange)="loadParcels($event)"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} parcels">
+    </p-paginator>
+  </div>
 
   <br>
 
@@ -249,7 +416,7 @@
     </div>
 
     <p-table [value]="parcels" [paginator]="true" [rows]="rows" [loading]="loading()" [totalRecords]="totalRecords"
-      [rowsPerPageOptions]="[10, 20, 30, 50, 100]" [showCurrentPageReport]="true"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100, 1000, 2500, 6000]" [showCurrentPageReport]="true"
       currentPageReportTemplate="Showing {first}–{last} of {totalRecords} parcels" styleClass="data-table"
       [tableStyle]="{ 'min-width': '60rem' }" [lazy]="true" (onLazyLoad)="loadParcels($event)"
       responsiveLayout="scroll">
@@ -264,7 +431,7 @@
           <th class="hide-mobile">Payment Method</th>
           <th>Status</th>
           <th>Parcel Value</th>
-          <th>Service Charge</th>
+          <!-- <th>Service Charge</th> -->
         </tr>
       </ng-template>
 
@@ -347,9 +514,9 @@
             <span class="amount">Ksh {{ parcel.value | number : '1.2-2' }}</span>
           </td>
 
-          <td class="amount-cell">
+          <!-- <td class="amount-cell">
             <span class="amount">Ksh {{ parcel.serviceCharge | number : '1.2-2' }}</span>
-          </td>
+          </td> -->
 
 
           <!-- <td>

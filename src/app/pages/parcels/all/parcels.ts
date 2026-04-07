@@ -33,6 +33,8 @@ import { MatInputModule } from '@angular/material/input';
 import { SelectModule } from 'primeng/select';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+import { Paginator } from "primeng/paginator";
+import { TotalValuePipe, TotalAmountPipe } from '../../../../@core/pipes/total-value.pipe';
 
 @Component({
   standalone: true,
@@ -63,7 +65,10 @@ import { formatDateLocal } from '../../../../@core/utils/date-time.util';
     ToastModule,
     ParcelReceiptComponent,
     SelectModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    Paginator,
+    TotalValuePipe,
+    TotalAmountPipe,
   ],
 })
 export class ParcelsComponent implements OnInit {
@@ -140,6 +145,19 @@ export class ParcelsComponent implements OnInit {
     { label: 'Collected', value: 'COLLECTED', icon: 'pi pi-check-circle' },
     { label: 'Cancelled', value: 'CANCELLED', icon: 'pi pi-times-circle' }
   ];
+
+  // Add near your other properties
+  showValueBreakdown = false;
+  valueThresholds = [
+    { label: 'Above Ksh 200k', min: 200000, max: Infinity },
+    { label: 'Ksh 100k – 200k', min: 100000, max: 200000 },
+    { label: 'Ksh 50k – 100k', min: 50000, max: 100000 },
+    { label: 'Ksh 10k – 50k', min: 10000, max: 50000 },
+    { label: 'Below Ksh 10k', min: 0, max: 10000 },
+  ];
+  valueBuckets: any[] = [];
+  selectedBucket: any = null;
+  showBucketParcels = false;
 
   constructor(
     private dataService: DataService,
@@ -396,6 +414,38 @@ export class ParcelsComponent implements OnInit {
         totalAmount,
       };
     });
+
+    this.computeValueBuckets();
+  }
+
+  computeValueBuckets(): void {
+    this.valueBuckets = this.valueThresholds.map(threshold => {
+      const parcels = this.allAggregateParcels.filter(p => {
+        const val = parseFloat(p.value as any) || 0;
+        return val >= threshold.min && val < threshold.max;
+      });
+
+      const totalValue = parcels.reduce((sum, p) => sum + (parseFloat(p.value as any) || 0), 0);
+      const totalAmount = parcels.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+      return {
+        ...threshold,
+        count: parcels.length,
+        totalValue,
+        totalAmount,
+        parcels,
+      };
+    });
+  }
+
+  openBucketParcels(bucket: any): void {
+    this.selectedBucket = bucket;
+    this.showBucketParcels = true;
+  }
+
+  closeBucketParcels(): void {
+    this.showBucketParcels = false;
+    this.selectedBucket = null;
   }
 
 

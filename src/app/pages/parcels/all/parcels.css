@@ -1066,3 +1066,111 @@
   background-size: 600px 100%;
   animation: shimmer 1.4s infinite linear;
 }
+
+
+
+/* ─────────────────────────────────────────────
+   PAGINATION
+───────────────────────────────────────────── */
+.pagination-wrapper {
+  margin-bottom: 1rem;
+}
+
+.pagination-wrapper:last-of-type {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+::ng-deep .p-paginator {
+  background: white !important;
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; */
+  padding: 0.75rem 1rem !important;
+}
+
+::ng-deep .p-paginator .p-paginator-current {
+  color: #4a5568;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+::ng-deep .p-paginator .p-dropdown {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+::ng-deep .p-paginator .p-paginator-page,
+::ng-deep .p-paginator .p-paginator-first,
+::ng-deep .p-paginator .p-paginator-prev,
+::ng-deep .p-paginator .p-paginator-next,
+::ng-deep .p-paginator .p-paginator-last {
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
+  margin: 0 0.125rem;
+}
+
+::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+
+/* Value Breakdown */
+.breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+}
+
+.breakdown-content {
+  margin-top: 1rem;
+}
+
+.bucket-label {
+  font-weight: 500;
+}
+
+.bucket-count {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.amount-danger {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.percentage-bar-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.percentage-bar {
+  height: 8px;
+  border-radius: 4px;
+  min-width: 4px;
+  transition: width 0.4s ease;
+}
+
+.bar-danger {
+  background-color: #e53935;
+}
+
+.bar-warning {
+  background-color: #fb8c00;
+}
+
+.bar-safe {
+  background-color: #43a047;
+}
+
+.percentage-label {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+}
