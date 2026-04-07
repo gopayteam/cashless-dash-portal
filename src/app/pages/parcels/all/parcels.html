@@ -201,7 +201,7 @@
               <span class="currency">Ksh</span>
               {{ card.totalValue | number: '1.2-2' }}
             </span>
-            <span class="agg-value-desc">Declared value of goods</span>
+            <span class="agg-value-desc">Declared value of <span>{{ card.label }}</span> goods</span>
           </div>
           <!-- <div class="agg-value-item">
             <span class="agg-value-label">Service Charge</span>
@@ -218,7 +218,8 @@
               <span class="currency">Ksh</span>
               {{ card.totalAmount | number: '1.2-2' }}
             </span>
-            <span class="agg-value-desc">Combined total</span>
+            <span class="agg-value-desc">Total charge for <span>{{ card.label }}</span>
+              parcels</span>
           </div>
         </div>
       </ng-container>
