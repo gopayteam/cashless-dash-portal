@@ -332,7 +332,7 @@
           <th>Receiver</th>
           <th>Route</th>
           <th>Declared Value</th>
-          <th>Service Charge</th>
+          <!-- <th>Service Charge</th> -->
           <th>Status</th>
         </tr>
       </ng-template>
@@ -362,9 +362,9 @@
           <td class="amount-cell">
             <span class="amount amount-danger">Ksh {{ parcel.value | number: '1.2-2' }}</span>
           </td>
-          <td class="amount-cell">
+          <!-- <td class="amount-cell">
             <span class="amount">Ksh {{ parcel.serviceCharge | number: '1.2-2' }}</span>
-          </td>
+          </td> -->
           <td>
             <span [class]="'badge ' + getStatusClass(parcel.parcelStatus)">
               {{ parcel.parcelStatus.replace('_', ' ') }}
