@@ -35,6 +35,8 @@ import { ActionButtonComponent } from "../../../components/action-button/action-
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 import { Paginator } from "primeng/paginator";
 import { TotalValuePipe, TotalAmountPipe } from '../../../../@core/pipes/total-value.pipe';
+import { ParcelManager } from '../../../../@core/models/parcels/parcel_manager.model';
+import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parcel_manager_response.model';
 
 @Component({
   standalone: true,
@@ -95,6 +97,9 @@ export class ParcelsComponent implements OnInit {
   stages: Stage[] = [];
   sourceStages: Stage[] = [];
   destinationStages: Stage[] = [];
+
+  // Managers
+  managerMap = new Map<string, ParcelManager>();
 
   // Server-side Filters
   filters = {
@@ -186,6 +191,7 @@ export class ParcelsComponent implements OnInit {
 
     this.setDefaultDateRange();
     this.loadStages();
+    this.loadParcelManagers();
 
     // this.router.events.subscribe(() => {
     //   if (this.lastEvent) {
@@ -202,6 +208,16 @@ export class ParcelsComponent implements OnInit {
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
     this.filters.dateRange = [lastWeek, today];
+  }
+
+  get selectedParcelManager(): ParcelManager | null {
+    if (!this.selectedParcel?.username) return null;
+    return this.managerMap.get(this.selectedParcel.username) ?? null;
+  }
+
+  getManager(username: string | null | undefined): ParcelManager | null {
+    if (!username) return null;
+    return this.managerMap.get(username) ?? null;
   }
 
   /**
@@ -321,6 +337,29 @@ export class ParcelsComponent implements OnInit {
         },
         complete: () => this.loadingStore.stop(),
       });
+  }
+
+  loadParcelManagers(): void {
+    if (!this.entityId) return;
+
+    const fullPayload = {
+      entityId: this.entityId,
+      page: 0,
+      size: 50,
+      transactionType: 'DEBIT',
+      paymentStatus: 'PAID',
+    };
+
+    this.dataService
+      .post<ParcelManagersApiResponse>(API_ENDPOINTS.ALL_PARCEL_MANAGERS, fullPayload, 'managers-full')
+      .subscribe({
+        next: (response) => {
+          this.managerMap.clear();
+          response.data.forEach(m => this.managerMap.set(m.username, m));
+        },
+        error: (err) => console.error('Failed to load parcel managers', err),
+      });
+
   }
 
   fetchParcelAggregates(): void {
@@ -463,6 +502,7 @@ export class ParcelsComponent implements OnInit {
     if (!parcelNumber) {
       // If search is cleared, reload normal data
       this.loadParcels({ first: 0, rows: this.rows });
+      // this.loadParcelManagers();
       return;
     }
 
@@ -475,6 +515,11 @@ export class ParcelsComponent implements OnInit {
   private performSearch(parcelNumber: string): void {
     if (!this.entityId) return;
 
+    // Re-load managers if the map is empty (e.g. initial load failed)
+    if (this.managerMap.size === 0) {
+      this.loadParcelManagers();
+    }
+
     this.isSearching = true;
     this.loadingStore.start();
 
@@ -486,7 +531,7 @@ export class ParcelsComponent implements OnInit {
     }
 
     this.dataService
-      .post<SingleParcelsAPiResponse>(searchEndpoint, 'single-parcel')
+      .post<SingleParcelsAPiResponse>(searchEndpoint, {}, 'single-parcel')
       .subscribe({
         next: (parcel) => {
           // Single parcel result

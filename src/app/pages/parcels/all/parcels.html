@@ -282,13 +282,14 @@
             </td>
             <td>
               <button pButton icon="pi pi-eye" label="View" class="p-button-text p-button-sm"
-                (click)="openBucketParcels(bucket)" pTooltip="View parcels in this range" tooltipPosition="left">
+                (click)="openBucketParcels(bucket)" pTooltip="View parcels in this range" tooltipPosition="top"
+                style="gap: 0.5rem;">
               </button>
             </td>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="footer">
+        <ng-template pTemplate="footer" style="margin-left: 0.5rem;">
           <tr>
             <td><strong>Total</strong></td>
             <td><strong>{{ allAggregateParcels.length | number }}</strong></td>
@@ -335,6 +336,7 @@
           <th>Declared Value</th>
           <!-- <th>Service Charge</th> -->
           <th>Status</th>
+          <th>created by</th>
         </tr>
       </ng-template>
 
@@ -371,12 +373,23 @@
               {{ parcel.parcelStatus.replace('_', ' ') }}
             </span>
           </td>
+          <td>
+            <ng-container *ngIf="getManager(parcel.username) as mgr; else fallback">
+              <div class="customer-info">
+                <span class="customer-name">{{ mgr.userName }}</span>
+                <span class="customer-phone">{{ mgr.userPhone }}</span>
+              </div>
+            </ng-container>
+            <ng-template #fallback>
+              <span class="code-value">{{ parcel.username || 'N/A' }}</span>
+            </ng-template>
+          </td>
         </tr>
       </ng-template>
     </p-table>
 
     <ng-template pTemplate="footer">
-      <button pButton label="Close" icon="pi pi-times" iconPos="right" class="p-button-text"
+      <button pButton label="Close" icon="pi pi-times" style="gap: 0.5rem;" iconPos="right" class="p-button-text"
         (click)="closeBucketParcels()">
       </button>
     </ng-template>
@@ -561,6 +574,40 @@
     </ng-template>
 
     <div class="detail-content" *ngIf="selectedParcel">
+
+      <!-- Parcel Manager Section -->
+      <div class="detail-section" *ngIf="getManager(selectedParcel.username) as mgr">
+        <h4 class="section-title">Created By</h4>
+
+        <div class="detail-item">
+          <label>Manager Name</label>
+          <span class="value">{{ mgr.userName }}</span>
+        </div>
+
+        <div class="detail-item">
+          <label>Manager Phone</label>
+          <span class="value">{{ mgr.userPhone }}</span>
+        </div>
+
+        <div class="detail-item">
+          <label>Username</label>
+          <span class="value code-value">{{ mgr.username }}</span>
+        </div>
+      </div>
+
+      <!-- Fallback if username exists but no match found -->
+      <div class="detail-section" *ngIf="selectedParcel.username && !selectedParcelManager">
+        <h4 class="section-title">Created By</h4>
+        <div class="detail-item">
+          <label>Username</label>
+          <span class="value code-value">{{ selectedParcel.username }}</span>
+        </div>
+        <div class="detail-item">
+          <label></label>
+          <span class="value text-muted" style="font-size: 0.8rem;">Manager details not found</span>
+        </div>
+      </div>
+
       <div class="detail-grid">
         <!-- Left Column -->
         <div class="detail-column">
