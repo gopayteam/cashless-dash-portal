@@ -720,7 +720,7 @@ export class AllVehiclesComponent implements OnInit {
     });
   }
 
-  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+  private buildBrandedQrCanvas23(): Promise<HTMLCanvasElement | null> {
     return new Promise((resolve) => {
       const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
       if (!qrCanvas) { resolve(null); return; }
@@ -851,6 +851,190 @@ export class AllVehiclesComponent implements OnInit {
         accentGradient.addColorStop(1, brandConfig.headerGradientEnd);
         ctx.fillStyle = accentGradient;
         ctx.fillRect(0, totalHeight - 6, totalWidth, 6);
+
+        resolve(offscreen);
+      };
+
+      if (brandConfig.footerType === 'image' && brandConfig.footerImagePath) {
+        const logo = new Image();
+        logo.src = brandConfig.footerImagePath;
+        logo.onload = () => draw(logo);
+        logo.onerror = () => draw();
+      } else {
+        draw();
+      }
+    });
+  }
+
+  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+    return new Promise((resolve) => {
+      const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
+      if (!qrCanvas) { resolve(null); return; }
+
+      const vehicle = this.selectedVehicleForQr;
+      const fleetNumber = vehicle?.fleetNumber ?? 'Unknown Fleet';
+      const regNumber = vehicle?.registrationNumber ?? 'Unknown Reg';
+      const entityId = vehicle?.entityId ?? '';
+
+      // ── Print dimensions ────────────────────────────────────────
+      // Target: 5cm wide × 8cm tall at 300 DPI
+      const DPI = 300;
+      const CM_TO_INCH = 1 / 2.54;
+      const totalWidth = Math.round(5 * CM_TO_INCH * DPI);  // ≈ 591 px
+      const totalHeight = Math.round(8 * CM_TO_INCH * DPI);  // ≈ 945 px
+
+      // ── Proportional layout (all values relative to totalHeight) ─
+      const headerHeight = Math.round(totalHeight * 0.12);  // ~12% → header
+      const footerHeight = Math.round(totalHeight * 0.12);  // ~12% → footer
+      const scanTextHeight = Math.round(totalHeight * 0.06);  // ~6%  → "SCAN TO PAY"
+      const accentBarH = Math.round(totalHeight * 0.007); // ~0.7% → accent lines
+      const padding = Math.round(totalWidth * 0.05);  // ~5%  → side padding
+      const textTopPadding = Math.round(totalHeight * 0.012); // small nudge
+
+      // QR code fills the remaining vertical space
+      const qrSize = totalHeight
+        - headerHeight
+        - footerHeight
+        - scanTextHeight
+        - accentBarH * 2   // top accent line + bottom bar
+        - padding * 2;     // top + bottom padding around QR
+
+      // ── Font sizes (proportional to totalWidth) ──────────────────
+      const fontFleet = Math.round(totalWidth * 0.075);  // fleet number
+      const fontReg = Math.round(totalWidth * 0.054);  // reg number
+      const fontScanText = Math.round(totalWidth * 0.09);   // SCAN TO PAY
+      const fontFooter1 = Math.round(totalWidth * 0.082);  // footer primary text
+      const fontFooter2 = Math.round(totalWidth * 0.044);  // footer secondary text
+
+      interface BrandConfig {
+        headerGradientStart: string;
+        headerGradientEnd: string;
+        accentColor: string;
+        footerType: 'image' | 'text';
+        footerImagePath?: string;
+        footerTextPrimary?: string;
+        footerTextSecondary?: string;
+        footerTextPrimaryColor?: string;
+        footerTextSecondaryColor?: string;
+      }
+
+      const brandConfig: BrandConfig = (() => {
+        switch (entityId) {
+          case 'GS000002':
+            return {
+              headerGradientStart: '#F47B20', headerGradientEnd: '#2E3192',
+              accentColor: '#F47B20', footerType: 'image',
+              footerImagePath: '/super_metro_logo.png',
+            };
+          case 'GS000006':
+            return {
+              headerGradientStart: '#1B5E20', headerGradientEnd: '#EF6C00',
+              accentColor: '#FB8C00', footerType: 'text',
+              footerTextPrimary: 'Bungoma', footerTextSecondary: 'Line',
+              footerTextPrimaryColor: '#EF6C00', footerTextSecondaryColor: '#2E7D32',
+            };
+          default:
+            return {
+              headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
+              accentColor: '#1E88E5', footerType: 'image',
+              footerImagePath: '/gopay_clear.png',
+            };
+        }
+      })();
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = totalWidth;
+      offscreen.height = totalHeight;
+      const ctx = offscreen.getContext('2d')!;
+
+      // Enable high-quality image smoothing for the scaled QR
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const draw = (logoImage?: HTMLImageElement) => {
+        // ── Background ─────────────────────────────────────────────
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+        // ── Header gradient ────────────────────────────────────────
+        const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
+        headerGradient.addColorStop(0, brandConfig.headerGradientStart);
+        headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(0, 0, totalWidth, headerHeight);
+
+        // Fleet number
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontFleet}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(fleetNumber, totalWidth / 2, headerHeight * 0.44);
+
+        // Reg number
+        ctx.font = `${fontReg}px Arial, sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(regNumber, totalWidth / 2, headerHeight * 0.78);
+
+        // ── QR code — scaled to qrSize × qrSize ───────────────────
+        const qrX = (totalWidth - qrSize) / 2;   // horizontally centred
+        const qrY = headerHeight + padding;
+        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+        const qrBottom = qrY + qrSize;
+
+        // ── "SCAN TO PAY" text ─────────────────────────────────────
+        const scanTextY = qrBottom + scanTextHeight * 0.6 + textTopPadding;
+        ctx.font = `bold ${fontScanText}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillText('SCAN TO PAY', totalWidth / 2, scanTextY);
+
+        // ── Accent separator line ──────────────────────────────────
+        const accentLineY = qrBottom + scanTextHeight + textTopPadding;
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillRect(0, accentLineY, totalWidth, accentBarH);
+
+        // ── Footer ─────────────────────────────────────────────────
+        const footerStartY = accentLineY + accentBarH;
+        const footerCentreY = footerStartY + footerHeight / 2;
+
+        if (brandConfig.footerType === 'image' && logoImage) {
+          const maxLogoW = totalWidth * 0.72;
+          const maxLogoH = footerHeight * 0.72;
+          const scale = Math.min(maxLogoW / logoImage.naturalWidth, maxLogoH / logoImage.naturalHeight);
+          const logoW = logoImage.naturalWidth * scale;
+          const logoH = logoImage.naturalHeight * scale;
+          ctx.drawImage(
+            logoImage,
+            (totalWidth - logoW) / 2,
+            footerCentreY - logoH / 2,
+            logoW, logoH
+          );
+        } else if (brandConfig.footerType === 'text') {
+          ctx.font = `bold ${fontFooter1}px Arial, sans-serif`;
+          ctx.textAlign = 'left';
+          const primaryW = ctx.measureText(brandConfig.footerTextPrimary!).width;
+          const spaceW = ctx.measureText(' ').width;
+          const secondaryW = ctx.measureText(brandConfig.footerTextSecondary!).width;
+          let startX = (totalWidth - (primaryW + spaceW + secondaryW)) / 2;
+
+          ctx.fillStyle = brandConfig.footerTextPrimaryColor!;
+          ctx.fillText(brandConfig.footerTextPrimary!, startX, footerCentreY);
+          startX += primaryW + spaceW;
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText(brandConfig.footerTextSecondary!, startX, footerCentreY);
+
+          ctx.font = `${fontFooter2}px Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText('Shuttle', totalWidth / 2, footerCentreY + fontFooter1 * 0.75);
+        }
+
+        // ── Bottom accent bar ──────────────────────────────────────
+        const bottomGradient = ctx.createLinearGradient(0, 0, totalWidth, 0);
+        bottomGradient.addColorStop(0, brandConfig.headerGradientStart);
+        bottomGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = bottomGradient;
+        ctx.fillRect(0, totalHeight - accentBarH * 2, totalWidth, accentBarH * 2);
 
         resolve(offscreen);
       };
