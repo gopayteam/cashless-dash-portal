@@ -1050,7 +1050,7 @@ export class AllVehiclesComponent implements OnInit {
     });
   }
 
-  private buildBrandedQrCanvas25(): Promise<HTMLCanvasElement | null> {
+  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
     return new Promise((resolve) => {
       const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
       if (!qrCanvas) { resolve(null); return; }
@@ -1235,7 +1235,7 @@ export class AllVehiclesComponent implements OnInit {
     });
   }
 
-  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+  private buildBrandedQrCanvas26(): Promise<HTMLCanvasElement | null> {
     return new Promise((resolve) => {
       const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
       if (!qrCanvas) { resolve(null); return; }
@@ -1414,7 +1414,7 @@ export class AllVehiclesComponent implements OnInit {
   }
 
   async downloadQrAsPdf(): Promise<void> {
-    const canvas = await this.buildBrandedQrCanvas25();
+    const canvas = await this.buildBrandedQrCanvas();
     if (!canvas) return;
 
     const vehicle = this.selectedVehicleForQr;
