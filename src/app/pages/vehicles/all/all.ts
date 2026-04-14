@@ -866,7 +866,7 @@ export class AllVehiclesComponent implements OnInit {
     });
   }
 
-  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+  private buildBrandedQrCanvas24(): Promise<HTMLCanvasElement | null> {
     return new Promise((resolve) => {
       const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
       if (!qrCanvas) { resolve(null); return; }
@@ -1050,8 +1050,371 @@ export class AllVehiclesComponent implements OnInit {
     });
   }
 
+  private buildBrandedQrCanvas25(): Promise<HTMLCanvasElement | null> {
+    return new Promise((resolve) => {
+      const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
+      if (!qrCanvas) { resolve(null); return; }
+
+      const vehicle = this.selectedVehicleForQr;
+      const fleetNumber = vehicle?.fleetNumber ?? 'Unknown Fleet';
+      const regNumber = vehicle?.registrationNumber ?? 'Unknown Reg';
+      const entityId = vehicle?.entityId ?? '';
+
+      // ── Print dimensions: exactly 5cm × 8cm @ 300 DPI ────────────
+      const DPI = 300;
+      const CM_TO_INCH = 1 / 2.54;
+      const totalWidth = Math.round(5 * CM_TO_INCH * DPI);   // 591 px
+      const totalHeight = Math.round(8 * CM_TO_INCH * DPI);   // 945 px
+
+      // ── Strict proportional budget (all from totalHeight) ─────────
+      const headerHeight = Math.round(totalHeight * 0.12);  // 12%
+      const footerHeight = Math.round(totalHeight * 0.12);  // 12%
+      const scanTextHeight = Math.round(totalHeight * 0.07);  // 7%
+      const accentBarH = Math.round(totalHeight * 0.008); // 0.8% each × 2 = 1.6%
+      const qrPadding = Math.round(totalHeight * 0.03);  // 3% gap above/below QR
+
+      // QR gets exactly what's left — no overflow, no gap
+      const qrSize = totalHeight
+        - headerHeight
+        - footerHeight
+        - scanTextHeight
+        - accentBarH * 2   // top accent + bottom bar
+        - qrPadding * 2;  // space above and below the QR
+
+      // ── Font sizes (proportional to totalWidth) ───────────────────
+      const fontFleet = Math.round(totalWidth * 0.075);
+      const fontReg = Math.round(totalWidth * 0.054);
+      const fontScanText = Math.round(totalWidth * 0.09);
+      const fontFooter1 = Math.round(totalWidth * 0.082);
+      const fontFooter2 = Math.round(totalWidth * 0.044);
+
+      interface BrandConfig {
+        headerGradientStart: string;
+        headerGradientEnd: string;
+        accentColor: string;
+        footerType: 'image' | 'text';
+        footerImagePath?: string;
+        footerTextPrimary?: string;
+        footerTextSecondary?: string;
+        footerTextPrimaryColor?: string;
+        footerTextSecondaryColor?: string;
+      }
+
+      const brandConfig: BrandConfig = (() => {
+        switch (entityId) {
+          case 'GS000002':
+            return {
+              headerGradientStart: '#F47B20', headerGradientEnd: '#2E3192',
+              accentColor: '#F47B20', footerType: 'image',
+              footerImagePath: '/super_metro_logo.png',
+            };
+          case 'GS000006':
+            return {
+              headerGradientStart: '#1B5E20', headerGradientEnd: '#EF6C00',
+              accentColor: '#FB8C00', footerType: 'text',
+              footerTextPrimary: 'Bungoma', footerTextSecondary: 'Line',
+              footerTextPrimaryColor: '#EF6C00', footerTextSecondaryColor: '#2E7D32',
+            };
+          default:
+            return {
+              headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
+              accentColor: '#1E88E5', footerType: 'image',
+              footerImagePath: '/gopay_clear.png',
+            };
+        }
+      })();
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = totalWidth;
+      offscreen.height = totalHeight;
+      const ctx = offscreen.getContext('2d')!;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const draw = (logoImage?: HTMLImageElement) => {
+        // Background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+        // ── Header ───────────────────────────────────────────────────
+        const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
+        headerGradient.addColorStop(0, brandConfig.headerGradientStart);
+        headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(0, 0, totalWidth, headerHeight);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontFleet}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(fleetNumber, totalWidth / 2, headerHeight * 0.44);
+
+        ctx.font = `${fontReg}px Arial, sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(regNumber, totalWidth / 2, headerHeight * 0.78);
+
+        // ── Top accent line ───────────────────────────────────────────
+        // (sits right below header, before QR padding)
+        const topAccentY = headerHeight;
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillRect(0, topAccentY, totalWidth, accentBarH);
+
+        // ── QR code ───────────────────────────────────────────────────
+        const qrX = (totalWidth - qrSize) / 2;
+        const qrY = topAccentY + accentBarH + qrPadding;
+        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+        const qrBottom = qrY + qrSize;
+
+        // ── "SCAN TO PAY" text ────────────────────────────────────────
+        // Centred in the scanTextHeight band
+        const scanTextY = qrBottom + qrPadding + scanTextHeight * 0.65;
+        ctx.font = `bold ${fontScanText}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillText('SCAN TO PAY', totalWidth / 2, scanTextY);
+
+        // ── Footer ────────────────────────────────────────────────────
+        // Starts immediately after scanText band
+        const footerStartY = qrBottom + qrPadding + scanTextHeight;
+        const footerCentreY = footerStartY + footerHeight / 2;
+
+        if (brandConfig.footerType === 'image' && logoImage) {
+          const maxLogoW = totalWidth * 0.72;
+          const maxLogoH = footerHeight * 0.72;
+          const scale = Math.min(
+            maxLogoW / logoImage.naturalWidth,
+            maxLogoH / logoImage.naturalHeight
+          );
+          const logoW = logoImage.naturalWidth * scale;
+          const logoH = logoImage.naturalHeight * scale;
+          ctx.drawImage(
+            logoImage,
+            (totalWidth - logoW) / 2,
+            footerCentreY - logoH / 2,
+            logoW, logoH
+          );
+        } else if (brandConfig.footerType === 'text') {
+          ctx.font = `bold ${fontFooter1}px Arial, sans-serif`;
+          ctx.textAlign = 'left';
+          const primaryW = ctx.measureText(brandConfig.footerTextPrimary!).width;
+          const spaceW = ctx.measureText(' ').width;
+          const secondaryW = ctx.measureText(brandConfig.footerTextSecondary!).width;
+          let startX = (totalWidth - (primaryW + spaceW + secondaryW)) / 2;
+
+          ctx.fillStyle = brandConfig.footerTextPrimaryColor!;
+          ctx.fillText(brandConfig.footerTextPrimary!, startX, footerCentreY);
+          startX += primaryW + spaceW;
+
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText(brandConfig.footerTextSecondary!, startX, footerCentreY);
+
+          ctx.font = `${fontFooter2}px Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = brandConfig.footerTextSecondaryColor!;
+          ctx.fillText('Shuttle', totalWidth / 2, footerCentreY + fontFooter1 * 0.75);
+        }
+
+        // ── Bottom accent bar (flush to bottom edge) ──────────────────
+        const bottomGradient = ctx.createLinearGradient(0, 0, totalWidth, 0);
+        bottomGradient.addColorStop(0, brandConfig.headerGradientStart);
+        bottomGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = bottomGradient;
+        ctx.fillRect(0, totalHeight - accentBarH * 2, totalWidth, accentBarH * 2);
+
+        resolve(offscreen);
+      };
+
+      if (brandConfig.footerType === 'image' && brandConfig.footerImagePath) {
+        const logo = new Image();
+        logo.src = brandConfig.footerImagePath;
+        logo.onload = () => draw(logo);
+        logo.onerror = () => draw();
+      } else {
+        draw();
+      }
+    });
+  }
+
+  private buildBrandedQrCanvas(): Promise<HTMLCanvasElement | null> {
+    return new Promise((resolve) => {
+      const qrCanvas = document.querySelector('canvas') as HTMLCanvasElement;
+      if (!qrCanvas) { resolve(null); return; }
+
+      const vehicle = this.selectedVehicleForQr;
+      const fleetNumber = vehicle?.fleetNumber ?? 'Unknown Fleet';
+      const regNumber = vehicle?.registrationNumber ?? 'Unknown Reg';
+      const entityId = vehicle?.entityId ?? '';
+
+      // ── Print dimensions: exactly 5cm × 8cm @ 300 DPI ────────────
+      const DPI = 300;
+      const CM_TO_INCH = 1 / 2.54;
+      const totalWidth = Math.round(5 * CM_TO_INCH * DPI);  // 591 px
+      const totalHeight = Math.round(8 * CM_TO_INCH * DPI);  // 945 px
+
+      // ── Proportional layout budget (all from totalHeight) ─────────
+      const headerHeight = Math.round(totalHeight * 0.12);  // 12% — header
+      const logoHeight = Math.round(totalHeight * 0.12);  // 12% — brand logo zone
+      const footerHeight = Math.round(totalHeight * 0.10);  // 10% — "SCAN TO PAY"
+      const accentBarH = Math.round(totalHeight * 0.008); // 0.8% × 2 = bottom bar
+      const qrPadding = Math.round(totalHeight * 0.02);  // 2%  — gap above/below QR
+
+      // QR gets exactly what's left
+      const qrSize = totalHeight
+        - headerHeight
+        - logoHeight
+        - footerHeight
+        - accentBarH * 2
+        - qrPadding * 2;
+
+      // ── Font sizes (proportional to totalWidth) ───────────────────
+      const fontFleet = Math.round(totalWidth * 0.075);
+      const fontReg = Math.round(totalWidth * 0.054);
+      const fontScanText = Math.round(totalWidth * 0.09);
+      const fontFooter2 = Math.round(totalWidth * 0.044); // for text-type "Shuttle" sub-label
+
+      interface BrandConfig {
+        headerGradientStart: string;
+        headerGradientEnd: string;
+        accentColor: string;
+        logoType: 'image' | 'text';
+        logoImagePath?: string;
+        logoTextPrimary?: string;
+        logoTextSecondary?: string;
+        logoTextPrimaryColor?: string;
+        logoTextSecondaryColor?: string;
+      }
+
+      const brandConfig: BrandConfig = (() => {
+        switch (entityId) {
+          case 'GS000002':
+            return {
+              headerGradientStart: '#F47B20', headerGradientEnd: '#2E3192',
+              accentColor: '#F47B20', logoType: 'image',
+              logoImagePath: '/super_metro_logo.png',
+            };
+          case 'GS000006':
+            return {
+              headerGradientStart: '#1B5E20', headerGradientEnd: '#EF6C00',
+              accentColor: '#FB8C00', logoType: 'text',
+              logoTextPrimary: 'Bungoma', logoTextSecondary: 'Line',
+              logoTextPrimaryColor: '#EF6C00', logoTextSecondaryColor: '#2E7D32',
+            };
+          default:
+            return {
+              headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
+              accentColor: '#1E88E5', logoType: 'image',
+              logoImagePath: '/gopay_clear.png',
+            };
+        }
+      })();
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = totalWidth;
+      offscreen.height = totalHeight;
+      const ctx = offscreen.getContext('2d')!;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const draw = (logoImage?: HTMLImageElement) => {
+        // ── Background ────────────────────────────────────────────────
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+        // ── Header ────────────────────────────────────────────────────
+        const headerGradient = ctx.createLinearGradient(0, 0, totalWidth, headerHeight);
+        headerGradient.addColorStop(0, brandConfig.headerGradientStart);
+        headerGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = headerGradient;
+        ctx.fillRect(0, 0, totalWidth, headerHeight);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontFleet}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(fleetNumber, totalWidth / 2, headerHeight * 0.44);
+
+        ctx.font = `${fontReg}px Arial, sans-serif`;
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText(regNumber, totalWidth / 2, headerHeight * 0.78);
+
+        // ── Brand logo zone (directly below header, no accent line) ──
+        const logoZoneY = headerHeight;
+        const logoCentreY = logoZoneY + logoHeight / 2;
+
+        if (brandConfig.logoType === 'image' && logoImage) {
+          const maxLogoW = totalWidth * 0.72;
+          const maxLogoH = logoHeight * 0.72;
+          const scale = Math.min(
+            maxLogoW / logoImage.naturalWidth,
+            maxLogoH / logoImage.naturalHeight
+          );
+          const logoW = logoImage.naturalWidth * scale;
+          const logoH = logoImage.naturalHeight * scale;
+          ctx.drawImage(
+            logoImage,
+            (totalWidth - logoW) / 2,
+            logoCentreY - logoH / 2,
+            logoW, logoH
+          );
+        } else if (brandConfig.logoType === 'text') {
+          const fontLogo1 = Math.round(totalWidth * 0.082);
+          ctx.font = `bold ${fontLogo1}px Arial, sans-serif`;
+          ctx.textAlign = 'left';
+          const primaryW = ctx.measureText(brandConfig.logoTextPrimary!).width;
+          const spaceW = ctx.measureText(' ').width;
+          const secondaryW = ctx.measureText(brandConfig.logoTextSecondary!).width;
+          let startX = (totalWidth - (primaryW + spaceW + secondaryW)) / 2;
+
+          ctx.fillStyle = brandConfig.logoTextPrimaryColor!;
+          ctx.fillText(brandConfig.logoTextPrimary!, startX, logoCentreY);
+          startX += primaryW + spaceW;
+
+          ctx.fillStyle = brandConfig.logoTextSecondaryColor!;
+          ctx.fillText(brandConfig.logoTextSecondary!, startX, logoCentreY);
+
+          ctx.font = `${fontFooter2}px Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillStyle = brandConfig.logoTextSecondaryColor!;
+          ctx.fillText('Shuttle', totalWidth / 2, logoCentreY + fontLogo1 * 0.75);
+        }
+
+        // ── QR code (below brand logo) ────────────────────────────────
+        const qrX = (totalWidth - qrSize) / 2;
+        const qrY = logoZoneY + logoHeight + qrPadding;
+        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+
+        const qrBottom = qrY + qrSize;
+
+        // ── "SCAN TO PAY" footer text ─────────────────────────────────
+        const footerStartY = qrBottom + qrPadding;
+        const footerCentreY = footerStartY + footerHeight / 2;
+        ctx.font = `bold ${fontScanText}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = brandConfig.accentColor;
+        ctx.fillText('SCAN TO PAY', totalWidth / 2, footerCentreY);
+
+        // ── Bottom accent bar (flush to bottom edge) ──────────────────
+        const bottomGradient = ctx.createLinearGradient(0, 0, totalWidth, 0);
+        bottomGradient.addColorStop(0, brandConfig.headerGradientStart);
+        bottomGradient.addColorStop(1, brandConfig.headerGradientEnd);
+        ctx.fillStyle = bottomGradient;
+        ctx.fillRect(0, totalHeight - accentBarH * 2, totalWidth, accentBarH * 2);
+
+        resolve(offscreen);
+      };
+
+      if (brandConfig.logoType === 'image' && brandConfig.logoImagePath) {
+        const logo = new Image();
+        logo.src = brandConfig.logoImagePath;
+        logo.onload = () => draw(logo);
+        logo.onerror = () => draw();
+      } else {
+        draw();
+      }
+    });
+  }
+
   async downloadQrAsPdf(): Promise<void> {
-    const canvas = await this.buildBrandedQrCanvas();
+    const canvas = await this.buildBrandedQrCanvas25();
     if (!canvas) return;
 
     const vehicle = this.selectedVehicleForQr;
