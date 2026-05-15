@@ -37,7 +37,7 @@ interface QueryHistoryItem {
     DividerModule, ProgressSpinnerModule,
   ],
   templateUrl: './rag-query.html',
-  styleUrls: ['./rag-query.css'],
+  styleUrls: ['./rag-query.css', '../../../../styles/global/_toast.css'],
   providers: [MessageService],
 })
 export class RagQueryComponent implements OnInit {
@@ -71,13 +71,16 @@ export class RagQueryComponent implements OnInit {
     this.currentResult.set(null);
 
     const payload: RagQueryRequest = {
-      entityId: this.entityId!,
-      query: q,
+      // entityId: this.entityId!,
+      text: q,
       topK: this.topK,
+      agent_type: "github",
+      source: "document",
+      stream: false
     };
 
     this.dataService
-      .post<RagQueryResponse>(API_ENDPOINTS.RAG_QUERY, payload, 'rag')
+      .post<RagQueryResponse>(API_ENDPOINTS.RAG_QUERY, payload, 'rag', true, true)
       .subscribe({
         next: (res) => {
           this.currentResult.set(res);

@@ -100,6 +100,16 @@
                 </button>
               </li>
 
+              <li class="menu-item" *hasRole="['CAN_VIEW_VEHICLES', 'CAN_VIEW_VEHICLE']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/vehicle-forecast')"
+                  (click)="navigate('/vehicle-forecast')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-chart-bar menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <span class="menu-text">Fleet Forecast</span>
+                  </span>
+                </button>
+              </li>
+
               <li class="menu-item" *hasRole="['CAN_ADD', 'CAN_EDIT']">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/transfer-payment')"
                   (click)="navigate('/transfer-payment/1')">

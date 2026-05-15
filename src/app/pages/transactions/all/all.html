@@ -55,6 +55,11 @@
             [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
             pTooltip="Export to CSV" tooltipPosition="bottom">
           </button>
+
+          <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn"
+            [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting"
+            (click)="exportLargeDatasetToCSV()" pTooltip="Export Dataset to CSV" tooltipPosition="bottom">
+          </button>
         </div>
       </div>
 
@@ -72,7 +77,8 @@
 
     <!-- Using global .data-table and .clickable-row classes -->
     <p-table [value]="transactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
-      [totalRecords]="apiTotalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100, 500, 1000]"
+      [totalRecords]="apiTotalRecords"
+      [rowsPerPageOptions]="[10, 20, 30, 50, 100, 500, 1000, 2000, 5000, 10000, 50000, 100000]"
       [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
       styleClass="data-table" (onLazyLoad)="loadTransactions($event)" [tableStyle]="{ 'min-width': '40rem' }"
       responsiveLayout="scroll">

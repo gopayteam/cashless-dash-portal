@@ -1,0 +1,306 @@
+<!-- rag-manager.component.html -->
+<p-toast></p-toast>
+
+<div class="rag-container">
+
+  <!-- ================= HEADER ================= -->
+  <div class="rag-header">
+    <div class="header-content">
+      <h1>RAG Knowledge Base</h1>
+      <p class="text-muted">Manage knowledge base entries across all data sources</p>
+    </div>
+    <div class="api-status" [class.online]="apiOnline" [class.offline]="!apiOnline">
+      <span class="status-dot"></span>
+      <span>{{ apiOnline ? 'API connected' : 'API offline' }}</span>
+    </div>
+  </div>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid grid-3">
+    <p-card styleClass="card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">Total entries</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ allChunks.length | number }}</span>
+          </h2>
+        </div>
+        <div class="stat-icon" style="background-color: #3b82f620">
+          <i class="pi pi-database" style="color: #3b82f6"></i>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">Showing</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ filteredChunks.length | number }}</span>
+          </h2>
+          <span class="stat-sub">{{ filteredChunks.length < allChunks.length ? 'filtered' : 'all results' }}</span>
+        </div>
+        <div class="stat-icon" style="background-color: #10b98120">
+          <i class="pi pi-eye" style="color: #10b981"></i>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card styleClass="card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">Categories</span>
+          <h2 class="stat-value">
+            <span class="amount">{{ uniqueCategories | number }}</span>
+          </h2>
+          <span class="stat-sub">unique</span>
+        </div>
+        <div class="stat-icon" style="background-color: #f59e0b20">
+          <i class="pi pi-tags" style="color: #f59e0b"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= MAIN LAYOUT: SIDEBAR + CONTENT ================= -->
+  <div class="rag-layout">
+
+    <!-- ── Sidebar ── -->
+    <p-card styleClass="stat-card card sidebar-card">
+      <div class="sidebar-section-label">Data Sources</div>
+
+      <div *ngFor="let src of sourceKeys" class="nav-item" [class.active]="currentSource === src"
+        (click)="switchSource(src)">
+        <i [class]="sourceMeta[src].icon"></i>
+        <span class="nav-label">{{ sourceMeta[src].label }}</span>
+        <span class="nav-badge">{{ counts[src] ?? '–' }}</span>
+      </div>
+
+      <div class="sidebar-sep"></div>
+      <div class="sidebar-section-label">Operations</div>
+
+      <div class="nav-item" (click)="triggerFullReEmbed()">
+        <i class="pi pi-bolt"></i>
+        <span class="nav-label">Re-embed All</span>
+      </div>
+      <div class="nav-item" (click)="refreshAll()">
+        <i class="pi pi-refresh"></i>
+        <span class="nav-label">Refresh Data</span>
+      </div>
+    </p-card>
+
+    <!-- ── Table Card ── -->
+    <p-card styleClass="stat-card card table-card">
+
+      <!-- Re-embed notice -->
+      <div class="ingest-banner" *ngIf="currentSource === 'faq' || currentSource === 'faq_pro'">
+        <div class="ingest-icon"><i class="pi pi-bolt"></i></div>
+        <div class="ingest-text">
+          <strong>Re-embedding</strong>
+          <span>After editing entries, click Re-embed to sync changes into the vector store.</span>
+        </div>
+        <button pButton icon="pi pi-microchip" label="Re-embed now" class="p-button-sm p-button-success"
+          [loading]="reEmbedLoading" (click)="triggerReEmbed()"></button>
+      </div>
+
+      <!-- Table header -->
+      <div class="table-header">
+        <div class="table-header-left" style="display: flex; flex-direction: row; gap: 1.5rem; align-items: center;">
+          <div>
+            <h3>{{ currentMeta.label }}</h3>
+            <span class="record-count">{{ allChunks.length }} entries</span>
+          </div>
+          <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+            (clicked)="refreshAll()"></app-action-button>
+        </div>
+
+        <div class="table-toolbar-right">
+          <div class="search-container">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input pInputText type="text" placeholder="Search entries..." [(ngModel)]="searchTerm"
+                (input)="onSearchChange()" class="search-input" />
+            </span>
+            <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+              (click)="clearSearch()" pTooltip="Clear search"></button>
+          </div>
+
+          <button pButton icon="pi pi-plus" label="Add Entry" class="p-button-sm p-button-primary"
+            (click)="openCreateDialog()"></button>
+
+          <button pButton icon="pi pi-microchip" label="Re-embed" class="p-button-sm p-button-success p-button-outlined"
+            [loading]="reEmbedLoading" (click)="triggerReEmbed()"></button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <p-table [value]="filteredChunks" [loading]="loading()" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} entries" styleClass="data-table"
+        [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 35%">Title / Question</th>
+            <th style="width: 38%">Content preview</th>
+            <th style="width: 13%">Category</th>
+            <th style="width: 14%; text-align: right">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-chunk>
+          <tr class="clickable-row">
+            <td>
+              <div class="chunk-title">{{ chunk.title || '—' }}</div>
+              <div class="chunk-tags" *ngIf="chunk.tags?.length">
+                <p-tag *ngFor="let tag of (chunk.tags | slice:0:3)" [value]="tag?.toString()" severity="secondary"
+                  styleClass="tag-pill"></p-tag>
+              </div>
+            </td>
+
+            <td>
+              <span class="content-preview">{{ contentPreview(chunk) }}</span>
+            </td>
+
+            <td>
+              <p-tag *ngIf="chunk.category; else noCategory" [value]="chunk.category"
+                [severity]="getCategoryTagSeverity(chunk.source_type)">
+              </p-tag>
+              <ng-template #noCategory>
+                <span style="color: var(--light-text)">—</span>
+              </ng-template>
+            </td>
+
+            <td>
+              <div class="td-actions">
+                <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm" pTooltip="Edit"
+                  (click)="openEditDialog(chunk); $event.stopPropagation()"></button>
+                <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" pTooltip="Delete"
+                  (click)="openDeleteDialog(chunk); $event.stopPropagation()"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="empty-message">
+              <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <h3>No entries found</h3>
+                <p>Try adjusting your search or add a new entry</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div><!-- /.rag-layout -->
+
+</div><!-- /.rag-container -->
+
+
+<!-- ================= ADD / EDIT DIALOG ================= -->
+<p-dialog [(visible)]="displayEntryDialog" [modal]="true" [closable]="true" [dismissableMask]="true" [draggable]="false"
+  [resizable]="false" [style]="{ width: '90vw', maxWidth: '640px' }"
+  [header]="editingChunk ? 'Edit entry' : 'Add to ' + currentMeta.label">
+  <div class="dialog-form" *ngIf="displayEntryDialog">
+
+    <!-- FAQ / FAQ Pro -->
+    <ng-container *ngIf="currentSource === 'faq' || currentSource === 'faq_pro'">
+      <div class="form-row">
+        <label class="filter-label">Question *</label>
+        <input pInputText class="form-input" placeholder="e.g. How do I cancel a ride?" [(ngModel)]="form.title" />
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Answer *</label>
+        <textarea class="form-input form-textarea" placeholder="Write the answer…" [(ngModel)]="form.content"
+          rows="5"></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="filter-label">Category</label>
+          <input pInputText class="form-input" placeholder="e.g. ride_booking" [(ngModel)]="form.category" />
+        </div>
+        <div class="form-row">
+          <label class="filter-label">Tags <span class="form-hint">(comma-separated)</span></label>
+          <input pInputText class="form-input" placeholder="booking, ride, cancel" [(ngModel)]="form.tags" />
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Privacy Policy -->
+    <ng-container *ngIf="currentSource === 'privacy_policy'">
+      <div class="form-row">
+        <label class="filter-label">Title *</label>
+        <input pInputText class="form-input" placeholder="e.g. Data Retention Policy" [(ngModel)]="form.title" />
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Section</label>
+        <input pInputText class="form-input" placeholder="e.g. 4. Data Retention" [(ngModel)]="form.category" />
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Content *</label>
+        <textarea class="form-input form-textarea" placeholder="Policy text…" [(ngModel)]="form.content"
+          rows="6"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Tags <span class="form-hint">(comma-separated)</span></label>
+        <input pInputText class="form-input" placeholder="retention, delete, gdpr" [(ngModel)]="form.tags" />
+      </div>
+    </ng-container>
+
+    <!-- App Guide -->
+    <ng-container *ngIf="currentSource === 'app_guide'">
+      <div class="form-row">
+        <label class="filter-label">Feature name *</label>
+        <input pInputText class="form-input" placeholder="e.g. Book a Ride" [(ngModel)]="form.title" />
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Screen / Category</label>
+        <input pInputText class="form-input" placeholder="e.g. Home Screen" [(ngModel)]="form.category" />
+      </div>
+      <div class="form-row">
+        <label class="filter-label">Description *</label>
+        <textarea class="form-input form-textarea" placeholder="What this feature does…" [(ngModel)]="form.content"
+          rows="4"></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="filter-label">How to use</label>
+          <textarea class="form-input form-textarea" placeholder="Step by step instructions…" [(ngModel)]="form.howTo"
+            rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="filter-label">Expected outcome</label>
+          <textarea class="form-input form-textarea" placeholder="What the user will see…" [(ngModel)]="form.outcome"
+            rows="3"></textarea>
+        </div>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" iconPos="right" class="p-button-text"
+      (click)="closeEntryDialog()"></button>
+    <button pButton label="Save" icon="pi pi-save" iconPos="right" class="p-button-primary" [loading]="loading()"
+      (click)="saveEntry()"></button>
+  </ng-template>
+</p-dialog>
+
+
+<!-- ================= DELETE CONFIRM DIALOG ================= -->
+<p-dialog [(visible)]="displayDeleteDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+  [draggable]="false" [resizable]="false" [style]="{ width: '90vw', maxWidth: '440px' }" header="Confirm deletion">
+  <div class="delete-confirm-body">
+    <p>Are you sure you want to delete <strong>{{ deleteTargetName }}</strong>?</p>
+    <p class="delete-warning">This action cannot be undone. The entry will be permanently removed.</p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" iconPos="right" class="p-button-text"
+      (click)="closeDeleteDialog()"></button>
+    <button pButton label="Delete" icon="pi pi-trash" iconPos="right" class="p-button-danger" [loading]="loading()"
+      (click)="confirmDelete()"></button>
+  </ng-template>
+</p-dialog>

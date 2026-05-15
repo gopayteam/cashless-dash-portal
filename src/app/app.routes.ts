@@ -97,6 +97,7 @@ import { AI_ROUTES } from './pages/ai-pages/ai.routes';
 import { VehicleAnalysisComponent } from './pages/vehicle-analysis/vehicle-analysis';
 import { PaymentRequestComponent } from './pages/payments/payment-request/payment-request';
 import { MarshalPerformanceComponent } from './pages/performance/marshall/marshall-performance/marshall-performance';
+import { VehicleForecastComponent } from './pages/vehicle-forecasting/vehicle-forecasting';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -756,6 +757,12 @@ export const routes: Routes = [
       {
         path: 'vehicle-analysis',
         component: VehicleAnalysisComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'vehicle-forecast',
+        component: VehicleForecastComponent,
         canActivate: [AuthGuard],
       },
 

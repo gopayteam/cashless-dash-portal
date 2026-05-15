@@ -143,9 +143,12 @@ export interface RagSource {
 }
 
 export interface RagQueryRequest {
-  entityId: string;
-  query: string;
+  entityId?: string;
+  text: string;
   topK?: number;
+  agent_type?: string,
+  source?: string,
+  stream?: boolean
 }
 
 export interface RagQueryResponse {
@@ -158,6 +161,8 @@ export interface RagQueryResponse {
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 
 export interface FaqEntry {
+  created_at: any;
+  updated_at: any;
   id: string;
   question: string;
   answer: string;

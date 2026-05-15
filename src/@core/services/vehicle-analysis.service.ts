@@ -27,7 +27,7 @@ import { PaymentsApiResponse } from '../models/transactions/payment_reponse.mode
 @Injectable({ providedIn: 'root' })
 export class VehicleAnalysisService {
 
-  constructor(private dataService: DataService) {}
+  constructor(private dataService: DataService) { }
 
   // ─────────────────────────────────────────────
   // Day
@@ -38,7 +38,7 @@ export class VehicleAnalysisService {
     fleetNumbers: string[],
     date: string,            // YYYY-MM-DD
   ): Observable<VehicleAnalysisResponse> {
-    return this._fetchTransactions(entityId, fleetNumbers, date, date).pipe(
+    return this.fetchTransactions(entityId, fleetNumbers, date, date).pipe(
       switchMap((transactions) => {
         const body: DayAnalysisRequest = { entityId, fleetNumbers, date, transactions };
         return this.dataService
@@ -58,7 +58,7 @@ export class VehicleAnalysisService {
     weekStart: string,       // YYYY-MM-DD (Monday)
   ): Observable<VehicleAnalysisResponse> {
     const weekEnd = this._addDays(weekStart, 6);
-    return this._fetchTransactions(entityId, fleetNumbers, weekStart, weekEnd).pipe(
+    return this.fetchTransactions(entityId, fleetNumbers, weekStart, weekEnd).pipe(
       switchMap((transactions) => {
         const body: WeekAnalysisRequest = { entityId, fleetNumbers, weekStart, transactions };
         return this.dataService
@@ -79,10 +79,10 @@ export class VehicleAnalysisService {
     month: number,
   ): Observable<VehicleAnalysisResponse> {
     const daysInMonth = new Date(year, month, 0).getDate();
-    const startDate   = `${year}-${String(month).padStart(2, '0')}-01`;
-    const endDate     = `${year}-${String(month).padStart(2, '0')}-${daysInMonth}`;
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${daysInMonth}`;
 
-    return this._fetchTransactions(entityId, fleetNumbers, startDate, endDate).pipe(
+    return this.fetchTransactions(entityId, fleetNumbers, startDate, endDate).pipe(
       switchMap((transactions) => {
         const body: MonthAnalysisRequest = { entityId, fleetNumbers, year, month, transactions };
         return this.dataService
@@ -102,9 +102,9 @@ export class VehicleAnalysisService {
     year: number,
   ): Observable<VehicleAnalysisResponse> {
     const startDate = `${year}-01-01`;
-    const endDate   = `${year}-12-31`;
+    const endDate = `${year}-12-31`;
 
-    return this._fetchTransactions(entityId, fleetNumbers, startDate, endDate, 5000).pipe(
+    return this.fetchTransactions(entityId, fleetNumbers, startDate, endDate, 5000).pipe(
       switchMap((transactions) => {
         const body: YearAnalysisRequest = { entityId, fleetNumbers, year, transactions };
         return this.dataService
@@ -115,22 +115,51 @@ export class VehicleAnalysisService {
   }
 
   // ─────────────────────────────────────────────
-  // Private — fetch transactions for the period
+  // Public — fetch transactions for the period
   // ─────────────────────────────────────────────
 
-  private _fetchTransactions(
+  // fetchTransactions(
+  //   entityId: string,
+  //   fleetNumbers: string[],
+  //   startDate: string,
+  //   endDate: string,
+  //   pageSize = 6000,
+  // ): Observable<PaymentRecord[]> {
+  //   const payload = {
+  //     entityId,
+  //     startDate,
+  //     endDate,
+  //     page: 0,
+  //     size: pageSize,
+  //     sort: 'createdAt,ASC',
+  //   };
+
+  //   return this.dataService
+  //     .post<PaymentsApiResponse>(EDA_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions', false)
+  //     .pipe(
+  //       map((response) => {
+  //         const all: PaymentRecord[] = response.data?.manifest ?? (response as any).data ?? [];
+  //         // Client-side filter — only keep the requested fleet numbers
+  //         return all.filter((tx) => fleetNumbers.includes(tx.fleetNumber));
+  //       }),
+  //     );
+  // }
+
+  fetchTransactions(
     entityId: string,
     fleetNumbers: string[],
     startDate: string,
     endDate: string,
-    pageSize = 6000,
+    pageSize?: number,          // optional override; auto-resolved if omitted
   ): Observable<PaymentRecord[]> {
+    const size = pageSize ?? this._resolvePageSize(startDate, endDate, fleetNumbers.length);
+
     const payload = {
       entityId,
       startDate,
       endDate,
       page: 0,
-      size: pageSize,
+      size,
       sort: 'createdAt,ASC',
     };
 
@@ -139,7 +168,6 @@ export class VehicleAnalysisService {
       .pipe(
         map((response) => {
           const all: PaymentRecord[] = response.data?.manifest ?? (response as any).data ?? [];
-          // Client-side filter — only keep the requested fleet numbers
           return all.filter((tx) => fleetNumbers.includes(tx.fleetNumber));
         }),
       );
@@ -149,6 +177,38 @@ export class VehicleAnalysisService {
   // Utilities
   // ─────────────────────────────────────────────
 
+  /**
+   * Derive a safe page size from the date range + fleet count.
+   *
+   * Assumptions (conservative):
+   *   - ~20 transactions / vehicle / day  (fuel fills, tolls, etc.)
+   *   - Hard cap at 50 000 to avoid gateway timeouts
+   *
+   * Examples:
+   *   1 fleet × 1 day   →   100    (floored so small ranges never get < 100)
+   *   5 fleets × 7 days →  1 400   (5 × 7 × 20 × 2 buffer)
+   *   5 fleets × 365 days → 50 000 (capped)
+   */
+  private _resolvePageSize(
+    startDate: string,
+    endDate: string,
+    fleetCount: number,
+  ): number {
+    const MS_PER_DAY = 86_400_000;
+    const days = Math.max(
+      1,
+      Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / MS_PER_DAY) + 1,
+    );
+
+    const TX_PER_VEHICLE_PER_DAY = 20;   // estimated peak
+    const BUFFER = 2;                     // 2× safety margin
+    const MIN_SIZE = 100;
+    const MAX_SIZE = 50_000;
+
+    const calculated = days * fleetCount * TX_PER_VEHICLE_PER_DAY * BUFFER;
+    return Math.min(MAX_SIZE, Math.max(MIN_SIZE, calculated));
+  }
+
   private _addDays(dateStr: string, days: number): string {
     const d = new Date(dateStr);
     d.setDate(d.getDate() + days);
@@ -156,7 +216,7 @@ export class VehicleAnalysisService {
   }
 
   getWeekStart(date: Date): string {
-    const d   = new Date(date);
+    const d = new Date(date);
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     d.setDate(diff);

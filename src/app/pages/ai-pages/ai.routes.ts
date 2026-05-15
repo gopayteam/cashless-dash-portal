@@ -8,7 +8,9 @@ import { Routes } from '@angular/router';
 import { ChatbotComponent } from './chatbot/chatbot';
 import { RagQueryComponent } from './rag/rag-query';
 import { IntentManagementComponent } from './intents/intent-management';
-import { FaqManagementComponent } from './faq/faq-management';
+import { FaqManagementComponent } from './faq-management/faq-management';
+import { RagManagerComponent } from './rag-manager/rag-manager';
+// import { FaqManagementComponent } from './faq/faq-management';
 
 // If you use an AuthGuard, add canActivate: [AuthGuard] to each route
 export const AI_ROUTES: Routes = [
@@ -29,7 +31,7 @@ export const AI_ROUTES: Routes = [
   },
   {
     path: 'knowledge-base',
-    component: FaqManagementComponent,
+    component: RagManagerComponent,
     title: 'Knowledge Base',
   },
 ];

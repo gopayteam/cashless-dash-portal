@@ -1,0 +1,644 @@
+/* faq-management.css – aligned to IntentsPage card/badge style */
+
+/* ── Page shell ──────────────────────────────────────────────── */
+.faq-page {
+display: flex;
+flex-direction: column;
+height: 100%;
+background: var(--surface-ground);
+overflow: hidden;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.page-header {
+padding: 12px 20px;
+border-bottom: 1px solid var(--surface-border);
+background: var(--surface-card);
+display: flex;
+align-items: center;
+flex-shrink: 0;
+}
+
+.header-left {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.page-icon {
+width: 36px;
+height: 36px;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 16px;
+flex-shrink: 0;
+}
+
+.faq-icon {
+background: var(--blue-50, rgba(59, 130, 246, 0.1));
+color: var(--blue-500, #3b82f6);
+}
+
+.page-header h1 {
+font-size: 14px;
+font-weight: 600;
+margin: 0 0 2px;
+color: var(--text-color);
+}
+
+.header-meta {
+display: flex;
+align-items: center;
+gap: 4px;
+margin: 0;
+font-size: 11px;
+font-family: var(--font-family-monospace, monospace);
+color: var(--text-color-secondary);
+}
+
+.meta-sep { opacity: 0.4; }
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+:host ::ng-deep .p-tabs {
+flex: 1;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+}
+
+:host ::ng-deep .p-tabpanels {
+flex: 1;
+overflow-y: auto;
+padding: 0;
+}
+
+:host ::ng-deep .p-tabpanel {
+padding: 0;
+}
+
+.tab-header {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 13px;
+}
+
+.tab-count {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+min-width: 20px;
+height: 18px;
+padding: 0 5px;
+background: var(--surface-border);
+border-radius: 999px;
+font-size: 10px;
+font-weight: 600;
+color: var(--text-color-secondary);
+}
+
+.tab-content {
+padding: 16px 20px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────── */
+.toolbar {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.toolbar-left { flex: 1; min-width: 0; }
+
+.toolbar-right {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+}
+
+.search-wrapper {
+display: flex;
+align-items: center;
+gap: 8px;
+background: var(--surface-card);
+border: 1px solid var(--surface-border);
+border-radius: 6px;
+padding: 5px 10px;
+width: 100%;
+}
+
+.search-icon { color: var(--text-color-secondary); font-size: 13px; flex-shrink: 0; }
+
+.search-input {
+flex: 1;
+background: none;
+border: none;
+outline: none;
+font-size: 13px;
+color: var(--text-color);
+font-family: var(--font-family);
+min-width: 0;
+}
+
+.search-clear {
+background: none;
+border: none;
+cursor: pointer;
+color: var(--text-color-secondary);
+padding: 0;
+display: flex;
+font-size: 11px;
+}
+
+/* ── Ingest result banner ─────────────────────────────────────── */
+.ingest-banner {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 8px 12px;
+border-radius: 6px;
+font-size: 12px;
+font-weight: 500;
+animation: fadeIn 0.2s ease;
+}
+
+.ingest-banner--success {
+background: rgba(34, 197, 94, 0.1);
+border: 1px solid rgba(34, 197, 94, 0.25);
+color: #16a34a;
+}
+
+.ingest-banner--error {
+background: rgba(239, 68, 68, 0.08);
+border: 1px solid rgba(239, 68, 68, 0.2);
+color: #dc2626;
+}
+
+/* ── Category filter pills ───────────────────────────────────── */
+.category-filters {
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+align-items: center;
+}
+
+.cat-pill {
+padding: 3px 12px;
+border-radius: 999px;
+font-size: 11px;
+font-weight: 600;
+cursor: pointer;
+border: 1px solid var(--surface-border);
+background: var(--surface-card);
+color: var(--text-color-secondary);
+transition: all 0.12s;
+}
+
+.cat-pill:hover {
+border-color: var(--primary-color);
+color: var(--primary-color);
+}
+
+.cat-pill.active {
+background: rgba(59, 130, 246, 0.1);
+border-color: rgba(59, 130, 246, 0.3);
+color: #3b82f6;
+}
+
+/* ── FAQ card list ───────────────────────────────────────────── */
+.faq-list {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.faq-card {
+background: var(--surface-card);
+border: 1px solid var(--surface-border);
+border-radius: 8px;
+overflow: hidden;
+transition: box-shadow 0.15s;
+}
+
+.faq-card:hover {
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Card header ─────────────────────────────────────────────── */
+.faq-card-header {
+display: flex;
+align-items: flex-start;
+gap: 10px;
+padding: 10px 14px;
+cursor: pointer;
+user-select: none;
+}
+
+.chevron {
+color: var(--text-color-secondary);
+flex-shrink: 0;
+margin-top: 2px;
+font-size: 13px;
+}
+
+.faq-q-icon {
+color: #3b82f6;
+flex-shrink: 0;
+margin-top: 2px;
+font-size: 14px;
+}
+
+.faq-title-block {
+flex: 1;
+min-width: 0;
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
+
+.faq-question-text {
+font-weight: 600;
+font-size: 13px;
+color: var(--text-color);
+line-height: 1.4;
+}
+
+.faq-answer-preview {
+font-size: 11px;
+color: var(--text-color-secondary);
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+.faq-badges {
+display: flex;
+gap: 6px;
+align-items: center;
+flex-shrink: 0;
+flex-wrap: wrap;
+}
+
+.faq-actions {
+display: flex;
+gap: 2px;
+align-items: center;
+flex-shrink: 0;
+}
+
+/* ── Badges ──────────────────────────────────────────────────── */
+.badge {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+padding: 2px 8px;
+border-radius: 999px;
+font-size: 11px;
+font-weight: 600;
+}
+
+.badge-blue {
+background: rgba(59, 130, 246, 0.1);
+border: 1px solid rgba(59, 130, 246, 0.25);
+color: #3b82f6;
+}
+
+.badge-green {
+background: rgba(34, 197, 94, 0.1);
+border: 1px solid rgba(34, 197, 94, 0.25);
+color: #16a34a;
+}
+
+.badge-purple {
+background: rgba(168, 85, 247, 0.1);
+border: 1px solid rgba(168, 85, 247, 0.25);
+color: #a855f7;
+}
+
+/* ── Card body (expanded) ────────────────────────────────────── */
+.faq-card-body {
+border-top: 1px solid var(--surface-border);
+padding: 14px;
+display: flex;
+flex-direction: column;
+gap: 14px;
+animation: fadeIn 0.15s ease;
+}
+
+.field-section {
+display: flex;
+flex-direction: column;
+gap: 6px;
+flex: 1;
+}
+
+.field-label {
+font-size: 10px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.1em;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.field-label--blue { color: #3b82f6; }
+.field-label--green { color: #16a34a; }
+.field-label--purple { color: #a855f7; }
+
+.answer-block {
+font-size: 12px;
+color: var(--text-color-secondary);
+background: rgba(34, 197, 94, 0.06);
+border: 1px solid rgba(34, 197, 94, 0.2);
+border-radius: 6px;
+padding: 8px 10px;
+line-height: 1.6;
+}
+
+.category-value {
+font-size: 12px;
+color: var(--text-color-secondary);
+background: rgba(59, 130, 246, 0.06);
+border: 1px solid rgba(59, 130, 246, 0.2);
+border-radius: 6px;
+padding: 3px 8px;
+display: inline-block;
+}
+
+.muted-value {
+font-size: 12px;
+color: var(--text-color-secondary);
+opacity: 0.5;
+}
+
+.field-row {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 16px;
+}
+
+.tags-row {
+display: flex;
+flex-wrap: wrap;
+gap: 5px;
+}
+
+.tag-chip {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+padding: 2px 8px;
+border-radius: 999px;
+font-size: 11px;
+font-weight: 600;
+background: rgba(168, 85, 247, 0.1);
+border: 1px solid rgba(168, 85, 247, 0.25);
+color: #a855f7;
+}
+
+.timestamp-row {
+display: flex;
+gap: 12px;
+font-size: 10px;
+color: var(--text-color-secondary);
+opacity: 0.6;
+border-top: 1px solid var(--surface-border);
+padding-top: 8px;
+}
+
+.filter-count {
+font-size: 11px;
+color: var(--text-color-secondary);
+text-align: center;
+margin-top: 4px;
+}
+
+/* ── Empty state ─────────────────────────────────────────────── */
+.empty-state {
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 48px 20px;
+text-align: center;
+color: var(--text-color-secondary);
+}
+
+.empty-state i {
+font-size: 36px;
+opacity: 0.2;
+margin-bottom: 12px;
+}
+
+.empty-state h3 {
+margin: 0 0 6px;
+font-size: 15px;
+font-weight: 600;
+color: var(--text-color);
+}
+
+.empty-state p {
+margin: 0 0 16px;
+font-size: 13px;
+}
+
+/* ── Upload zone ─────────────────────────────────────────────── */
+.upload-zone {
+border: 2px dashed var(--surface-border);
+border-radius: 10px;
+padding: 32px;
+cursor: pointer;
+text-align: center;
+transition: border-color 0.15s, background 0.15s;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+border-color: var(--primary-color);
+background: var(--primary-50, rgba(59, 130, 246, 0.04));
+}
+
+.upload-inner h3 {
+margin: 8px 0 4px;
+font-size: 15px;
+font-weight: 600;
+}
+
+.upload-inner p {
+margin: 0;
+font-size: 13px;
+color: var(--text-color-secondary);
+}
+
+.upload-icon {
+font-size: 28px;
+color: var(--text-color-secondary);
+}
+
+.upload-icon.uploading { color: var(--primary-color); }
+
+.browse-link {
+color: var(--primary-color);
+font-weight: 600;
+cursor: pointer;
+}
+
+.supported { font-size: 11px !important; opacity: 0.6; margin-top: 4px !important; }
+
+:host ::ng-deep .upload-progress { margin-top: 12px; }
+
+/* ── Document table ──────────────────────────────────────────── */
+.doc-name-cell {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.doc-type-icon { color: var(--text-color-secondary); font-size: 14px; }
+.doc-name { font-weight: 500; font-size: 13px; }
+
+.size-text { font-size: 12px; color: var(--text-color-secondary); }
+
+.chunk-count {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+font-size: 12px;
+color: var(--text-color-secondary);
+}
+
+.doc-status {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+font-size: 12px;
+font-weight: 600;
+padding: 2px 8px;
+border-radius: 999px;
+}
+
+.status-indexed {
+background: rgba(34, 197, 94, 0.1);
+color: #16a34a;
+}
+
+.status-processing {
+background: rgba(59, 130, 246, 0.1);
+color: #3b82f6;
+}
+
+.status-error {
+background: rgba(239, 68, 68, 0.1);
+color: #dc2626;
+}
+
+.date-muted { font-size: 12px; color: var(--text-color-secondary); }
+
+/* ── Dialog form ─────────────────────────────────────────────── */
+.dialog-form {
+display: flex;
+flex-direction: column;
+gap: 14px;
+padding: 4px 0;
+}
+
+.form-field {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+
+.form-field label {
+font-size: 12px;
+font-weight: 600;
+color: var(--text-color-secondary);
+}
+
+.required { color: #dc2626; }
+.hint { font-weight: 400; opacity: 0.6; }
+
+.form-textarea {
+width: 100%;
+border: 1px solid var(--surface-border);
+border-radius: 6px;
+padding: 8px 10px;
+font-size: 13px;
+font-family: var(--font-family);
+color: var(--text-color);
+background: var(--surface-ground);
+resize: vertical;
+outline: none;
+transition: border-color 0.12s;
+}
+
+.form-textarea:focus {
+border-color: var(--primary-color);
+}
+
+.form-row { display: flex; gap: 14px; }
+.two-col .form-field { flex: 1; }
+
+/* Tags in dialog */
+.tag-input-wrapper {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+
+.tag-chips {
+display: flex;
+flex-wrap: wrap;
+gap: 5px;
+}
+
+.tag-chip .tag-remove {
+background: none;
+border: none;
+cursor: pointer;
+padding: 0;
+display: inline-flex;
+align-items: center;
+color: #a855f7;
+opacity: 0.7;
+font-size: 9px;
+margin-left: 2px;
+}
+
+.tag-add-row {
+display: flex;
+gap: 6px;
+align-items: center;
+}
+
+.tag-input-field {
+flex: 1;
+font-size: 12px !important;
+padding: 4px 8px !important;
+}
+
+/* ── Data table override ──────────────────────────────────────── */
+:host ::ng-deep .data-table .p-datatable-thead > tr > th {
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+padding: 8px 12px;
+}
+
+:host ::ng-deep .data-table .p-datatable-tbody > tr > td {
+padding: 8px 12px;
+font-size: 13px;
+}
+
+/* ── Animation ───────────────────────────────────────────────── */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(-4px); }
+to { opacity: 1; transform: translateY(0); }
+}

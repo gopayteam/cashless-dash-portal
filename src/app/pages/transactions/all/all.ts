@@ -377,4 +377,163 @@ export class AllTransactionsComponent implements OnInit {
       this.isExporting = false;
     }
   }
+
+
+  async exportLargeDatasetToCSV(): Promise<void> {
+    try {
+      this.isExporting = true;
+
+      const [start, end] = this.dateRange;
+
+      if (!start || !end) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Invalid Date Range',
+          detail: 'Please select a valid date range',
+          life: 3000
+        });
+        return;
+      }
+
+      const TOTAL_RECORDS = 150000;
+      const PAGE_SIZE = 2000;
+
+      let page = 0;
+      let fetched = 0;
+
+      const csvRows: string[] = [];
+
+      // CSV Header
+      csvRows.push([
+        'M-Pesa Receipt',
+        'Customer Name',
+        'Fleet Number',
+        'Transaction Type',
+        'Payment Status',
+        'Amount (KES)',
+        'Trip ID',
+        'Pickup',
+        'Drop Off',
+        'Driver Username',
+        'Created At',
+        'Updated At'
+      ].join(','));
+
+      while (fetched < TOTAL_RECORDS) {
+
+        const payload = {
+          entityId: this.entityId,
+          startDate: formatDateLocal(start),
+          endDate: formatDateLocal(end),
+          page,
+          size: PAGE_SIZE,
+          sort: 'createdAt,DESC',
+        };
+
+        const response = await this.dataService
+          .post<PaymentsApiResponse>(
+            API_ENDPOINTS.ALL_PAYMENTS,
+            payload,
+            'transactions',
+            true
+          )
+          .toPromise();
+
+        const records = response?.data?.manifest || [];
+
+        if (records.length === 0) {
+          break;
+        }
+
+        for (const t of records) {
+
+          const row = [
+            this.escapeCSV(t.mpesaReceiptNumber),
+            this.escapeCSV(t.customerName || 'N/A'),
+            this.escapeCSV(t.fleetNumber),
+            this.escapeCSV(t.transactionType),
+            this.escapeCSV(t.paymentStatus),
+            t.assignedAmount ?? 0,
+            this.escapeCSV(t.tripId || 'N/A'),
+            this.escapeCSV(t.pickup || 'N/A'),
+            this.escapeCSV(t.dropOff || 'N/A'),
+            this.escapeCSV(t.activeDriverUsername || 'N/A'),
+            this.escapeCSV(new Date(t.createdAt).toLocaleString()),
+            this.escapeCSV(new Date(t.updatedAt).toLocaleString()),
+          ];
+
+          csvRows.push(row.join(','));
+        }
+
+        fetched += records.length;
+        page++;
+
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Export Progress',
+          detail: `Fetched ${fetched.toLocaleString()} records...`,
+          life: 1500
+        });
+
+        // Yield control to browser to prevent freezing
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      const csvContent = csvRows.join('\n');
+
+      const blob = new Blob(
+        [csvContent],
+        { type: 'text/csv;charset=utf-8;' }
+      );
+
+      const link = document.createElement('a');
+
+      const startDate = formatDateLocal(start);
+      const endDate = formatDateLocal(end);
+
+      const filename =
+        `transactions_${startDate}_to_${endDate}_large.csv`;
+
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(link.href);
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Export Complete',
+        detail: `${fetched.toLocaleString()} transactions exported successfully`,
+        life: 5000
+      });
+
+    } catch (error) {
+
+      console.error('Large export failed:', error);
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Export Failed',
+        detail: 'Failed to export transactions',
+        life: 5000
+      });
+
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  private escapeCSV(value: any): string {
+    if (value === null || value === undefined) {
+      return '""';
+    }
+
+    const stringValue = String(value).replace(/"/g, '""');
+
+    return `"${stringValue}"`;
+  }
 }

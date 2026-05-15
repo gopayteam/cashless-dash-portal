@@ -1,0 +1,312 @@
+<!-- pages/vehicle-forecast/vehicle-forecast.html -->
+<p-toast />
+
+<section class="vf-wrap">
+
+  <!-- ══════════════════════════════════════════════════════
+       HEADER
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-header">
+    <div class="vf-header-text">
+      <div class="vf-eyebrow">
+        <span class="vf-eyebrow-dot"></span>
+        ML Ensemble Engine
+      </div>
+      <h2 class="vf-title">Revenue Forecast</h2>
+      <p class="vf-subtitle">
+        Generate forward-looking revenue projections using ARIMA, SARIMA, Prophet, and ensemble models.
+      </p>
+    </div>
+
+    <!-- Period Selection (Dynamic by Tab) -->
+    <div class="va-header-right">
+      <!-- DAY -->
+      <ng-container *ngIf="activeTabValue === 'day'">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Date</label>
+          <mat-form-field appearance="outline" class="date-range-field">
+            <input matInput [matDatepicker]="dayPicker" [(ngModel)]="dayDate" placeholder="Pick a date" />
+            <mat-datepicker-toggle matSuffix [for]="dayPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dayPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <!-- WEEK -->
+      <ng-container *ngIf="activeTabValue === 'week'">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Week Range</label>
+          <mat-form-field appearance="outline" class="date-range-field">
+            <mat-date-range-input [rangePicker]="weekRangePicker">
+              <input matStartDate placeholder="Start date" [(ngModel)]="weekStartDate"
+                (dateChange)="onWeekStartChange()" />
+              <input matEndDate placeholder="End date" [(ngModel)]="weekEndDate" [readonly]="true" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="weekRangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #weekRangePicker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      </ng-container>
+
+      <!-- MONTH -->
+      <ng-container *ngIf="activeTabValue === 'month'">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Month &amp; Year</label>
+          <div class="header-date-row">
+            <mat-form-field appearance="outline" class="date-select-field">
+              <mat-select [(ngModel)]="monthMonth" placeholder="Month">
+                <mat-option *ngFor="let m of months" [value]="m.value">
+                  {{ m.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="date-select-field">
+              <mat-select [(ngModel)]="monthYear" placeholder="Year">
+                <mat-option *ngFor="let y of years" [value]="y.value">
+                  {{ y.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- YEAR -->
+      <ng-container *ngIf="activeTabValue === 'year'">
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Year</label>
+          <mat-form-field appearance="outline" class="date-select-field">
+            <mat-select [(ngModel)]="yearYear" placeholder="Select year">
+              <mat-option *ngFor="let y of years" [value]="y.value">
+                {{ y.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FILTER BAR — Tabs | Fleet selector | Fetch button
+       ══════════════════════════════════════════════════════════ -->
+  <p-card styleClass="stat-card card vf-filter-card">
+    <div class="filter-bar">
+      <!-- LEFT: Tabs -->
+      <p-tabs [value]="activeTabValue" (valueChange)="onTabChange($event)" class="filter-tabs">
+        <p-tablist>
+          <p-tab value="day"><i class="pi pi-sun"></i> Day</p-tab>
+          <p-tab value="week"><i class="pi pi-calendar"></i> Week</p-tab>
+          <p-tab value="month"><i class="pi pi-chart-bar"></i> Month</p-tab>
+          <p-tab value="year"><i class="pi pi-chart-line"></i> Year</p-tab>
+        </p-tablist>
+      </p-tabs>
+
+      <div class="filter-divider"></div>
+
+      <!-- RIGHT: Fleet selector + Fetch button -->
+      <div class="filter-right">
+        <div class="fleet-select-wrapper">
+          <p-multiSelect [options]="fleetOptions" [(ngModel)]="selectedFleets" optionLabel="label" optionValue="value"
+            placeholder="Select fleets..." [filter]="true" [autofocusFilter]="true" filterPlaceholder="Search..."
+            [showClear]="true" (onChange)="onFleetSelectionChange()" styleClass="fleet-multiselect" appendTo="body">
+            <ng-template pTemplate="item" let-opt>
+              <div class="fleet-option-item">
+                <i class="pi pi-car fleet-option-icon"></i>
+                <span>{{ opt.label }}</span>
+              </div>
+            </ng-template>
+          </p-multiSelect>
+        </div>
+
+        <button pButton icon="pi pi-download" label="Fetch Data" class="fetch-btn"
+          [disabled]="!canFetch || analysisLoading" [loading]="analysisLoading" (click)="fetchData()">
+        </button>
+      </div>
+    </div>
+  </p-card>
+
+  <!-- ══════════════════════════════════════════════════════
+       INSUFFICIENT DATA WARNING
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-alert vf-alert--warn" *ngIf="insufficientData && !analysisLoading">
+    <i class="pi pi-exclamation-triangle"></i>
+    <div>
+      <strong>Insufficient Data</strong>
+      <p>At least 10 transaction records are required for meaningful forecasting. Currently loaded: {{
+        transactions.length }}. Try selecting a longer period or more fleets.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       NO DATA STATE
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-empty" *ngIf="transactions.length === 0 && !loading && !analysisLoading">
+    <div class="vf-empty-icon">
+      <i class="pi pi-chart-line"></i>
+    </div>
+    <h3>Ready to Forecast</h3>
+    <p>Select fleets and a time period above, then click <strong>Fetch Data</strong> to load transactions for modeling.
+    </p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       FETCHING LOADING STATE
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-loading-box" *ngIf="analysisLoading">
+    <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" fill="transparent"
+      animationDuration=".5s"></p-progressSpinner>
+    <p>Fetching transaction data...</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       CONFIG PANEL (shown when data is available)
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-config-card" *ngIf="transactions.length >= 10 && !analysisLoading">
+
+    <div class="vf-config-grid">
+
+      <!-- Forecast Horizon -->
+      <div class="vf-config-block">
+        <div class="vf-config-label">
+          <i class="pi pi-calendar-plus"></i>
+          Forecast Horizon
+          <span class="vf-config-value-badge">{{ periods }} {{ freqLabel }}</span>
+        </div>
+        <div class="vf-slider-wrap">
+          <span class="vf-slider-min">1</span>
+          <input type="range" class="vf-slider" [(ngModel)]="periods" min="1" max="90" step="1" />
+          <span class="vf-slider-max">90</span>
+        </div>
+        <div class="vf-slider-ticks">
+          <span>Short</span>
+          <span>Medium</span>
+          <span>Long</span>
+        </div>
+      </div>
+
+      <!-- Frequency -->
+      <div class="vf-config-block">
+        <div class="vf-config-label">
+          <i class="pi pi-clock"></i>
+          Aggregation Frequency
+        </div>
+        <div class="vf-freq-group">
+          <button *ngFor="let opt of freqOptions" class="vf-freq-btn" [class.vf-freq-btn--active]="freq === opt.value"
+            (click)="freq = opt.value">
+            {{ opt.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Model Selection -->
+      <div class="vf-config-block vf-config-block--full">
+        <div class="vf-config-label">
+          <i class="pi pi-cog"></i>
+          Ensemble Models
+          <span class="vf-config-value-badge">{{ selectedModels.length }} selected</span>
+        </div>
+        <div class="vf-model-grid">
+          <button *ngFor="let model of availableModels" class="vf-model-chip"
+            [class.vf-model-chip--active]="isModelSelected(model.value)" (click)="toggleModel(model.value)"
+            [pTooltip]="model.description" tooltipPosition="top">
+            <i class="pi" [class.pi-check-circle]="isModelSelected(model.value)"
+              [class.pi-circle]="!isModelSelected(model.value)"></i>
+            {{ model.label }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Run Button -->
+    <div class="vf-run-row">
+      <button class="vf-run-btn" [disabled]="!canForecast || loading" (click)="runForecast()">
+        <span class="vf-run-btn-inner" *ngIf="!loading">
+          <i class="pi pi-play"></i>
+          Generate Forecast
+        </span>
+        <span class="vf-run-btn-inner" *ngIf="loading">
+          <span class="vf-spinner"></span>
+          Running Models...
+        </span>
+      </button>
+
+      <span class="vf-run-hint" *ngIf="!loading">
+        <i class="pi pi-info-circle"></i>
+        Ensemble models may take 5–10 seconds
+      </span>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       FORECASTING LOADING SKELETON
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-skeleton-wrap" *ngIf="loading">
+    <div class="vf-skeleton-header">
+      <div class="vf-skeleton-pulse vf-skeleton-title"></div>
+      <div class="vf-skeleton-pulse vf-skeleton-sub"></div>
+    </div>
+    <div class="vf-skeleton-chart">
+      <div class="vf-skeleton-pulse vf-skeleton-chart-body"></div>
+      <div class="vf-skeleton-bars">
+        <div class="vf-skeleton-pulse vf-skeleton-bar" *ngFor="let b of [1,2,3,4,5,6,7,8]"
+          [style.height.px]="[40,70,55,90,65,80,45,75][b-1]"></div>
+      </div>
+    </div>
+    <div class="vf-skeleton-metrics">
+      <div class="vf-skeleton-pulse vf-skeleton-metric" *ngFor="let m of [1,2,3]"></div>
+    </div>
+    <div class="vf-loading-label">
+      <span class="vf-spinner vf-spinner--lg"></span>
+      <span>Running ensemble models… this may take a moment</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       RESULTS
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-results" *ngIf="!loading && forecastResult">
+
+    <!-- Status badge -->
+    <div class="vf-result-header">
+      <div class="vf-result-status" [class.vf-result-status--ok]="forecastResult.status === 'completed'">
+        <i class="pi" [class.pi-check-circle]="forecastResult.status === 'completed'"
+          [class.pi-times-circle]="forecastResult.status === 'failed'"></i>
+        {{ forecastResult.status | titlecase }}
+      </div>
+      <span class="vf-result-meta">
+        {{ periods }} {{ freqLabel }}(s) · {{ selectedModels.length }} models · Job {{ forecastResult.job_id | slice:0:8
+        }}…
+      </span>
+    </div>
+
+    <!-- ── Metrics Grid ──────────────────────────────────── -->
+    <div class="vf-metrics-grid" *ngIf="metricEntries.length > 0">
+      <div class="vf-metric-card" *ngFor="let m of metricEntries">
+        <div class="vf-metric-icon">
+          <i class="pi" [ngClass]="'pi-' + metricIcon(m.key)"></i>
+        </div>
+        <div class="vf-metric-body">
+          <div class="vf-metric-label" [pTooltip]="metricDescription(m.key)" tooltipPosition="top">
+            {{ metricLabel(m.key) }}
+          </div>
+          <div class="vf-metric-value">{{ formatMetricValue(m.key, m.value) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Plotly Chart ──────────────────────────────────── -->
+    <div class="vf-chart-card">
+      <div class="vf-chart-title">
+        <i class="pi pi-chart-line"></i>
+        Ensemble Forecast
+      </div>
+      <div class="vf-chart-container" #plotlyChart></div>
+    </div>
+
+  </div>
+
+</section>

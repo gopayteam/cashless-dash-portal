@@ -1,5 +1,6 @@
 import { AI_ENDPOINTS } from "./endpoints/AI_ENDPOINTS";
 import { EDA_ENDPOINTS } from "./endpoints/EDA_ENDPOINTS";
+import { FORECAST_ENDPOINTS } from "./endpoints/FORECAST_ENDPOINTS";
 
 export const API_ENDPOINTS = {
   // #####################  AUTHENTICATION SUB-ENDPOINTS   #######################
@@ -117,4 +118,5 @@ export const API_ENDPOINTS = {
 
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,
+  ...FORECAST_ENDPOINTS,
 };
