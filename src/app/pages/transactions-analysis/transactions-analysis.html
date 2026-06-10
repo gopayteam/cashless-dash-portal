@@ -1,0 +1,391 @@
+<div class="analyser-shell">
+  <!-- Header -->
+  <header class="shell-header">
+    <div class="header-brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="2" width="7" height="7" fill="currentColor" opacity="0.9" />
+          <rect x="11" y="2" width="7" height="7" fill="currentColor" opacity="0.5" />
+          <rect x="2" y="11" width="7" height="7" fill="currentColor" opacity="0.5" />
+          <rect x="11" y="11" width="7" height="7" fill="currentColor" opacity="0.9" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">TRANSACTION ANALYSER</h1>
+        <p class="brand-sub">M-Pesa Fleet Intelligence · v2.0</p>
+      </div>
+    </div>
+    <div class="header-status" *ngIf="transactions().length > 0">
+      <span class="status-pill" [class.status-warn]="flaggedCount() > 0">
+        {{ transactions().length }} records loaded
+      </span>
+      <span class="status-pill status-danger" *ngIf="flaggedCount() > 0">
+        ⚠ {{ flaggedCount() }} flagged
+      </span>
+    </div>
+  </header>
+
+  <!-- Upload Zone -->
+  <div class="upload-zone" *ngIf="transactions().length === 0" [class.drag-over]="isDragging()"
+    (dragover)="onDragOver($event)" (dragleave)="isDragging.set(false)" (drop)="onDrop($event)"
+    (click)="fileInput.click()">
+    <input #fileInput type="file" accept=".csv" style="display:none" (change)="onFileSelected($event)" />
+    <div class="upload-icon">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 8L20 28M20 8L14 14M20 8L26 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <path d="M8 30H32" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5" />
+      </svg>
+    </div>
+    <p class="upload-title">Drop your M-Pesa CSV here</p>
+    <p class="upload-sub">or click to browse · .csv files only</p>
+    <div class="upload-schema">
+      M-Pesa Receipt · Customer Name · Fleet Number · Transaction Type · Payment Status · Amount · Trip ID · Driver ·
+      Created At
+    </div>
+  </div>
+
+  <!-- Main UI (post-upload) -->
+  <div class="main-ui" *ngIf="transactions().length > 0">
+
+    <!-- Tab Nav -->
+    <nav class="tab-nav">
+      <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="activeTab() === tab.id"
+        (click)="activeTab.set(tab.id)">
+        <span class="tab-icon">{{ tab.icon }}</span>
+        {{ tab.label }}
+        <span class="tab-badge" *ngIf="tab.id === 'anomalies' && flaggedCount() > 0">{{ flaggedCount() }}</span>
+      </button>
+      <button class="tab-btn reset-btn" (click)="reset()">↩ New File</button>
+    </nav>
+
+    <!-- ── TAB: Overview ── -->
+    <div class="tab-content" *ngIf="activeTab() === 'overview'">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Volume</div>
+          <div class="kpi-value">KES {{ totalVolume() | number:'1.0-0' }}</div>
+          <div class="kpi-sub">{{ transactions().length }} transactions</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Average Amount</div>
+          <div class="kpi-value">KES {{ avgAmount() | number:'1.0-0' }}</div>
+          <div class="kpi-sub">per transaction</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Peak Amount</div>
+          <div class="kpi-value">KES {{ maxAmount() | number:'1.0-0' }}</div>
+          <div class="kpi-sub">single transaction</div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-label">Flagged</div>
+          <div class="kpi-value">{{ flaggedCount() }}</div>
+          <div class="kpi-sub">require review</div>
+        </div>
+      </div>
+
+      <!-- Fleet breakdown -->
+      <div class="section-block">
+        <h3 class="section-title">Fleet Breakdown</h3>
+        <div class="fleet-grid">
+          <div class="fleet-row" *ngFor="let f of fleetBreakdown()">
+            <span class="fleet-id">{{ f.fleet }}</span>
+            <div class="fleet-bar-wrap">
+              <div class="fleet-bar" [style.width.%]="f.pct"></div>
+            </div>
+            <span class="fleet-amount">KES {{ f.total | number:'1.0-0' }}</span>
+            <span class="fleet-count">{{ f.count }} txn</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent transactions table -->
+      <div class="section-block">
+        <h3 class="section-title">All Transactions</h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receipt</th>
+                <th>Customer</th>
+                <th>Fleet</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Amount (KES)</th>
+                <th>Driver</th>
+                <th>Created At</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of transactions()" [class.row-flagged]="t.anomalies.length > 0">
+                <td class="mono">{{ t.receipt }}</td>
+                <td>{{ t.customerName }}</td>
+                <td><span class="fleet-tag">{{ t.fleetNumber }}</span></td>
+                <td><span class="type-tag" [class.type-credit]="t.transactionType === 'CREDIT'">{{ t.transactionType
+                    }}</span></td>
+                <td><span class="status-tag" [class.status-paid]="t.paymentStatus === 'PAID'">{{ t.paymentStatus
+                    }}</span></td>
+                <td class="mono amount-cell">{{ t.amount | number:'1.0-0' }}</td>
+                <td class="mono">{{ t.driverUsername }}</td>
+                <td class="mono dt-cell">{{ t.createdAt | date:'dd MMM, HH:mm' }}</td>
+                <td>
+                  <span *ngFor="let a of t.anomalies" class="flag-chip" [class.flag-high]="a.severity === 'HIGH'"
+                    [class.flag-med]="a.severity === 'MEDIUM'" [title]="a.label">{{ a.type === 'DUPLICATE_RECEIPT' ?
+                    'DUP' : a.type === 'UNUSUAL_AMOUNT' ? 'AMT' : a.type === 'RAPID_DRIVER_REPEAT' ? 'RPD' : 'OBH'
+                    }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Trends ── -->
+    <div class="tab-content" *ngIf="activeTab() === 'trends'">
+      <div class="period-toggle">
+        <button *ngFor="let p of periods" class="period-btn" [class.active]="trendPeriod() === p.id"
+          (click)="trendPeriod.set(p.id)">{{ p.label }}</button>
+      </div>
+
+      <div class="section-block">
+        <h3 class="section-title">Transaction Volume · {{ trendLabel() }}</h3>
+        <div class="chart-area">
+          <div class="bar-chart">
+            <div class="bar-group" *ngFor="let b of trendBars()">
+              <div class="bar-wrap">
+                <div class="bar-fill" [style.height.%]="b.heightPct" [title]="'KES ' + (b.total | number)"></div>
+              </div>
+              <div class="bar-label">{{ b.label }}</div>
+              <div class="bar-value">{{ b.total | number:'1.0-0' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trend-stats">
+        <div class="trend-stat" *ngFor="let b of trendBars()">
+          <span class="ts-label">{{ b.label }}</span>
+          <span class="ts-count">{{ b.count }} txn</span>
+          <span class="ts-amount">KES {{ b.total | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Anomalies ── -->
+    <div class="tab-content" *ngIf="activeTab() === 'anomalies'">
+      <div class="anomaly-legend">
+        <div class="legend-item" *ngFor="let r of anomalyRules">
+          <span class="legend-dot" [class]="'dot-' + r.severity.toLowerCase()"></span>
+          <span class="legend-code">{{ r.code }}</span>
+          <span class="legend-desc">{{ r.desc }}</span>
+        </div>
+      </div>
+
+      <div class="section-block" *ngIf="flaggedCount() === 0">
+        <div class="empty-state">
+          <div class="empty-icon">✓</div>
+          <p>No anomalies detected in this dataset.</p>
+        </div>
+      </div>
+
+      <div class="flagged-list" *ngIf="flaggedCount() > 0">
+        <div class="flagged-card" *ngFor="let t of flaggedTransactions()">
+          <div class="flagged-header">
+            <span class="mono receipt-id">{{ t.receipt }}</span>
+            <span class="flagged-customer">{{ t.customerName }}</span>
+            <span class="flagged-amount">KES {{ t.amount | number:'1.0-0' }}</span>
+            <span class="flagged-dt">{{ t.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+          </div>
+          <div class="flagged-flags">
+            <div class="flagged-flag" *ngFor="let a of t.anomalies" [class]="'fflag-' + a.severity.toLowerCase()">
+              <span class="ff-sev">{{ a.severity }}</span>
+              <span class="ff-label">{{ a.label }}</span>
+            </div>
+          </div>
+          <div class="flagged-meta">
+            <span>Fleet: {{ t.fleetNumber }}</span>
+            <span>Driver: {{ t.driverUsername }}</span>
+            <span>Status: {{ t.paymentStatus }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Time Filter ── -->
+    <div class="tab-content" *ngIf="activeTab() === 'time-filter'">
+
+      <!-- Filter Mode Selector -->
+      <div class="filter-mode-row">
+        <span class="filter-mode-label">Filter by:</span>
+        <div class="filter-mode-pills">
+          <button *ngFor="let m of filterModes" class="mode-pill" [class.active]="filterMode() === m.id"
+            (click)="setFilterMode(m.id)">
+            {{ m.icon }} {{ m.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Hourly (Date + Hour range) ── -->
+      <div class="time-filter-form" *ngIf="filterMode() === 'hourly'">
+        <div class="tf-hint">Filter transactions within a specific date and hour window.</div>
+        <div class="tf-row">
+          <div class="tf-field">
+            <label>From Date</label>
+            <input type="date" [(ngModel)]="filterFromDate" class="tf-input" />
+          </div>
+          <div class="tf-field">
+            <label>From Hour</label>
+            <select [(ngModel)]="filterFromHour" class="tf-input">
+              <option *ngFor="let h of hours" [value]="h.val">{{ h.label }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="tf-row">
+          <div class="tf-field">
+            <label>To Date</label>
+            <input type="date" [(ngModel)]="filterToDate" class="tf-input" />
+          </div>
+          <div class="tf-field">
+            <label>To Hour</label>
+            <select [(ngModel)]="filterToHour" class="tf-input">
+              <option *ngFor="let h of hours" [value]="h.val">{{ h.label }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="tf-btn-row">
+          <button class="apply-btn" (click)="applyTimeFilter()">Apply Filter</button>
+          <button class="clear-btn" (click)="clearTimeFilter()">Clear</button>
+        </div>
+      </div>
+
+      <!-- ── Weekly ── -->
+      <div class="time-filter-form" *ngIf="filterMode() === 'weekly'">
+        <div class="tf-hint">Select any date — the full ISO week (Mon–Sun) containing that date will be filtered.</div>
+        <div class="tf-row">
+          <div class="tf-field">
+            <label>Any date in the week</label>
+            <input type="date" [(ngModel)]="filterWeekDate" class="tf-input" />
+          </div>
+          <div class="tf-field tf-field-info" *ngIf="weekRangeLabel()">
+            <label>Week window</label>
+            <div class="tf-range-display">{{ weekRangeLabel() }}</div>
+          </div>
+        </div>
+        <div class="tf-btn-row">
+          <button class="apply-btn" (click)="applyWeekFilter()">Apply Filter</button>
+          <button class="clear-btn" (click)="clearTimeFilter()">Clear</button>
+        </div>
+      </div>
+
+      <!-- ── Monthly ── -->
+      <div class="time-filter-form" *ngIf="filterMode() === 'monthly'">
+        <div class="tf-hint">Show all transactions for a full calendar month.</div>
+        <div class="tf-row">
+          <div class="tf-field">
+            <label>Year</label>
+            <select [(ngModel)]="filterYear" class="tf-input">
+              <option *ngFor="let y of availableYears()" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+          <div class="tf-field">
+            <label>Month</label>
+            <select [(ngModel)]="filterMonth" class="tf-input">
+              <option *ngFor="let m of months; let i = index" [value]="i">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="tf-btn-row">
+          <button class="apply-btn" (click)="applyMonthFilter()">Apply Filter</button>
+          <button class="clear-btn" (click)="clearTimeFilter()">Clear</button>
+        </div>
+      </div>
+
+      <!-- ── Yearly ── -->
+      <div class="time-filter-form" *ngIf="filterMode() === 'yearly'">
+        <div class="tf-hint">Show all transactions for an entire calendar year.</div>
+        <div class="tf-row">
+          <div class="tf-field">
+            <label>Year</label>
+            <select [(ngModel)]="filterYear" class="tf-input">
+              <option *ngFor="let y of availableYears()" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="tf-btn-row">
+          <button class="apply-btn" (click)="applyYearFilter()">Apply Filter</button>
+          <button class="clear-btn" (click)="clearTimeFilter()">Clear</button>
+        </div>
+      </div>
+
+      <!-- Results (shared across all modes) -->
+      <div class="tf-results" *ngIf="timeFilterApplied()">
+        <div class="tf-summary">
+          <span class="tf-window-label">{{ activeFilterLabel() }}</span>
+          <span class="tf-sep">·</span>
+          <span>{{ timeFilteredTxns().length }} transactions</span>
+          <span class="tf-sep">·</span>
+          <span>KES {{ timeFilteredTotal() | number:'1.0-0' }}</span>
+          <span class="tf-sep">·</span>
+          <span [class.tf-flagged]="timeFilteredFlagged() > 0">{{ timeFilteredFlagged() }} flagged</span>
+        </div>
+
+        <!-- Mini KPIs for the filtered window -->
+        <div class="tf-kpi-row" *ngIf="timeFilteredTxns().length > 0">
+          <div class="tf-kpi">
+            <div class="tf-kpi-label">Avg Amount</div>
+            <div class="tf-kpi-value">KES {{ timeFilteredAvg() | number:'1.0-0' }}</div>
+          </div>
+          <div class="tf-kpi">
+            <div class="tf-kpi-label">Peak Amount</div>
+            <div class="tf-kpi-value">KES {{ timeFilteredPeak() | number:'1.0-0' }}</div>
+          </div>
+          <div class="tf-kpi">
+            <div class="tf-kpi-label">Unique Fleets</div>
+            <div class="tf-kpi-value">{{ timeFilteredFleets() }}</div>
+          </div>
+          <div class="tf-kpi">
+            <div class="tf-kpi-label">Unique Drivers</div>
+            <div class="tf-kpi-value">{{ timeFilteredDrivers() }}</div>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Receipt</th>
+                <th>Customer</th>
+                <th>Fleet</th>
+                <th>Amount (KES)</th>
+                <th>Driver</th>
+                <th>Created At</th>
+                <th>Flags</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of timeFilteredTxns()" [class.row-flagged]="t.anomalies.length > 0">
+                <td class="mono">{{ t.receipt }}</td>
+                <td>{{ t.customerName }}</td>
+                <td><span class="fleet-tag">{{ t.fleetNumber }}</span></td>
+                <td class="mono amount-cell">{{ t.amount | number:'1.0-0' }}</td>
+                <td class="mono">{{ t.driverUsername }}</td>
+                <td class="mono dt-cell">{{ t.createdAt | date:'dd MMM yyyy, HH:mm' }}</td>
+                <td>
+                  <span *ngFor="let a of t.anomalies" class="flag-chip" [class.flag-high]="a.severity === 'HIGH'"
+                    [class.flag-med]="a.severity === 'MEDIUM'" [title]="a.label">{{ a.type === 'DUPLICATE_RECEIPT' ?
+                    'DUP' : a.type === 'UNUSUAL_AMOUNT' ? 'AMT' : a.type === 'RAPID_DRIVER_REPEAT' ? 'RPD' : 'OBH'
+                    }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="timeFilteredTxns().length === 0">
+                <td colspan="7" class="empty-row">No transactions in this window.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

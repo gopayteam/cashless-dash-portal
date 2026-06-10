@@ -56,7 +56,7 @@
             pTooltip="Export to CSV" tooltipPosition="bottom">
           </button>
 
-          <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn"
+          <button pButton icon="pi pi-file" label="Large CSV" class="p-button-help export-action-btn"
             [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting"
             (click)="exportLargeDatasetToCSV()" pTooltip="Export Dataset to CSV" tooltipPosition="bottom">
           </button>
@@ -289,5 +289,29 @@
       <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem;" class="p-button-text"
         (click)="closeDetailDialog()"></button>
     </ng-template>
+  </p-dialog>
+
+  <!-- ================= EXPORT PROGRESS DIALOG ================= -->
+  <p-dialog [(visible)]="showExportProgressDialog" [modal]="true" [closable]="false" [draggable]="false"
+    [resizable]="false" [style]="{ width: '420px' }" styleClass="export-progress-dialog">
+    <ng-template pTemplate="header">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <i class="pi pi-download" style="font-size: 1.2rem; color: var(--primary-color)"></i>
+        <span style="font-weight: 600; font-size: 1rem;">Exporting Transactions</span>
+      </div>
+    </ng-template>
+
+    <div style="padding: 1rem 0;">
+      <p style="margin: 0 0 1rem; color: var(--text-color-secondary); font-size: 0.9rem;">
+        {{ exportProgressMessage }}
+      </p>
+
+      <!-- PrimeNG ProgressBar -->
+      <p-progressBar [value]="exportProgress" [showValue]="true" styleClass="export-progress-bar"></p-progressBar>
+
+      <p style="margin: 0.8rem 0 0; font-size: 0.8rem; color: var(--text-color-secondary);">
+        Please keep this window open until the export is complete.
+      </p>
+    </div>
   </p-dialog>
 </div>

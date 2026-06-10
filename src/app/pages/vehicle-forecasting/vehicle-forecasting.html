@@ -1,4 +1,4 @@
-<!-- pages/vehicle-forecast/vehicle-forecast.html -->
+<!-- pages/vehicle-forecast/vehicle-forecasting.html -->
 <p-toast />
 
 <section class="vf-wrap">
@@ -18,9 +18,8 @@
       </p>
     </div>
 
-    <!-- Period Selection (Dynamic by Tab) -->
-    <div class="va-header-right">
-      <!-- DAY -->
+    <!-- Period Selection (only shown in live mode) -->
+    <div class="va-header-right" *ngIf="dataSourceMode === 'live'">
       <ng-container *ngIf="activeTabValue === 'day'">
         <div class="filter-item-gradient filter-item">
           <label class="filter-label">Date</label>
@@ -32,7 +31,6 @@
         </div>
       </ng-container>
 
-      <!-- WEEK -->
       <ng-container *ngIf="activeTabValue === 'week'">
         <div class="filter-item-gradient filter-item">
           <label class="filter-label">Week Range</label>
@@ -48,39 +46,30 @@
         </div>
       </ng-container>
 
-      <!-- MONTH -->
       <ng-container *ngIf="activeTabValue === 'month'">
         <div class="filter-item-gradient filter-item">
           <label class="filter-label">Month &amp; Year</label>
           <div class="header-date-row">
             <mat-form-field appearance="outline" class="date-select-field">
               <mat-select [(ngModel)]="monthMonth" placeholder="Month">
-                <mat-option *ngFor="let m of months" [value]="m.value">
-                  {{ m.label }}
-                </mat-option>
+                <mat-option *ngFor="let m of months" [value]="m.value">{{ m.label }}</mat-option>
               </mat-select>
             </mat-form-field>
-
             <mat-form-field appearance="outline" class="date-select-field">
               <mat-select [(ngModel)]="monthYear" placeholder="Year">
-                <mat-option *ngFor="let y of years" [value]="y.value">
-                  {{ y.label }}
-                </mat-option>
+                <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
         </div>
       </ng-container>
 
-      <!-- YEAR -->
       <ng-container *ngIf="activeTabValue === 'year'">
         <div class="filter-item-gradient filter-item">
           <label class="filter-label">Year</label>
           <mat-form-field appearance="outline" class="date-select-field">
             <mat-select [(ngModel)]="yearYear" placeholder="Select year">
-              <mat-option *ngFor="let y of years" [value]="y.value">
-                {{ y.label }}
-              </mat-option>
+              <mat-option *ngFor="let y of years" [value]="y.value">{{ y.label }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -88,12 +77,34 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════════
-       FILTER BAR — Tabs | Fleet selector | Fetch button
-       ══════════════════════════════════════════════════════════ -->
-  <p-card styleClass="stat-card card vf-filter-card">
+  <!-- ══════════════════════════════════════════════════════
+       DATA SOURCE SWITCHER
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-source-switcher">
+    <button class="vf-source-btn" [class.vf-source-btn--active]="dataSourceMode === 'live'"
+      (click)="switchDataSource('live')">
+      <i class="pi pi-database"></i>
+      <span>Live Data</span>
+      <span class="vf-source-badge" *ngIf="dataSourceMode === 'live' && transactions.length > 0">
+        {{ transactions.length | number }}
+      </span>
+    </button>
+    <button class="vf-source-btn" [class.vf-source-btn--active]="dataSourceMode === 'file'"
+      (click)="switchDataSource('file')">
+      <i class="pi pi-file-excel"></i>
+      <span>Upload File</span>
+      <span class="vf-source-badge vf-source-badge--file" *ngIf="dataSourceMode === 'file' && isFileReady">
+        Ready
+      </span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       LIVE DATA: FILTER BAR
+       ══════════════════════════════════════════════════════ -->
+  <p-card styleClass="stat-card card vf-filter-card" *ngIf="dataSourceMode === 'live'">
     <div class="filter-bar">
-      <!-- LEFT: Tabs -->
+      <!-- Tabs -->
       <p-tabs [value]="activeTabValue" (valueChange)="onTabChange($event)" class="filter-tabs">
         <p-tablist>
           <p-tab value="day"><i class="pi pi-sun"></i> Day</p-tab>
@@ -105,12 +116,12 @@
 
       <div class="filter-divider"></div>
 
-      <!-- RIGHT: Fleet selector + Fetch button -->
+      <!-- Fleet selector + Fetch -->
       <div class="filter-right">
         <div class="fleet-select-wrapper">
           <p-multiSelect [options]="fleetOptions" [(ngModel)]="selectedFleets" optionLabel="label" optionValue="value"
-            placeholder="Select fleets..." [filter]="true" [autofocusFilter]="true" filterPlaceholder="Search..."
-            [showClear]="true" (onChange)="onFleetSelectionChange()" styleClass="fleet-multiselect" appendTo="body">
+            placeholder="Select fleets…" [filter]="true" filterPlaceholder="Search…" [showClear]="true"
+            (onChange)="onFleetSelectionChange()" styleClass="fleet-multiselect" appendTo="body">
             <ng-template pTemplate="item" let-opt>
               <div class="fleet-option-item">
                 <i class="pi pi-car fleet-option-icon"></i>
@@ -119,7 +130,6 @@
             </ng-template>
           </p-multiSelect>
         </div>
-
         <button pButton icon="pi pi-download" label="Fetch Data" class="fetch-btn"
           [disabled]="!canFetch || analysisLoading" [loading]="analysisLoading" (click)="fetchData()">
         </button>
@@ -128,42 +138,285 @@
   </p-card>
 
   <!-- ══════════════════════════════════════════════════════
-       INSUFFICIENT DATA WARNING
+       FILE UPLOAD PANEL
        ══════════════════════════════════════════════════════ -->
-  <div class="vf-alert vf-alert--warn" *ngIf="insufficientData && !analysisLoading">
-    <i class="pi pi-exclamation-triangle"></i>
-    <div>
-      <strong>Insufficient Data</strong>
-      <p>At least 10 transaction records are required for meaningful forecasting. Currently loaded: {{
-        transactions.length }}. Try selecting a longer period or more fleets.</p>
+  <div class="vf-file-panel" *ngIf="dataSourceMode === 'file'">
+
+    <!-- Parse mode toggle -->
+    <div class="vf-file-mode-row">
+      <span class="vf-file-mode-label">Processing mode</span>
+      <div class="vf-file-mode-toggle">
+        <button class="vf-mode-btn" [class.vf-mode-btn--active]="fileUploadMode === 'browser'"
+          (click)="fileUploadMode = 'browser'">
+          <i class="pi pi-desktop"></i>
+          <div>
+            <strong>In Browser</strong>
+            <span>Parsed locally — no upload needed</span>
+          </div>
+        </button>
+        <button class="vf-mode-btn" [class.vf-mode-btn--active]="fileUploadMode === 'backend'"
+          (click)="fileUploadMode = 'backend'">
+          <i class="pi pi-cloud-upload"></i>
+          <div>
+            <strong>Server Upload</strong>
+            <span>File stored on server for large datasets</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="vf-dropzone" [class.vf-dropzone--has-file]="!!uploadedFile"
+      (click)="!uploadedFile && fileInputRef.click()" (dragover)="$event.preventDefault()"
+      (drop)="$event.preventDefault(); onFileSelected($any({ target: { files: $event.dataTransfer?.files } }))">
+      <input type="file" #fileInputRef hidden
+        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+        (change)="onFileSelected($event)" />
+
+      <!-- No file yet -->
+      <ng-container *ngIf="!uploadedFile">
+        <div class="vf-dropzone-icon">
+          <i class="pi pi-cloud-upload"></i>
+        </div>
+        <p class="vf-dropzone-title">Drop your file here or <span class="vf-dropzone-link">browse</span></p>
+        <p class="vf-dropzone-sub">CSV, Excel (.xlsx / .xls) · Max 100 MB</p>
+        <div class="vf-dropzone-chips">
+          <span class="vf-format-chip"><i class="pi pi-file"></i> CSV</span>
+          <span class="vf-format-chip"><i class="pi pi-file-excel"></i> XLSX</span>
+          <span class="vf-format-chip"><i class="pi pi-file-excel"></i> XLS</span>
+        </div>
+      </ng-container>
+
+      <!-- File selected — parsing / uploading -->
+      <ng-container *ngIf="uploadedFile && (fileParseLoading || fileUploadLoading)">
+        <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" fill="transparent"
+          animationDuration=".5s"></p-progressSpinner>
+        <p class="vf-dropzone-title">{{ fileUploadMode === 'browser' ? 'Parsing' : 'Uploading' }} <strong>{{
+            uploadedFile.name }}</strong>…</p>
+      </ng-container>
+
+      <!-- File ready -->
+      <ng-container *ngIf="uploadedFile && !fileParseLoading && !fileUploadLoading && isFileReady">
+        <div class="vf-file-ready">
+          <div class="vf-file-ready-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+          <div class="vf-file-ready-info">
+            <strong>{{ uploadedFile.name }}</strong>
+            <span>{{ fileSummary?.rows | number }} rows · {{ fileSummary?.columns?.length }} columns</span>
+          </div>
+          <button class="vf-file-clear" (click)="$event.stopPropagation(); clearFile()" pTooltip="Remove file">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- Column hint -->
+    <div class="vf-col-hint" *ngIf="isFileReady && fileSummary">
+      <i class="pi pi-info-circle"></i>
+      <span>
+        Detected columns:
+        <strong *ngFor="let c of fileSummary.columns.slice(0, 6); let last = last">
+          {{ c }}<span *ngIf="!last">, </span>
+        </strong>
+        <span *ngIf="fileSummary.columns.length > 6"> + {{ fileSummary.columns.length - 6 }} more</span>.
+        Column names are auto-mapped — both camelCase
+        (<code>createdAt</code>, <code>assignedAmount</code>, <code>fleetNumber</code>) and snake_case
+        (<code>created_at</code>, <code>amount</code>, <code>fleet_number</code>) are supported.
+      </span>
+    </div>
+
+    <!-- Fleet filter for file source -->
+    <div class="vf-file-fleet-row" *ngIf="isFileReady">
+      <span class="vf-file-mode-label">Filter to specific fleets (optional)</span>
+      <div class="fleet-select-wrapper">
+        <p-multiSelect [options]="fleetOptions" [(ngModel)]="selectedFleets" optionLabel="label" optionValue="value"
+          placeholder="All fleets in file…" [filter]="true" filterPlaceholder="Search…" [showClear]="true"
+          (onChange)="onFleetSelectionChange()" styleClass="fleet-multiselect" appendTo="body">
+        </p-multiSelect>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       TRANSACTION REPORT PANEL
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-report-panel" *ngIf="transactionReport && !analysisLoading">
+
+    <div class="vf-report-header">
+      <div class="vf-report-title">
+        <i class="pi pi-chart-bar"></i>
+        Transaction Report
+      </div>
+      <span class="vf-report-range" *ngIf="transactionReport.dateRange">
+        <i class="pi pi-calendar"></i>
+        {{ transactionReport.dateRange.start }} → {{ transactionReport.dateRange.end }}
+      </span>
+    </div>
+
+    <!-- Summary stat cards -->
+    <div class="vf-report-stats">
+      <div class="vf-rstat vf-rstat--total">
+        <div class="vf-rstat-icon"><i class="pi pi-list"></i></div>
+        <div class="vf-rstat-body">
+          <div class="vf-rstat-label">Total Records</div>
+          <div class="vf-rstat-value">{{ transactionReport.totalRecords | number }}</div>
+        </div>
+      </div>
+
+      <div class="vf-rstat vf-rstat--credit">
+        <div class="vf-rstat-icon"><i class="pi pi-arrow-circle-down"></i></div>
+        <div class="vf-rstat-body">
+          <div class="vf-rstat-label">CREDIT Transactions</div>
+          <div class="vf-rstat-value">{{ transactionReport.creditRecords | number }}</div>
+          <div class="vf-rstat-sub">
+            {{ transactionReport.totalRecords ? ((transactionReport.creditRecords / transactionReport.totalRecords) *
+            100 | number:'1.0-1') : 0 }}% of total
+          </div>
+        </div>
+      </div>
+
+      <div class="vf-rstat vf-rstat--debit">
+        <div class="vf-rstat-icon"><i class="pi pi-arrow-circle-up"></i></div>
+        <div class="vf-rstat-body">
+          <div class="vf-rstat-label">DEBIT Transactions</div>
+          <div class="vf-rstat-value">{{ transactionReport.debitRecords | number }}</div>
+          <div class="vf-rstat-sub">
+            {{ transactionReport.totalRecords ? ((transactionReport.debitRecords / transactionReport.totalRecords) * 100
+            | number:'1.0-1') : 0 }}% of total
+          </div>
+        </div>
+      </div>
+
+      <div class="vf-rstat vf-rstat--vehicles">
+        <div class="vf-rstat-icon"><i class="pi pi-car"></i></div>
+        <div class="vf-rstat-body">
+          <div class="vf-rstat-label">Unique Vehicles</div>
+          <div class="vf-rstat-value">{{ transactionReport.uniqueVehicles | number }}</div>
+        </div>
+      </div>
+
+      <div class="vf-rstat vf-rstat--selected">
+        <div class="vf-rstat-icon"><i class="pi pi-filter"></i></div>
+        <div class="vf-rstat-body">
+          <div class="vf-rstat-label">Selected Fleet Records</div>
+          <div class="vf-rstat-value">{{ transactionReport.selectedTotal | number }}</div>
+          <div class="vf-rstat-sub">
+            {{ transactionReport.selectedPercentage }}% of all records
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Per-vehicle breakdown table -->
+    <div class="vf-report-table-wrap" *ngIf="transactionReport.selectedVehicles.length > 0">
+      <div class="vf-report-table-title">Selected Fleet Breakdown</div>
+
+      <p-table [value]="transactionReport.selectedVehicles" styleClass="vf-p-table" [scrollable]="true"
+        scrollHeight="260px" [rowHover]="true">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Fleet</th>
+            <th class="text-right">Total Records</th>
+            <th class="text-right">CREDIT Records</th>
+            <th class="text-right">CREDIT Revenue</th>
+            <th class="text-right">% of All Records</th>
+            <th>Share</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>
+              <div class="vf-fleet-cell">
+                <i class="pi pi-car vf-fleet-icon"></i>
+                <strong>{{ row.fleetNumber }}</strong>
+              </div>
+            </td>
+            <td class="text-right">{{ row.count | number }}</td>
+            <td class="text-right">
+              <span class="vf-credit-badge">{{ row.creditCount | number }}</span>
+            </td>
+            <td class="text-right">{{ formatCurrency(row.creditTotal) }}</td>
+            <td class="text-right">
+              <span class="vf-pct-badge">{{ row.percentage }}%</span>
+            </td>
+            <td>
+              <div class="vf-share-bar-wrap">
+                <div class="vf-share-bar" [style.width.%]="row.percentage"></div>
+                <span class="vf-share-pct">{{ row.percentage }}%</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       INSUFFICIENT DATA WARNING (improved)
+       ══════════════════════════════════════════════════════ -->
+  <div class="vf-alert vf-alert--warn" *ngIf="insufficientData && !analysisLoading && !fileParseLoading">
+    <div class="vf-alert-icon-wrap">
+      <i class="pi pi-exclamation-triangle"></i>
+    </div>
+    <div class="vf-alert-body">
+      <strong>Not Enough Data for Forecasting</strong>
+      <p>{{ insufficientDataReason }}</p>
+      <div class="vf-alert-tips">
+        <div class="vf-tip">
+          <i class="pi pi-calendar"></i>
+          <span>Switch to the <strong>Month</strong> or <strong>Year</strong> tab to capture more dates</span>
+        </div>
+        <div class="vf-tip">
+          <i class="pi pi-chart-bar"></i>
+          <span>Change aggregation to <strong>Weekly (W)</strong> if daily data is sparse</span>
+        </div>
+        <div class="vf-tip">
+          <i class="pi pi-car"></i>
+          <span>Add more fleets — more vehicles = more data points per day</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════
-       NO DATA STATE
+       EMPTY STATE
        ══════════════════════════════════════════════════════ -->
-  <div class="vf-empty" *ngIf="transactions.length === 0 && !loading && !analysisLoading">
+  <div class="vf-empty"
+    *ngIf="activeTransactions.length === 0 && !loading && !analysisLoading && !fileParseLoading && !fileUploadLoading">
     <div class="vf-empty-icon">
       <i class="pi pi-chart-line"></i>
     </div>
     <h3>Ready to Forecast</h3>
-    <p>Select fleets and a time period above, then click <strong>Fetch Data</strong> to load transactions for modeling.
+    <p *ngIf="dataSourceMode === 'live'">
+      Select fleets and a time period above, then click <strong>Fetch Data</strong> to load transactions.
+    </p>
+    <p *ngIf="dataSourceMode === 'file'">
+      Upload a CSV or Excel file above to load transaction data for forecasting.
     </p>
   </div>
 
   <!-- ══════════════════════════════════════════════════════
        FETCHING LOADING STATE
        ══════════════════════════════════════════════════════ -->
-  <div class="vf-loading-box" *ngIf="analysisLoading">
+  <div class="vf-loading-box" *ngIf="analysisLoading || fileParseLoading || fileUploadLoading">
     <p-progressSpinner styleClass="w-3rem h-3rem" strokeWidth="4" fill="transparent"
       animationDuration=".5s"></p-progressSpinner>
-    <p>Fetching transaction data...</p>
+    <p>
+      <ng-container *ngIf="analysisLoading">Fetching transaction data…</ng-container>
+      <ng-container *ngIf="fileParseLoading">Parsing file in browser…</ng-container>
+      <ng-container *ngIf="fileUploadLoading">Uploading file to server…</ng-container>
+    </p>
   </div>
 
   <!-- ══════════════════════════════════════════════════════
-       CONFIG PANEL (shown when data is available)
+       CONFIG PANEL
        ══════════════════════════════════════════════════════ -->
-  <div class="vf-config-card" *ngIf="transactions.length >= 10 && !analysisLoading">
+  <div class="vf-config-card" *ngIf="activeTransactions.length >= 10 && !analysisLoading && !fileParseLoading">
 
     <div class="vf-config-grid">
 
@@ -180,9 +433,7 @@
           <span class="vf-slider-max">90</span>
         </div>
         <div class="vf-slider-ticks">
-          <span>Short</span>
-          <span>Medium</span>
-          <span>Long</span>
+          <span>Short</span><span>Medium</span><span>Long</span>
         </div>
       </div>
 
@@ -198,6 +449,12 @@
             {{ opt.label }}
           </button>
         </div>
+        <!-- Freq tip when data might be sparse -->
+        <p class="vf-freq-tip" *ngIf="freq === 'D' && activeTransactions.length < 50">
+          <i class="pi pi-info-circle"></i>
+          Daily mode needs data across 10+ different dates. If your data is within a short range, try
+          <strong>Weekly</strong>.
+        </p>
       </div>
 
       <!-- Model Selection -->
@@ -220,6 +477,22 @@
 
     </div>
 
+    <!-- Data readiness summary -->
+    <div class="vf-data-summary">
+      <div class="vf-ds-item">
+        <i class="pi pi-database"></i>
+        <span><strong>{{ activeTransactions.length | number }}</strong> records loaded</span>
+      </div>
+      <div class="vf-ds-item" *ngIf="dataSourceMode === 'file' && uploadedFile">
+        <i class="pi pi-file"></i>
+        <span>Source: <strong>{{ uploadedFile.name }}</strong></span>
+      </div>
+      <div class="vf-ds-item" *ngIf="dataSourceMode === 'live'">
+        <i class="pi pi-calendar"></i>
+        <span>Period: <strong>{{ activeTabValue | titlecase }}</strong></span>
+      </div>
+    </div>
+
     <!-- Run Button -->
     <div class="vf-run-row">
       <button class="vf-run-btn" [disabled]="!canForecast || loading" (click)="runForecast()">
@@ -229,10 +502,9 @@
         </span>
         <span class="vf-run-btn-inner" *ngIf="loading">
           <span class="vf-spinner"></span>
-          Running Models...
+          Running Models…
         </span>
       </button>
-
       <span class="vf-run-hint" *ngIf="!loading">
         <i class="pi pi-info-circle"></i>
         Ensemble models may take 5–10 seconds
@@ -242,7 +514,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════════
-       FORECASTING LOADING SKELETON
+       FORECASTING SKELETON
        ══════════════════════════════════════════════════════ -->
   <div class="vf-skeleton-wrap" *ngIf="loading">
     <div class="vf-skeleton-header">
@@ -270,7 +542,7 @@
        ══════════════════════════════════════════════════════ -->
   <div class="vf-results" *ngIf="!loading && forecastResult">
 
-    <!-- Status badge -->
+    <!-- Status bar -->
     <div class="vf-result-header">
       <div class="vf-result-status" [class.vf-result-status--ok]="forecastResult.status === 'completed'">
         <i class="pi" [class.pi-check-circle]="forecastResult.status === 'completed'"
@@ -283,11 +555,11 @@
       </span>
     </div>
 
-    <!-- ── Metrics Grid ──────────────────────────────────── -->
+    <!-- Metrics -->
     <div class="vf-metrics-grid" *ngIf="metricEntries.length > 0">
       <div class="vf-metric-card" *ngFor="let m of metricEntries">
         <div class="vf-metric-icon">
-          <i class="pi" [ngClass]="'pi-' + metricIcon(m.key)"></i>
+          <i class="pi" [ngClass]="metricIcon(m.key)"></i>
         </div>
         <div class="vf-metric-body">
           <div class="vf-metric-label" [pTooltip]="metricDescription(m.key)" tooltipPosition="top">
@@ -298,7 +570,7 @@
       </div>
     </div>
 
-    <!-- ── Plotly Chart ──────────────────────────────────── -->
+    <!-- Plotly Chart -->
     <div class="vf-chart-card">
       <div class="vf-chart-title">
         <i class="pi pi-chart-line"></i>

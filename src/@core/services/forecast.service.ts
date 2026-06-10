@@ -7,6 +7,15 @@ import { ForecastRequest, ForecastResponse } from '../models/forecast/forecast.m
 
 @Injectable({ providedIn: 'root' })
 export class ForecastService {
+  uploadFile(formData: FormData): Observable<any> {
+    return this.dataService.post<any>(
+      API_ENDPOINTS.FORECAST_VEHICLE,
+      formData,
+      'forecast-data',
+      false,
+      true,
+    );
+  }
   constructor(private dataService: DataService) { }
 
   /**
