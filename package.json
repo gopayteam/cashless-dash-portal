@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "proxy": "ngrok http 4200 --domain capital-obviously-terrier.ngrok-free.app",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy-docker": "docker build -t amos876/admin-dashboard:2.0.4 . && docker push amos876/admin-dashboard:2.0.4"
   },
   "prettier": {
     "printWidth": 100,

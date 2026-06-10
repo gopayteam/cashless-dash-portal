@@ -5,6 +5,7 @@
     "packageManager": "npm",
     "analytics": "1fb1fce3-9404-43c4-93c9-96793fab96b4"
   },
+  
   "newProjectRoot": "projects",
   "projects": {
     "prime": {
@@ -57,6 +58,7 @@
           "configurations": {
             "production": {
               "buildTarget": "prime:build:production"
+              
             },
             "development": {
               "buildTarget": "prime:build:development"
