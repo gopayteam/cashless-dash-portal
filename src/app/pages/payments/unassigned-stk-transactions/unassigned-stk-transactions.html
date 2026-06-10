@@ -2,11 +2,6 @@
 
 <p-card>
 
-  <!-- <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-    <button pButton icon="pi pi-refresh" label="Refresh" (click)="loadTransactions()" class="p-button-outlined">
-    </button>
-  </div> -->
-
   <div class="header-row">
 
     <div style="display: flex; align-items: center; gap: 1rem;">
@@ -16,7 +11,7 @@
         (clicked)="refresh()"></app-action-button>
     </div>
 
-    <div class="search-container" style="display: flex; gap: 0.5rem; flex: 1; max-width: 400px; margin: 0 2rem;">
+    <div class="search-container">
       <span class="p-input-icon-left" style="width: 100%;">
         <i class="pi pi-search"></i>
         <input type="text" pInputText placeholder="Search MPESA Receipt Number" [(ngModel)]="searchQuery"
@@ -24,6 +19,8 @@
       </span>
       <button pButton label="Search" (click)="searchTransaction()"></button>
     </div>
+
+
 
   </div>
 
@@ -74,9 +71,8 @@
 </p-card>
 
 
-<p-dialog [(visible)]="displayPublishDialog" [modal]="true" [style]="{width:'550px', padding: '1rem'}"
-  header="Assign Transaction">
-
+<p-dialog [(visible)]="displayPublishDialog" [modal]="true"
+  [style]="{width:'90vw', 'max-width':'550px', padding: '1rem'}" header=" Assign Transaction">
   <div class="form-grid" *ngIf="selectedTransaction">
 
     <div class="field">
