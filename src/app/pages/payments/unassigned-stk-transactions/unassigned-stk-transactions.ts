@@ -15,6 +15,7 @@ import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 interface StkTransaction {
   amount: string;
@@ -33,7 +34,8 @@ interface StkTransaction {
     ButtonModule,
     DialogModule,
     InputTextModule,
-    ToastModule
+    ToastModule,
+    ActionButtonComponent
   ],
   providers: [MessageService],
   templateUrl: './unassigned-stk-transactions.html',
@@ -56,6 +58,8 @@ export class UnassignedStkTransactionsComponent implements OnInit {
   displayPublishDialog = false;
 
   selectedTransaction: StkTransaction | null = null;
+
+  searchQuery = '';
 
   publishPayload = {
     entityId: this.entityId,
@@ -83,8 +87,59 @@ export class UnassignedStkTransactionsComponent implements OnInit {
 
     this.entityId = user.entityId;
 
+  }
 
-    this.loadTransactions();
+  searchTransaction(): void {
+
+    if (!this.searchQuery) {
+      this.loadTransactions();
+      return;
+    }
+
+    const payload = {
+      mpesaReceiptNumber: this.searchQuery.trim().toUpperCase()
+    };
+
+    this.loadingStore.start();
+
+    this.dataService
+      .post<any>(
+        API_ENDPOINTS.SEARCH_TRANSACTION,
+        payload,
+        'search-stk',
+        true
+      )
+      .subscribe({
+        next: (response) => {
+
+          if (response.data) {
+            this.transactions = [response.data];
+            this.totalRecords = 1;
+          } else {
+            this.transactions = [];
+            this.totalRecords = 0;
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Info',
+              detail: 'No transaction found'
+            });
+          }
+
+          this.cdr.detectChanges();
+          this.loadingStore.stop();
+        },
+        error: (err) => {
+
+          console.error(err);
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to search transaction'
+          });
+          this.loadingStore.stop();
+        }
+      });
   }
 
   loadTransactions(event?: any): void {
@@ -225,5 +280,9 @@ export class UnassignedStkTransactionsComponent implements OnInit {
     ).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+  }
+
+  refresh(): void {
+    this.loadTransactions();
   }
 }
