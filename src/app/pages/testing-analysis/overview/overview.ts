@@ -457,11 +457,11 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit() {
     Promise.all([
-      this.api.getKpi().toPromise(),
-      this.api.getFleet().toPromise(),
+      this.api.getKpi().toPromise().catch(() => null),
+      this.api.getFleet().toPromise().catch(() => []),
     ]).then(([kpi, fleet]) => {
-      this.kpi.set(kpi!);
-      this.fleet.set(fleet!);
+      this.kpi.set(kpi ?? null);
+      this.fleet.set(fleet || []);
       this.loading.set(false);
     });
     this.loadTransactions();
@@ -469,7 +469,13 @@ export class OverviewComponent implements OnInit {
 
   loadTransactions() {
     this.api.getTransactions(this.currentPage(), 50, undefined, this.flaggedOnly)
-      .subscribe(p => this.txPage.set(p));
+      .subscribe({
+        next: p => this.txPage.set(p),
+        error: () => {
+          this.txPage.set(null);
+          this.loading.set(false);
+        }
+      });
   }
 
   changePage(dir: number) {

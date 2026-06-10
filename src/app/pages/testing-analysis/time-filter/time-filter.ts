@@ -503,9 +503,12 @@ export class TimeFilterComponent implements OnInit {
   constructor(private api: AnalysisApiService) {}
 
   ngOnInit() {
-    this.api.getAvailableYears().subscribe(r => {
-      this.availableYears.set(r.years);
-      if (r.years.length) this.selectedYear = r.years[r.years.length - 1];
+    this.api.getAvailableYears().subscribe({
+      next: r => {
+        this.availableYears.set(r.years);
+        if (r.years.length) this.selectedYear = r.years[r.years.length - 1];
+      },
+      error: () => this.availableYears.set([new Date().getFullYear()])
     });
   }
 
@@ -515,7 +518,10 @@ export class TimeFilterComponent implements OnInit {
     if (!this.fromDate || !this.toDate) return;
     this.loading.set(true);
     this.api.filterHourly(this.fromDate, this.fromHour, this.toDate, this.toHour)
-      .subscribe({ next: r => { this.result.set(r); this.loading.set(false); }, error: () => this.loading.set(false) });
+      .subscribe({
+        next: r => { this.result.set(r); this.loading.set(false); },
+        error: () => { this.result.set(null); this.loading.set(false); }
+      });
   }
 
   computeWeekLabel() {
@@ -533,19 +539,28 @@ export class TimeFilterComponent implements OnInit {
     if (!this.weekDate) return;
     this.loading.set(true);
     this.api.filterWeekly(this.weekDate)
-      .subscribe({ next: r => { this.result.set(r); this.loading.set(false); }, error: () => this.loading.set(false) });
+      .subscribe({
+        next: r => { this.result.set(r); this.loading.set(false); },
+        error: () => { this.result.set(null); this.loading.set(false); }
+      });
   }
 
   applyMonthly() {
     this.loading.set(true);
     this.api.filterMonthly(this.selectedYear, this.selectedMonth)
-      .subscribe({ next: r => { this.result.set(r); this.loading.set(false); }, error: () => this.loading.set(false) });
+      .subscribe({
+        next: r => { this.result.set(r); this.loading.set(false); },
+        error: () => { this.result.set(null); this.loading.set(false); }
+      });
   }
 
   applyYearly() {
     this.loading.set(true);
     this.api.filterYearly(this.selectedYear)
-      .subscribe({ next: r => { this.result.set(r); this.loading.set(false); }, error: () => this.loading.set(false) });
+      .subscribe({
+        next: r => { this.result.set(r); this.loading.set(false); },
+        error: () => { this.result.set(null); this.loading.set(false); }
+      });
   }
 
   clear() {

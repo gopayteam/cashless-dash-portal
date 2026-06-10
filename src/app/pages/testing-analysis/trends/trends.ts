@@ -318,7 +318,10 @@ export class TrendsComponent implements OnInit {
   }
 
   load() {
-    this.api.getTrends(this.period()).subscribe(d => this.data.set(d));
+    this.api.getTrends(this.period()).subscribe({
+      next: d => this.data.set(d),
+      error: () => this.data.set([])
+    });
   }
 
   maxVal() { return Math.max(...this.data().map(d => d.total), 1); }

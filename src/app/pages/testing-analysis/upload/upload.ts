@@ -69,7 +69,7 @@ import { UploadResponse } from '../../../../@core/services/analysis-api.service'
   styles: [`
     .upload-page {
       position: relative;
-      min-height: calc(100vh - 64px);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;

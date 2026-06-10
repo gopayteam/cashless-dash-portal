@@ -98,6 +98,7 @@ import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
 import { AnalysisDashboardComponent } from './pages/testing-analysis/dashboard/dashboard';
+import { UnassignedStkTransactionsComponent } from './pages/payments/unassigned-stk-transactions/unassigned-stk-transactions';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -790,6 +791,13 @@ export const routes: Routes = [
       {
         path: 'testing/analysis',
         component: AnalysisDashboardComponent,
+        canActivate: [AuthGuard],
+      },
+
+      // ##########################################################################
+      {
+        path: 'unassigned-payments',
+        component: UnassignedStkTransactionsComponent,
         canActivate: [AuthGuard],
       },
 

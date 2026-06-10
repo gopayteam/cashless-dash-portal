@@ -5,13 +5,14 @@ import { AnomaliesComponent } from '../anomalies/anomalies';
 import { OverviewComponent } from '../overview/overview';
 import { TimeFilterComponent } from '../time-filter/time-filter';
 import { TrendsComponent } from '../trends/trends';
+import { UploadComponent } from '../upload/upload';
 
-type Tab = 'overview' | 'trends' | 'anomalies' | 'time-filter';
+type Tab = 'upload' | 'overview' | 'trends' | 'anomalies' | 'time-filter';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, OverviewComponent, TrendsComponent, AnomaliesComponent, TimeFilterComponent],
+  imports: [CommonModule, OverviewComponent, TrendsComponent, AnomaliesComponent, TimeFilterComponent, UploadComponent],
   template: `
     <div class="dashboard">
 
@@ -37,6 +38,10 @@ type Tab = 'overview' | 'trends' | 'anomalies' | 'time-filter';
 
       <!-- Panels -->
       <main class="tab-panel">
+        <app-upload *ngIf="activeTab() === 'upload'"
+          [loading]="uploading()"
+          [error]="uploadError()"
+          (fileSelected)="onFileSelected($event)" />
         <app-overview *ngIf="activeTab() === 'overview'" />
         <app-trends *ngIf="activeTab() === 'trends'" />
         <app-anomalies *ngIf="activeTab() === 'anomalies'" />
@@ -45,13 +50,13 @@ type Tab = 'overview' | 'trends' | 'anomalies' | 'time-filter';
     </div>
   `,
   styles: [`
-    .dashboard { min-height: calc(100vh - 64px); display: flex; flex-direction: column; }
+    .dashboard { min-height: 100vh; display: flex; flex-direction: column; }
 
     .tab-nav {
       background: rgba(245, 240, 232, 0.95);
       border-bottom: 1px solid #d4c9b0;
       position: sticky;
-      top: 64px;
+      top: 0;
       z-index: 90;
     }
 
@@ -128,10 +133,13 @@ type Tab = 'overview' | 'trends' | 'anomalies' | 'time-filter';
   `],
 })
 export class AnalysisDashboardComponent implements OnInit {
-  activeTab = signal<Tab>('overview');
+  activeTab = signal<Tab>('upload');
   kpi = signal<KpiSummary | null>(null);
+  uploading = signal(false);
+  uploadError = signal('');
 
   tabs = [
+    { id: 'upload' as Tab, num: '00', label: 'Upload' },
     { id: 'overview' as Tab, num: '01', label: 'Overview' },
     { id: 'trends' as Tab, num: '02', label: 'Trends' },
     { id: 'anomalies' as Tab, num: '03', label: 'Anomalies' },
@@ -141,6 +149,33 @@ export class AnalysisDashboardComponent implements OnInit {
   constructor(private api: AnalysisApiService) { }
 
   ngOnInit() {
-    this.api.getKpi().subscribe({ next: (k) => this.kpi.set(k), error: () => { } });
+    this.refreshKpi();
+  }
+
+  refreshKpi() {
+    this.api.getKpi().subscribe({
+      next: (k) => {
+        this.kpi.set(k);
+        if (k && k.transaction_count > 0 && this.activeTab() === 'upload') {
+          this.activeTab.set('overview');
+        }
+      },
+      error: () => { }
+    });
+  }
+
+  onFileSelected(file: File) {
+    this.uploading.set(true);
+    this.uploadError.set('');
+    this.api.upload(file).subscribe({
+      next: () => {
+        this.uploading.set(false);
+        this.refreshKpi();
+      },
+      error: (err) => {
+        this.uploading.set(false);
+        this.uploadError.set(err.error?.detail || 'Failed to upload CSV');
+      }
+    });
   }
 }

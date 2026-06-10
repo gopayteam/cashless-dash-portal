@@ -1,0 +1,104 @@
+<p-toast></p-toast>
+
+<p-card>
+
+  <div class="header-row">
+
+    <h2>Unassigned STK Transactions</h2>
+
+    <button pButton icon="pi pi-refresh" label="Refresh" style="gap: 0.5rem;" (click)="loadTransactions()">
+    </button>
+
+  </div>
+
+  <p-table [value]="transactions" [lazy]="true" [rows]="rows" [first]="first" [totalRecords]="totalRecords"
+    [loading]="loading()" (onLazyLoad)="loadTransactions($event)" responsiveLayout="scroll" [paginator]="true"
+    [rowsPerPageOptions]="[5, 10, 20, 50, 100, 200]"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+
+    <ng-template pTemplate="header">
+
+      <tr>
+        <th>Receipt</th>
+        <th>Amount</th>
+        <th>Created</th>
+        <th>Action</th>
+      </tr>
+
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+
+      <tr>
+
+        <td>{{ row.mpesaReceiptNumber }}</td>
+
+        <td>
+          KES {{ row.amount }}
+        </td>
+
+        <td>
+          {{ row.createdAt | date:'medium' }}
+        </td>
+
+        <td>
+
+          <button pButton label="Assign" icon="pi pi-check" style="gap: 0.5rem;" class="p-button-sm"
+            (click)="openPublishDialog(row)">
+          </button>
+
+        </td>
+
+      </tr>
+
+    </ng-template>
+
+  </p-table>
+
+</p-card>
+
+
+<p-dialog [(visible)]="displayPublishDialog" [modal]="true" [style]="{width:'550px', padding: '1rem'}"
+  header="Assign Transaction">
+
+  <div class="form-grid" *ngIf="selectedTransaction">
+
+    <div class="field">
+      <label>Receipt Number</label>
+      <input pInputText [value]="selectedTransaction.mpesaReceiptNumber" readonly style="background: #f4f4f4;">
+    </div>
+
+    <div class="field">
+      <label>Amount (KES)</label>
+      <input pInputText [value]="selectedTransaction.amount" readonly style="background: #f4f4f4;">
+    </div>
+
+    <div class="field">
+      <label>Fleet Number <span style="color: red;">*</span></label>
+      <input pInputText [(ngModel)]="publishPayload.fleetNumber" placeholder="Enter fleet number">
+    </div>
+
+    <div class="field">
+      <label>Username</label>
+      <input pInputText [(ngModel)]="publishPayload.username" placeholder="2547960110105 (Default)">
+    </div>
+
+    <div class="field">
+      <label>Phone Number</label>
+      <input pInputText [(ngModel)]="publishPayload.phoneNumber" placeholder="2547960110105 (Default)">
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+
+    <button pButton label="Cancel" class="p-button-text" style="gap: 0.5rem; margin-right: 1rem"
+      (click)="displayPublishDialog=false">
+    </button>
+
+    <button pButton label="Publish" icon="pi pi-check" style="gap: 0.6rem;" (click)="publishTransaction()">
+    </button>
+
+  </ng-template>
+
+</p-dialog>

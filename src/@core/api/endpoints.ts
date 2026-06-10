@@ -26,6 +26,8 @@ export const API_ENDPOINTS = {
   TRANSACTION_STATS: '/api/payment/transactions/stats',
   STATS_BY_PERIOD: '/api/payment/transactions/stats-by-period',
   STATS_PER_CATEGORY: '/api/payment/transactions/stats-per-category',
+  UNASSIGNED_STK_TRANSACTIONS: '/api/route/stk/transactions/no-fleet-number',
+  PUBLISH_STK_TRANSACTIONS: '/api/route/publish/stk/transactions/no-fleet-number',
 
   // #####################  PARCELS SUB-ENDPOINTS   #######################
   ALL_PARCELS: '/api/parcels/filter/user/sales',

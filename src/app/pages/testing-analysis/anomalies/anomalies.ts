@@ -325,7 +325,19 @@ export class AnomaliesComponent implements OnInit {
   constructor(private api: AnalysisApiService) {}
 
   ngOnInit() {
-    this.api.getAnomalies().subscribe(r => this.report.set(r));
+    this.api.getAnomalies().subscribe({
+      next: r => this.report.set(r),
+      error: () => this.report.set({
+        total_flagged: 0,
+        by_type: {
+          DUPLICATE_RECEIPT: [],
+          UNUSUAL_AMOUNT: [],
+          RAPID_DRIVER_REPEAT: [],
+          OUTSIDE_BUSINESS_HOURS: []
+        },
+        all_flagged: []
+      } as any)
+    });
   }
 
   setView(v: ViewMode) { this.view.set(v); }
