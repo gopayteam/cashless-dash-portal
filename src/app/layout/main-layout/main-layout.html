@@ -121,6 +121,16 @@
               </li>
 
               <li class="menu-item">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/unassigned')"
+                  (click)="navigate('/unassigned-payments')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-exclamation-circle menu-icon" style="color: rgb(125, 3, 3)"></i>
+                    <span class="menu-text">Unassigned Transactions</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/user-payment-request')"
                   (click)="navigate('/user-payment-request')">
                   <span class="menu-link-content">
@@ -129,6 +139,8 @@
                   </span>
                 </button>
               </li>
+
+
             </ul>
           </li>
 
