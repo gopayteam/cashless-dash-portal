@@ -17,6 +17,17 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
+interface SearchTransactionResponse {
+  status: number,
+  message: string,
+  data: {
+    amount: string;
+    mpesaReceiptNumber: string;
+    createdAt: string;
+
+  },
+  totalRecords: number,
+}
 interface StkTransaction {
   amount: string;
   createdAt: string;
@@ -103,7 +114,7 @@ export class UnassignedStkTransactionsComponent implements OnInit {
     this.loadingStore.start();
 
     this.dataService
-      .post<any>(
+      .post<SearchTransactionResponse>(
         API_ENDPOINTS.SEARCH_TRANSACTION,
         payload,
         'search-stk',
@@ -111,6 +122,14 @@ export class UnassignedStkTransactionsComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
+
+          if (response.status !== 0) {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'An error occured: ' + response.message
+            });
+          }
 
           if (response.data) {
             this.transactions = [response.data];
@@ -236,7 +255,7 @@ export class UnassignedStkTransactionsComponent implements OnInit {
 
     this.dataService
       .post<any>(
-        'https://api.gopay.ke',
+        API_ENDPOINTS.PUBLISH_STK_TRANSACTIONS,
         payload,
         'publish-stk',
         true
