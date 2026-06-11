@@ -1,3 +1,8 @@
+.transactions-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 :host {
   display: block;
 }
@@ -34,7 +39,7 @@
     margin: 0;
     max-width: none;
   }
-  
+
   .refresh-btn {
     align-self: flex-end;
   }
@@ -70,7 +75,7 @@
 :host ::ng-deep .p-button:hover {
   background: var(--primary-color-dark);
   border-color: var(--primary-color-dark);
-  color: #ffffff !important;
+  color: var(--secondary-bg) !important;
 }
 
 :host ::ng-deep .p-dialog .p-dialog-content {

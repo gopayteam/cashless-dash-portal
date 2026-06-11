@@ -17,6 +17,12 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+
 interface SearchTransactionResponse {
   status: number,
   message: string,
@@ -46,11 +52,19 @@ interface StkTransaction {
     DialogModule,
     InputTextModule,
     ToastModule,
-    ActionButtonComponent
+    ActionButtonComponent,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule,
   ],
   providers: [MessageService],
   templateUrl: './unassigned-stk-transactions.html',
-  styleUrls: ['./unassigned-stk-transactions.css', '../../../../styles/global/_toast.css']
+  styleUrls: [
+    './unassigned-stk-transactions.css',
+    '../../../../styles/global/_toast.css',
+    '../../../../styles/modules/_transactions.css'
+  ]
 })
 export class UnassignedStkTransactionsComponent implements OnInit {
   entityId: string | null = null;
@@ -64,7 +78,7 @@ export class UnassignedStkTransactionsComponent implements OnInit {
     return this.loadingStore.loading;
   }
 
-  selectedDate = new Date();
+  selectedDate: Date = new Date();
 
   displayPublishDialog = false;
 
@@ -98,6 +112,7 @@ export class UnassignedStkTransactionsComponent implements OnInit {
 
     this.entityId = user.entityId;
 
+    this.loadTransactions();
   }
 
   searchTransaction(): void {
@@ -162,12 +177,16 @@ export class UnassignedStkTransactionsComponent implements OnInit {
   }
 
   loadTransactions(event?: any): void {
-
     const page = event ? event.first / event.rows : 0;
     const size = event ? event.rows : this.rows;
 
+    if (!this.selectedDate) {
+      console.error('No date selected');
+      return;
+    }
+
     const payload = {
-      createdAt: this.formatDate(this.selectedDate),
+      createdAt: formatDateLocal(this.selectedDate),
       page,
       size
     };
@@ -302,6 +321,11 @@ export class UnassignedStkTransactionsComponent implements OnInit {
   }
 
   refresh(): void {
+    this.loadTransactions();
+  }
+
+  onDateChange(): void {
+    this.first = 0;
     this.loadTransactions();
   }
 }

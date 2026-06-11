@@ -1,116 +1,139 @@
 <p-toast></p-toast>
 
-<p-card>
-
-  <div class="header-row">
-
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <h2>Unassigned STK Transactions</h2>
-
-      <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
-        (clicked)="refresh()"></app-action-button>
+<div class="transactions-container">
+  <!-- ================= HEADER WITH DATE FILTER ================= -->
+  <div class="transactions-header">
+    <div class="header-content">
+      <h1>Unassigned STK Transactions</h1>
+      <p class="text-muted">View and manage all your unassigned STK transactions</p>
     </div>
 
-    <div class="search-container">
-      <span class="p-input-icon-left" style="width: 100%;">
-        <i class="pi pi-search"></i>
-        <input type="text" pInputText placeholder="Search MPESA Receipt Number" [(ngModel)]="searchQuery"
-          (keyup.enter)="searchTransaction()" style="width: 100%;">
-      </span>
-      <button pButton label="Search" (click)="searchTransaction()"></button>
+    <div class="filter-item filter-item-gradient">
+      <label class="filter-label">Date</label>
+
+      <mat-form-field appearance="outline" class="date-range-field date-picker-compact">
+        <input matInput [matDatepicker]="picker" placeholder="Select date" [(ngModel)]="selectedDate"
+          (dateChange)="onDateChange()">
+
+        <mat-datepicker-toggle matSuffix [for]="picker">
+        </mat-datepicker-toggle>
+
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
     </div>
-
-
-
   </div>
+  <p-card>
 
-  <p-table [value]="transactions" [lazy]="true" [rows]="rows" [first]="first" [totalRecords]="totalRecords"
-    [loading]="loading()" (onLazyLoad)="loadTransactions($event)" responsiveLayout="scroll" [paginator]="true"
-    [rowsPerPageOptions]="[5, 10, 20, 50, 100, 200]"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+    <div class="header-row">
 
-    <ng-template pTemplate="header">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <h2>Transactions</h2>
 
-      <tr>
-        <th>Receipt</th>
-        <th>Amount</th>
-        <th>Created</th>
-        <th>Action</th>
-      </tr>
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="refresh()"></app-action-button>
+      </div>
+
+      <div class="search-container">
+        <span class="p-input-icon-left" style="width: 100%;">
+          <!-- <i class="pi pi-search"></i> -->
+          <input type="text" pInputText placeholder="Search MPESA Receipt Number" [(ngModel)]="searchQuery"
+            (keyup.enter)="searchTransaction()" style="width: 100%;">
+        </span>
+        <button pButton label="Search" (click)="searchTransaction()"></button>
+      </div>
+
+
+
+    </div>
+
+    <p-table [value]="transactions" [lazy]="true" [rows]="rows" [first]="first" [totalRecords]="totalRecords"
+      [loading]="loading()" (onLazyLoad)="loadTransactions($event)" responsiveLayout="scroll" [paginator]="true"
+      [rowsPerPageOptions]="[5, 10, 20, 50, 100, 200]"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [showCurrentPageReport]="true">
+
+      <ng-template pTemplate="header">
+
+        <tr>
+          <th>Receipt</th>
+          <th>Amount</th>
+          <th>Created</th>
+          <th>Action</th>
+        </tr>
+
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+
+        <tr>
+
+          <td>{{ row.mpesaReceiptNumber }}</td>
+
+          <td>
+            KES {{ row.amount }}
+          </td>
+
+          <td>
+            {{ row.createdAt | date:'medium' }}
+          </td>
+
+          <td>
+
+            <button pButton label="Assign" icon="pi pi-check" style="gap: 0.5rem;" class="p-button-sm"
+              (click)="openPublishDialog(row)">
+            </button>
+
+          </td>
+
+        </tr>
+
+      </ng-template>
+
+    </p-table>
+
+  </p-card>
+
+
+  <p-dialog [(visible)]="displayPublishDialog" [modal]="true"
+    [style]="{width:'90vw', 'max-width':'550px', padding: '1rem'}" header=" Assign Transaction">
+    <div class="form-grid" *ngIf="selectedTransaction">
+
+      <div class="field">
+        <label>Receipt Number</label>
+        <input pInputText [value]="selectedTransaction.mpesaReceiptNumber" readonly style="background: #f4f4f4;">
+      </div>
+
+      <div class="field">
+        <label>Amount (KES)</label>
+        <input pInputText [value]="selectedTransaction.amount" readonly style="background: #f4f4f4;">
+      </div>
+
+      <div class="field">
+        <label>Fleet Number <span style="color: red;">*</span></label>
+        <input pInputText [(ngModel)]="publishPayload.fleetNumber" placeholder="Enter fleet number">
+      </div>
+
+      <div class="field">
+        <label>Username</label>
+        <input pInputText [(ngModel)]="publishPayload.username" placeholder="2547960110105 (Default)">
+      </div>
+
+      <div class="field">
+        <label>Phone Number</label>
+        <input pInputText [(ngModel)]="publishPayload.phoneNumber" placeholder="2547960110105 (Default)">
+      </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+
+      <button pButton label="Cancel" class="p-button-text" style="gap: 0.5rem; margin-right: 1rem"
+        (click)="displayPublishDialog=false">
+      </button>
+
+      <button pButton label="Publish" icon="pi pi-check" style="gap: 0.6rem;" (click)="publishTransaction()">
+      </button>
 
     </ng-template>
 
-    <ng-template pTemplate="body" let-row>
-
-      <tr>
-
-        <td>{{ row.mpesaReceiptNumber }}</td>
-
-        <td>
-          KES {{ row.amount }}
-        </td>
-
-        <td>
-          {{ row.createdAt | date:'medium' }}
-        </td>
-
-        <td>
-
-          <button pButton label="Assign" icon="pi pi-check" style="gap: 0.5rem;" class="p-button-sm"
-            (click)="openPublishDialog(row)">
-          </button>
-
-        </td>
-
-      </tr>
-
-    </ng-template>
-
-  </p-table>
-
-</p-card>
-
-
-<p-dialog [(visible)]="displayPublishDialog" [modal]="true"
-  [style]="{width:'90vw', 'max-width':'550px', padding: '1rem'}" header=" Assign Transaction">
-  <div class="form-grid" *ngIf="selectedTransaction">
-
-    <div class="field">
-      <label>Receipt Number</label>
-      <input pInputText [value]="selectedTransaction.mpesaReceiptNumber" readonly style="background: #f4f4f4;">
-    </div>
-
-    <div class="field">
-      <label>Amount (KES)</label>
-      <input pInputText [value]="selectedTransaction.amount" readonly style="background: #f4f4f4;">
-    </div>
-
-    <div class="field">
-      <label>Fleet Number <span style="color: red;">*</span></label>
-      <input pInputText [(ngModel)]="publishPayload.fleetNumber" placeholder="Enter fleet number">
-    </div>
-
-    <div class="field">
-      <label>Username</label>
-      <input pInputText [(ngModel)]="publishPayload.username" placeholder="2547960110105 (Default)">
-    </div>
-
-    <div class="field">
-      <label>Phone Number</label>
-      <input pInputText [(ngModel)]="publishPayload.phoneNumber" placeholder="2547960110105 (Default)">
-    </div>
-
-  </div>
-
-  <ng-template pTemplate="footer">
-
-    <button pButton label="Cancel" class="p-button-text" style="gap: 0.5rem; margin-right: 1rem"
-      (click)="displayPublishDialog=false">
-    </button>
-
-    <button pButton label="Publish" icon="pi pi-check" style="gap: 0.6rem;" (click)="publishTransaction()">
-    </button>
-
-  </ng-template>
-
-</p-dialog>
+  </p-dialog>
+</div>
