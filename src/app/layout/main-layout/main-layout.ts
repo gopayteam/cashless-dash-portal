@@ -8,26 +8,29 @@
 //
 // Everything else (sidebar, tabs, dark mode, etc.) is unchanged.
 
-import {
-  Component, HostListener, OnInit, OnDestroy,
-  inject, NgZone, effect
-} from '@angular/core';
-import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {
+  Component, HostListener,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  inject
+} from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { filter } from 'rxjs/operators';
-import { AuthService } from '../../../@core/services/auth.service';
-import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Dialog } from 'primeng/dialog';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
+import { HasRoleDirective } from '../../../@core/directives/has-role.directive';
+import { AuthService } from '../../../@core/services/auth.service';
 import { DarkModeService } from '../../../@core/services/dark-mode.service';
 import { ThemeService } from '../../../@core/services/theme.service';
 
 // ── NEW imports ────────────────────────────────────────────────────────────────
-import { AppNotificationService } from '../../../@core/services/app-notification.service';
-import { BookingConflictService } from '../../../@core/services/booking-conflict.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppNotification } from '../../../@core/models/notifications/app-notification.model';
+import { AppNotificationService } from '../../../@core/services/app-notification.service';
+import { BookingConflictService } from '../../../@core/services/booking-conflict.service';
 // ──────────────────────────────────────────────────────────────────────────────
 
 interface TabConfig {

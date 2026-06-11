@@ -203,7 +203,7 @@ export class AllVehiclesComponent implements OnInit {
             headerGradientEnd: '#0D47A1',
             accentColor: '#1E88E5',
             footerType: 'image',
-            footerImagePath: '/gopay_clear.png',
+            footerImagePath: '/logo_2.png',
           };
       }
     })();
@@ -631,7 +631,7 @@ export class AllVehiclesComponent implements OnInit {
           default:
             return {
               headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
-              accentColor: '#1E88E5', footerType: 'image', footerImagePath: '/gopay_clear.png',
+              accentColor: '#1E88E5', footerType: 'image', footerImagePath: '/logo_2.png',
             };
         }
       })();
@@ -759,7 +759,7 @@ export class AllVehiclesComponent implements OnInit {
           default:
             return {
               headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
-              accentColor: '#1E88E5', footerType: 'image', footerImagePath: '/gopay_clear.png',
+              accentColor: '#1E88E5', footerType: 'image', footerImagePath: '/logo_2.png',
             };
         }
       })();
@@ -937,7 +937,7 @@ export class AllVehiclesComponent implements OnInit {
             return {
               headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
               accentColor: '#1E88E5', footerType: 'image',
-              footerImagePath: '/gopay_clear.png',
+              footerImagePath: '/logo_2.png',
             };
         }
       })();
@@ -1119,7 +1119,7 @@ export class AllVehiclesComponent implements OnInit {
             return {
               headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
               accentColor: '#1E88E5', footerType: 'image',
-              footerImagePath: '/gopay_clear.png',
+              footerImagePath: '/logo_2.png',
             };
         }
       })();
@@ -1303,7 +1303,7 @@ export class AllVehiclesComponent implements OnInit {
             return {
               headerGradientStart: '#1E88E5', headerGradientEnd: '#0D47A1',
               accentColor: '#1E88E5', logoType: 'image',
-              logoImagePath: '/gopay_clear.png',
+              logoImagePath: '/logo_2.png',
             };
         }
       })();
