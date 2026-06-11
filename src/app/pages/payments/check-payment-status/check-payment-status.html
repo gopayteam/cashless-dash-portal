@@ -1,0 +1,175 @@
+<!-- pages/payments/payment-status-check/check-payment-status.html -->
+<div class="psc-page">
+
+  <!-- ── Back nav ─────────────────────────────────────────── -->
+  <button class="psc-back-btn" (click)="goBack()">
+    <i class="pi pi-arrow-left"></i>
+    <span>Back to Transactions</span>
+  </button>
+
+  <!-- ── Page heading ─────────────────────────────────────── -->
+  <div class="psc-heading">
+    <h1 class="psc-title">Payment Status</h1>
+    <p class="psc-subtitle">Enter the merchant and checkout identifiers to verify a payment.</p>
+  </div>
+
+  <!-- ── Main card ────────────────────────────────────────── -->
+  <div class="psc-card">
+
+    <!-- ══════════════════════════════════════════════════════
+         INPUT FORM
+         Shown for: idle | api-error | http-error
+    ══════════════════════════════════════════════════════ -->
+    <div class="psc-form-section" *ngIf="showForm">
+
+      <div class="psc-field">
+        <label class="psc-label" for="merchantId">Merchant ID</label>
+        <div class="psc-input-wrap">
+          <i class="pi pi-building psc-input-icon"></i>
+          <input id="merchantId" pInputText type="text" class="psc-input" placeholder="e.g. MERCH-001"
+            [(ngModel)]="merchantId" [disabled]="isLoading" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="psc-field">
+        <label class="psc-label" for="checkoutId">Checkout ID</label>
+        <div class="psc-input-wrap">
+          <i class="pi pi-receipt psc-input-icon"></i>
+          <input id="checkoutId" pInputText type="text" class="psc-input" placeholder="e.g. UFB8C7FLII"
+            [(ngModel)]="checkoutId" [disabled]="isLoading" autocomplete="off" (keyup.enter)="checkStatus()" />
+        </div>
+      </div>
+
+      <!-- ── Error banner (api-error or http-error) ─────────── -->
+      <div class="psc-error-banner" *ngIf="showErrorBanner">
+        <div class="psc-error-banner-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <div class="psc-error-banner-body">
+          <span class="psc-error-banner-title">
+            {{ checkState === 'api-error' ? 'Payment Not Found' : 'Request Failed' }}
+          </span>
+          <span class="psc-error-banner-msg">{{ errorMessage }}</span>
+          <span class="psc-error-code" *ngIf="errorCode !== null">
+            Code {{ errorCode }}
+          </span>
+        </div>
+      </div>
+
+      <button class="psc-check-btn" [disabled]="!isFormValid" (click)="checkStatus()">
+        <i class="pi pi-search"></i>
+        {{ showErrorBanner ? 'Try Again' : 'Check Status' }}
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         LOADING STATE — radar animation
+    ══════════════════════════════════════════════════════ -->
+    <div class="psc-state-section psc-loading-section" *ngIf="checkState === 'loading'">
+      <div class="psc-radar">
+        <div class="psc-radar-ring psc-radar-ring--1"></div>
+        <div class="psc-radar-ring psc-radar-ring--2"></div>
+        <div class="psc-radar-ring psc-radar-ring--3"></div>
+        <div class="psc-radar-core">
+          <i class="pi pi-search"></i>
+        </div>
+      </div>
+      <p class="psc-loading-label">Checking payment status&hellip;</p>
+      <p class="psc-loading-sub">Querying <strong>{{ checkoutId }}</strong></p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         RESULT STATE — only when code === 0
+    ══════════════════════════════════════════════════════ -->
+    <div class="psc-state-section psc-result-section" *ngIf="checkState === 'success' && statusResult">
+
+      <!-- Status icon bubble -->
+      <div class="psc-status-bubble" [class.psc-bubble--paid]="isPaid" [class.psc-bubble--pending]="isPending"
+        [class.psc-bubble--failed]="isFailed" [class.psc-bubble--cancelled]="isCancelled"
+        [class.psc-bubble--unknown]="isUnknown">
+        <!-- PAID / SUCCESS -->
+        <svg *ngIf="isPaid" class="psc-check-svg" viewBox="0 0 52 52">
+          <circle class="psc-check-circle" cx="26" cy="26" r="23" />
+          <path class="psc-check-mark" d="M14 26 L22 34 L38 18" />
+        </svg>
+
+        <!-- PENDING -->
+        <div *ngIf="isPending" class="psc-pending-spinner">
+          <i class="pi pi-clock"></i>
+        </div>
+
+        <!-- FAILED -->
+        <svg *ngIf="isFailed" class="psc-x-svg" viewBox="0 0 52 52">
+          <circle class="psc-x-circle" cx="26" cy="26" r="23" />
+          <line class="psc-x-line" x1="16" y1="16" x2="36" y2="36" />
+          <line class="psc-x-line" x1="36" y1="16" x2="16" y2="36" />
+        </svg>
+
+        <!-- CANCELLED -->
+        <div *ngIf="isCancelled" class="psc-cancelled-icon">
+          <i class="pi pi-ban"></i>
+        </div>
+
+        <!-- UNKNOWN -->
+        <div *ngIf="isUnknown" class="psc-unknown-icon">
+          <i class="pi pi-question-circle"></i>
+        </div>
+      </div>
+
+      <!-- Status text -->
+      <h2 class="psc-result-label" [class.psc-label--paid]="isPaid" [class.psc-label--pending]="isPending"
+        [class.psc-label--failed]="isFailed" [class.psc-label--cancelled]="isCancelled"
+        [class.psc-label--unknown]="isUnknown">
+        {{ statusLabel }}<span *ngIf="isPending" class="psc-dots">{{ pendingDots }}</span>
+      </h2>
+
+      <!-- API message shown verbatim when available -->
+      <p class="psc-result-api-msg" *ngIf="statusResult.message">
+        {{ statusResult.message }}
+      </p>
+      <p class="psc-result-sub">{{ statusSubtitle }}</p>
+
+      <!-- Detail pills -->
+      <div class="psc-detail-grid">
+        <div class="psc-detail-item" *ngIf="statusResult.checkoutId">
+          <span class="psc-detail-key">Checkout ID</span>
+          <span class="psc-detail-val">{{ statusResult.checkoutId }}</span>
+        </div>
+        <div class="psc-detail-item" *ngIf="statusResult.merchantId">
+          <span class="psc-detail-key">Merchant ID</span>
+          <span class="psc-detail-val">{{ statusResult.merchantId }}</span>
+        </div>
+        <div class="psc-detail-item" *ngIf="statusResult.mpesaReceiptNumber">
+          <span class="psc-detail-key">M-Pesa Receipt</span>
+          <span class="psc-detail-val">{{ statusResult.mpesaReceiptNumber }}</span>
+        </div>
+        <div class="psc-detail-item" *ngIf="statusResult.customerName">
+          <span class="psc-detail-key">Customer</span>
+          <span class="psc-detail-val">{{ statusResult.customerName }}</span>
+        </div>
+        <div class="psc-detail-item" *ngIf="statusResult.amount">
+          <span class="psc-detail-key">Amount</span>
+          <span class="psc-detail-val psc-amount">Ksh {{ statusResult.amount | number:'1.2-2' }}</span>
+        </div>
+        <div class="psc-detail-item" *ngIf="statusResult.timestamp">
+          <span class="psc-detail-key">Checked At</span>
+          <span class="psc-detail-val">{{ statusResult.timestamp | date:'dd MMM yyyy, hh:mm a' }}</span>
+        </div>
+      </div>
+
+      <!-- Action row -->
+      <div class="psc-action-row">
+        <button class="psc-recheck-btn" (click)="checkStatus()" *ngIf="isPending">
+          <i class="pi pi-refresh"></i> Check Again
+        </button>
+        <button class="psc-reset-btn" (click)="reset()">
+          <i class="pi pi-plus"></i> New Check
+        </button>
+        <button class="psc-back-action-btn" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i> Transactions
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

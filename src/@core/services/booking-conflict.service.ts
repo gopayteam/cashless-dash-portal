@@ -3,19 +3,19 @@ import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import {
-  Trip,
-  TripTransaction,
-  SeatReservation,
-  SeatConflict,
-  ConflictType,
-  TripsApiResponse,
-  TransactionsApiResponse,
-  ReservationsApiResponse,
-} from '../models/booking/booking-conflict.model';
-import { AppNotificationService } from './app-notification.service';
 import { DataService } from '../api/data.service';
 import { API_ENDPOINTS } from '../api/endpoints';
+import {
+  ConflictType,
+  ReservationsApiResponse,
+  SeatConflict,
+  SeatReservation,
+  TransactionsApiResponse,
+  Trip,
+  TripsApiResponse,
+  TripTransaction,
+} from '../models/booking/booking-conflict.model';
+import { AppNotificationService } from './app-notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class BookingConflictService {

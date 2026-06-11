@@ -1,0 +1,718 @@
+/* pages/payments/payment-status-check/payment-status-check.component.css */
+
+/* ================================================================
+   PAGE WRAPPER
+================================================================ */
+.psc-page {
+  min-height: 100vh;
+  background: var(--bg-app, #f8f9fa);
+  padding: 2rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ================================================================
+   BACK BUTTON
+================================================================ */
+.psc-back-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted, #6c757d);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  margin-bottom: 2rem;
+  transition: color var(--transition, 0.3s ease);
+}
+
+.psc-back-btn:hover {
+  color: var(--primary-color, #0e2c5a);
+}
+
+.psc-back-btn i {
+  font-size: 0.8rem;
+}
+
+/* ================================================================
+   HEADING
+================================================================ */
+.psc-heading {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.psc-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--primary-color, #0e2c5a);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.psc-subtitle {
+  font-size: 0.925rem;
+  color: var(--text-muted, #6c757d);
+}
+
+/* ================================================================
+   MAIN CARD
+================================================================ */
+.psc-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem 2rem;
+  overflow: hidden;
+}
+
+/* ================================================================
+   FORM SECTION
+================================================================ */
+.psc-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: psc-fade-up 0.35s ease both;
+}
+
+.psc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.psc-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary, #495057);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.psc-input-wrap {
+  position: relative;
+}
+
+.psc-input-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #6c757d);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.psc-input {
+  width: 100%;
+  padding: 0.72rem 0.9rem 0.72rem 2.5rem !important;
+  border: 1.5px solid var(--border-color, #e9ecef) !important;
+  border-radius: 10px !important;
+  font-size: 0.925rem !important;
+  color: var(--text-primary, #212529) !important;
+  background: var(--bg-app, #f8f9fa) !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  outline: none !important;
+}
+
+.psc-input:focus {
+  border-color: var(--primary-color, #0e2c5a) !important;
+  box-shadow: 0 0 0 3px rgba(14, 44, 90, 0.1) !important;
+  background: var(--bg-card, #ffffff) !important;
+}
+
+.psc-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Error banner ───────────────────────────────────────────── */
+.psc-error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--danger-bg, #f8d7da);
+  border: 1px solid var(--danger-color, #b71c1c);
+  border-left: 4px solid var(--danger-color, #b71c1c);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  animation: psc-shake 0.4s ease;
+}
+
+.psc-error-banner-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--danger-color, #b71c1c);
+  border-radius: 50%;
+  margin-top: 0.1rem;
+}
+
+.psc-error-banner-icon i {
+  color: #fff;
+  font-size: 0.875rem;
+}
+
+.psc-error-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.psc-error-banner-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--danger-color, #b71c1c);
+}
+
+.psc-error-banner-msg {
+  font-size: 0.825rem;
+  color: var(--danger-color, #b71c1c);
+  opacity: 0.85;
+  line-height: 1.45;
+}
+
+.psc-error-code {
+  font-size: 0.75rem;
+  color: var(--danger-color, #b71c1c);
+  opacity: 0.6;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Check button ───────────────────────────────────────────── */
+.psc-check-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--primary-color, #0e2c5a);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.psc-check-btn:hover:not(:disabled) {
+  background: var(--primary-color-dark, #093170);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(14, 44, 90, 0.25);
+}
+
+.psc-check-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.psc-check-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ================================================================
+   SHARED STATE SECTION
+================================================================ */
+.psc-state-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ================================================================
+   LOADING — RADAR ANIMATION
+================================================================ */
+.psc-loading-section {
+  padding: 1.5rem 0 0.5rem;
+  gap: 1.25rem;
+  animation: psc-fade-up 0.3s ease both;
+}
+
+.psc-radar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.psc-radar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--primary-color, #0e2c5a);
+  opacity: 0;
+  animation: psc-radar-pulse 2s ease-out infinite;
+}
+
+.psc-radar-ring--1 {
+  width: 40px;
+  height: 40px;
+  animation-delay: 0s;
+}
+
+.psc-radar-ring--2 {
+  width: 70px;
+  height: 70px;
+  animation-delay: 0.5s;
+}
+
+.psc-radar-ring--3 {
+  width: 100px;
+  height: 100px;
+  animation-delay: 1s;
+}
+
+.psc-radar-core {
+  width: 44px;
+  height: 44px;
+  background: var(--primary-color, #0e2c5a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.psc-radar-core i {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.psc-loading-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #212529);
+}
+
+.psc-loading-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted, #6c757d);
+}
+
+.psc-loading-sub strong {
+  color: var(--primary-color, #0e2c5a);
+}
+
+/* ================================================================
+   RESULT SECTION
+================================================================ */
+.psc-result-section {
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  animation: psc-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Status bubble ──────────────────────────────────────────── */
+.psc-status-bubble {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+/* PAID */
+.psc-bubble--paid {
+  background: var(--success-bg, #d1e7dd);
+  animation: psc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* PENDING */
+.psc-bubble--pending {
+  background: var(--warning-bg, #fff3cd);
+  animation: psc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* FAILED */
+.psc-bubble--failed {
+  background: var(--danger-bg, #f8d7da);
+  animation: psc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both,
+    psc-shake 0.5s 0.5s ease both;
+}
+
+/* CANCELLED */
+.psc-bubble--cancelled {
+  background: #f0f0f0;
+  animation: psc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* UNKNOWN */
+.psc-bubble--unknown {
+  background: var(--info-bg, #cff4fc);
+  animation: psc-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Checkmark SVG (PAID) ───────────────────────────────────── */
+.psc-check-svg {
+  width: 52px;
+  height: 52px;
+}
+
+.psc-check-circle {
+  fill: none;
+  stroke: var(--success-color, #198754);
+  stroke-width: 2.5;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: psc-draw-circle 0.55s 0.2s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.psc-check-mark {
+  fill: none;
+  stroke: var(--success-color, #198754);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: psc-draw-check 0.35s 0.65s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+/* ── X SVG (FAILED) ─────────────────────────────────────────── */
+.psc-x-svg {
+  width: 52px;
+  height: 52px;
+}
+
+.psc-x-circle {
+  fill: none;
+  stroke: var(--danger-color, #b71c1c);
+  stroke-width: 2.5;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: psc-draw-circle 0.55s 0.2s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.psc-x-line {
+  stroke: var(--danger-color, #b71c1c);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: psc-draw-check 0.3s 0.65s ease forwards;
+}
+
+.psc-x-line:nth-child(3) {
+  animation-delay: 0.85s;
+}
+
+/* ── Pending spinner ────────────────────────────────────────── */
+.psc-pending-spinner i {
+  font-size: 2.2rem;
+  color: var(--warning-color, #ffc107);
+  animation: psc-pulse-scale 1.5s ease-in-out infinite;
+}
+
+/* ── Cancelled / Unknown icons ──────────────────────────────── */
+.psc-cancelled-icon i {
+  font-size: 2.2rem;
+  color: var(--medium-text, #495057);
+}
+
+.psc-unknown-icon i {
+  font-size: 2.2rem;
+  color: var(--info-color, #0dcaf0);
+}
+
+/* ── Result labels ──────────────────────────────────────────── */
+.psc-result-label {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  animation: psc-fade-up 0.4s 0.3s ease both;
+}
+
+.psc-label--paid {
+  color: var(--success-color, #198754);
+}
+
+.psc-label--pending {
+  color: #b45309;
+}
+
+.psc-label--failed {
+  color: var(--danger-color, #b71c1c);
+}
+
+.psc-label--cancelled {
+  color: var(--medium-text, #495057);
+}
+
+.psc-label--unknown {
+  color: var(--info-color, #0dcaf0);
+}
+
+.psc-dots {
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+}
+
+.psc-result-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6c757d);
+  max-width: 320px;
+  line-height: 1.5;
+  animation: psc-fade-up 0.4s 0.45s ease both;
+}
+
+/* ── Detail grid ────────────────────────────────────────────── */
+.psc-detail-grid {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 0.75rem;
+  animation: psc-fade-up 0.4s 0.55s ease both;
+}
+
+.psc-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  gap: 1rem;
+}
+
+.psc-detail-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+}
+
+.psc-detail-item:nth-child(odd) {
+  background: var(--bg-app, #f8f9fa);
+}
+
+.psc-detail-key {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #6c757d);
+  flex-shrink: 0;
+}
+
+.psc-detail-val {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary, #212529);
+  font-family: 'Courier New', Courier, monospace;
+  text-align: right;
+  word-break: break-all;
+}
+
+.psc-amount {
+  color: var(--primary-color, #0e2c5a);
+  font-weight: 700;
+  font-family: inherit;
+}
+
+/* ── Action row ─────────────────────────────────────────────── */
+.psc-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1rem;
+  animation: psc-fade-up 0.4s 0.65s ease both;
+}
+
+.psc-recheck-btn,
+.psc-reset-btn,
+.psc-back-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.psc-recheck-btn:hover,
+.psc-reset-btn:hover,
+.psc-back-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.psc-recheck-btn {
+  background: var(--warning-bg, #fff3cd);
+  color: #b45309;
+}
+
+.psc-recheck-btn:hover {
+  background: #fde68a;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.2);
+}
+
+.psc-reset-btn {
+  background: var(--primary-color, #0e2c5a);
+  color: #ffffff;
+}
+
+.psc-reset-btn:hover {
+  background: var(--primary-color-dark, #093170);
+  box-shadow: 0 4px 14px rgba(14, 44, 90, 0.3);
+}
+
+.psc-back-action-btn {
+  background: var(--bg-app, #f8f9fa);
+  color: var(--text-secondary, #495057);
+  border: 1.5px solid var(--border-color, #e9ecef);
+}
+
+.psc-back-action-btn:hover {
+  background: var(--border-color, #e9ecef);
+}
+
+
+/* ── API message (verbatim from server, shown on success) ─── */
+.psc-result-api-msg {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted, #6c757d);
+  margin-top: -0.25rem;
+}
+
+/* ================================================================
+   KEYFRAME ANIMATIONS
+================================================================ */
+
+/* Smooth upward fade-in */
+@keyframes psc-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pop scale for bubbles */
+@keyframes psc-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Radar ring pulse */
+@keyframes psc-radar-pulse {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* SVG circle draw */
+@keyframes psc-draw-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* SVG checkmark/X draw */
+@keyframes psc-draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Shake for failures */
+@keyframes psc-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Pulse scale for pending */
+@keyframes psc-pulse-scale {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.75;
+  }
+}
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 540px) {
+  .psc-page {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .psc-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .psc-title {
+    font-size: 1.5rem;
+  }
+}

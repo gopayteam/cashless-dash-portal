@@ -67,15 +67,18 @@ import { DeletedParcelsComponent } from './pages/parcels/deleted-parcels/deleted
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
 import { ParcelManagersComponent } from './pages/parcels/parcel-managers/parcel-managers';
 import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
+import { PaymentStatusCheckComponent } from './pages/payments/check-payment-status/check-payment-status';
 import { CreditDriverComponent } from './pages/payments/credit-driver/create-payment';
 import { CreditTransactionsComponent } from './pages/payments/credit-transactions/credit-transactions';
 import { DebitTransactionsComponent } from './pages/payments/debit-transactions/debit-transactions';
 import { FundReassignmentComponent } from './pages/payments/fund-reassignment/fund-reassignment';
 import { PaymentRequestComponent } from './pages/payments/payment-request/payment-request';
+import { UnassignedStkTransactionsComponent } from './pages/payments/unassigned-stk-transactions/unassigned-stk-transactions';
 import { MarshalPerformanceComponent } from './pages/performance/marshall/marshall-performance/marshall-performance';
 import { NotificationsComponent } from './pages/profile/notifications/notifications';
 import { SettingsComponent } from './pages/profile/settings/settings';
 import { UserProfileComponent } from './pages/profile/update-profile/update-profile';
+import { AnalysisDashboardComponent } from './pages/testing-analysis/dashboard/dashboard';
 import { AllTransactionsComponent } from './pages/transactions/all/all';
 import { FailedTransactionsComponent } from './pages/transactions/failed/failed';
 import { PendingTransactionsComponent } from './pages/transactions/pending/pending';
@@ -97,8 +100,6 @@ import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
-import { AnalysisDashboardComponent } from './pages/testing-analysis/dashboard/dashboard';
-import { UnassignedStkTransactionsComponent } from './pages/payments/unassigned-stk-transactions/unassigned-stk-transactions';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -798,6 +799,12 @@ export const routes: Routes = [
       {
         path: 'unassigned-payments',
         component: UnassignedStkTransactionsComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'payments/status',
+        component: PaymentStatusCheckComponent,
         canActivate: [AuthGuard],
       },
 

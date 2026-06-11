@@ -229,7 +229,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       }
 
       // ── Run initial conflict scan after login ──────────────────────────
-      this.runConflictScan();
+      // this.runConflictScan();
     } else {
       this.router.navigate(['/login']);
       return;

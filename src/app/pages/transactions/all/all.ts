@@ -693,4 +693,13 @@ export class AllTransactionsComponent implements OnInit {
 
     return `"${stringValue}"`;
   }
+
+  checkPaymentStatus(transaction: PaymentRecord): void {
+    this.router.navigate(['/payments/status'], {
+      queryParams: {
+        merchantId: this.entityId,           // from AuthService
+        checkoutId: transaction.mpesaReceiptNumber,
+      },
+    });
+  }
 }
