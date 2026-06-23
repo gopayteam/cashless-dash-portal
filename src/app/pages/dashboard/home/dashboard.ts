@@ -32,7 +32,7 @@ import {
   TransactionStatsByPeriod,
   TransactionStatsPerCategory,
 } from '../../../../@core/models/dashboard/dashboard.models';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
 import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/date-time.util';
@@ -40,6 +40,10 @@ import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../../../@core/services/theme.service';
 import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget";
+import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
+import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
+import { Parcel } from '../../../../@core/models/parcels/parcel.model';
+import { ParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
 
 @Component({
   imports: [
@@ -82,6 +86,28 @@ export class DashboardComponent implements OnInit {
   first: number = 0;
   totalRecords: number = 0;
 
+  // New State variables for Enhanced Dashboard
+  selectedTab: 'revenue' | 'fleet' | 'parcels' = 'revenue';
+  isSuperMetro: boolean = false;
+
+  // Vehicles data & trends
+  allVehicles: Vehicle[] = [];
+  vehicleStats = { total: 0, active: 0, inactive: 0, capacity: 0 };
+  vehiclesTrendData: any;
+  vehiclesTrendOptions: any;
+  singleDayVehiclesCount: number = 0;
+  singleDayVehiclesList: Vehicle[] = [];
+
+  // Parcels data & trends
+  allParcels: Parcel[] = [];
+  parcelStats = { total: 0, collected: 0, amount: 0, cash: 0, cashless: 0 };
+  parcelsTrendData: any;
+  parcelsTrendOptions: any;
+  singleDayParcelsCount: number = 0;
+  singleDayParcelsList: Parcel[] = [];
+
+  singleDayLabel: string = '';
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -105,6 +131,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.entityId = user.entityId;
+    this.isSuperMetro = this.entityId === 'GS000002' || this.entityId === 'GS0000002';
     this.themeService.applyTheme(user.entityId);
     this.themeService.loadPersistedTheme();
 
@@ -180,6 +207,7 @@ export class DashboardComponent implements OnInit {
     this.loadingStore.start();
 
     const [start, end] = this.dateRange;
+    this.singleDayLabel = this.formatDateToReadable(end);
 
     const baseParams = {
       entityId: this.entityId,
@@ -195,6 +223,8 @@ export class DashboardComponent implements OnInit {
       transactionType: 'CREDIT',
       sort: 'createdAt,DESC',
     };
+
+    const isSuperMetro = this.isSuperMetro;
 
     forkJoin({
       transaction_stats: this.dataService.get<TransactionStats>(
@@ -212,14 +242,33 @@ export class DashboardComponent implements OnInit {
         baseParams,
         'categories',
       ),
-
       recentTransactions: this.dataService.post<PaymentsApiResponse>(
         API_ENDPOINTS.ALL_PAYMENTS,
         transactionsPayload,
         'transactions',
       ),
+      vehicles: this.dataService.post<VehicleApiResponse>(
+        API_ENDPOINTS.ALL_VEHICLES,
+        { entityId: this.entityId, page: 0, size: 5000 },
+        'vehicles'
+      ),
+      parcels: isSuperMetro
+        ? this.dataService.post<ParcelsAPiResponse>(
+            API_ENDPOINTS.ALL_PARCELS,
+            {
+              entityId: this.entityId,
+              page: 0,
+              size: 5000,
+              paymentStatus: 'PAID',
+              startDate: formatDateLocal(start),
+              endDate: formatDateLocal(end),
+              sort: 'createdAt,DESC',
+            },
+            'parcels'
+          )
+        : of(null)
     }).subscribe({
-      next: (data: DashboardData) => {
+      next: (data: any) => {
         // Cards
         this.statsCards = mapStatsToCards(data.transaction_stats);
 
@@ -233,9 +282,19 @@ export class DashboardComponent implements OnInit {
 
         // Set transactions
         const response = data.recentTransactions;
-
         this.recentTransactions = response.data.manifest;
         this.totalRecords = response.data.totalRecords;
+
+        // Vehicle details & trend processing
+        const days = this.getDaysArray(start, end);
+        this.allVehicles = data.vehicles?.data || [];
+        this.buildVehiclesTrend(this.allVehicles, days);
+
+        // Parcel details & trend processing
+        if (isSuperMetro && data.parcels) {
+          this.allParcels = data.parcels.parcels || [];
+          this.buildParcelsTrend(this.allParcels, days);
+        }
 
         this.cdr.detectChanges();
       },
@@ -247,6 +306,174 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
+    this.selectedTab = tab;
+    this.cdr.detectChanges();
+  }
+
+  getDaysArray(start: Date, end: Date): string[] {
+    const arr: string[] = [];
+    const dt = new Date(start);
+    while (dt <= end) {
+      arr.push(formatDateLocal(dt));
+      dt.setDate(dt.getDate() + 1);
+    }
+    return arr;
+  }
+
+  formatDateToReadable(date: Date): string {
+    return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  buildVehiclesTrend(vehicles: Vehicle[], days: string[]) {
+    const countsMap = new Map<string, number>();
+    days.forEach(day => countsMap.set(day, 0));
+
+    vehicles.forEach(v => {
+      if (v.createdOn) {
+        const dateStr = v.createdOn.split('T')[0];
+        if (countsMap.has(dateStr)) {
+          countsMap.set(dateStr, countsMap.get(dateStr)! + 1);
+        }
+      }
+    });
+
+    const trendData = days.map(day => countsMap.get(day) || 0);
+
+    const selectedDayStr = days[days.length - 1];
+    this.singleDayVehiclesCount = countsMap.get(selectedDayStr) || 0;
+    this.singleDayVehiclesList = vehicles.filter(v => v.createdOn && v.createdOn.startsWith(selectedDayStr));
+
+    const active = vehicles.filter(v => v.status === 'ACTIVE').length;
+    const inactive = vehicles.filter(v => v.status === 'INACTIVE' || v.status === 'BLOCKED').length;
+    const total = vehicles.length;
+    const capacity = vehicles.reduce((sum, v) => sum + (v.capacity || 0), 0);
+    this.vehicleStats = { total, active, inactive, capacity };
+
+    this.vehiclesTrendData = {
+      labels: days.map(day => {
+        const date = new Date(day);
+        return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
+      }),
+      datasets: [
+        {
+          label: 'Vehicles Activated',
+          data: trendData,
+          fill: true,
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25,135,84,0.1)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#198754',
+          pointHoverRadius: 6
+        }
+      ]
+    };
+
+    this.vehiclesTrendOptions = {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context: any) {
+              return `Activated: ${context.parsed.y} vehicles`;
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+          },
+        },
+      },
+    };
+  }
+
+  buildParcelsTrend(parcels: Parcel[], days: string[]) {
+    const countsMap = new Map<string, number>();
+    days.forEach(day => countsMap.set(day, 0));
+
+    parcels.forEach(p => {
+      if (p.parcelStatus === 'COLLECTED' || p.pickedAt) {
+        const dateStr = p.pickedAt ? p.pickedAt.split('T')[0] : p.createdAt.split('T')[0];
+        if (countsMap.has(dateStr)) {
+          countsMap.set(dateStr, countsMap.get(dateStr)! + 1);
+        }
+      }
+    });
+
+    const trendData = days.map(day => countsMap.get(day) || 0);
+
+    const selectedDayStr = days[days.length - 1];
+    this.singleDayParcelsCount = countsMap.get(selectedDayStr) || 0;
+    this.singleDayParcelsList = parcels.filter(p => {
+      const isCollected = p.parcelStatus === 'COLLECTED' || p.pickedAt;
+      const dateStr = p.pickedAt ? p.pickedAt.split('T')[0] : p.createdAt.split('T')[0];
+      return isCollected && dateStr === selectedDayStr;
+    });
+
+    const total = parcels.length;
+    const collected = parcels.filter(p => p.parcelStatus === 'COLLECTED').length;
+    const amount = parcels.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const cash = parcels.filter(p => p.paymentMethod === 'CASH').reduce((sum, p) => sum + (p.amount || 0), 0);
+    const cashless = parcels.filter(p => p.paymentMethod === 'CASHLESS').reduce((sum, p) => sum + (p.amount || 0), 0);
+    this.parcelStats = { total, collected, amount, cash, cashless };
+
+    this.parcelsTrendData = {
+      labels: days.map(day => {
+        const date = new Date(day);
+        return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
+      }),
+      datasets: [
+        {
+          label: 'Parcels Collected',
+          data: trendData,
+          fill: true,
+          borderColor: '#0dcaf0',
+          backgroundColor: 'rgba(13,202,240,0.1)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#0dcaf0',
+          pointHoverRadius: 6
+        }
+      ]
+    };
+
+    this.parcelsTrendOptions = {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context: any) {
+              return `Collected: ${context.parsed.y} parcels`;
+            },
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+          },
+        },
+      },
+    };
+  }
+
   setDateRange() {
     const today = new Date();
     const lastWeek = new Date();
@@ -256,6 +483,12 @@ export class DashboardComponent implements OnInit {
 
   onDateRangeChange() {
     const event = { first: 0, rows: this.rows };
+    this.loadTransactions(event);
+    this.loadDashboardData();
+  }
+
+  onRefresh() {
+    const event = { first: this.first, rows: this.rows };
     this.loadTransactions(event);
     this.loadDashboardData();
   }

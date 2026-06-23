@@ -11,7 +11,18 @@
   <!-- ================= HEADER ================= -->
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>Dashboard Overview</h1>
+      <h1 class="header-title-container">
+        Dashboard Overview
+        <button 
+          pButton 
+          icon="pi pi-refresh" 
+          [loading]="loading()"
+          class="p-button-text p-button-plain refresh-btn-invisible" 
+          (click)="onRefresh()"
+          pTooltip="Refresh Dashboard"
+          tooltipPosition="right"
+        ></button>
+      </h1>
       <p class="text-muted">Welcome back! Here's what's happening with your fleet today.</p>
     </div>
 
@@ -27,136 +38,381 @@
       </mat-form-field>
     </div>
   </div>
+  <!-- ================= SEGMENTED CATEGORY SWITCHER ================= -->
+  <div class="segmented-tabs-container">
+    <div class="segmented-tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTab === 'revenue'" 
+        (click)="selectTab('revenue')"
+      >
+        <i class="pi pi-chart-line"></i>
+        <span>Revenue & Sales</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="selectedTab === 'fleet'" 
+        (click)="selectTab('fleet')"
+      >
+        <i class="pi pi-car"></i>
+        <span>Fleet Operations</span>
+      </button>
+      
+      <button 
+        *ngIf="isSuperMetro" 
+        class="tab-btn" 
+        [class.active]="selectedTab === 'parcels'" 
+        (click)="selectTab('parcels')"
+      >
+        <i class="pi pi-box"></i>
+        <span>Parcel Logistics</span>
+      </button>
+    </div>
+  </div>
 
-  <!-- ================= STATS CARDS ================= -->
-  <!-- Using global .stat-card class with hover effect -->
-  <div class="stats-grid">
-    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
-      <!-- Using global .stat-content class -->
-      <div class="stat-content">
-        <div class="stat-info">
-          <!-- Using global .stat-title class -->
-          <span class="stat-title">{{ card.title }}</span>
-
-          <!-- Using global .stat-value class -->
-          <h2 class="stat-value">
-            <ng-container *ngIf="card.amount !== undefined; else countValue">
-              <span class="currency">{{ card.currency }}</span>
-              <span class="amount">
-                {{ card.amount | number : '1.0-2' }}
-              </span>
-            </ng-container>
-
-            <ng-template #countValue>
-              <span class="amount">
-                {{ card.count | number }}
-              </span>
-            </ng-template>
-          </h2>
-
-          <!-- Using global .stat-change class -->
-          <span class="stat-change positive" *ngIf="card.change">
-            <i class="pi pi-arrow-up"></i> {{ card.change }}
-          </span>
+  <!-- ================= REVENUE & SALES TAB ================= -->
+  <div *ngIf="selectedTab === 'revenue'" class="tab-content fade-in">
+    <!-- ================= STATS CARDS ================= -->
+    <div class="stats-grid">
+      <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">{{ card.title }}</span>
+            <h2 class="stat-value">
+              <ng-container *ngIf="card.amount !== undefined; else countValue">
+                <span class="currency">{{ card.currency }}</span>
+                <span class="amount">
+                  {{ card.amount | number : '1.0-2' }}
+                </span>
+              </ng-container>
+              <ng-template #countValue>
+                <span class="amount">
+                  {{ card.count | number }}
+                </span>
+              </ng-template>
+            </h2>
+            <span class="stat-change positive" *ngIf="card.change">
+              <i class="pi pi-arrow-up"></i> {{ card.change }}
+            </span>
+          </div>
+          <div class="stat-icon" [style.background-color]="card.color + '20'">
+            <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+          </div>
         </div>
+      </p-card>
+    </div>
 
-        <!-- Using global .stat-icon class -->
-        <div class="stat-icon" [style.background-color]="card.color + '20'">
-          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+    <!-- ================= CHARTS SECTION ================= -->
+    <div class="charts-grid">
+      <p-card header="Organizations Performance" styleClass="stat-card card">
+        <div class="chart-container">
+          <p-chart *ngIf="chartData" type="line" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
         </div>
-      </div>
+      </p-card>
+
+      <p-card header="Total Amount Per Category" styleClass="stat-card card">
+        <div class="chart-container">
+          <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions" height="300px"></p-chart>
+        </div>
+        <div class="category-legend" *ngIf="pieChartData">
+          <div class="legend-item" *ngFor="let label of pieChartData.labels; let i = index">
+            <span class="legend-dot" [style.background]="pieChartData.datasets[0].backgroundColor[i]"></span>
+            <span class="legend-label">{{ label }}</span>
+            <span class="legend-value">
+              Ksh {{ pieChartData.datasets[0].data[i] | number : '1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- ================= RECENT TRANSACTIONS ================= -->
+    <p-card header="Recent Transactions" styleClass="stat-card card">
+      <p-table [value]="recentTransactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+        [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+        (onLazyLoad)="loadTransactions($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }"
+        responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Transaction ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Vehicle</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-transaction>
+          <tr>
+            <td>{{ transaction.mpesaReceiptNumber }}</td>
+            <td>{{ transaction.createdAt | date : 'dd MMM yyyy, hh:mm a' }}</td>
+            <td>{{ transaction.createdAtFormatted || "N/A" }}</td>
+            <td>
+              <span class="vehicle-badge">
+                <i class="pi pi-car"></i>
+                {{ transaction.fleetNumber }}
+              </span>
+            </td>
+            <td class="amount-cell">Ksh {{ transaction.assignedAmount | number : '1.2-2' }}</td>
+            <td>
+              <span [class]="'badge badge-' + transaction.transactionType.toLowerCase()">
+                {{ transaction.transactionType }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge badge-' + transaction.paymentStatus.toLowerCase()">
+                {{ transaction.paymentStatus }}
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </p-card>
   </div>
 
-  <!-- ================= CHARTS SECTION ================= -->
-  <div class="charts-grid">
-    <!-- Line Chart -->
-    <!-- Using global .card class -->
-    <p-card header="Organizations Performance" styleClass="stat-card card">
-      <div class="chart-container">
-        <p-chart *ngIf="chartData" type="line" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
-      </div>
-    </p-card>
-
-    <!-- Pie Chart -->
-    <p-card header="Total Amount Per Category" styleClass="stat-card card">
-      <div class="chart-container">
-        <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions"
-          height="300px"></p-chart>
-      </div>
-
-      <!-- Dynamic Legend -->
-      <div class="category-legend" *ngIf="pieChartData">
-        <div class="legend-item" *ngFor="let label of pieChartData.labels; let i = index">
-          <span class="legend-dot" [style.background]="pieChartData.datasets[0].backgroundColor[i]"></span>
-          <span class="legend-label">{{ label }}</span>
-          <span class="legend-value">
-            Ksh {{ pieChartData.datasets[0].data[i] | number : '1.2-2' }}
-          </span>
+  <!-- ================= FLEET OPERATIONS TAB ================= -->
+  <div *ngIf="selectedTab === 'fleet'" class="tab-content fade-in">
+    <!-- FLEET CARDS -->
+    <div class="stats-grid">
+      <p-card styleClass="stat-card card-hover card-fleet-total">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Total Registered Fleet</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ vehicleStats.total | number }}</span>
+            </h2>
+            <span class="stat-change text-muted">Vehicles on system</span>
+          </div>
+          <div class="stat-icon icon-fleet-total" style="background-color: rgba(13,110,253,0.15)">
+            <i class="pi pi-truck" style="color: #0d6efd"></i>
+          </div>
         </div>
-      </div>
-    </p-card>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover card-fleet-active">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Active Fleet</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ vehicleStats.active | number }}</span>
+            </h2>
+            <span class="stat-change positive">
+              <i class="pi pi-check"></i> {{ (vehicleStats.active / (vehicleStats.total || 1)) * 100 | number: '1.0-1' }}% Active
+            </span>
+          </div>
+          <div class="stat-icon icon-fleet-active" style="background-color: rgba(25,135,84,0.15)">
+            <i class="pi pi-check-circle" style="color: #198754"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover card-fleet-inactive">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Inactive / Blocked Fleet</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ vehicleStats.inactive | number }}</span>
+            </h2>
+            <span class="stat-change negative">
+              <i class="pi pi-exclamation-triangle"></i> {{ (vehicleStats.inactive / (vehicleStats.total || 1)) * 100 | number: '1.0-1' }}% Inactive
+            </span>
+          </div>
+          <div class="stat-icon icon-fleet-inactive" style="background-color: rgba(220,53,69,0.15)">
+            <i class="pi pi-times-circle" style="color: #dc3545"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover card-fleet-capacity">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Total Passenger Capacity</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ vehicleStats.capacity | number }}</span>
+            </h2>
+            <span class="stat-change text-muted">Total seats available</span>
+          </div>
+          <div class="stat-icon icon-fleet-capacity" style="background-color: rgba(255,193,7,0.15)">
+            <i class="pi pi-users" style="color: #ffc107"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- FLEET CHARTS & DETAILS -->
+    <div class="split-view-grid">
+      <!-- Activation Trend Chart -->
+      <p-card header="Vehicle Activation Trend" styleClass="stat-card card split-left-card">
+        <div class="chart-container" style="position: relative; height: 350px;">
+          <p-chart *ngIf="vehiclesTrendData" type="line" [data]="vehiclesTrendData" [options]="vehiclesTrendOptions" height="330px"></p-chart>
+        </div>
+      </p-card>
+
+      <!-- Single Day Details -->
+      <p-card styleClass="stat-card card split-right-card">
+        <ng-template pTemplate="header">
+          <div class="split-card-header">
+            <div>
+              <h3 style="margin: 0; font-size: 1.25rem;">Activations on {{ singleDayLabel }}</h3>
+              <span style="font-size: 0.85rem; color: var(--medium-text)">Vehicles registered/activated</span>
+            </div>
+            <span class="badge badge-success-outline">{{ singleDayVehiclesCount }} Activated</span>
+          </div>
+        </ng-template>
+
+        <div class="list-container">
+          <div *ngIf="singleDayVehiclesList.length === 0" class="empty-list-state">
+            <i class="pi pi-info-circle"></i>
+            <p>No new vehicles were activated on this day.</p>
+          </div>
+          
+          <div *ngFor="let vehicle of singleDayVehiclesList" class="list-item-card">
+            <div class="item-main-info">
+              <div class="item-title-row">
+                <span class="item-tag-code">{{ vehicle.fleetNumber }}</span>
+                <span class="item-reg-no">{{ vehicle.registrationNumber }}</span>
+              </div>
+              <div class="item-subtitle-row">
+                <span class="item-location"><i class="pi pi-map-marker"></i> {{ vehicle.stageName || 'No Stage Assigned' }}</span>
+                <span class="item-cap"><i class="pi pi-users"></i> {{ vehicle.capacity }} seats</span>
+              </div>
+            </div>
+            <div class="item-status-badge">
+              <span [class]="'badge badge-' + (vehicle.status === 'ACTIVE' ? 'paid' : 'failed')">
+                {{ vehicle.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
   </div>
 
-  <!-- ================= RECENT TRANSACTIONS ================= -->
-  <p-card header="Recent Transactions" styleClass="stat-card card">
-    <!-- Using global .data-table class -->
-    <p-table [value]="recentTransactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
-      [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
-      [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
-      (onLazyLoad)="loadTransactions($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }"
-      responsiveLayout="scroll">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Transaction ID</th>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Vehicle</th>
-          <th>Amount</th>
-          <th>Type</th>
-          <th>Status</th>
-          <!-- <th>Actions</th> -->
-        </tr>
-      </ng-template>
+  <!-- ================= PARCEL LOGISTICS TAB ================= -->
+  <div *ngIf="selectedTab === 'parcels' && isSuperMetro" class="tab-content fade-in">
+    <!-- PARCEL CARDS -->
+    <div class="stats-grid">
+      <p-card styleClass="stat-card card-hover card-parcel-total">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Total Parcels Registered</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ parcelStats.total | number }}</span>
+            </h2>
+            <span class="stat-change text-muted">In selected period</span>
+          </div>
+          <div class="stat-icon icon-parcel-total" style="background-color: rgba(13,202,240,0.15)">
+            <i class="pi pi-box" style="color: #0dcaf0"></i>
+          </div>
+        </div>
+      </p-card>
 
-      <ng-template pTemplate="body" let-transaction>
-        <tr>
-          <td>{{ transaction.mpesaReceiptNumber }}</td>
-          <td>{{ transaction.createdAt | date : 'dd MMM yyyy, hh:mm a' }}</td>
-          <td>{{ transaction.createdAtFormatted || "N/A" }}</td>
-          <td>
-            <!-- Using component-specific .vehicle-badge -->
-            <span class="vehicle-badge">
-              <i class="pi pi-car"></i>
-              {{ transaction.fleetNumber }}
+      <p-card styleClass="stat-card card-hover card-parcel-collected">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Parcels Collected</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ parcelStats.collected | number }}</span>
+            </h2>
+            <span class="stat-change positive">
+              <i class="pi pi-check"></i> {{ (parcelStats.collected / (parcelStats.total || 1)) * 100 | number: '1.0-1' }}% Collected
             </span>
-          </td>
-          <td class="amount-cell">Ksh {{ transaction.assignedAmount | number : '1.2-2' }}</td>
-          <td>
-            <!-- Using global .badge classes -->
-            <span [class]="'badge badge-' + transaction.transactionType.toLowerCase()">
-              {{ transaction.transactionType }}
-            </span>
-          </td>
-          <td>
-            <!-- Using global .badge classes -->
-            <span [class]="'badge badge-' + transaction.paymentStatus.toLowerCase()">
-              {{ transaction.paymentStatus }}
-            </span>
-          </td>
-          <!-- <td>
-            <button
-              pButton
-              icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-sm"
-              pTooltip="View Details"
-              tooltipPosition="top"
-            ></button>
-          </td> -->
-        </tr>
-      </ng-template>
-    </p-table>
-  </p-card>
+          </div>
+          <div class="stat-icon icon-parcel-collected" style="background-color: rgba(25,135,84,0.15)">
+            <i class="pi pi-check-square" style="color: #198754"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover card-parcel-amount">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Total Revenue</span>
+            <h2 class="stat-value">
+              <span class="currency">KSh</span>
+              <span class="amount">{{ parcelStats.amount | number: '1.2-2' }}</span>
+            </h2>
+            <span class="stat-change text-muted">Overall parcel collections</span>
+          </div>
+          <div class="stat-icon icon-parcel-amount" style="background-color: rgba(111,66,193,0.15)">
+            <i class="pi pi-wallet" style="color: #6f42c1"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover card-parcel-payments">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Payment Mode Breakdown</span>
+            <div class="amount-split" style="margin-top: 0.5rem; font-size: 0.95rem; font-weight: 600;">
+              <span style="color: #198754">Cash: KSh {{ parcelStats.cash | number: '1.0-0' }}</span>
+              <span style="margin: 0 0.5rem; color: #ccc">|</span>
+              <span style="color: #0d6efd">Cashless: KSh {{ parcelStats.cashless | number: '1.0-0' }}</span>
+            </div>
+            <span class="stat-change text-muted" style="margin-top: 0.25rem;">Payment source split</span>
+          </div>
+          <div class="stat-icon icon-parcel-payments" style="background-color: rgba(253,126,20,0.15)">
+            <i class="pi pi-credit-card" style="color: #fd7e14"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- PARCELS CHARTS & DETAILS -->
+    <div class="split-view-grid">
+      <!-- Collection Trend Chart -->
+      <p-card header="Parcel Collection Trend" styleClass="stat-card card split-left-card">
+        <div class="chart-container" style="position: relative; height: 350px;">
+          <p-chart *ngIf="parcelsTrendData" type="line" [data]="parcelsTrendData" [options]="parcelsTrendOptions" height="330px"></p-chart>
+        </div>
+      </p-card>
+
+      <!-- Single Day Details -->
+      <p-card styleClass="stat-card card split-right-card">
+        <ng-template pTemplate="header">
+          <div class="split-card-header">
+            <div>
+              <h3 style="margin: 0; font-size: 1.25rem;">Collections on {{ singleDayLabel }}</h3>
+              <span style="font-size: 0.85rem; color: var(--medium-text)">Parcels handed over to recipients</span>
+            </div>
+            <span class="badge badge-info-outline">{{ singleDayParcelsCount }} Collected</span>
+          </div>
+        </ng-template>
+
+        <div class="list-container">
+          <div *ngIf="singleDayParcelsList.length === 0" class="empty-list-state">
+            <i class="pi pi-info-circle"></i>
+            <p>No parcels were collected on this day.</p>
+          </div>
+          
+          <div *ngFor="let parcel of singleDayParcelsList" class="list-item-card parcel-item">
+            <div class="item-main-info">
+              <div class="item-title-row">
+                <span class="item-tag-code">{{ parcel.parcelNumber }}</span>
+                <span class="item-route" style="font-size: 0.85rem; font-weight: 500; color: var(--medium-text);">
+                  {{ parcel.sourceName }} 
+                  <i class="pi pi-arrow-right" style="font-size: 0.7rem; margin: 0 4px; color: #999;"></i> 
+                  {{ parcel.destinationName }}
+                </span>
+              </div>
+              <div class="item-subtitle-row" style="margin-top: 0.25rem;">
+                <span class="item-parties" style="font-size: 0.85rem; color: #666;"><i class="pi pi-user" style="font-size: 0.8rem; margin-right: 2px;"></i> {{ parcel.senderName }} &rarr; {{ parcel.receiverName }}</span>
+              </div>
+            </div>
+            <div class="item-payment-info" style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+              <span class="item-price" style="font-weight: 600; color: var(--dark-text);">KSh {{ parcel.amount | number: '1.2-2' }}</span>
+              <span [class]="'badge badge-' + (parcel.paymentMethod === 'CASHLESS' ? 'credit' : 'debit')" style="font-size: 0.75rem; padding: 2px 6px;">
+                {{ parcel.paymentMethod }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
 
   <app-chat-widget />
 </div>
