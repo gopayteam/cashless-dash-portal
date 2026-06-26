@@ -5,6 +5,7 @@
 //      replace with computed signals from AppNotificationService
 //   3. Wire markAsRead / markAllAsRead through the service
 //   4. Add a `scanForConflicts()` helper for convenience
+//   5. Added GS000007 (Salty Supporters Club) to logoMap and brandingMap
 //
 // Everything else (sidebar, tabs, dark mode, etc.) is unchanged.
 
@@ -73,11 +74,13 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   private logoMap: Record<string, string> = {
     GS000002: 'logo_2.png',
     GS000006: 'BUNGOMA_LOGO.png',
+    GS000007: 'SALTY_LOGO.jpeg',   // ← NEW
   };
 
   brandingMap: Record<string, { logo: string; name: string; type: 'text' | 'logo' }> = {
     GS000006: { logo: 'BUNGOMA_LOGO.png', name: 'Bungoma Line Shuttle', type: 'text' },
     GS000002: { logo: 'super_metro_logo.png', name: 'Super Metro', type: 'logo' },
+    GS000007: { logo: 'SALTY_LOGO.jpeg', name: 'Salty Supporters Club', type: 'text' }, // ← NEW
   };
 
   // ── Notifications — now powered by AppNotificationService ────────────────
@@ -178,18 +181,11 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
       { label: 'By Vehicle', icon: 'pi pi-car', route: '/revenue/by-vehicle', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_VEHICLES'] },
       { label: 'By Location', icon: 'pi pi-map-marker', route: '/revenue/by-location', roles: ['CAN_VIEW_TRANSACTIONS', 'CAN_VIEW_LOCATIONS'] },
     ],
-    // '/vehicle-analysis': [
-    //   { label: 'Daily', icon: 'pi pi-calendar', route: '/vehicle-analysis/daily', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-    //   { label: 'Weekly', icon: 'pi pi-calendar-plus', route: '/vehicle-analysis/weekly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-    //   { label: 'Monthly', icon: 'pi pi-calendar-times', route: '/vehicle-analysis/monthly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-    //   { label: 'Yearly', icon: 'pi pi-chart-bar', route: '/vehicle-analysis/yearly', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_VEHICLES'] },
-    // ],
     '/prediction': [
       { label: 'Short Term', icon: 'pi pi-calendar', route: '/prediction/short-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Long Term', icon: 'pi pi-chart-line', route: '/prediction/long-term', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
       { label: 'Trends', icon: 'pi pi-chart-bar', route: '/prediction/trends', roles: ['CAN_VIEW_DASHBOARD', 'CAN_VIEW_TRANSACTIONS'] },
     ],
-
     '/ai': [
       { label: 'AI Assistant', icon: 'pi pi-comments', route: '/ai/chatbot' },
       { label: 'Knowledge Query', icon: 'pi pi-database', route: '/ai/rag' },
@@ -253,16 +249,6 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   // ── Conflict scan ─────────────────────────────────────────────────────────
 
-  /**
-   * Run a conflict scan for IN_PROGRESS trips.
-   * Any conflicts found are automatically pushed into the notification bell
-   * via BookingConflictService → AppNotificationService.
-   *
-   * Call this:
-   *   - on app start (ngOnInit)
-   *   - on a timer (setInterval every N minutes)
-   *   - manually from a "Refresh" button if you add one
-   */
   runConflictScan(): void {
     if (!this.entityId) return;
 

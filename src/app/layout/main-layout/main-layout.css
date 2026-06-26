@@ -188,6 +188,20 @@
   /* Bungoma orange */
 }
 
+.brand-name .salty-lime {
+  color: #8AB833 !important;
+}
+
+.brand-name .salty-lite {
+  color: #B5D334 !important;
+  font-size: 0.5em;
+  opacity: 0.6;
+}
+
+.brand-name .salty-black {
+  color: #2D5016 !important;
+}
+
 .brand-logo {
   height: 32px;
   object-fit: contain;

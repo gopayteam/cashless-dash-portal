@@ -51,5 +51,26 @@ export const THEMES: Record<string, any> = {
       '--bg-sidebar': '#1B2A1F',
       '--bg-topbar': '#1B2A1F'
     }
+  },
+
+  // SALTY SUPPORTERS CLUB — LIME GREEN + BLACK BRAND
+  GS000007: {
+    light: {
+      '--primary-color': '#2D5016',        // deep forest green — readable on white
+      '--primary-color-dark': '#1E3A0E',   // darker for hover states
+      '--primary-hover': '#3D6B1F',        // slightly lighter for hover
+      '--secondary-color': '#8AB833',      // muted lime — accent without harshness
+      '--secondary-color-dark': '#6E9A22', // deeper lime for dark accents
+      '--bg-sidebar': '#F4F8EE',           // very light green tint, almost white
+      '--bg-topbar': '#EBF2DC'             // slightly deeper tint for topbar
+    },
+    dark: {
+      '--primary-color': '#A8CC2E',        // lime that reads well on dark bg
+      '--primary-hover': '#BADA3A',        // brighter on hover
+      '--primary-active': '#8FAF22',       // pressed state
+      '--secondary-color': '#6B9E1F',      // muted green accent
+      '--bg-sidebar': '#141F0A',           // very deep forest
+      '--bg-topbar': '#141F0A'
+    }
   }
 };

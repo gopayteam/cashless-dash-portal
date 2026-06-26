@@ -13,15 +13,9 @@
     <div class="header-content">
       <h1 class="header-title-container">
         Dashboard Overview
-        <button 
-          pButton 
-          icon="pi pi-refresh" 
-          [loading]="loading()"
-          class="p-button-text p-button-plain refresh-btn-invisible" 
-          (click)="onRefresh()"
-          pTooltip="Refresh Dashboard"
-          tooltipPosition="right"
-        ></button>
+        <button pButton icon="pi pi-refresh" [loading]="loading()"
+          class="p-button-text p-button-plain refresh-btn-invisible" (click)="onRefresh()" pTooltip="Refresh Dashboard"
+          tooltipPosition="right"></button>
       </h1>
       <p class="text-muted">Welcome back! Here's what's happening with your fleet today.</p>
     </div>
@@ -41,30 +35,18 @@
   <!-- ================= SEGMENTED CATEGORY SWITCHER ================= -->
   <div class="segmented-tabs-container">
     <div class="segmented-tabs">
-      <button 
-        class="tab-btn" 
-        [class.active]="selectedTab === 'revenue'" 
-        (click)="selectTab('revenue')"
-      >
+      <button class="tab-btn" [class.active]="selectedTab === 'revenue'" (click)="selectTab('revenue')">
         <i class="pi pi-chart-line"></i>
         <span>Revenue & Sales</span>
       </button>
-      
-      <button 
-        class="tab-btn" 
-        [class.active]="selectedTab === 'fleet'" 
-        (click)="selectTab('fleet')"
-      >
+
+      <button class="tab-btn" [class.active]="selectedTab === 'fleet'" (click)="selectTab('fleet')">
         <i class="pi pi-car"></i>
         <span>Fleet Operations</span>
       </button>
-      
-      <button 
-        *ngIf="isSuperMetro" 
-        class="tab-btn" 
-        [class.active]="selectedTab === 'parcels'" 
-        (click)="selectTab('parcels')"
-      >
+
+      <button *ngIf="isSuperMetro" class="tab-btn" [class.active]="selectedTab === 'parcels'"
+        (click)="selectTab('parcels')">
         <i class="pi pi-box"></i>
         <span>Parcel Logistics</span>
       </button>
@@ -113,7 +95,8 @@
 
       <p-card header="Total Amount Per Category" styleClass="stat-card card">
         <div class="chart-container">
-          <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions" height="300px"></p-chart>
+          <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions"
+            height="300px"></p-chart>
         </div>
         <div class="category-legend" *ngIf="pieChartData">
           <div class="legend-item" *ngFor="let label of pieChartData.labels; let i = index">
@@ -200,7 +183,8 @@
               <span class="amount">{{ vehicleStats.active | number }}</span>
             </h2>
             <span class="stat-change positive">
-              <i class="pi pi-check"></i> {{ (vehicleStats.active / (vehicleStats.total || 1)) * 100 | number: '1.0-1' }}% Active
+              <i class="pi pi-check"></i> {{ (vehicleStats.active / (vehicleStats.total || 1)) * 100 | number: '1.0-1'
+              }}% Active
             </span>
           </div>
           <div class="stat-icon icon-fleet-active" style="background-color: rgba(25,135,84,0.15)">
@@ -217,7 +201,8 @@
               <span class="amount">{{ vehicleStats.inactive | number }}</span>
             </h2>
             <span class="stat-change negative">
-              <i class="pi pi-exclamation-triangle"></i> {{ (vehicleStats.inactive / (vehicleStats.total || 1)) * 100 | number: '1.0-1' }}% Inactive
+              <i class="pi pi-exclamation-triangle"></i> {{ (vehicleStats.inactive / (vehicleStats.total || 1)) * 100 |
+              number: '1.0-1' }}% Inactive
             </span>
           </div>
           <div class="stat-icon icon-fleet-inactive" style="background-color: rgba(220,53,69,0.15)">
@@ -247,7 +232,8 @@
       <!-- Activation Trend Chart -->
       <p-card header="Vehicle Activation Trend" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
-          <p-chart *ngIf="vehiclesTrendData" type="line" [data]="vehiclesTrendData" [options]="vehiclesTrendOptions" height="330px"></p-chart>
+          <p-chart *ngIf="vehiclesTrendData" type="line" [data]="vehiclesTrendData" [options]="vehiclesTrendOptions"
+            height="330px"></p-chart>
         </div>
       </p-card>
 
@@ -268,7 +254,7 @@
             <i class="pi pi-info-circle"></i>
             <p>No new vehicles were activated on this day.</p>
           </div>
-          
+
           <div *ngFor="let vehicle of singleDayVehiclesList" class="list-item-card">
             <div class="item-main-info">
               <div class="item-title-row">
@@ -276,7 +262,8 @@
                 <span class="item-reg-no">{{ vehicle.registrationNumber }}</span>
               </div>
               <div class="item-subtitle-row">
-                <span class="item-location"><i class="pi pi-map-marker"></i> {{ vehicle.stageName || 'No Stage Assigned' }}</span>
+                <span class="item-location"><i class="pi pi-map-marker"></i> {{ vehicle.stageName || 'No Stage Assigned'
+                  }}</span>
                 <span class="item-cap"><i class="pi pi-users"></i> {{ vehicle.capacity }} seats</span>
               </div>
             </div>
@@ -318,7 +305,8 @@
               <span class="amount">{{ parcelStats.collected | number }}</span>
             </h2>
             <span class="stat-change positive">
-              <i class="pi pi-check"></i> {{ (parcelStats.collected / (parcelStats.total || 1)) * 100 | number: '1.0-1' }}% Collected
+              <i class="pi pi-check"></i> {{ (parcelStats.collected / (parcelStats.total || 1)) * 100 | number: '1.0-1'
+              }}% Collected
             </span>
           </div>
           <div class="stat-icon icon-parcel-collected" style="background-color: rgba(25,135,84,0.15)">
@@ -366,7 +354,8 @@
       <!-- Collection Trend Chart -->
       <p-card header="Parcel Collection Trend" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
-          <p-chart *ngIf="parcelsTrendData" type="line" [data]="parcelsTrendData" [options]="parcelsTrendOptions" height="330px"></p-chart>
+          <p-chart *ngIf="parcelsTrendData" type="line" [data]="parcelsTrendData" [options]="parcelsTrendOptions"
+            height="330px"></p-chart>
         </div>
       </p-card>
 
@@ -387,24 +376,29 @@
             <i class="pi pi-info-circle"></i>
             <p>No parcels were collected on this day.</p>
           </div>
-          
+
           <div *ngFor="let parcel of singleDayParcelsList" class="list-item-card parcel-item">
             <div class="item-main-info">
               <div class="item-title-row">
                 <span class="item-tag-code">{{ parcel.parcelNumber }}</span>
                 <span class="item-route" style="font-size: 0.85rem; font-weight: 500; color: var(--medium-text);">
-                  {{ parcel.sourceName }} 
-                  <i class="pi pi-arrow-right" style="font-size: 0.7rem; margin: 0 4px; color: #999;"></i> 
+                  {{ parcel.sourceName }}
+                  <i class="pi pi-arrow-right" style="font-size: 0.7rem; margin: 0 4px; color: #999;"></i>
                   {{ parcel.destinationName }}
                 </span>
               </div>
               <div class="item-subtitle-row" style="margin-top: 0.25rem;">
-                <span class="item-parties" style="font-size: 0.85rem; color: #666;"><i class="pi pi-user" style="font-size: 0.8rem; margin-right: 2px;"></i> {{ parcel.senderName }} &rarr; {{ parcel.receiverName }}</span>
+                <span class="item-parties" style="font-size: 0.85rem; color: #666;"><i class="pi pi-user"
+                    style="font-size: 0.8rem; margin-right: 2px;"></i> {{ parcel.senderName }} &rarr; {{
+                  parcel.receiverName }}</span>
               </div>
             </div>
-            <div class="item-payment-info" style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-              <span class="item-price" style="font-weight: 600; color: var(--dark-text);">KSh {{ parcel.amount | number: '1.2-2' }}</span>
-              <span [class]="'badge badge-' + (parcel.paymentMethod === 'CASHLESS' ? 'credit' : 'debit')" style="font-size: 0.75rem; padding: 2px 6px;">
+            <div class="item-payment-info"
+              style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+              <span class="item-price" style="font-weight: 600; color: var(--dark-text);">KSh {{ parcel.amount | number:
+                '1.2-2' }}</span>
+              <span [class]="'badge badge-' + (parcel.paymentMethod === 'CASHLESS' ? 'credit' : 'debit')"
+                style="font-size: 0.75rem; padding: 2px 6px;">
                 {{ parcel.paymentMethod }}
               </span>
             </div>

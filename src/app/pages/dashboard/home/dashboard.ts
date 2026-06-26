@@ -88,7 +88,13 @@ export class DashboardComponent implements OnInit {
 
   // New State variables for Enhanced Dashboard
   selectedTab: 'revenue' | 'fleet' | 'parcels' = 'revenue';
-  isSuperMetro: boolean = false;
+
+  /**
+   * Entity flags — only one parcel-capable entity exists (GS000002).
+   * GS000007 (Salty) gets Revenue + Fleet only, same as GS000006.
+   */
+  isSuperMetro: boolean = false;   // GS000002 — shows Parcel Logistics tab
+  isSalty: boolean = false;        // GS000007 — lime-green brand, no parcels
 
   // Vehicles data & trends
   allVehicles: Vehicle[] = [];
@@ -98,7 +104,7 @@ export class DashboardComponent implements OnInit {
   singleDayVehiclesCount: number = 0;
   singleDayVehiclesList: Vehicle[] = [];
 
-  // Parcels data & trends
+  // Parcels data & trends (GS000002 only)
   allParcels: Parcel[] = [];
   parcelStats = { total: 0, collected: 0, amount: 0, cash: 0, cashless: 0 };
   parcelsTrendData: any;
@@ -131,7 +137,12 @@ export class DashboardComponent implements OnInit {
     }
 
     this.entityId = user.entityId;
+
+    // ── Entity flags ────────────────────────────────────────────────────────
     this.isSuperMetro = this.entityId === 'GS000002' || this.entityId === 'GS0000002';
+    this.isSalty      = this.entityId === 'GS000007';
+    // ────────────────────────────────────────────────────────────────────────
+
     this.themeService.applyTheme(user.entityId);
     this.themeService.loadPersistedTheme();
 
@@ -141,25 +152,15 @@ export class DashboardComponent implements OnInit {
     const event = { first: 0, rows: this.rows };
     this.loadTransactions(event);
     this.loadDashboardData();
-
-    // 🔁 RELOAD ON NAVIGATION
-    // this.router.events.subscribe(() => {
-    //   const event = { first: 0, rows: this.rows };
-    //   this.loadTransactions(event);
-    //   this.loadDashboardData();
-    // });
   }
-
-
 
   loadTransactions($event: any): void {
     if (!this.dateRange || this.dateRange.length < 2) {
-      return; // dates not ready yet
+      return;
     }
 
     const [start, end] = this.dateRange;
     const event = $event;
-
     const page = event.first / event.rows;
 
     this.rows = event.rows;
@@ -180,7 +181,6 @@ export class DashboardComponent implements OnInit {
       .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
       .subscribe({
         next: (response) => {
-          const records = response.data.manifest;
           this.recentTransactions = this.mapPaymentRecords(response.data.manifest);
           this.totalRecords = response.data.totalRecords;
           this.rows = event.rows;
@@ -224,8 +224,6 @@ export class DashboardComponent implements OnInit {
       sort: 'createdAt,DESC',
     };
 
-    const isSuperMetro = this.isSuperMetro;
-
     forkJoin({
       transaction_stats: this.dataService.get<TransactionStats>(
         API_ENDPOINTS.TRANSACTION_STATS,
@@ -252,7 +250,9 @@ export class DashboardComponent implements OnInit {
         { entityId: this.entityId, page: 0, size: 5000 },
         'vehicles'
       ),
-      parcels: isSuperMetro
+      // Parcels are fetched only for Super Metro (GS000002).
+      // GS000007 (Salty) does not use the parcel logistics tab.
+      parcels: this.isSuperMetro
         ? this.dataService.post<ParcelsAPiResponse>(
             API_ENDPOINTS.ALL_PARCELS,
             {
@@ -290,8 +290,8 @@ export class DashboardComponent implements OnInit {
         this.allVehicles = data.vehicles?.data || [];
         this.buildVehiclesTrend(this.allVehicles, days);
 
-        // Parcel details & trend processing
-        if (isSuperMetro && data.parcels) {
+        // Parcel details & trend processing (GS000002 only)
+        if (this.isSuperMetro && data.parcels) {
           this.allParcels = data.parcels.parcels || [];
           this.buildParcelsTrend(this.allParcels, days);
         }
@@ -374,10 +374,7 @@ export class DashboardComponent implements OnInit {
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-        },
+        legend: { display: true, position: 'top' },
         tooltip: {
           callbacks: {
             label: function (context: any) {
@@ -387,12 +384,7 @@ export class DashboardComponent implements OnInit {
         },
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1,
-          },
-        },
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
       },
     };
   }
@@ -451,10 +443,7 @@ export class DashboardComponent implements OnInit {
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-        },
+        legend: { display: true, position: 'top' },
         tooltip: {
           callbacks: {
             label: function (context: any) {
@@ -464,12 +453,7 @@ export class DashboardComponent implements OnInit {
         },
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1,
-          },
-        },
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
       },
     };
   }
@@ -493,14 +477,12 @@ export class DashboardComponent implements OnInit {
     this.loadDashboardData();
   }
 
-
   exportData() {
     // TODO: Implement export functionality
     console.log('Exporting data...');
   }
 
-  // Sign out
   signOut() {
-    this.authService.signOut(); // Auto redirects to signin
+    this.authService.signOut();
   }
 }

@@ -410,11 +410,21 @@
 
       <div class="brand-name">
         <!-- Bungoma special styling -->
-        <ng-container *ngIf="entityId === 'GS000006'; else normalBrand">
+        <ng-container *ngIf="entityId === 'GS000006'; else saltyBrand">
           <span class="green">Bungoma</span>
           <span class="green">Line</span>
           <span class="orange">Shuttle</span>
         </ng-container>
+
+        <!-- Salty special styling -->
+        <ng-template #saltyBrand>
+          <ng-container *ngIf="entityId === 'GS000007'; else normalBrand">
+            <span class="salty-lime">Salty</span>
+            <span class="salty-black">Supporters</span>
+            <span class="salty-black">Club</span>
+            <span class="salty-lite">Est.2014</span>
+          </ng-container>
+        </ng-template>
 
         <!-- Normal branding -->
         <ng-template #normalBrand>
