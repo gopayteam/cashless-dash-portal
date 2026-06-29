@@ -67,6 +67,7 @@ import { DeletedParcelsComponent } from './pages/parcels/deleted-parcels/deleted
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
 import { ParcelManagersComponent } from './pages/parcels/parcel-managers/parcel-managers';
 import { ParcelSourceComponent } from './pages/parcels/parcel-source/parcel-source';
+import { StageContactsComponent } from './pages/parcels/parcel-stages-contact/parcel-stages-contact';
 import { PaymentStatusCheckComponent } from './pages/payments/check-payment-status/check-payment-status';
 import { CreditDriverComponent } from './pages/payments/credit-driver/create-payment';
 import { CreditTransactionsComponent } from './pages/payments/credit-transactions/credit-transactions';
@@ -254,6 +255,13 @@ export const routes: Routes = [
         component: DeletedParcelsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_PARCELS', 'CAN_DELETE'] }
+      },
+
+      {
+        path: 'parcel-offices/stage-contacts',
+        component: StageContactsComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_MANAGE_PARCELS',] }
       },
 
       /* Drivers */

@@ -1,28 +1,28 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
 
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
 
 import { DataService } from '../../../../@core/api/data.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 
+import { Router } from '@angular/router';
+import { DialogModule } from 'primeng/dialog';
+import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 import { ParcelStage } from '../../../../@core/models/parcels/parcel_stage.model';
 import { ParcelStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
-import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { DialogModule } from 'primeng/dialog';
-import { Router } from '@angular/router';
 import { AuthService } from '../../../../@core/services/auth.service';
-import { ActionButtonComponent } from "../../../components/action-button/action-button";
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 @Component({
   standalone: true,
@@ -125,7 +125,7 @@ export class ParcelDestinationComponent implements OnInit {
       page,
       size,
       startDate: start ? formatDateLocal(start) : null,
-      endDate: end ? formatDateLocal(start) : null,
+      endDate: end ? formatDateLocal(end) : null,
     };
 
     this.dataService

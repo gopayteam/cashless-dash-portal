@@ -39,6 +39,12 @@ export const API_ENDPOINTS = {
   ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
   ALL_PARCEL_STAGES: '/api/route/list/stages',
 
+  // #####################  PARCEL STAGES CONTACT SUB-ENDPOINTS   #######################
+  CREATE_PARCEL_STAGE_CONTACT: '/api/parcels/contacts/create-stage-contact',
+  PARCEL_STAGE_LIST_CONTACT: '/api/parcels/contacts/list-stage-contact',
+  UPDATE_PARCEL_STAGE_CONTACT: '/api/parcels/contacts/update-stage-contact',
+  DELETE_PARCEL_STAGE_CONTACT: '/api/parcels/contacts/delete-stage-contact',
+
   // #####################  Driver SUB-ENDPOINTS   #######################
   ALL_DRIVERS: '/api/v1/org/view-activated-fleets',
 

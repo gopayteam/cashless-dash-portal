@@ -1,0 +1,384 @@
+/* ================= STAGE CONTACTS STYLES ================= */
+/* Follows the same visual language as parcel-source & parcel-destination */
+
+/* ── CONTAINER ────────────────────────────────────────────────────────────── */
+.contacts-container {
+  padding: 1rem;
+  background-color: var(--light-bg);
+  min-height: 100vh;
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.contacts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.contacts-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.25rem 0;
+}
+
+.contacts-header p {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.btn-add {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  padding: 0.6rem 1.2rem !important;
+  transition: opacity 0.2s ease;
+}
+
+.btn-add:hover {
+  opacity: 0.88;
+}
+
+/* ── TABLE HEADER ────────────────────────────────────────────────────────── */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.table-header-left {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.record-count {
+  color: var(--light-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* ── PRIME TABLE ─────────────────────────────────────────────────────────── */
+.contacts-container .p-datatable {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.contacts-container .p-datatable thead th {
+  background-color: #f8f9fb;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contacts-container .p-datatable thead th.actions-col {
+  text-align: center;
+}
+
+.contacts-container .p-datatable tbody td {
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: #2c3e50;
+  vertical-align: middle;
+}
+
+.contacts-container .p-datatable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.contacts-container .p-datatable tbody tr:hover {
+  background-color: #f5f7fa;
+}
+
+.contacts-container .p-datatable tbody tr:nth-child(even) {
+  background-color: #fcfcfd;
+}
+
+/* ── CELL CONTENT ────────────────────────────────────────────────────────── */
+.stage-id-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  color: #555;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.stage-name-cell,
+.phone-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-name-cell i {
+  color: #3b5ccc;
+  font-size: 0.9rem;
+}
+
+.phone-cell i {
+  color: #28a745;
+  font-size: 0.9rem;
+}
+
+/* ── ROW ACTIONS ─────────────────────────────────────────────────────────── */
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.btn-action-edit.p-button.p-button-text {
+  color: #3b5ccc !important;
+  transition: background-color 0.2s;
+}
+
+.btn-action-edit.p-button.p-button-text:hover {
+  background-color: #e8f0fe !important;
+}
+
+.btn-action-delete.p-button.p-button-text {
+  color: #e53935 !important;
+  transition: background-color 0.2s;
+}
+
+.btn-action-delete.p-button.p-button-text:hover {
+  background-color: #fdecea !important;
+}
+
+/* ── PAGINATOR ───────────────────────────────────────────────────────────── */
+.contacts-container .p-paginator {
+  border-top: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+.contacts-container .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 0.5rem;
+  color: var(--light-text);
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  color: #c0c8d8;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ── STAGE DROPDOWN ──────────────────────────────────────────────────────── */
+.form-select {
+  width: 100%;
+}
+
+::ng-deep .form-select.p-select {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.select-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.select-item i {
+  color: #3b5ccc;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.select-item .stage-id-badge {
+  margin-left: auto;
+  font-size: 0.72rem;
+}
+
+/* ── DIALOG FORM ─────────────────────────────────────────────────────────── */
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--medium-text, #555);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.required {
+  color: #e53935;
+  margin-left: 2px;
+}
+
+.form-input {
+  width: 100%;
+  border-radius: 6px !important;
+}
+
+.form-input.input-error {
+  border-color: #e53935 !important;
+}
+
+.form-hint {
+  font-size: 0.78rem;
+  color: var(--light-text, #888);
+}
+
+.form-hint--error {
+  color: #e53935 !important;
+}
+
+.read-only-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  background-color: #f8f9fb;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: #2c3e50;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.read-only-field i {
+  color: #3b5ccc;
+  font-size: 0.9rem;
+}
+
+/* ── DIALOG BUTTON ───────────────────────────────────────────────────────── */
+.btn-confirm {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 6px !important;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── DIALOG HEADER OVERRIDES ─────────────────────────────────────────────── */
+::ng-deep .crud-dialog .p-dialog-header {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color-dark, #2a4aa0) 0%,
+    var(--secondary-color, #3b5ccc) 100%
+  );
+  color: white;
+  border-radius: 6px 6px 0 0;
+  padding: 1.25rem 1.5rem;
+}
+
+::ng-deep .crud-dialog .p-dialog-title,
+::ng-deep .crud-dialog .p-dialog-header-icon {
+  color: white !important;
+}
+
+::ng-deep .crud-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+::ng-deep .crud-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ── CONFIRM DIALOG ──────────────────────────────────────────────────────── */
+::ng-deep .p-confirm-dialog .p-dialog-header {
+  padding: 1.25rem 1.5rem;
+}
+
+::ng-deep .p-confirm-dialog .p-dialog-content {
+  padding: 1.5rem;
+  font-size: 0.95rem;
+  color: #2c3e50;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .contacts-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .contacts-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .row-actions {
+    justify-content: flex-start;
+  }
+}

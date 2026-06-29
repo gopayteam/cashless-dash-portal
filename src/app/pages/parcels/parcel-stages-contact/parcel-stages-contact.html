@@ -1,0 +1,182 @@
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="contacts-container">
+
+  <!-- ================= HEADER ================= -->
+  <div class="contacts-header">
+    <div class="header-content">
+      <h1>Stage Contacts</h1>
+      <p class="text-muted">Manage parcel stage phone contacts</p>
+    </div>
+
+    <button pButton icon="pi pi-plus" label="Add Contact" class="btn-add" style="gap: 0.5rem;"
+      (click)="openCreateDialog()"></button>
+  </div>
+
+  <!-- ================= TABLE ================= -->
+  <p-card styleClass="card-hover card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <div>
+          <h3>Stage Contacts</h3>
+          <span class="record-count">{{ totalRecords }} records</span>
+        </div>
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="refresh()"></app-action-button>
+      </div>
+    </div>
+
+    <p-table [value]="contacts" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+      [totalRecords]="totalRecords" [loading]="loading()" [rowsPerPageOptions]="[10, 20, 30, 50]"
+      (onLazyLoad)="loadContacts($event)" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} contacts" styleClass="data-table"
+      [tableStyle]="{ 'min-width': '50rem' }" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Stage ID</th>
+          <th>Stage Name</th>
+          <th>Phone Number</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-contact>
+        <tr>
+          <td>
+            <span class="stage-id-badge">#{{ contact.stageId }}</span>
+          </td>
+          <td>
+            <div class="stage-name-cell">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ contact.stageName }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="phone-cell">
+              <i class="pi pi-phone"></i>
+              <span>{{ formatDisplayPhone(contact.phoneNumber) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="row-actions">
+              <button pButton pTooltip="Edit contact" tooltipPosition="top" icon="pi pi-pencil"
+                class="p-button-rounded p-button-text btn-action-edit" (click)="openEditDialog(contact)"></button>
+              <button pButton pTooltip="Delete contact" tooltipPosition="top" icon="pi pi-trash"
+                class="p-button-rounded p-button-text btn-action-delete" [loading]="deletingId === contact.stageId"
+                (click)="confirmDelete(contact)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-phone"></i>
+              <h3>No Contacts Found</h3>
+              <p>Add a stage contact to get started</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+</div>
+
+<!-- ================= CREATE DIALOG ================= -->
+<p-dialog header="Add Stage Contact" [(visible)]="showCreateDialog" [modal]="true"
+  [style]="{ width: '480px', background: '#f9f9f9' }" styleClass="crud-dialog custom-dialog" [dismissableMask]="true"
+  (onHide)="closeCreateDialog()">
+  <div class="dialog-form">
+
+    <div class="form-field">
+      <label class="form-label">Stage <span class="required">*</span></label>
+      <p-select [options]="availableStages" [(ngModel)]="selectedCreateStage" optionLabel="stageName"
+        placeholder="Select a stage…" [filter]="true" filterBy="stageName" [showClear]="true" [loading]="loadingStages"
+        styleClass="form-select" appendTo="body" emptyMessage="All stages already have contacts"
+        emptyFilterMessage="No stages match your search">
+        <ng-template pTemplate="selectedItem" let-stage>
+          <div class="select-item" *ngIf="stage">
+            <i class="pi pi-map-marker"></i>
+            <span>{{ stage.stageName }}</span>
+            <span class="stage-id-badge">#{{ stage.stageId }}</span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="item" let-stage>
+          <div class="select-item">
+            <i class="pi pi-map-marker"></i>
+            <span>{{ stage.stageName }}</span>
+            <span class="stage-id-badge">#{{ stage.stageId }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+      <small class="form-hint" *ngIf="selectedCreateStage">
+        Stage ID <strong>#{{ selectedCreateStage.stageId }}</strong> will be used
+      </small>
+      <small class="form-hint" *ngIf="!selectedCreateStage">
+        Only stages without an existing contact are shown
+      </small>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Phone Number <span class="required">*</span></label>
+      <input pInputText type="tel" [(ngModel)]="createPhone" placeholder="e.g. 0727918955 or 254727918955"
+        class="form-input" [class.input-error]="createPhone && !isValidPhone(createPhone)" />
+      <small class="form-hint form-hint--error" *ngIf="createPhone && !isValidPhone(createPhone)">
+        Use format 07XXXXXXXX or 254XXXXXXXXX
+      </small>
+      <small class="form-hint" *ngIf="!createPhone || isValidPhone(createPhone)">
+        Accepts local (07…) or international (254…) format
+      </small>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" style="gap: 0.5rem;"
+      (click)="closeCreateDialog()"></button>
+    <button pButton label="Add Contact" icon="pi pi-check" class="btn-confirm" style="gap: 0.5rem;"
+      [loading]="submittingCreate" [disabled]="!isCreateFormValid() || submittingCreate"
+      (click)="submitCreate()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- ================= EDIT DIALOG ================= -->
+<p-dialog [header]="'Edit — ' + (selectedContact?.stageName || '')" [(visible)]="showEditDialog" [modal]="true"
+  [style]="{ width: '480px', background: '#f9f9f9'  }" styleClass="crud-dialog custom-dialog" [dismissableMask]="true"
+  (onHide)="closeEditDialog()">
+  <div class="dialog-form" *ngIf="selectedContact">
+
+    <div class="form-field">
+      <label class="form-label">Stage</label>
+      <div class="read-only-field">
+        <i class="pi pi-map-marker"></i>
+        <span>{{ selectedContact.stageName }}</span>
+        <span class="stage-id-badge">#{{ selectedContact.stageId }}</span>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Phone Number <span class="required">*</span></label>
+      <input pInputText type="tel" [(ngModel)]="editPhone" placeholder="e.g. 0727918955 or 254727918955"
+        class="form-input" [class.input-error]="editPhone && !isValidPhone(editPhone)" />
+      <small class="form-hint form-hint--error" *ngIf="editPhone && !isValidPhone(editPhone)">
+        Use format 07XXXXXXXX or 254XXXXXXXXX
+      </small>
+      <small class="form-hint" *ngIf="!editPhone || isValidPhone(editPhone)">
+        Accepts local (07…) or international (254…) format
+      </small>
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" icon="pi pi-times" class="p-button-text" style="gap: 0.5rem;"
+      (click)="closeEditDialog()"></button>
+    <button pButton label="Save Changes" icon="pi pi-check" class="btn-confirm" style="gap: 0.5rem;"
+      [loading]="submittingEdit" [disabled]="!isEditFormValid() || submittingEdit" (click)="submitEdit()"></button>
+  </ng-template>
+</p-dialog>

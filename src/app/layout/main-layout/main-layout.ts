@@ -149,6 +149,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     '/parcel-offices': [
       { label: 'Source', icon: 'pi pi-building', route: '/parcel-offices/parcel-source', roles: ['CAN_MANAGE_PARCELS'] },
       { label: 'Destination', icon: 'pi pi-map-marker', route: '/parcel-offices/parcel-destination', roles: ['CAN_MANAGE_PARCELS'] },
+      { label: 'Stage Contacts', icon: 'pi pi-phone', route: '/parcel-offices/stage-contacts', roles: ['CAN_MANAGE_PARCELS'] },
     ],
     '/locations': [
       { label: 'Stages', icon: 'pi pi-map', route: '/locations/stages', roles: ['CAN_VIEW_STAGES', 'CAN_VIEW_LOCATIONS'] },
