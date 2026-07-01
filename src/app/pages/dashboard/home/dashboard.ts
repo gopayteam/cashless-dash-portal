@@ -125,6 +125,24 @@ export class DashboardComponent implements OnInit {
   singleDayParcelsCount: number = 0;
   singleDayParcelsList: Parcel[] = [];
 
+  // Which parcel-tab card is currently driving the trend chart.
+  // Vehicle Operations chart intentionally does NOT support this — it stays
+  // fixed on "Vehicles Registered" per request.
+  selectedParcelMetric: 'registered' | 'collected' | 'revenue' | 'payment' = 'collected';
+  parcelsTrendTitle: string = 'Parcel Collection Trend';
+
+  // Precomputed daily buckets for every parcel metric, built once per data
+  // load in buildParcelsTrend(). Switching cards just re-renders the chart
+  // from these — no refetch needed.
+  private parcelsDailyMetrics: {
+    labels: string[];
+    registered: number[];
+    collected: number[];
+    revenue: number[];
+    cash: number[];
+    cashless: number[];
+  } | null = null;
+
   singleDayLabel: string = '';
 
   constructor(
@@ -394,7 +412,7 @@ export class DashboardComponent implements OnInit {
     // how many are CURRENTLY active" — not "activated that day". True
     // activation-date tracking would require the backend to expose an
     // activatedAt/statusChangedAt timestamp.
-    this.singleDayActiveVehiclesCount = this.allVehicles.filter(
+    this.singleDayActiveVehiclesCount = this.singleDayVehiclesList.filter(
       v => v.status === 'ACTIVE'
     ).length;
 
@@ -462,31 +480,51 @@ export class DashboardComponent implements OnInit {
   }
 
   buildParcelsTrend(parcels: Parcel[], days: string[], apiResponse?: any) {
-    const countsMap = new Map<string, number>();
-    days.forEach(day => countsMap.set(day, 0));
+    const collectedCountMap = new Map<string, number>();
+    const registeredCountMap = new Map<string, number>();
+    const revenueMap = new Map<string, number>();
+    const cashMap = new Map<string, number>();
+    const cashlessMap = new Map<string, number>();
+    days.forEach(day => {
+      collectedCountMap.set(day, 0);
+      registeredCountMap.set(day, 0);
+      revenueMap.set(day, 0);
+      cashMap.set(day, 0);
+      cashlessMap.set(day, 0);
+    });
 
-    // FIX #4: only count parcels whose status is actually COLLECTED, using
-    // pickedAt as the collection date when present, falling back to
-    // createdAt only for legacy rows missing pickedAt. Previously
-    // `p.parcelStatus === 'COLLECTED' || p.pickedAt` could double-count or
-    // include parcels that have a pickedAt but a different current status
-    // (e.g. later cancelled). If you actually want to track parcel
-    // *movement* (including ARRIVED/DISPATCHED) rather than final
-    // collection, that's a separate metric — let me know and I'll add it
-    // as its own chart rather than folding it into "Collected".
     parcels.forEach(p => {
+      // "Registered" and money metrics are bucketed by createdAt — the day
+      // the parcel entered the system, which is what "registered" means
+      // and is the only date every parcel has regardless of status.
+      if (p.createdAt) {
+        const createdDateStr = p.createdAt.split(/[ T]/)[0];
+        if (registeredCountMap.has(createdDateStr)) {
+          registeredCountMap.set(createdDateStr, registeredCountMap.get(createdDateStr)! + 1);
+          revenueMap.set(createdDateStr, revenueMap.get(createdDateStr)! + (p.amount || 0));
+          if (p.paymentMethod === 'CASH') {
+            cashMap.set(createdDateStr, cashMap.get(createdDateStr)! + (p.amount || 0));
+          } else if (p.paymentMethod === 'CASHLESS') {
+            cashlessMap.set(createdDateStr, cashlessMap.get(createdDateStr)! + (p.amount || 0));
+          }
+        }
+      }
+
+      // FIX #4: "Collected" is bucketed by pickedAt (falling back to
+      // createdAt only for legacy rows missing it), and strictly requires
+      // parcelStatus === 'COLLECTED'.
       if (p.parcelStatus === 'COLLECTED') {
-        const dateStr = (p.pickedAt || p.createdAt).split(/[ T]/)[0];
-        if (countsMap.has(dateStr)) {
-          countsMap.set(dateStr, countsMap.get(dateStr)! + 1);
+        const collectedDateStr = (p.pickedAt || p.createdAt).split(/[ T]/)[0];
+        if (collectedCountMap.has(collectedDateStr)) {
+          collectedCountMap.set(collectedDateStr, collectedCountMap.get(collectedDateStr)! + 1);
         }
       }
     });
 
-    const trendData = days.map(day => countsMap.get(day) || 0);
-
+    // Single-day "Collections on X" panel — unchanged behavior, still tied
+    // to actual collection date regardless of which chart metric is selected.
     const selectedDayStr = days[days.length - 1];
-    this.singleDayParcelsCount = countsMap.get(selectedDayStr) || 0;
+    this.singleDayParcelsCount = collectedCountMap.get(selectedDayStr) || 0;
     this.singleDayParcelsList = parcels.filter(p => {
       if (p.parcelStatus !== 'COLLECTED') return false;
       const dateStr = (p.pickedAt || p.createdAt).split(/[ T]/)[0];
@@ -499,7 +537,6 @@ export class DashboardComponent implements OnInit {
     // these fields, so the dashboard degrades gracefully rather than
     // breaking.
     const collected = parcels.filter(p => p.parcelStatus === 'COLLECTED').length;
-
     const total = apiResponse?.totalItems ?? parcels.length;
     const amount = apiResponse?.totalAmount ?? parcels.reduce((sum, p) => sum + (p.amount || 0), 0);
     const cash = apiResponse?.totalCash ?? parcels
@@ -511,43 +548,150 @@ export class DashboardComponent implements OnInit {
 
     this.parcelStats = { total, collected, amount, cash, cashless };
 
-    this.parcelsTrendData = {
+    // Store the raw daily buckets so card clicks can re-render the chart
+    // instantly without refetching or recomputing from scratch.
+    this.parcelsDailyMetrics = {
       labels: days.map(day => {
         const date = this.parseLocalDay(day);
         return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
       }),
-      datasets: [
-        {
+      registered: days.map(day => registeredCountMap.get(day) || 0),
+      collected: days.map(day => collectedCountMap.get(day) || 0),
+      revenue: days.map(day => revenueMap.get(day) || 0),
+      cash: days.map(day => cashMap.get(day) || 0),
+      cashless: days.map(day => cashlessMap.get(day) || 0),
+    };
+
+    this.renderParcelsChart();
+  }
+
+  /**
+   * Renders parcelsTrendData/parcelsTrendOptions from the currently
+   * selected metric, using the precomputed daily buckets. Called whenever
+   * a parcel-tab card is clicked, or whenever fresh data loads.
+   */
+  private renderParcelsChart(): void {
+    if (!this.parcelsDailyMetrics) return;
+    const m = this.parcelsDailyMetrics;
+
+    const metricConfig: Record<typeof this.selectedParcelMetric, {
+      title: string;
+      datasets: any[];
+      tooltipUnit: 'count' | 'currency';
+    }> = {
+      registered: {
+        title: 'Parcel Registration Trend',
+        tooltipUnit: 'count',
+        datasets: [{
+          label: 'Parcels Registered',
+          data: m.registered,
+          fill: true,
+          borderColor: '#6f42c1',
+          backgroundColor: 'rgba(111,66,193,0.1)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#6f42c1',
+          pointHoverRadius: 6,
+        }],
+      },
+      collected: {
+        title: 'Parcel Collection Trend',
+        tooltipUnit: 'count',
+        datasets: [{
           label: 'Parcels Collected',
-          data: trendData,
+          data: m.collected,
           fill: true,
           borderColor: '#0dcaf0',
           backgroundColor: 'rgba(13,202,240,0.1)',
           tension: 0.3,
           borderWidth: 2,
           pointBackgroundColor: '#0dcaf0',
-          pointHoverRadius: 6
-        }
-      ]
+          pointHoverRadius: 6,
+        }],
+      },
+      revenue: {
+        title: 'Parcel Revenue Trend',
+        tooltipUnit: 'currency',
+        datasets: [{
+          label: 'Revenue (KSh)',
+          data: m.revenue,
+          fill: true,
+          borderColor: '#6c757d',
+          backgroundColor: 'rgba(108,117,125,0.1)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointBackgroundColor: '#6c757d',
+          pointHoverRadius: 6,
+        }],
+      },
+      payment: {
+        title: 'Payment Mode Trend',
+        tooltipUnit: 'currency',
+        datasets: [
+          {
+            label: 'Cash (KSh)',
+            data: m.cash,
+            fill: false,
+            borderColor: '#198754',
+            backgroundColor: '#198754',
+            tension: 0.3,
+            borderWidth: 2,
+            pointBackgroundColor: '#198754',
+            pointHoverRadius: 6,
+          },
+          {
+            label: 'Cashless (KSh)',
+            data: m.cashless,
+            fill: false,
+            borderColor: '#0d6efd',
+            backgroundColor: '#0d6efd',
+            tension: 0.3,
+            borderWidth: 2,
+            pointBackgroundColor: '#0d6efd',
+            pointHoverRadius: 6,
+          },
+        ],
+      },
+    };
+
+    const config = metricConfig[this.selectedParcelMetric];
+    this.parcelsTrendTitle = config.title;
+
+    this.parcelsTrendData = {
+      labels: m.labels,
+      datasets: config.datasets,
     };
 
     this.parcelsTrendOptions = {
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
-        legend: { display: true, position: 'top' },
+        legend: { display: config.datasets.length > 1, position: 'top' },
         tooltip: {
           callbacks: {
-            label: function (context: any) {
-              return `Collected: ${context.parsed.y} parcels`;
+            label: (context: any) => {
+              const value = context.parsed.y;
+              const datasetLabel = context.dataset.label;
+              return config.tooltipUnit === 'currency'
+                ? `${datasetLabel}: KSh ${value.toLocaleString()}`
+                : `${datasetLabel}: ${value}`;
             },
           },
         },
       },
       scales: {
-        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+        y: { beginAtZero: true },
       },
     };
+
+    this.cdr.detectChanges();
+  }
+
+  /** Called from the parcel-tab card click handlers. */
+  selectParcelMetric(metric: 'registered' | 'collected' | 'revenue' | 'payment'): void {
+    if (this.selectedParcelMetric === metric) return;
+    this.selectedParcelMetric = metric;
+    this.renderParcelsChart();
   }
 
   setDateRange() {

@@ -288,7 +288,8 @@
   <div *ngIf="selectedTab === 'parcels' && isSuperMetro" class="tab-content fade-in">
     <!-- PARCEL CARDS -->
     <div class="stats-grid">
-      <p-card styleClass="stat-card card-hover card-parcel-total">
+      <p-card styleClass="stat-card card-hover card-parcel-total" [style]="{ cursor: 'pointer' }"
+        [class.metric-card-active]="selectedParcelMetric === 'registered'" (click)="selectParcelMetric('registered')">
         <div class="stat-content">
           <div class="stat-info">
             <span class="stat-title">Total Parcels Registered</span>
@@ -303,7 +304,8 @@
         </div>
       </p-card>
 
-      <p-card styleClass="stat-card card-hover card-parcel-collected">
+      <p-card styleClass="stat-card card-hover card-parcel-collected" [style]="{ cursor: 'pointer' }"
+        [class.metric-card-active]="selectedParcelMetric === 'collected'" (click)="selectParcelMetric('collected')">
         <div class="stat-content">
           <div class="stat-info">
             <span class="stat-title">Parcels Collected</span>
@@ -321,7 +323,8 @@
         </div>
       </p-card>
 
-      <p-card styleClass="stat-card card-hover card-parcel-amount">
+      <p-card styleClass="stat-card card-hover card-parcel-amount" [style]="{ cursor: 'pointer' }"
+        [class.metric-card-active]="selectedParcelMetric === 'revenue'" (click)="selectParcelMetric('revenue')">
         <div class="stat-content">
           <div class="stat-info">
             <span class="stat-title">Total Revenue</span>
@@ -337,7 +340,8 @@
         </div>
       </p-card>
 
-      <p-card styleClass="stat-card card-hover card-parcel-payments">
+      <p-card styleClass="stat-card card-hover card-parcel-payments" [style]="{ cursor: 'pointer' }"
+        [class.metric-card-active]="selectedParcelMetric === 'payment'" (click)="selectParcelMetric('payment')">
         <div class="stat-content">
           <div class="stat-info">
             <span class="stat-title">Payment Mode Breakdown</span>
@@ -359,7 +363,7 @@
     <!-- PARCELS CHARTS & DETAILS -->
     <div class="split-view-grid">
       <!-- Collection Trend Chart -->
-      <p-card header="Parcel Collection Trend" styleClass="stat-card card split-left-card">
+      <p-card [header]="parcelsTrendTitle" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
           <p-chart *ngIf="parcelsTrendData" type="line" [data]="parcelsTrendData" [options]="parcelsTrendOptions"
             height="330px"></p-chart>

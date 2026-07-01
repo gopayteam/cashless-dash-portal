@@ -201,6 +201,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -299,7 +300,8 @@
   color: #64748b;
 }
 
-.item-location, .item-cap {
+.item-location,
+.item-cap {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -348,17 +350,21 @@
   .segmented-tabs-container {
     justify-content: center;
   }
+
   .segmented-tabs {
     width: 100%;
   }
+
   .tab-btn {
     flex: 1;
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
     justify-content: center;
   }
+
   .tab-btn span {
-    display: none; /* Hide text on mobile to fit icons */
+    display: none;
+    /* Hide text on mobile to fit icons */
   }
 }
 
@@ -370,4 +376,10 @@
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.metric-card-active {
+  outline: 2px solid var(--primary-color, #0e2c5a);
+  outline-offset: -2px;
+  box-shadow: 0 4px 14px rgba(14, 44, 90, 0.15);
 }
