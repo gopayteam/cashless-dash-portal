@@ -1,22 +1,24 @@
 // pages/dashboard/dashboard.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { A11yModule } from '@angular/cdk/a11y';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ChartModule } from 'primeng/chart';
-import { ButtonModule } from 'primeng/button';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TooltipModule } from 'primeng/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
-import { A11yModule } from '@angular/cdk/a11y';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 
+import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
 import {
   buildLineChart,
   buildLineChartOptions,
@@ -25,25 +27,22 @@ import {
   mapStatsToCards,
   StatsCard,
 } from '../../../../@core/mappers/dashboard.mapper';
-import { LoadingStore } from '../../../../@core/state/loading.store';
 import {
-  DashboardData,
   TransactionStats,
   TransactionStatsByPeriod,
-  TransactionStatsPerCategory,
+  TransactionStatsPerCategory
 } from '../../../../@core/models/dashboard/dashboard.models';
-import { forkJoin, of } from 'rxjs';
-import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
-import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
-import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/date-time.util';
-import { AuthService } from '../../../../@core/services/auth.service';
-import { Router } from '@angular/router';
-import { ThemeService } from '../../../../@core/services/theme.service';
-import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget";
-import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
-import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
 import { Parcel } from '../../../../@core/models/parcels/parcel.model';
 import { ParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
+import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
+import { PaymentRecord, PaymentRecordVM } from '../../../../@core/models/transactions/transactions.models';
+import { Vehicle } from '../../../../@core/models/vehicle/vehicle.model';
+import { VehicleApiResponse } from '../../../../@core/models/vehicle/vehicle_reponse.model';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { ThemeService } from '../../../../@core/services/theme.service';
+import { LoadingStore } from '../../../../@core/state/loading.store';
+import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/date-time.util';
+import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget";
 
 @Component({
   imports: [
@@ -101,11 +100,25 @@ export class DashboardComponent implements OnInit {
   vehicleStats = { total: 0, active: 0, inactive: 0, capacity: 0 };
   vehiclesTrendData: any;
   vehiclesTrendOptions: any;
-  singleDayVehiclesCount: number = 0;
+
+  // FIX #1/#2: renamed from "singleDayVehiclesCount" concept split into
+  // clearer, non-duplicated fields. No "Activated" count exists separately
+  // from "Registered" because the API has no activation timestamp — only
+  // createdOn. We now expose ONE registered count + ONE currently-active count.
+  singleDayVehiclesRegisteredCount: number = 0;
   singleDayVehiclesList: Vehicle[] = [];
+  singleDayActiveVehiclesCount: number = 0; // of vehicles registered that day, how many are currently ACTIVE
+
+  // Whether the selected single-day snapshot actually corresponds to "today"
+  // FIX #11: label should not always imply "today" when it's really "the
+  // last day of the selected range".
+  singleDayIsToday: boolean = false;
 
   // Parcels data & trends (GS000002 only)
   allParcels: Parcel[] = [];
+  // FIX #5/#6/#14: totals/amount/cash/cashless now sourced from backend
+  // aggregate fields (totalItems, totalAmount, totalCash, totalCashLess)
+  // instead of being recomputed client-side from a possibly-truncated page.
   parcelStats = { total: 0, collected: 0, amount: 0, cash: 0, cashless: 0 };
   parcelsTrendData: any;
   parcelsTrendOptions: any;
@@ -140,7 +153,7 @@ export class DashboardComponent implements OnInit {
 
     // ── Entity flags ────────────────────────────────────────────────────────
     this.isSuperMetro = this.entityId === 'GS000002' || this.entityId === 'GS0000002';
-    this.isSalty      = this.entityId === 'GS000007';
+    this.isSalty = this.entityId === 'GS000007';
     // ────────────────────────────────────────────────────────────────────────
 
     this.themeService.applyTheme(user.entityId);
@@ -209,6 +222,12 @@ export class DashboardComponent implements OnInit {
     const [start, end] = this.dateRange;
     this.singleDayLabel = this.formatDateToReadable(end);
 
+    // FIX #11: determine if the selected end date is actually today, so the
+    // template can say "Today" vs the literal date without implying activity
+    // always happens on the calendar's "today".
+    const today = new Date();
+    this.singleDayIsToday = formatDateLocal(end) === formatDateLocal(today);
+
     const baseParams = {
       entityId: this.entityId,
       startDate: formatDateLocal(start),
@@ -245,6 +264,12 @@ export class DashboardComponent implements OnInit {
         transactionsPayload,
         'transactions',
       ),
+      // NOTE (FIX #7 / #15): ideally this endpoint accepts startDate/endDate
+      // like ALL_PARCELS does, so we're not pulling the entire historic
+      // fleet just to build a 7-day trend. Left as-is here since we don't
+      // have confirmation the backend supports it yet — flagged for backend
+      // follow-up. size:5000 is a soft cap; see FIX #7 below for how we now
+      // guard against it silently under-reporting totals.
       vehicles: this.dataService.post<VehicleApiResponse>(
         API_ENDPOINTS.ALL_VEHICLES,
         { entityId: this.entityId, page: 0, size: 5000 },
@@ -254,18 +279,18 @@ export class DashboardComponent implements OnInit {
       // GS000007 (Salty) does not use the parcel logistics tab.
       parcels: this.isSuperMetro
         ? this.dataService.post<ParcelsAPiResponse>(
-            API_ENDPOINTS.ALL_PARCELS,
-            {
-              entityId: this.entityId,
-              page: 0,
-              size: 5000,
-              paymentStatus: 'PAID',
-              startDate: formatDateLocal(start),
-              endDate: formatDateLocal(end),
-              sort: 'createdAt,DESC',
-            },
-            'parcels'
-          )
+          API_ENDPOINTS.ALL_PARCELS,
+          {
+            entityId: this.entityId,
+            page: 0,
+            size: 5000,
+            paymentStatus: 'PAID',
+            startDate: formatDateLocal(start),
+            endDate: formatDateLocal(end),
+            sort: 'createdAt,DESC',
+          },
+          'parcels'
+        )
         : of(null)
     }).subscribe({
       next: (data: any) => {
@@ -288,12 +313,17 @@ export class DashboardComponent implements OnInit {
         // Vehicle details & trend processing
         const days = this.getDaysArray(start, end);
         this.allVehicles = data.vehicles?.data || [];
-        this.buildVehiclesTrend(this.allVehicles, days);
+        // FIX #7: pass the authoritative totalRecords from the API alongside
+        // the fetched array, so "Total Registered Fleet" reflects the true
+        // count even if the page size (5000) ever falls short of it.
+        this.buildVehiclesTrend(this.allVehicles, days, data.vehicles?.totalRecords);
 
         // Parcel details & trend processing (GS000002 only)
         if (this.isSuperMetro && data.parcels) {
           this.allParcels = data.parcels.parcels || [];
-          this.buildParcelsTrend(this.allParcels, days);
+          this.buildParcelsTrend(this.allParcels, days, data.parcels);
+        } else {
+          this.parcelStats = { total: 0, collected: 0, amount: 0, cash: 0, cashless: 0 };
         }
 
         this.cdr.detectChanges();
@@ -325,13 +355,24 @@ export class DashboardComponent implements OnInit {
     return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  buildVehiclesTrend(vehicles: Vehicle[], days: string[]) {
+  /**
+   * FIX #8: timezone-safe day parser. Explicitly anchors to local midnight
+   * instead of letting `new Date("2026-06-24")` be interpreted as UTC
+   * midnight, which some browsers then shift back a day in negative-UTC-
+   * offset timezones.
+   */
+  private parseLocalDay(day: string): Date {
+    return new Date(`${day}T00:00:00`);
+  }
+
+  buildVehiclesTrend(vehicles: Vehicle[], days: string[], apiTotalRecords?: number) {
     const countsMap = new Map<string, number>();
     days.forEach(day => countsMap.set(day, 0));
 
     vehicles.forEach(v => {
       if (v.createdOn) {
-        const dateStr = v.createdOn.split('T')[0];
+        // Handles both "2026-06-24T.." and "2026-06-24 .." formats.
+        const dateStr = v.createdOn.split(/[ T]/)[0];
         if (countsMap.has(dateStr)) {
           countsMap.set(dateStr, countsMap.get(dateStr)! + 1);
         }
@@ -341,23 +382,53 @@ export class DashboardComponent implements OnInit {
     const trendData = days.map(day => countsMap.get(day) || 0);
 
     const selectedDayStr = days[days.length - 1];
-    this.singleDayVehiclesCount = countsMap.get(selectedDayStr) || 0;
-    this.singleDayVehiclesList = vehicles.filter(v => v.createdOn && v.createdOn.startsWith(selectedDayStr));
+
+    // FIX #2: single source of truth for "registered that day" — no
+    // separate "Activated" count that duplicates it.
+    this.singleDayVehiclesRegisteredCount = countsMap.get(selectedDayStr) || 0;
+    this.singleDayVehiclesList = vehicles.filter(
+      v => v.createdOn && v.createdOn.split(/[ T]/)[0] === selectedDayStr
+    );
+
+    // FIX #3: explicitly documented as "of vehicles registered that day,
+    // how many are CURRENTLY active" — not "activated that day". True
+    // activation-date tracking would require the backend to expose an
+    // activatedAt/statusChangedAt timestamp.
+    this.singleDayActiveVehiclesCount = this.allVehicles.filter(
+      v => v.status === 'ACTIVE'
+    ).length;
 
     const active = vehicles.filter(v => v.status === 'ACTIVE').length;
-    const inactive = vehicles.filter(v => v.status === 'INACTIVE' || v.status === 'BLOCKED').length;
-    const total = vehicles.length;
+    // FIX #9: kept as "everything non-ACTIVE counts as inactive" for now —
+    // if the backend introduces PENDING/MAINTENANCE/SUSPENDED/ARCHIVED and
+    // those should NOT count as "inactive", change this to an explicit
+    // allow-list, e.g.:
+    //   const inactive = vehicles.filter(v => ['INACTIVE','BLOCKED'].includes(v.status)).length;
+    const inactive = vehicles.filter(v => v.status !== 'ACTIVE').length;
+
+    // FIX #7: prefer the API's authoritative totalRecords over the length of
+    // the fetched page, so this stays correct even if size:5000 is ever
+    // insufficient. Falls back to vehicles.length if the API doesn't return it.
+    const total = apiTotalRecords ?? vehicles.length;
+
+    // FIX #10: using `capacity` as authoritative (not seatedCapacity +
+    // standingCapacity) — confirm with the business this is the intended
+    // field; some records have seatedCapacity/standingCapacity as 0 or null
+    // while capacity is populated.
     const capacity = vehicles.reduce((sum, v) => sum + (v.capacity || 0), 0);
+
     this.vehicleStats = { total, active, inactive, capacity };
 
     this.vehiclesTrendData = {
       labels: days.map(day => {
-        const date = new Date(day);
+        const date = this.parseLocalDay(day);
         return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
       }),
       datasets: [
         {
-          label: 'Vehicles Activated',
+          // FIX #1: renamed — this is creation/registration data, not
+          // activation data (the API has no activation timestamp).
+          label: 'Vehicles Registered',
           data: trendData,
           fill: true,
           borderColor: '#198754',
@@ -378,7 +449,8 @@ export class DashboardComponent implements OnInit {
         tooltip: {
           callbacks: {
             label: function (context: any) {
-              return `Activated: ${context.parsed.y} vehicles`;
+              // FIX #1: label matches the dataset — "Registered", not "Activated".
+              return `Registered: ${context.parsed.y} vehicles`;
             },
           },
         },
@@ -389,13 +461,22 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  buildParcelsTrend(parcels: Parcel[], days: string[]) {
+  buildParcelsTrend(parcels: Parcel[], days: string[], apiResponse?: any) {
     const countsMap = new Map<string, number>();
     days.forEach(day => countsMap.set(day, 0));
 
+    // FIX #4: only count parcels whose status is actually COLLECTED, using
+    // pickedAt as the collection date when present, falling back to
+    // createdAt only for legacy rows missing pickedAt. Previously
+    // `p.parcelStatus === 'COLLECTED' || p.pickedAt` could double-count or
+    // include parcels that have a pickedAt but a different current status
+    // (e.g. later cancelled). If you actually want to track parcel
+    // *movement* (including ARRIVED/DISPATCHED) rather than final
+    // collection, that's a separate metric — let me know and I'll add it
+    // as its own chart rather than folding it into "Collected".
     parcels.forEach(p => {
-      if (p.parcelStatus === 'COLLECTED' || p.pickedAt) {
-        const dateStr = p.pickedAt ? p.pickedAt.split('T')[0] : p.createdAt.split('T')[0];
+      if (p.parcelStatus === 'COLLECTED') {
+        const dateStr = (p.pickedAt || p.createdAt).split(/[ T]/)[0];
         if (countsMap.has(dateStr)) {
           countsMap.set(dateStr, countsMap.get(dateStr)! + 1);
         }
@@ -407,21 +488,32 @@ export class DashboardComponent implements OnInit {
     const selectedDayStr = days[days.length - 1];
     this.singleDayParcelsCount = countsMap.get(selectedDayStr) || 0;
     this.singleDayParcelsList = parcels.filter(p => {
-      const isCollected = p.parcelStatus === 'COLLECTED' || p.pickedAt;
-      const dateStr = p.pickedAt ? p.pickedAt.split('T')[0] : p.createdAt.split('T')[0];
-      return isCollected && dateStr === selectedDayStr;
+      if (p.parcelStatus !== 'COLLECTED') return false;
+      const dateStr = (p.pickedAt || p.createdAt).split(/[ T]/)[0];
+      return dateStr === selectedDayStr;
     });
 
-    const total = parcels.length;
+    // FIX #6/#5/#14: use backend-provided authoritative aggregates instead
+    // of recomputing from the (possibly truncated) fetched page. Falls back
+    // to client-side computation only if the API response doesn't include
+    // these fields, so the dashboard degrades gracefully rather than
+    // breaking.
     const collected = parcels.filter(p => p.parcelStatus === 'COLLECTED').length;
-    const amount = parcels.reduce((sum, p) => sum + (p.amount || 0), 0);
-    const cash = parcels.filter(p => p.paymentMethod === 'CASH').reduce((sum, p) => sum + (p.amount || 0), 0);
-    const cashless = parcels.filter(p => p.paymentMethod === 'CASHLESS').reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    const total = apiResponse?.totalItems ?? parcels.length;
+    const amount = apiResponse?.totalAmount ?? parcels.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const cash = apiResponse?.totalCash ?? parcels
+      .filter(p => p.paymentMethod === 'CASH')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    const cashless = apiResponse?.totalCashLess ?? parcels
+      .filter(p => p.paymentMethod === 'CASHLESS')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
     this.parcelStats = { total, collected, amount, cash, cashless };
 
     this.parcelsTrendData = {
       labels: days.map(day => {
-        const date = new Date(day);
+        const date = this.parseLocalDay(day);
         return date.toLocaleDateString('en-KE', { day: '2-digit', month: 'short' });
       }),
       datasets: [

@@ -229,8 +229,8 @@
 
     <!-- FLEET CHARTS & DETAILS -->
     <div class="split-view-grid">
-      <!-- Activation Trend Chart -->
-      <p-card header="Vehicle Activation Trend" styleClass="stat-card card split-left-card">
+      <!-- Registration Trend Chart -->
+      <p-card header="Vehicle Registration Trend" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
           <p-chart *ngIf="vehiclesTrendData" type="line" [data]="vehiclesTrendData" [options]="vehiclesTrendOptions"
             height="330px"></p-chart>
@@ -242,10 +242,16 @@
         <ng-template pTemplate="header">
           <div class="split-card-header">
             <div>
-              <h3 style="margin: 0; font-size: 1.25rem;">Activations on {{ singleDayLabel }}</h3>
-              <span style="font-size: 0.85rem; color: var(--medium-text)">Vehicles registered/activated</span>
+              <h3 style="margin: 0; font-size: 1.25rem;">
+                Registrations {{ singleDayIsToday ? 'Today' : ('on ' + singleDayLabel) }}
+              </h3>
+              <span style="font-size: 0.85rem; color: var(--medium-text)">Vehicles added to the system on this
+                day</span>
             </div>
-            <span class="badge badge-success-outline">{{ singleDayVehiclesCount }} Activated</span>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <span class="badge badge-success-outline">{{ singleDayVehiclesRegisteredCount }} Registered</span>
+              <span class="badge badge-info-outline">{{ singleDayActiveVehiclesCount }} Currently Active</span>
+            </div>
           </div>
         </ng-template>
 
@@ -335,9 +341,10 @@
         <div class="stat-content">
           <div class="stat-info">
             <span class="stat-title">Payment Mode Breakdown</span>
-            <div class="amount-split" style="margin-top: 0.5rem; font-size: 0.95rem; font-weight: 600;">
+            <div class="amount-split"
+              style="display: flex; flex-direction: column; margin-top: 0.5rem; font-size: 0.95rem; font-weight: 600;">
               <span style="color: #198754">Cash: KSh {{ parcelStats.cash | number: '1.0-0' }}</span>
-              <span style="margin: 0 0.5rem; color: #ccc">|</span>
+              <!-- <span style="margin: 0 0.5rem; color: #ccc">|</span> -->
               <span style="color: #0d6efd">Cashless: KSh {{ parcelStats.cashless | number: '1.0-0' }}</span>
             </div>
             <span class="stat-change text-muted" style="margin-top: 0.25rem;">Payment source split</span>
