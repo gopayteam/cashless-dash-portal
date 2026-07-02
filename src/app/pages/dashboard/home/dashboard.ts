@@ -19,6 +19,7 @@ import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
 
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import {
   buildLineChart,
   buildLineChartOptions,
@@ -32,6 +33,13 @@ import {
   TransactionStatsByPeriod,
   TransactionStatsPerCategory
 } from '../../../../@core/models/dashboard/dashboard.models';
+import { GeneralDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
+import {
+  ActiveDriverAssignmentApiResponse,
+  DriverAssignmentApiResponse,
+  PendingDriverAssignmentApiResponse,
+  RejectedDriverAssignmentApiResponse,
+} from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 import { Parcel } from '../../../../@core/models/parcels/parcel.model';
 import { ParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
 import { PaymentsApiResponse } from '../../../../@core/models/transactions/payment_reponse.model';
@@ -145,6 +153,27 @@ export class DashboardComponent implements OnInit {
 
   singleDayLabel: string = '';
 
+  // ── Driver Assignment Stats (Fleet Operations tab) ────────────────────────
+  // Tallies come straight from each endpoint's `totalRecords` — we request
+  // size:1 since we only need the count, not the rows, keeping this cheap.
+  assignmentStats = { total: 0, active: 0, inactive: 0, pending: 0, rejected: 0 };
+  assignmentStatsLoaded: boolean = false;
+
+  // ── Full assignment list — lazy-loaded once, then cached ──────────────────
+  // Not tied to the dashboard date range (assignments aren't date-scoped the
+  // same way). Fetched on first vehicle search rather than on every dashboard
+  // load, and reused afterwards via the data service's cache (bypassCache:
+  // false) so repeated searches don't re-hit the network.
+  private allDriverAssignments: GeneralDriverAssignment[] = [];
+  private assignmentsListLoaded: boolean = false;
+
+  // ── Vehicle search (Fleet Operations tab) ─────────────────────────────────
+  vehicleSearchTerm: string = '';
+  vehicleSearchAttempted: boolean = false;
+  vehicleSearchLoading: boolean = false;
+  vehicleSearchResult: Vehicle | null = null;
+  vehicleSearchAssignment: GeneralDriverAssignment | null = null;
+
   constructor(
     private dataService: DataService,
     private router: Router,
@@ -179,10 +208,15 @@ export class DashboardComponent implements OnInit {
 
     this.setDateRange();
 
+    // Driver assignment stats aren't date-scoped, so load them once here
+    // rather than inside loadDashboardData() (which reruns on every date
+    // range change).
+    this.loadAssignmentStats();
+
     // 🔥 FIRST LOAD
     const event = { first: 0, rows: this.rows };
-    this.loadTransactions(event);
     this.loadDashboardData();
+    this.loadTransactions(event);
   }
 
   loadTransactions($event: any): void {
@@ -692,6 +726,156 @@ export class DashboardComponent implements OnInit {
     if (this.selectedParcelMetric === metric) return;
     this.selectedParcelMetric = metric;
     this.renderParcelsChart();
+  }
+
+  // ── Driver Assignment Stats ────────────────────────────────────────────
+
+  /**
+   * Loads the total/active/inactive/pending/rejected assignment tallies.
+   * Each call requests size:1 — we only need `totalRecords` from the
+   * response, not the actual rows, so this stays cheap regardless of how
+   * many assignments exist.
+   */
+  loadAssignmentStats(): void {
+    if (!this.entityId) return;
+
+    const tinyPage = { entityId: this.entityId, page: 0, size: 1 };
+
+    forkJoin({
+      total: this.dataService.post<DriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_DRIVER_ASSIGNMENTS,
+        tinyPage,
+        'assignment-stats-total'
+      ),
+      active: this.dataService.post<ActiveDriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_ACTIVE_DRIVERS,
+        { ...tinyPage, status: 'ACTIVE' },
+        'assignment-stats-active'
+      ),
+      inactive: this.dataService.post<ActiveDriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_ACTIVE_DRIVERS,
+        { ...tinyPage, status: 'INACTIVE' },
+        'assignment-stats-inactive'
+      ),
+      pending: this.dataService.post<PendingDriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_PENDING_REQUESTS,
+        { ...tinyPage, status: 'PENDING' },
+        'assignment-stats-pending'
+      ),
+      rejected: this.dataService.post<RejectedDriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_PENDING_REQUESTS,
+        { ...tinyPage, status: 'REJECTED' },
+        'assignment-stats-rejected'
+      ),
+    }).subscribe({
+      next: (res: any) => {
+        this.assignmentStats = {
+          total: res.total?.totalRecords ?? 0,
+          active: res.active?.totalRecords ?? 0,
+          inactive: res.inactive?.totalRecords ?? 0,
+          pending: res.pending?.totalRecords ?? 0,
+          rejected: res.rejected?.totalRecords ?? 0,
+        };
+        this.assignmentStatsLoaded = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load driver assignment stats', err);
+        this.assignmentStatsLoaded = true; // stop showing a loading state even on failure
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  // ── Vehicle Search ──────────────────────────────────────────────────────
+
+  /**
+   * Fetches the full assignment list once (large page size) and caches it
+   * (bypassCache: false) so subsequent searches reuse it instead of
+   * re-fetching. This is intentionally lazy — it only runs the first time
+   * a vehicle search is performed, not on dashboard load.
+   */
+  private ensureAssignmentsListLoaded() {
+    if (this.assignmentsListLoaded) {
+      return of(this.allDriverAssignments);
+    }
+
+    return this.dataService
+      .post<DriverAssignmentApiResponse>(
+        API_ENDPOINTS.ALL_DRIVER_ASSIGNMENTS,
+        { entityId: this.entityId, page: 0, size: 5000 },
+        'all-driver-assignments-full',
+        false // bypassCache: false — allow this to be served from cache
+      )
+      .pipe(
+        tap((response) => {
+          this.allDriverAssignments = response.data || [];
+          this.assignmentsListLoaded = true;
+        }),
+        map(() => this.allDriverAssignments)
+      );
+  }
+
+  /**
+   * Searches the already-loaded fleet (allVehicles has no date filter, so
+   * it already represents the whole fleet regardless of the dashboard's
+   * selected date range) by fleet number or registration number, then
+   * looks up the matching driver assignment.
+   *
+   * Payments for the matched vehicle are intentionally NOT fetched here —
+   * that needs a "transactions by fleet number + date range" endpoint that
+   * doesn't exist yet. The result panel has a placeholder for it; wire it
+   * up once that endpoint is available.
+   */
+  searchVehicle(): void {
+    const term = this.vehicleSearchTerm.trim().toLowerCase();
+    this.vehicleSearchAttempted = true;
+    this.vehicleSearchResult = null;
+    this.vehicleSearchAssignment = null;
+
+    if (!term) {
+      return;
+    }
+
+    const normalizedTerm = term.replace(/\s+/g, '');
+    const vehicle = this.allVehicles.find(v =>
+      v.fleetNumber?.toLowerCase() === term ||
+      v.registrationNumber?.toLowerCase().replace(/\s+/g, '') === normalizedTerm
+    ) || null;
+
+    this.vehicleSearchResult = vehicle;
+    if (!vehicle) return;
+
+    this.vehicleSearchLoading = true;
+    this.ensureAssignmentsListLoaded().subscribe({
+      next: (assignments) => {
+        const matches = assignments.filter(
+          a => a.fleetNumber?.toLowerCase() === vehicle.fleetNumber?.toLowerCase()
+        );
+        // Prefer the current ACTIVE assignment; otherwise fall back to the
+        // most recently created one so there's still something useful to show.
+        this.vehicleSearchAssignment =
+          matches.find(a => a.status === 'ACTIVE') ??
+          matches.sort(
+            (a, b) => new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime()
+          )[0] ??
+          null;
+        this.vehicleSearchLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load assignments for vehicle search', err);
+        this.vehicleSearchLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  clearVehicleSearch(): void {
+    this.vehicleSearchTerm = '';
+    this.vehicleSearchAttempted = false;
+    this.vehicleSearchResult = null;
+    this.vehicleSearchAssignment = null;
   }
 
   setDateRange() {

@@ -383,3 +383,9 @@
   outline-offset: -2px;
   box-shadow: 0 4px 14px rgba(14, 44, 90, 0.15);
 }
+
+.assignment-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}

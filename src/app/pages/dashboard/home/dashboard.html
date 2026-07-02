@@ -282,6 +282,162 @@
         </div>
       </p-card>
     </div>
+
+    <!-- ================= DRIVER ASSIGNMENT OVERVIEW ================= -->
+    <div class="stats-grid" style="margin-top: 1.5rem;">
+      <p-card styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Total Assignments</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ assignmentStats.total | number }}</span>
+            </h2>
+          </div>
+          <div class="stat-icon" style="background-color: rgba(102,126,234,0.15)">
+            <i class="pi pi-id-card" style="color: #667eea"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Active Drivers</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ assignmentStats.active | number }}</span>
+            </h2>
+          </div>
+          <div class="stat-icon" style="background-color: rgba(25,135,84,0.15)">
+            <i class="pi pi-check-circle" style="color: #198754"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Inactive Drivers</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ assignmentStats.inactive | number }}</span>
+            </h2>
+          </div>
+          <div class="stat-icon" style="background-color: rgba(220,53,69,0.15)">
+            <i class="pi pi-times-circle" style="color: #dc3545"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Pending Requests</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ assignmentStats.pending | number }}</span>
+            </h2>
+          </div>
+          <div class="stat-icon" style="background-color: rgba(255,193,7,0.15)">
+            <i class="pi pi-clock" style="color: #ffc107"></i>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card styleClass="stat-card card-hover">
+        <div class="stat-content">
+          <div class="stat-info">
+            <span class="stat-title">Rejected Requests</span>
+            <h2 class="stat-value">
+              <span class="amount">{{ assignmentStats.rejected | number }}</span>
+            </h2>
+          </div>
+          <div class="stat-icon" style="background-color: rgba(108,117,125,0.15)">
+            <i class="pi pi-ban" style="color: #6c757d"></i>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- ================= VEHICLE SEARCH ================= -->
+    <p-card header="Vehicle Lookup" styleClass="stat-card card" [style]="{ 'margin-top': '1.5rem' }">
+      <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+        <input type="text" [(ngModel)]="vehicleSearchTerm" (keyup.enter)="searchVehicle()"
+          placeholder="Enter fleet number or registration number (e.g. SM924 or KDY 129M)"
+          style="flex: 1; padding: 0.65rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;" />
+        <button pButton label="Search" icon="pi pi-search" style="gap: 1.4rem;" (click)="searchVehicle()"></button>
+        <button *ngIf="vehicleSearchAttempted" pButton label="Clear" icon="pi pi-times" style="gap: 1.4rem;"
+          class="p-button-outlined" (click)="clearVehicleSearch()">
+        </button>
+      </div>
+
+      <!-- No match -->
+      <div *ngIf="vehicleSearchAttempted && !vehicleSearchResult" class="empty-list-state">
+        <i class="pi pi-info-circle"></i>
+        <p>No vehicle found matching "{{ vehicleSearchTerm }}".</p>
+      </div>
+
+      <!-- Match found -->
+      <div *ngIf="vehicleSearchResult" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Vehicle details -->
+        <div>
+          <h4 style="margin: 0 0 0.75rem;">Vehicle</h4>
+          <div class="list-item-card" style="cursor: default;">
+            <div class="item-main-info">
+              <div class="item-title-row">
+                <span class="item-tag-code">{{ vehicleSearchResult.fleetNumber }}</span>
+                <span class="item-reg-no">{{ vehicleSearchResult.registrationNumber }}</span>
+              </div>
+              <div class="item-subtitle-row">
+                <span class="item-location"><i class="pi pi-map-marker"></i> {{ vehicleSearchResult.stageName || 'No
+                  Stage Assigned' }}</span>
+                <span class="item-cap"><i class="pi pi-users"></i> {{ vehicleSearchResult.capacity }} seats</span>
+              </div>
+            </div>
+            <div class="item-status-badge">
+              <span [class]="'badge badge-' + (vehicleSearchResult.status === 'ACTIVE' ? 'paid' : 'failed')">
+                {{ vehicleSearchResult.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver details -->
+        <div>
+          <h4 style="margin: 0 0 0.75rem;">Assigned Driver</h4>
+          <div *ngIf="vehicleSearchLoading" style="padding: 1rem; color: var(--medium-text);">
+            Loading driver details...
+          </div>
+          <div *ngIf="!vehicleSearchLoading && !vehicleSearchAssignment" class="empty-list-state">
+            <i class="pi pi-info-circle"></i>
+            <p>No driver assignment found for this vehicle.</p>
+          </div>
+          <div *ngIf="!vehicleSearchLoading && vehicleSearchAssignment" class="list-item-card" style="cursor: default;">
+            <div class="item-main-info">
+              <div class="item-title-row">
+                <span class="item-reg-no">{{ vehicleSearchAssignment.firstName }} {{ vehicleSearchAssignment.lastName
+                  }}</span>
+              </div>
+              <div class="item-subtitle-row">
+                <span class="item-location"><i class="pi pi-phone"></i> {{ vehicleSearchAssignment.phoneNumber }}</span>
+              </div>
+            </div>
+            <div class="item-status-badge">
+              <span [class]="'badge badge-' + (vehicleSearchAssignment.status === 'ACTIVE' ? 'paid' : 'failed')">
+                {{ vehicleSearchAssignment.status }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments placeholder -->
+      <div *ngIf="vehicleSearchResult"
+        style="margin-top: 1.5rem; padding: 1rem; border: 1px dashed #e2e8f0; border-radius: 10px; color: var(--medium-text); text-align: center;">
+        <i class="pi pi-wallet" style="margin-right: 0.5rem;"></i>
+        Payment history for this vehicle will appear here once the fleet-number transaction lookup endpoint is
+        available.
+      </div>
+    </p-card>
+
+
   </div>
 
   <!-- ================= PARCEL LOGISTICS TAB ================= -->
