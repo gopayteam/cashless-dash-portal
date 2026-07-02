@@ -208,15 +208,16 @@ export class DashboardComponent implements OnInit {
 
     this.setDateRange();
 
+    // 🔥 FIRST LOAD
+    const event = { first: 0, rows: this.rows };
+
+    this.loadDashboardData();
+    this.loadTransactions(event);
+
     // Driver assignment stats aren't date-scoped, so load them once here
     // rather than inside loadDashboardData() (which reruns on every date
     // range change).
     this.loadAssignmentStats();
-
-    // 🔥 FIRST LOAD
-    const event = { first: 0, rows: this.rows };
-    this.loadDashboardData();
-    this.loadTransactions(event);
   }
 
   loadTransactions($event: any): void {
@@ -883,6 +884,32 @@ export class DashboardComponent implements OnInit {
     const lastWeek = new Date();
     lastWeek.setDate(today.getDate() - 7);
     this.dateRange = [lastWeek, today];
+  }
+
+  /**
+   * True when the current dateRange matches the default 7-day window.
+   * Recomputes "today" each call rather than caching it, so this stays
+   * correct if the dashboard is left open across midnight.
+   */
+  get isDateRangeDefault(): boolean {
+    if (!this.dateRange || this.dateRange.length < 2 || !this.dateRange[0] || !this.dateRange[1]) {
+      return true;
+    }
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+
+    return (
+      formatDateLocal(this.dateRange[0]) === formatDateLocal(lastWeek) &&
+      formatDateLocal(this.dateRange[1]) === formatDateLocal(today)
+    );
+  }
+
+  /** Resets the date range back to the default 7-day window and reloads data. */
+  resetDateRange(): void {
+    if (this.isDateRangeDefault) return;
+    this.setDateRange();
+    this.onDateRangeChange();
   }
 
   onDateRangeChange() {

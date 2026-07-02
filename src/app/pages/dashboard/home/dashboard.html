@@ -21,7 +21,14 @@
     </div>
 
     <div class="filter-item-gradient filter-item">
-      <label class="filter-label">Select Date Range</label>
+      <div class="filter-label-row">
+        <label class="filter-label">Select Date Range</label>
+        <button *ngIf="!isDateRangeDefault" type="button" class="reset-date-btn" (click)="resetDateRange()"
+          pTooltip="Reset Date" tooltipPosition="top">
+          <i class="pi pi-refresh"></i>
+          Reset
+        </button>
+      </div>
       <mat-form-field appearance="outline" class="date-range-field">
         <mat-date-range-input [rangePicker]="picker">
           <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
