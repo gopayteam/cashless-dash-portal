@@ -93,6 +93,15 @@ export class DashboardComponent implements OnInit {
   first: number = 0;
   totalRecords: number = 0;
 
+  // ── Lazy-load tracking for Fleet/Parcel tabs ──────────────────────────────
+  // These stay false until the user actually visits the tab. Revenue is the
+  // only data fetched on initial load, so first paint isn't gated on the
+  // heavy size:5000 vehicle/parcel fetches.
+  fleetDataLoaded: boolean = false;
+  fleetDataLoading: boolean = false;
+  parcelDataLoaded: boolean = false;
+  parcelDataLoading: boolean = false;
+
   // New State variables for Enhanced Dashboard
   selectedTab: 'revenue' | 'fleet' | 'parcels' = 'revenue';
 
@@ -208,16 +217,26 @@ export class DashboardComponent implements OnInit {
 
     this.setDateRange();
 
-    // 🔥 FIRST LOAD
+    // // 🔥 FIRST LOAD
+    // const event = { first: 0, rows: this.rows };
+
+    // this.loadDashboardData();
+    // this.loadTransactions(event);
+
+    // // Driver assignment stats aren't date-scoped, so load them once here
+    // // rather than inside loadDashboardData() (which reruns on every date
+    // // range change).
+    // this.loadAssignmentStats();
+
+    // 🔥 FAST FIRST PAINT: only Revenue tab data loads eagerly. Fleet and
+    // Parcel data (each a size:5000 fetch) are deliberately NOT requested
+    // here — they load lazily the first time the user switches to those
+    // tabs (see selectTab()). This cuts the initial forkJoin from 6 calls
+    // (2 of them heavy) down to 4 lighter ones.
+    this.loadRevenueData();
+
     const event = { first: 0, rows: this.rows };
-
-    this.loadDashboardData();
     this.loadTransactions(event);
-
-    // Driver assignment stats aren't date-scoped, so load them once here
-    // rather than inside loadDashboardData() (which reruns on every date
-    // range change).
-    this.loadAssignmentStats();
   }
 
   loadTransactions($event: any): void {
@@ -263,6 +282,91 @@ export class DashboardComponent implements OnInit {
       createdAtFormatted: formatRelativeTime(r.createdAt),
       updatedAtFormatted: formatRelativeTime(r.updatedAt),
     }));
+  }
+
+  /**
+   * Loads only what the default Revenue & Sales tab needs: stats cards,
+   * line/pie charts, and recent transactions. This is the sole blocking
+   * call on initial page load — Fleet and Parcel data are fetched
+   * separately and lazily (see loadFleetData / loadParcelData).
+   */
+  loadRevenueData(): void {
+    if (!this.dateRange || this.dateRange.length < 2) {
+      return;
+    }
+
+    this.loadingStore.start();
+
+    const [start, end] = this.dateRange;
+    this.singleDayLabel = this.formatDateToReadable(end);
+
+    const today = new Date();
+    this.singleDayIsToday = formatDateLocal(end) === formatDateLocal(today);
+
+    const baseParams = {
+      entityId: this.entityId,
+      startDate: formatDateLocal(start),
+      endDate: formatDateLocal(end),
+    };
+
+    const transactionsPayload = {
+      ...baseParams,
+      page: 0,
+      size: this.rows,
+      paymentStatus: 'PAID',
+      transactionType: 'CREDIT',
+      sort: 'createdAt,DESC',
+    };
+
+    forkJoin({
+      transaction_stats: this.dataService.get<TransactionStats>(
+        API_ENDPOINTS.TRANSACTION_STATS,
+        baseParams,
+        'stats',
+      ),
+      transaction_stats_by_period: this.dataService.get<TransactionStatsByPeriod[]>(
+        API_ENDPOINTS.STATS_BY_PERIOD,
+        { ...baseParams, periodType: 'DAILY' },
+        'daily'
+      ),
+      transaction_stats_per_category: this.dataService.get<TransactionStatsPerCategory[]>(
+        API_ENDPOINTS.STATS_PER_CATEGORY,
+        baseParams,
+        'categories',
+      ),
+      recentTransactions: this.dataService.post<PaymentsApiResponse>(
+        API_ENDPOINTS.ALL_PAYMENTS,
+        transactionsPayload,
+        'transactions',
+      ),
+    }).subscribe({
+      next: (data: any) => {
+        this.statsCards = mapStatsToCards(data.transaction_stats);
+
+        this.chartData = buildLineChart(data.transaction_stats_by_period);
+        this.chartOptions = buildLineChartOptions();
+
+        this.pieChartData = buildPieChart(data.transaction_stats_per_category);
+        this.pieChartOptions = buildPieChartOptions();
+
+        const response = data.recentTransactions;
+        this.recentTransactions = response.data.manifest;
+        this.totalRecords = response.data.totalRecords;
+
+        this.cdr.detectChanges();
+        this.loadingStore.stop();
+
+        // Fire-and-forget: driver assignment stats are five cheap size:1
+        // calls. We don't gate first paint on them, but we also don't make
+        // the user wait for a Fleet-tab click to see them, since they're
+        // near-instant anyway.
+        this.loadAssignmentStats();
+      },
+      error: (err) => {
+        console.error('Revenue dashboard load failed', err);
+        this.loadingStore.stop();
+      },
+    });
   }
 
   loadDashboardData(): void {
@@ -389,8 +493,101 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * Lazy-loaded the first time the user switches to the Fleet Operations
+   * tab (see selectTab()). Fetches the full vehicle list (size:5000) and
+   * builds the registration trend/stats from it. Re-triggered automatically
+   * on date-range changes IF the tab has already been visited once.
+   */
+  loadFleetData(): void {
+    if (!this.dateRange || this.dateRange.length < 2) return;
+
+    const [start, end] = this.dateRange;
+    this.fleetDataLoading = true;
+
+    this.dataService
+      .post<VehicleApiResponse>(
+        API_ENDPOINTS.ALL_VEHICLES,
+        { entityId: this.entityId, page: 0, size: 5000 },
+        'vehicles'
+      )
+      .subscribe({
+        next: (response) => {
+          this.allVehicles = response?.data || [];
+          const days = this.getDaysArray(start, end);
+          this.buildVehiclesTrend(this.allVehicles, days, response?.totalRecords);
+
+          this.fleetDataLoaded = true;
+          this.fleetDataLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Fleet data load failed', err);
+          this.fleetDataLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  /**
+   * Lazy-loaded the first time the user switches to the Parcel Logistics
+   * tab (Super Metro / GS000002 only).
+   */
+  loadParcelData(): void {
+    if (!this.isSuperMetro) return;
+    if (!this.dateRange || this.dateRange.length < 2) return;
+
+    const [start, end] = this.dateRange;
+    this.parcelDataLoading = true;
+
+    this.dataService
+      .post<ParcelsAPiResponse>(
+        API_ENDPOINTS.ALL_PARCELS,
+        {
+          entityId: this.entityId,
+          page: 0,
+          size: 5000,
+          paymentStatus: 'PAID',
+          startDate: formatDateLocal(start),
+          endDate: formatDateLocal(end),
+          sort: 'createdAt,DESC',
+        },
+        'parcels'
+      )
+      .subscribe({
+        next: (response) => {
+          this.allParcels = response?.parcels || [];
+          const days = this.getDaysArray(start, end);
+          this.buildParcelsTrend(this.allParcels, days, response);
+
+          this.parcelDataLoaded = true;
+          this.parcelDataLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Parcel data load failed', err);
+          this.parcelDataLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  // selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
+  //   this.selectedTab = tab;
+  //   this.cdr.detectChanges();
+  // }
+
   selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
     this.selectedTab = tab;
+
+    if (tab === 'fleet' && !this.fleetDataLoaded && !this.fleetDataLoading) {
+      this.loadFleetData();
+    }
+
+    if (tab === 'parcels' && this.isSuperMetro && !this.parcelDataLoaded && !this.parcelDataLoading) {
+      this.loadParcelData();
+    }
+
     this.cdr.detectChanges();
   }
 
@@ -829,6 +1026,8 @@ export class DashboardComponent implements OnInit {
    * up once that endpoint is available.
    */
   searchVehicle(): void {
+    if (this.fleetDataLoading) return; // input should be disabled in template while this is true
+
     const term = this.vehicleSearchTerm.trim().toLowerCase();
     this.vehicleSearchAttempted = true;
     this.vehicleSearchResult = null;
@@ -912,16 +1111,48 @@ export class DashboardComponent implements OnInit {
     this.onDateRangeChange();
   }
 
+  // onDateRangeChange() {
+  //   const event = { first: 0, rows: this.rows };
+  //   this.loadTransactions(event);
+  //   this.loadDashboardData();
+  // }
+
+  // onRefresh() {
+  //   const event = { first: this.first, rows: this.rows };
+  //   this.loadTransactions(event);
+  //   this.loadDashboardData();
+  // }
+
   onDateRangeChange() {
     const event = { first: 0, rows: this.rows };
     this.loadTransactions(event);
-    this.loadDashboardData();
+    this.loadRevenueData();
+
+    // Fleet/Parcel only refetch if the user has already visited them —
+    // otherwise they'll pick up the new date range naturally on first visit.
+    if (this.fleetDataLoaded) {
+      this.fleetDataLoaded = false;
+      this.loadFleetData();
+    }
+    if (this.isSuperMetro && this.parcelDataLoaded) {
+      this.parcelDataLoaded = false;
+      this.loadParcelData();
+    }
   }
 
   onRefresh() {
     const event = { first: this.first, rows: this.rows };
     this.loadTransactions(event);
-    this.loadDashboardData();
+    this.loadRevenueData();
+
+    if (this.fleetDataLoaded) {
+      this.fleetDataLoaded = false;
+      this.loadFleetData();
+    }
+    if (this.isSuperMetro && this.parcelDataLoaded) {
+      this.parcelDataLoaded = false;
+      this.loadParcelData();
+    }
   }
 
   exportData() {

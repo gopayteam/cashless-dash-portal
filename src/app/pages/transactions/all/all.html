@@ -47,18 +47,20 @@
 
       <div class="action-container ">
         <div class="export-buttons-group export-animated" *ngIf="showExportButtons">
-          <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
-            [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting" (click)="exportToExcel()"
-            pTooltip="Export to Excel" tooltipPosition="bottom">
+          <button pButton icon="pi pi-file-excel" style="gap:1.2rem;" label="Excel"
+            class="p-button-success export-action-btn" [disabled]="transactions.length === 0 || isExporting"
+            [loading]="isExporting" (click)="exportToExcel()" pTooltip="Export to Excel" tooltipPosition="bottom">
           </button>
-          <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn"
+
+          <button pButton icon="pi pi-file" style="gap:1.2rem;" label="CSV" class="p-button-help export-action-btn"
             [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
             pTooltip="Export to CSV" tooltipPosition="bottom">
           </button>
 
-          <button pButton icon="pi pi-file" label="Large CSV" class="p-button-help export-action-btn"
-            [disabled]="transactions.length === 0 || isExporting" [loading]="isExporting"
-            (click)="exportLargeDatasetToCSV()" pTooltip="Export Dataset to CSV" tooltipPosition="bottom">
+          <button pButton icon="pi pi-file" style="gap:1.2rem;" label="Large CSV"
+            class="p-button-help export-action-btn" [disabled]="transactions.length === 0 || isExporting"
+            [loading]="isExporting" (click)="exportLargeDatasetToCSV()" pTooltip="Export Dataset to CSV"
+            tooltipPosition="bottom">
           </button>
         </div>
       </div>
