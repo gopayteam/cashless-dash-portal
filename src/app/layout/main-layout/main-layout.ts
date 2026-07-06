@@ -383,6 +383,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     return this.authService.hasAnyRole(['CAN_VIEW_ADMINS', 'CAN_VIEW_DASHBOARD', 'CAN_VIEW_USERS']);
   }
 
+  get canViewUnassignedTransactions(): boolean {
+    return this.entityId !== 'GS000007';
+  }
+
   // ── Tab navigation ────────────────────────────────────────────────────────
 
   private setupRouteListener(): void {

@@ -120,7 +120,7 @@
                 </button>
               </li>
 
-              <li class="menu-item">
+              <li class="menu-item" *ngIf="canViewUnassignedTransactions">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/unassigned')"
                   (click)="navigate('/unassigned-payments')">
                   <span class="menu-link-content">
@@ -340,14 +340,25 @@
               </li> -->
 
               <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
-                <button class="menu-link" [class.menu-link--active]="isRouteActive('/send-broadcast')"
-                  (click)="navigate('/send-broadcast/agents')">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/send-broadcast/push')"
+                  (click)="navigate('/send-broadcast/push')">
                   <span class="menu-link-content">
                     <i class="pi pi-bell menu-icon" style="color: rgb(134, 5, 5)"></i>
-                    <span class="menu-text">Create Broadcast</span>
+                    <span class="menu-text">Send in-app Broadcast</span>
                   </span>
                 </button>
               </li>
+
+              <li class="menu-item" *hasRole="['CAN_VIEW_USERS', 'CAN_VIEW_USER']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/send-broadcast/sms')"
+                  (click)="navigate('/send-broadcast/sms')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-bell menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Send SMS Broadcast</span>
+                  </span>
+                </button>
+              </li>
+
             </ul>
           </li>
 

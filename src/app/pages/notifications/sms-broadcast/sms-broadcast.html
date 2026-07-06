@@ -1,0 +1,116 @@
+<div class="broadcast-container">
+  <p-toast position="top-right"></p-toast>
+
+  <div class="broadcast-header">
+    <h1 class="title">SMS Broadcast Center</h1>
+    <p class="subtitle">Send SMS messages to agents across your network</p>
+  </div>
+
+  <p-card class="broadcast-form">
+    <form [formGroup]="broadcastForm" (ngSubmit)="onSubmit()">
+
+      <!-- Agent Selection -->
+      <div class="form-section">
+        <label class="form-label">Select Target Agent</label>
+        <div class="agent-grid">
+          @for (agent of agents; track agent.value) {
+          <button type="button" class="agent-card" [class.selected]="selectedAgentValue() === agent.value"
+            [style.--agent-color]="agent.color" (click)="selectAgent(agent.value)" [disabled]="loading()">
+            <span class="agent-icon">{{ agent.icon }}</span>
+            <span class="agent-label">{{ agent.label }}</span>
+            <div class="agent-indicator"></div>
+          </button>
+          }
+        </div>
+      </div>
+
+      <!-- Message -->
+      <div class="form-section">
+        <label class="form-label" for="message">
+          SMS Message
+          <span class="label-required">*</span>
+        </label>
+        <textarea pInputTextarea id="message" formControlName="message" placeholder="Type your SMS message here..."
+          rows="4" [disabled]="loading()" class="w-full form-textarea"
+          [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('message')}"></textarea>
+
+        <div class="char-counter sms-counter">
+          <span>{{ characterCount() }} characters</span>
+          <span class="segment-badge" [class.multi]="segmentCount() > 1">
+            {{ segmentCount() }} SMS segment{{ segmentCount() !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        @if (isFieldInvalid('message')) {
+        <small class="p-error">
+          {{ getErrorMessage('message') }}
+        </small>
+        }
+      </div>
+
+      <!-- Preview Card -->
+      @if (broadcastForm.get('message')?.value) {
+      <div class="form-section">
+        <label class="form-label">Preview</label>
+        <div class="preview-card">
+          <div class="preview-header">
+            @if (selectedAgent(); as agent) {
+            <span class="preview-agent-icon">{{ agent.icon }}</span>
+            <span class="preview-title">To: {{ agent.label }}</span>
+            }
+          </div>
+          <p class="preview-message">
+            {{ broadcastForm.get('message')?.value || 'Your SMS will appear here...' }}
+          </p>
+        </div>
+      </div>
+      }
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <p-button type="button" label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true"
+          (onClick)="resetForm()" [disabled]="loading()" class="btn btn-secondary" [style]="{'gap': '1rem'}"
+          class="btn btn-clear" styleClass="p-button-text p-button-plain"></p-button>
+
+        <p-button type="submit" [label]="loading() ? 'Sending...' : 'Send SMS Broadcast'"
+          [icon]="loading() ? 'pi pi-spin pi-spinner' : 'pi pi-send'" severity="primary" [disabled]="loading()"
+          [loading]="loading()" class="btn btn-primary" [style]="{'gap': '1rem'}" class="btn btn-primary"
+          styleClass="p-button-text p-button-plain"></p-button>
+      </div>
+
+    </form>
+  </p-card>
+
+  <!-- Confirmation Modal: charge warning -->
+  @if (showConfirmDialog()) {
+  <div class="confirm-overlay" (click)="cancelSend()">
+    <div class="confirm-modal" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">⚠️</div>
+      <h2 class="confirm-title">Confirm SMS Broadcast</h2>
+      <p class="confirm-body">
+        You're about to send an SMS to all <strong>{{ selectedAgent()?.label }}</strong> recipients.
+        This message is <strong>{{ segmentCount() }} SMS segment{{ segmentCount() !== 1 ? 's' : '' }}</strong>
+        ({{ characterCount() }} characters) and <strong>may incur significant charges</strong>
+        depending on your recipient count and carrier rates.
+      </p>
+      <div class="confirm-preview">
+        <p class="confirm-preview-label">Message to be sent:</p>
+        <p class="confirm-preview-text">{{ broadcastForm.get('message')?.value }}</p>
+      </div>
+      <p class="confirm-warning-text">
+        Please make sure this message is intentional and necessary before proceeding.
+      </p>
+
+      <div class="confirm-actions form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelSend()" [disabled]="loading()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary btn-danger" (click)="confirmSend()" [disabled]="loading()">
+          {{ loading() ? 'Sending...' : 'Yes, Send SMS' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+  }
+</div>

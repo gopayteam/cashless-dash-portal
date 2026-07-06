@@ -1,27 +1,26 @@
 // pages/drivers/all.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 import { MessageModule } from 'primeng/message';
+import { Paginator } from "primeng/paginator";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { LoadingStore } from '../../../../@core/state/loading.store';
 import { GeneralDriverAssignment } from '../../../../@core/models/driver_assignment/driver_assignment.model';
 import { DriverAssignmentApiResponse } from '../../../../@core/models/driver_assignment/driver_assignment_response.mode';
 import { AuthService } from '../../../../@core/services/auth.service';
-import { Router } from '@angular/router';
-import { ActionButtonComponent } from '../../../components/action-button/action-button';
-import { Paginator } from "primeng/paginator";
+import { LoadingStore } from '../../../../@core/state/loading.store';
 
 import * as XLSX from 'xlsx';
 
@@ -484,7 +483,87 @@ export class AllDriverAssignmentsComponent implements OnInit {
     }, 300);
   }
 
+  /**
+   * Submits the deactivation request.
+   * Calls the fleet deactivate endpoint with fleetNumber and username as query params.
+   * No request body is needed for this endpoint.
+   */
   confirmDeactivate(): void {
+    if (!this.selectedAssignment || !this.entityId || !this.username) return;
+
+    const assignment = this.selectedAssignment;
+
+    const params = {
+      fleetNumber: assignment.fleetNumber,
+      username: this.username,
+    };
+
+    console.log('Deactivating fleet assignment with params:', params);
+
+    this.actionSubmitting = true;
+
+    this.dataService
+      .postWithParams<ActionApiResponse>(
+        API_ENDPOINTS.DEACTIVATE_DRIVER_ASSIGNMENT,
+        {}, // no body required by this endpoint
+        params,
+        'deactivate-fleet'
+      )
+      .subscribe({
+        next: (response) => {
+          this.actionSubmitting = false;
+
+          if (response.status === 0) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deactivated',
+              detail:
+                response.message ||
+                `${this.getFullName(assignment)} has been deactivated.`,
+              life: 4000,
+            });
+
+            this.closeDeactivateDialog();
+
+            // Reload current page to reflect changes
+            this.loadAssignments();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Failed',
+              detail: response.message || 'Deactivation failed.',
+              life: 5000,
+            });
+            this.closeDeactivateDialog();
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Deactivation error:', err);
+
+          let msg = 'Deactivation failed. Please try again.';
+          if (err.status === 404) msg = 'Fleet assignment not found.';
+          else if (err.status === 400)
+            msg = err.error?.message || 'Invalid request.';
+          else if (err.status === 500)
+            msg = 'Server error. Please try again later.';
+          else if (err.error?.message) msg = err.error.message;
+
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: msg,
+            life: 5000,
+          });
+
+          this.actionSubmitting = false;
+          this.closeDeactivateDialog();
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  confirmDeactivateOld(): void {
     if (!this.selectedAssignment || !this.entityId || !this.username) return;
 
     const assignment = this.selectedAssignment;

@@ -62,6 +62,7 @@ import { LocationRoutesComponent } from './pages/locations/routes/routes';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
 import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts';
 import { SendNotificationsComponent } from './pages/notifications/send-notifications/send-notifications';
+import { SmsBroadcastComponent } from './pages/notifications/sms-broadcast/sms-broadcast';
 import { ParcelsComponent } from './pages/parcels/all/parcels';
 import { DeletedParcelsComponent } from './pages/parcels/deleted-parcels/deleted-parcels';
 import { ParcelDestinationComponent } from './pages/parcels/parcel-destination/parcel-destination';
@@ -752,8 +753,15 @@ export const routes: Routes = [
       },
 
       {
-        path: 'send-broadcast/agents',
+        path: 'send-broadcast/push',
         component: BroadcastComponent2,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_EDIT_USER'] }
+      },
+
+      {
+        path: 'send-broadcast/sms',
+        component: SmsBroadcastComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_EDIT_USER'] }
       },

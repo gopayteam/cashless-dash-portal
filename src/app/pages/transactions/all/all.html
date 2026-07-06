@@ -297,7 +297,8 @@
 
   <!-- ================= EXPORT PROGRESS DIALOG ================= -->
   <p-dialog [(visible)]="showExportProgressDialog" [modal]="true" [closable]="false" [draggable]="false"
-    [resizable]="false" [style]="{ width: '420px' }" styleClass="export-progress-dialog">
+    [resizable]="false" [style]="{ width: '420px', background: '#fff' }"
+    styleClass="export-progress-dialog custom-dialog">
     <ng-template pTemplate="header">
       <div style="display: flex; align-items: center; gap: 0.6rem;">
         <i class="pi pi-download" style="font-size: 1.2rem; color: var(--primary-color)"></i>
