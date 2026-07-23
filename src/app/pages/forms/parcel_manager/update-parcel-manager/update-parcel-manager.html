@@ -92,10 +92,12 @@
 
             <!-- Device ID -->
             <div class="form-field">
-              <label for="deviceId" class="field-label required">Device ID</label>
+              <label for="deviceId" class="field-label">Device ID</label>
               <input pInputText id="deviceId" [(ngModel)]="deviceId" name="deviceId"
-                placeholder="e.g., 897867556457-698" class="w-full" required />
-              <small class="field-hint">Unique device identifier</small>
+                placeholder="e.g., 897867556457-698" class="w-full" />
+              <small class="field-hint">
+                Optional. Leave blank if the manager does not have an assigned device.
+              </small>
             </div>
 
             <!-- Profile (Read-only) -->

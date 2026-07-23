@@ -1,25 +1,25 @@
 // pages/parcel-managers/update-parcel-manager/update-parcel-manager.component.ts
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { CardModule } from 'primeng/card';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { MessageModule } from 'primeng/message';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../../@core/api/data.service';
-import { LoadingStore } from '../../../../../@core/state/loading.store';
-import { AuthService } from '../../../../../@core/services/auth.service';
 import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
 import { Stage } from '../../../../../@core/models/locations/stage.model';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { ParcelDetailsApiResponse } from '../../../../../@core/models/parcels/parcel_stage_response';
 import { User } from '../../../../../@core/models/user/user.model';
 import { UserApiResponse } from '../../../../../@core/models/user/user_api_Response.mode';
+import { AuthService } from '../../../../../@core/services/auth.service';
+import { LoadingStore } from '../../../../../@core/state/loading.store';
 
 interface DropdownOption {
   label: string;
@@ -385,8 +385,13 @@ export class UpdateParcelManagerComponent implements OnInit {
       channel: this.CHANNEL,
       agent: this.AGENT,
       stageId: this.selectedStage!,
-      deviceId: this.deviceId.trim(),
     };
+
+    const trimmedDeviceId = this.deviceId.trim();
+
+    if (trimmedDeviceId) {
+      payload.deviceId = trimmedDeviceId;
+    }
 
     console.log('Submitting payload:', payload);
 
@@ -434,9 +439,16 @@ export class UpdateParcelManagerComponent implements OnInit {
           // More detailed error message
           let errorMessage = 'Failed to update parcel manager';
 
-          if (err.status === 500) {
-            errorMessage = 'Server error occurred. Please check if all required fields are correct.';
-          } else if (err.status === 400) {
+          const serverMessage = err?.error?.message ?? '';
+
+          if (serverMessage.includes('Unrecognized field "deviceId"')) {
+            errorMessage =
+              'The selected server does not support updating the Device ID. Please leave the Device ID blank and try again.';
+          }
+          // else if (err.status === 500) {
+          //   errorMessage = 'Server error occurred. Please check if all required fields are correct.';
+          // }
+          else if (err.status === 400) {
             errorMessage = err.error?.message || 'Invalid data provided. Please check your inputs.';
           } else if (err.status === 404) {
             errorMessage = 'User or endpoint not found.';

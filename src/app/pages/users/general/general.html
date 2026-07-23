@@ -96,6 +96,14 @@
         <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
           (clicked)="refresh()"></app-action-button>
 
+        <app-action-button icon="pi-file-excel" tooltip="Export current list to Excel" variant="primary"
+          [disabled]="exportingCurrent" (clicked)="exportCurrentPageUsers()">
+        </app-action-button>
+
+        <app-action-button icon="pi-cloud-download" tooltip="Export ALL users to Excel" variant="primary"
+          [disabled]="exportingAll" (clicked)="exportAllUsers()">
+        </app-action-button>
+
       </div>
 
       <div class="search-container">

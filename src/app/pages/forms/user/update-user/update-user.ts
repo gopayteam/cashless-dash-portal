@@ -1,23 +1,23 @@
 // pages/users/update-user/update-user.component.ts
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TooltipModule } from 'primeng/tooltip';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../../@core/api/data.service';
-import { LoadingStore } from '../../../../../@core/state/loading.store';
-import { AuthService } from '../../../../../@core/services/auth.service';
 import { API_ENDPOINTS } from '../../../../../@core/api/endpoints';
 import { User } from '../../../../../@core/models/user/user.model';
 import { UserApiResponse } from '../../../../../@core/models/user/user_api_Response.mode';
+import { AuthService } from '../../../../../@core/services/auth.service';
+import { LoadingStore } from '../../../../../@core/state/loading.store';
 
 interface DropdownOption {
   label: string;
@@ -111,6 +111,24 @@ export class UpdateUserComponent implements OnInit {
     { label: 'App', value: 'APP' },
     { label: 'Web', value: 'WEB' },
   ];
+
+  private profileToAgentMap: Record<string, string> = {
+    DASHMASTER: 'DASHMASTER',
+    ADMIN: 'ADMIN',
+    USER: 'PASSENGER',
+    PARCEL: 'PARCEL',
+    MARSHAL: 'MARSHAL',
+    DRIVER: 'DRIVER',
+    CONDUCTOR: 'CONDUCTOR',
+    INVESTOR: 'INVESTOR',
+    APPROVER: 'APPROVER',
+    INSPECTOR: 'INSPECTOR',
+  };
+
+  onProfileChange(event: any): void {
+    const profile = event.value;
+    this.selectedAgent = this.profileToAgentMap[profile] || '';
+  }
 
   // Loading states
   userLoading: boolean = false;
@@ -240,7 +258,7 @@ export class UpdateUserComponent implements OnInit {
     this.email = user.email || '';
     this.idNumber = user.idNumber || '';
     this.selectedProfile = user.profile || '';
-    this.selectedAgent = user.agent || '';
+    this.selectedAgent = this.profileToAgentMap[user.profile] || user.agent || '';
     this.selectedChannel = user.channel || '';
 
     // console.log('Form populated with user data:', {

@@ -1,28 +1,29 @@
 // pages/users/all-users.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
+import { Router } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CardModule } from 'primeng/card';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { LoadingStore } from '../../../../@core/state/loading.store';
 import { User } from '../../../../@core/models/user/user.model';
 import { UserApiResponse } from '../../../../@core/models/user/user_api_Response.mode';
-import { SelectModule } from 'primeng/select';
 import { AuthService } from '../../../../@core/services/auth.service';
-import { Router } from '@angular/router';
+import { LoadingStore } from '../../../../@core/state/loading.store';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
-import { MessageService } from 'primeng/api';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
+import * as XLSX from 'xlsx';
 
 interface ProfileOption {
   label: string;
@@ -142,6 +143,9 @@ export class GeneralUserComponent implements OnInit {
   ];
 
   private lastEvent: any;
+
+  exportingCurrent: boolean = false;
+  exportingAll: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -533,5 +537,136 @@ export class GeneralUserComponent implements OnInit {
         });
       }
     });
+  }
+
+  // ----- Shared export helpers -----
+
+  private mapUsersForExport(users: User[]): any[] {
+    return users.map(user => ({
+      'Full Name': this.getFullName(user),
+      'Username': user.username,
+      'Email': user.email,
+      'Phone Number': user.phoneNumber,
+      'ID Number': user.idNumber || 'N/A',
+      'Profile': user.profile,
+      'Channel': user.channel,
+      'Status': this.getStatusText(user.blocked),
+      'Login Trials': user.loginTrials,
+      'First Login': user.firstLogin ? 'Yes' : 'No',
+      'Created On': user.createdOn,
+    }));
+  }
+
+  private writeExcelFile(rows: any[], fileNamePrefix: string): void {
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+
+    // Optional: reasonable column widths
+    worksheet['!cols'] = [
+      { wch: 22 }, { wch: 22 }, { wch: 28 }, { wch: 15 },
+      { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 10 },
+      { wch: 12 }, { wch: 12 }, { wch: 20 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+    const timestamp = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(workbook, `${fileNamePrefix}_${timestamp}.xlsx`);
+  }
+
+  // ----- Export current (filtered/loaded) users -----
+
+  exportCurrentPageUsers(): void {
+    if (!this.filteredUsers.length) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'There are no users to export.'
+      });
+      return;
+    }
+
+    this.exportingCurrent = true;
+    try {
+      const rows = this.mapUsersForExport(this.filteredUsers);
+      this.writeExcelFile(rows, 'users_current_page');
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Exported',
+        detail: `Exported ${rows.length} users.`
+      });
+    } catch (err) {
+      console.error('Export error', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Export Failed',
+        detail: 'Could not export users.'
+      });
+    } finally {
+      this.exportingCurrent = false;
+    }
+  }
+
+  // ----- Export ALL users in the system (batched) -----
+
+  exportAllUsers(): void {
+    if (this.exportingAll) return;
+
+    this.exportingAll = true;
+    const batchSize = 500;
+    const collected: User[] = [];
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Export Started',
+      detail: 'Fetching all users, this may take a moment…'
+    });
+
+    const fetchBatch = (page: number): void => {
+      const payload = { entityId: this.entityId, page, size: batchSize };
+
+      this.dataService
+        .post<UserApiResponse>(API_ENDPOINTS.ALL_USERS, payload, `export-all-${page}`, true)
+        .subscribe({
+          next: (response) => {
+            collected.push(...response.data);
+            const totalPages = Math.ceil(response.totalRecords / batchSize);
+
+            if (page + 1 < totalPages) {
+              fetchBatch(page + 1);
+            } else {
+              try {
+                const rows = this.mapUsersForExport(collected);
+                this.writeExcelFile(rows, 'all_users');
+                this.messageService.add({
+                  severity: 'success',
+                  summary: 'Exported',
+                  detail: `Exported ${rows.length} users.`
+                });
+              } catch (err) {
+                console.error('Export error', err);
+                this.messageService.add({
+                  severity: 'error',
+                  summary: 'Export Failed',
+                  detail: 'Could not build the export file.'
+                });
+              } finally {
+                this.exportingAll = false;
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Export all users error', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Export Failed',
+              detail: 'Failed to fetch all users for export.'
+            });
+            this.exportingAll = false;
+          }
+        });
+    };
+
+    fetchBatch(0);
   }
 }
