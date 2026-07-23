@@ -99,7 +99,8 @@ export const API_ENDPOINTS = {
   RETRIEVE_STATEMENTS: '/api/statements/retrieve',
 
   ACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/driver/fleets/approve',
-  DEACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/activated-deactivate-fleet',
+  // DEACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/activated-deactivate-fleet',
+  DEACTIVATE_DRIVER_ASSIGNMENT: '/api/v1/org/vehicle/management/deactivate/fleet',
 
   ALL_ORGANIZATIONS: '/api/v1/org/organizations/view-all',
 
