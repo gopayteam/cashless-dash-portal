@@ -67,7 +67,7 @@
 }
 
 /* Currency Display in Stats */
-.stat-value .currency {
+/* .stat-value .currency {
   font-size: 1.2rem;
   font-weight: 600;
   margin-right: 0.25rem;
@@ -75,6 +75,24 @@
 
 .stat-value .amount {
   font-size: 1.75rem;
+} */
+
+.stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0;
+
+  .currency {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .amount {
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1;
+  }
 }
 
 /* Charts Grid Layout */
@@ -423,4 +441,75 @@
 
 .reset-date-btn:hover i {
   transform: rotate(0deg);
+}
+
+
+
+/* pages/dashboard/dashboard-loading.css
+   Skeleton shimmer placeholders for stat cards + spinner overlays for
+   charts/lists, used across the Revenue, Fleet, and Parcel tabs while
+   their respective data is still loading. */
+
+/* ── Skeleton stat cards ─────────────────────────────────────────────── */
+.skeleton-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  min-height: 110px;
+}
+
+.skeleton-line {
+  border-radius: 6px;
+  background: linear-gradient(90deg,
+      rgba(0, 0, 0, 0.06) 25%,
+      rgba(0, 0, 0, 0.12) 37%,
+      rgba(0, 0, 0, 0.06) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-title {
+  width: 55%;
+  height: 0.85rem;
+}
+
+.skeleton-value {
+  width: 40%;
+  height: 1.5rem;
+}
+
+.skeleton-subtext {
+  width: 65%;
+  height: 0.7rem;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ── Spinner overlay for charts & lists ──────────────────────────────── */
+.loading-container {
+  position: relative;
+}
+
+.chart-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 8px;
+  z-index: 5;
+  backdrop-filter: blur(1px);
 }

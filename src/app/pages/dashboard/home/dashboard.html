@@ -63,7 +63,16 @@
   <!-- ================= REVENUE & SALES TAB ================= -->
   <div *ngIf="selectedTab === 'revenue'" class="tab-content fade-in">
     <!-- ================= STATS CARDS ================= -->
-    <div class="stats-grid">
+    <!-- Skeleton shown only before the first successful load (no cards yet). -->
+    <div class="stats-grid" *ngIf="revenueDataLoading && statsCards.length === 0">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3,4]">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-value"></div>
+        <div class="skeleton-line skeleton-subtext"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" *ngIf="!(revenueDataLoading && statsCards.length === 0)">
       <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
         <div class="stat-content">
           <div class="stat-info">
@@ -95,13 +104,19 @@
     <!-- ================= CHARTS SECTION ================= -->
     <div class="charts-grid">
       <p-card header="Organizations Performance" styleClass="stat-card card">
-        <div class="chart-container">
+        <div class="chart-container loading-container">
+          <div class="chart-spinner-overlay" *ngIf="revenueDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <p-chart *ngIf="chartData" type="line" [data]="chartData" [options]="chartOptions" height="300px"></p-chart>
         </div>
       </p-card>
 
       <p-card header="Total Amount Per Category" styleClass="stat-card card">
-        <div class="chart-container">
+        <div class="chart-container loading-container">
+          <div class="chart-spinner-overlay" *ngIf="revenueDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <p-chart *ngIf="pieChartData" type="pie" [data]="pieChartData" [options]="pieChartOptions"
             height="300px"></p-chart>
         </div>
@@ -118,9 +133,12 @@
     </div>
 
     <!-- ================= RECENT TRANSACTIONS ================= -->
+    <!-- Uses its own transactionsLoading flag (not the global loading() signal)
+         so the table can show a spinner independently of the cards/charts
+         above, which have already resolved and rendered by this point. -->
     <p-card header="Recent Transactions" styleClass="stat-card card">
       <p-table [value]="recentTransactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
-        [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
+        [loading]="transactionsLoading" [totalRecords]="totalRecords" [rowsPerPageOptions]="[5, 10, 20, 30, 50]"
         [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
         (onLazyLoad)="loadTransactions($event)" styleClass="data-table" [tableStyle]="{ 'min-width': '60rem' }"
         responsiveLayout="scroll">
@@ -166,10 +184,14 @@
   <!-- ================= FLEET OPERATIONS TAB ================= -->
   <div *ngIf="selectedTab === 'fleet'" class="tab-content fade-in">
 
-    <!-- <div *ngIf="fleetDataLoading && !fleetDataLoaded" class="tab-loading-state">
-      <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
-      <p>Loading fleet data...</p>
-    </div> -->
+    <!-- FLEET CARDS: skeleton while the size:5000 vehicle fetch is in flight -->
+    <div class="stats-grid" *ngIf="fleetDataLoading && !fleetDataLoaded">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3,4]">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-value"></div>
+        <div class="skeleton-line skeleton-subtext"></div>
+      </div>
+    </div>
 
     <!-- FLEET CARDS -->
     <ng-container *ngIf="fleetDataLoaded">
@@ -250,6 +272,9 @@
       <!-- Registration Trend Chart -->
       <p-card header="Vehicle Registration Trend" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
+          <div class="chart-spinner-overlay" *ngIf="fleetDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <p-chart *ngIf="vehiclesTrendData" type="line" [data]="vehiclesTrendData" [options]="vehiclesTrendOptions"
             height="330px"></p-chart>
         </div>
@@ -273,7 +298,10 @@
           </div>
         </ng-template>
 
-        <div class="list-container">
+        <div class="list-container loading-container">
+          <div class="chart-spinner-overlay" *ngIf="fleetDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <div *ngIf="singleDayVehiclesList.length === 0" class="empty-list-state">
             <i class="pi pi-info-circle"></i>
             <p>No new vehicles were activated on this day.</p>
@@ -302,7 +330,14 @@
     </div>
 
     <!-- ================= DRIVER ASSIGNMENT OVERVIEW ================= -->
-    <div class="stats-grid" style="margin-top: 1.5rem;">
+    <div class="stats-grid" style="margin-top: 1.5rem;" *ngIf="!assignmentStatsLoaded && assignmentStatsLoading">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3,4,5]">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-value"></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="margin-top: 1.5rem;" *ngIf="assignmentStatsLoaded">
       <p-card styleClass="stat-card card-hover">
         <div class="stat-content">
           <div class="stat-info">
@@ -464,10 +499,14 @@
   <!-- ================= PARCEL LOGISTICS TAB ================= -->
   <div *ngIf="selectedTab === 'parcels' && isSuperMetro" class="tab-content fade-in">
 
-    <!-- <div *ngIf="parcelDataLoading && !parcelDataLoaded" class="tab-loading-state">
-     <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
-     <p> parcel data...</p>
-     </div> -->
+    <!-- PARCEL CARDS: skeleton while the size:5000 parcel fetch is in flight -->
+    <div class="stats-grid" *ngIf="parcelDataLoading && !parcelDataLoaded">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3,4]">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-value"></div>
+        <div class="skeleton-line skeleton-subtext"></div>
+      </div>
+    </div>
 
     <!-- PARCEL CARDS -->
     <ng-container *ngIf="parcelDataLoaded">
@@ -551,6 +590,9 @@
       <!-- Collection Trend Chart -->
       <p-card [header]="parcelsTrendTitle" styleClass="stat-card card split-left-card">
         <div class="chart-container" style="position: relative; height: 350px;">
+          <div class="chart-spinner-overlay" *ngIf="parcelDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <p-chart *ngIf="parcelsTrendData" type="line" [data]="parcelsTrendData" [options]="parcelsTrendOptions"
             height="330px"></p-chart>
         </div>
@@ -568,7 +610,10 @@
           </div>
         </ng-template>
 
-        <div class="list-container">
+        <div class="list-container loading-container">
+          <div class="chart-spinner-overlay" *ngIf="parcelDataLoading">
+            <p-progressSpinner strokeWidth="4" styleClass="w-3rem h-3rem"></p-progressSpinner>
+          </div>
           <div *ngIf="singleDayParcelsList.length === 0" class="empty-list-state">
             <i class="pi pi-info-circle"></i>
             <p>No parcels were collected on this day.</p>

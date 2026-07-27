@@ -93,6 +93,19 @@ export class DashboardComponent implements OnInit {
   first: number = 0;
   totalRecords: number = 0;
 
+  // ── Progressive-load tracking ──────────────────────────────────────────
+  // Stats cards + charts are the fastest, cheapest calls and now resolve on
+  // their own — they no longer wait on (or block) the transactions fetch.
+  // `loadingStore` continues to gate ONLY that first paint. Recent
+  // transactions get their own independent spinner via `transactionsLoading`
+  // so the cards/charts are interactive while the table is still loading.
+  transactionsLoading: boolean = false;
+
+  // True only while the stats-card/chart calls are in flight. Distinct from
+  // loadingStore.loading() (which also drives the refresh-button spinner) so
+  // the Revenue tab can show its own skeleton/spinner independently.
+  revenueDataLoading: boolean = false;
+
   // ── Lazy-load tracking for Fleet/Parcel tabs ──────────────────────────────
   // These stay false until the user actually visits the tab. Revenue is the
   // only data fetched on initial load, so first paint isn't gated on the
@@ -165,8 +178,12 @@ export class DashboardComponent implements OnInit {
   // ── Driver Assignment Stats (Fleet Operations tab) ────────────────────────
   // Tallies come straight from each endpoint's `totalRecords` — we request
   // size:1 since we only need the count, not the rows, keeping this cheap.
+  // NOTE: this is now fully lazy — it's fetched only the first time the user
+  // opens the Fleet Operations tab (see loadFleetData()), instead of firing
+  // right after the revenue data resolves.
   assignmentStats = { total: 0, active: 0, inactive: 0, pending: 0, rejected: 0 };
   assignmentStatsLoaded: boolean = false;
+  assignmentStatsLoading: boolean = false;
 
   // ── Full assignment list — lazy-loaded once, then cached ──────────────────
   // Not tied to the dashboard date range (assignments aren't date-scoped the
@@ -217,22 +234,14 @@ export class DashboardComponent implements OnInit {
 
     this.setDateRange();
 
-    // // 🔥 FIRST LOAD
-    // const event = { first: 0, rows: this.rows };
-
-    // this.loadDashboardData();
-    // this.loadTransactions(event);
-
-    // // Driver assignment stats aren't date-scoped, so load them once here
-    // // rather than inside loadDashboardData() (which reruns on every date
-    // // range change).
-    // this.loadAssignmentStats();
-
-    // 🔥 FAST FIRST PAINT: only Revenue tab data loads eagerly. Fleet and
-    // Parcel data (each a size:5000 fetch) are deliberately NOT requested
-    // here — they load lazily the first time the user switches to those
-    // tabs (see selectTab()). This cuts the initial forkJoin from 6 calls
-    // (2 of them heavy) down to 4 lighter ones.
+    // 🔥 PROGRESSIVE FIRST PAINT:
+    // 1) Stats cards + line/pie charts — cheapest, fastest calls. These
+    //    gate loadingStore, so the UI unblocks the moment they're back.
+    // 2) Recent transactions — fetched right after, but independently, with
+    //    its own `transactionsLoading` spinner so it never blocks (1).
+    // 3) Fleet/Parcel data (size:5000 fetches) and driver-assignment stats
+    //    are NOT requested here at all — they load lazily the first time the
+    //    user switches to those tabs (see selectTab() / loadFleetData()).
     this.loadRevenueData();
 
     const event = { first: 0, rows: this.rows };
@@ -262,6 +271,8 @@ export class DashboardComponent implements OnInit {
       sort: 'createdAt,DESC',
     };
 
+    this.transactionsLoading = true;
+
     this.dataService
       .post<PaymentsApiResponse>(API_ENDPOINTS.ALL_PAYMENTS, payload, 'transactions')
       .subscribe({
@@ -270,9 +281,14 @@ export class DashboardComponent implements OnInit {
           this.totalRecords = response.data.totalRecords;
           this.rows = event.rows;
           this.first = event.first;
+          this.transactionsLoading = false;
           this.cdr.detectChanges();
         },
-        error: (err) => console.error('Recent Transaction load failed', err),
+        error: (err) => {
+          console.error('Recent Transaction load failed', err);
+          this.transactionsLoading = false;
+          this.cdr.detectChanges();
+        },
       });
   }
 
@@ -285,10 +301,12 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Loads only what the default Revenue & Sales tab needs: stats cards,
-   * line/pie charts, and recent transactions. This is the sole blocking
-   * call on initial page load — Fleet and Parcel data are fetched
-   * separately and lazily (see loadFleetData / loadParcelData).
+   * Loads ONLY the stats cards + line/pie charts — the fastest data the
+   * Revenue tab needs. Recent transactions are intentionally NOT part of
+   * this call anymore; they're fetched separately by loadTransactions()
+   * (called right after, in ngOnInit / onDateRangeChange / onRefresh) so
+   * the cards and charts can render the instant these three resolve,
+   * without waiting on the transactions page or driver-assignment stats.
    */
   loadRevenueData(): void {
     if (!this.dateRange || this.dateRange.length < 2) {
@@ -296,6 +314,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.loadingStore.start();
+    this.revenueDataLoading = true;
 
     const [start, end] = this.dateRange;
     this.singleDayLabel = this.formatDateToReadable(end);
@@ -307,15 +326,6 @@ export class DashboardComponent implements OnInit {
       entityId: this.entityId,
       startDate: formatDateLocal(start),
       endDate: formatDateLocal(end),
-    };
-
-    const transactionsPayload = {
-      ...baseParams,
-      page: 0,
-      size: this.rows,
-      paymentStatus: 'PAID',
-      transactionType: 'CREDIT',
-      sort: 'createdAt,DESC',
     };
 
     forkJoin({
@@ -334,11 +344,6 @@ export class DashboardComponent implements OnInit {
         baseParams,
         'categories',
       ),
-      recentTransactions: this.dataService.post<PaymentsApiResponse>(
-        API_ENDPOINTS.ALL_PAYMENTS,
-        transactionsPayload,
-        'transactions',
-      ),
     }).subscribe({
       next: (data: any) => {
         this.statsCards = mapStatsToCards(data.transaction_stats);
@@ -349,21 +354,14 @@ export class DashboardComponent implements OnInit {
         this.pieChartData = buildPieChart(data.transaction_stats_per_category);
         this.pieChartOptions = buildPieChartOptions();
 
-        const response = data.recentTransactions;
-        this.recentTransactions = response.data.manifest;
-        this.totalRecords = response.data.totalRecords;
-
+        this.revenueDataLoading = false;
         this.cdr.detectChanges();
         this.loadingStore.stop();
-
-        // Fire-and-forget: driver assignment stats are five cheap size:1
-        // calls. We don't gate first paint on them, but we also don't make
-        // the user wait for a Fleet-tab click to see them, since they're
-        // near-instant anyway.
-        this.loadAssignmentStats();
       },
       error: (err) => {
         console.error('Revenue dashboard load failed', err);
+        this.revenueDataLoading = false;
+        this.cdr.detectChanges();
         this.loadingStore.stop();
       },
     });
@@ -498,6 +496,10 @@ export class DashboardComponent implements OnInit {
    * tab (see selectTab()). Fetches the full vehicle list (size:5000) and
    * builds the registration trend/stats from it. Re-triggered automatically
    * on date-range changes IF the tab has already been visited once.
+   *
+   * Also triggers the driver-assignment stats load the first time this tab
+   * is opened (previously this fired automatically after every revenue
+   * load — now it's fully lazy, matching Fleet/Parcel data).
    */
   loadFleetData(): void {
     if (!this.dateRange || this.dateRange.length < 2) return;
@@ -527,6 +529,10 @@ export class DashboardComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+
+    if (!this.assignmentStatsLoaded && !this.assignmentStatsLoading) {
+      this.loadAssignmentStats();
+    }
   }
 
   /**
@@ -571,11 +577,6 @@ export class DashboardComponent implements OnInit {
         },
       });
   }
-
-  // selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
-  //   this.selectedTab = tab;
-  //   this.cdr.detectChanges();
-  // }
 
   selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
     this.selectedTab = tab;
@@ -933,9 +934,14 @@ export class DashboardComponent implements OnInit {
    * Each call requests size:1 — we only need `totalRecords` from the
    * response, not the actual rows, so this stays cheap regardless of how
    * many assignments exist.
+   *
+   * Now called only from loadFleetData(), i.e. the first time the Fleet
+   * Operations tab is opened — not automatically after every revenue load.
    */
   loadAssignmentStats(): void {
     if (!this.entityId) return;
+
+    this.assignmentStatsLoading = true;
 
     const tinyPage = { entityId: this.entityId, page: 0, size: 1 };
 
@@ -975,11 +981,13 @@ export class DashboardComponent implements OnInit {
           rejected: res.rejected?.totalRecords ?? 0,
         };
         this.assignmentStatsLoaded = true;
+        this.assignmentStatsLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load driver assignment stats', err);
         this.assignmentStatsLoaded = true; // stop showing a loading state even on failure
+        this.assignmentStatsLoading = false;
         this.cdr.detectChanges();
       },
     });
@@ -1111,22 +1119,10 @@ export class DashboardComponent implements OnInit {
     this.onDateRangeChange();
   }
 
-  // onDateRangeChange() {
-  //   const event = { first: 0, rows: this.rows };
-  //   this.loadTransactions(event);
-  //   this.loadDashboardData();
-  // }
-
-  // onRefresh() {
-  //   const event = { first: this.first, rows: this.rows };
-  //   this.loadTransactions(event);
-  //   this.loadDashboardData();
-  // }
-
   onDateRangeChange() {
     const event = { first: 0, rows: this.rows };
-    this.loadTransactions(event);
     this.loadRevenueData();
+    this.loadTransactions(event);
 
     // Fleet/Parcel only refetch if the user has already visited them —
     // otherwise they'll pick up the new date range naturally on first visit.
@@ -1142,8 +1138,8 @@ export class DashboardComponent implements OnInit {
 
   onRefresh() {
     const event = { first: this.first, rows: this.rows };
-    this.loadTransactions(event);
     this.loadRevenueData();
+    this.loadTransactions(event);
 
     if (this.fleetDataLoaded) {
       this.fleetDataLoaded = false;
