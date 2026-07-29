@@ -513,3 +513,17 @@
   z-index: 5;
   backdrop-filter: blur(1px);
 }
+
+.today-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-color, #0e2c5a);
+  background: rgba(14, 44, 90, 0.08);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
+  width: fit-content;
+}

@@ -1,0 +1,250 @@
+<!-- pages/wallets/organization-balance/organization-balance.component.html -->
+<div class="org-balance-container">
+  <div class="org-header">
+    <div class="header-content">
+      <h1>Organization Balance</h1>
+      <p class="text-muted">Live working-account balance, sufficiency checks, and query history</p>
+    </div>
+    <div class="party-chip" *ngIf="hasParty">
+      <i class="pi pi-hashtag"></i>
+      <span>{{ partyA }}</span>
+      <button type="button" class="party-change-btn" (click)="changeParty()" pTooltip="Look up a different party number"
+        tooltipPosition="top">
+        <i class="pi pi-pencil"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= PARTY LOOKUP ================= -->
+  <div class="party-lookup" *ngIf="!hasParty">
+    <div class="lookup-icon"><i class="pi pi-search"></i></div>
+    <div class="lookup-body">
+      <span class="lookup-label">Party A / Till Number</span>
+      <div class="lookup-row">
+        <input type="text" class="lookup-input" [(ngModel)]="partyAInput" placeholder="e.g. 6854728"
+          (keyup.enter)="submitPartyA()" />
+        <button type="button" class="lookup-btn" (click)="submitPartyA()" [disabled]="!partyAInput.trim()">
+          Look up
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      </div>
+      <p class="lookup-error" *ngIf="partyAValidationError">{{ partyAValidationError }}</p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="hasParty">
+    <!-- ================= HERO: LIVE BALANCE ================= -->
+    <div class="hero-card">
+      <div class="hero-sheen"></div>
+
+      <div class="hero-top">
+        <span class="hero-eyebrow">Total Balance</span>
+        <!-- <span class="hero-updated" *ngIf="latest?.recordedAt">Synced {{ formatRelative(latest.recordedAt ?? null)
+          }}</span> -->
+      </div>
+
+      <ng-container *ngIf="latestLoaded; else heroSkeleton">
+        <ng-container *ngIf="latest; else heroEmpty">
+          <div class="hero-amount">
+            <span class="currency">{{ latest.currency || 'Ksh' }}</span>
+            <span class="value">{{ (latest.totalBalance ?? 0) | number: '1.2-2' }}</span>
+          </div>
+
+          <div class="hero-action-row">
+            <button type="button" class="pulse-trigger" [class.is-processing]="queryState === 'processing'"
+              [class.is-resolved]="queryState === 'resolved'"
+              [class.is-timeout]="queryState === 'timeout' || queryState === 'error'" (click)="refreshBalance()"
+              [disabled]="queryState === 'processing'" pTooltip="Send a fresh balance inquiry" tooltipPosition="top">
+              <span class="pulse-ring"></span>
+              <span class="pulse-core">
+                <i class="pi"
+                  [class.pi-refresh]="queryState === 'idle' || queryState === 'timeout' || queryState === 'error'"
+                  [class.pi-spin]="queryState === 'processing'" [class.pi-sync]="queryState === 'processing'"
+                  [class.pi-check]="queryState === 'resolved'"></i>
+              </span>
+            </button>
+
+            <div class="query-status" *ngIf="queryStatusLabel" [class]="'state-' + queryState">
+              {{ queryStatusLabel }}
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #heroEmpty>
+          <div class="hero-empty">
+            <div class="hero-empty-icon">
+              <i class="pi" [class.pi-info-circle]="latestNotFound"
+                [class.pi-exclamation-triangle]="!latestNotFound"></i>
+            </div>
+            <div class="hero-empty-body">
+              <span class="hero-empty-title">{{ latestNotFound ? 'No balance record yet' : 'Something went wrong'
+                }}</span>
+              <p class="hero-empty-message">{{ latestErrorMessage }}</p>
+            </div>
+            <div class="hero-action-row">
+              <button type="button" class="pulse-trigger" [class.is-processing]="queryState === 'processing'"
+                [class.is-resolved]="queryState === 'resolved'"
+                [class.is-timeout]="queryState === 'timeout' || queryState === 'error'" (click)="refreshBalance()"
+                [disabled]="queryState === 'processing'" pTooltip="Send a balance inquiry for this party"
+                tooltipPosition="top">
+                <span class="pulse-ring"></span>
+                <span class="pulse-core">
+                  <i class="pi"
+                    [class.pi-refresh]="queryState === 'idle' || queryState === 'timeout' || queryState === 'error'"
+                    [class.pi-spin]="queryState === 'processing'" [class.pi-sync]="queryState === 'processing'"
+                    [class.pi-check]="queryState === 'resolved'"></i>
+                </span>
+              </button>
+              <div class="query-status" *ngIf="queryStatusLabel" [class]="'state-' + queryState">
+                {{ queryStatusLabel }}
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+
+      <ng-template #heroSkeleton>
+        <p-skeleton height="3rem" width="55%" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="2.5rem" width="2.5rem" styleClass="mb-2" borderRadius="50%"></p-skeleton>
+      </ng-template>
+    </div>
+
+    <!-- ================= SUB-ACCOUNT BREAKDOWN ================= -->
+    <div class="subaccount-grid" *ngIf="latestLoaded && latest && subAccountRows.length">
+      <div class="subaccount-card" *ngFor="let acc of subAccountRows">
+        <div class="subaccount-icon"><i class="pi" [class]="acc.icon"></i></div>
+        <div class="subaccount-body">
+          <span class="subaccount-name">{{ acc.name }}</span>
+          <span class="subaccount-balance">{{ latest.currency || 'Ksh' }} {{ acc.balance | number: '1.2-2' }}</span>
+          <div class="subaccount-meta" *ngIf="acc.available !== null">
+            <span>Available: {{ acc.available | number: '1.2-2' }}</span>
+            <span *ngIf="acc.reserved">Reserved: {{ acc.reserved | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SUFFICIENCY CHECKER ================= -->
+    <p-card styleClass="checker-panel">
+      <div class="panel-header">
+        <div class="panel-icon checker-icon"><i class="pi pi-verified"></i></div>
+        <span class="panel-title">Check Sufficiency</span>
+      </div>
+
+      <div class="checker-row">
+        <span class="checker-prefix">Ksh</span>
+        <p-inputNumber [(ngModel)]="checkAmount" placeholder="Amount to verify" mode="decimal" [minFractionDigits]="2"
+          [maxFractionDigits]="2" styleClass="checker-input"></p-inputNumber>
+        <button type="button" class="checker-btn" (click)="checkSufficiency()" [disabled]="checking || !checkAmount">
+          <i class="pi" [class.pi-spin]="checking" [class.pi-spinner]="checking" [class.pi-search]="!checking"></i>
+          Check
+        </button>
+      </div>
+
+      <div class="checker-result" *ngIf="checkResult" [class.sufficient]="checkResult.sufficient"
+        [class.insufficient]="!checkResult.sufficient">
+        <div class="not-found-banner" *ngIf="checkNotFound">
+          <i class="pi pi-info-circle"></i>
+          No balance record exists yet for this party — run "Refresh Balance" above first.
+        </div>
+        <div class="result-badge">
+          <i class="pi" [class.pi-check-circle]="checkResult.sufficient"
+            [class.pi-times-circle]="!checkResult.sufficient"></i>
+          {{ checkResult.sufficient ? 'Sufficient' : 'Insufficient' }}
+        </div>
+        <div class="result-details">
+          <div class="result-row">
+            <span>Available</span>
+            <span>{{ checkResult.currency || 'Ksh' }} {{ checkResult.availableBalance | number: '1.2-2' }}</span>
+          </div>
+          <div class="result-row">
+            <span>Required</span>
+            <span>{{ checkResult.currency || 'Ksh' }} {{ checkResult.requiredAmount | number: '1.2-2' }}</span>
+          </div>
+          <div class="result-row" *ngIf="!checkResult.sufficient">
+            <span>Shortfall</span>
+            <span class="shortfall">{{ checkResult.currency || 'Ksh' }} {{ checkResult.shortfall | number: '1.2-2'
+              }}</span>
+          </div>
+        </div>
+        <p class="result-message">{{ checkResult.message }}</p>
+      </div>
+
+      <p class="checker-error" *ngIf="checkError">{{ checkError }}</p>
+    </p-card>
+
+    <!-- ================= QUERY HISTORY ================= -->
+    <div class="history-section">
+      <div class="section-heading">
+        <span class="panel-title">Query History</span>
+        <span class="text-muted history-count" *ngIf="historyLoaded">{{ history.length }} requests</span>
+      </div>
+
+      <ng-container *ngIf="historyLoaded; else historySkeleton">
+        <div class="timeline" *ngIf="history.length; else historyEmpty">
+          <div class="timeline-item" *ngFor="let record of history">
+            <div class="timeline-marker" [class]="'marker-' + statusVariant(record.status)"></div>
+
+            <div class="timeline-content" (click)="toggleExpanded(record)">
+              <div class="timeline-row">
+                <div class="timeline-main">
+                  <span class="timeline-status" [class]="'status-' + statusVariant(record.status)">
+                    {{ statusLabel(record.status) }}
+                  </span>
+                  <span class="timeline-amount" *ngIf="record.totalBalance !== null">
+                    {{ record.currency }} {{ record.totalBalance | number: '1.2-2' }}
+                  </span>
+                  <span class="timeline-amount muted" *ngIf="record.totalBalance === null">Pending confirmation</span>
+                </div>
+                <div class="timeline-time">
+                  <span>{{ formatRelative(record.recordedAt) }}</span>
+                  <i class="pi" [class.pi-chevron-down]="!isExpanded(record)"
+                    [class.pi-chevron-up]="isExpanded(record)"></i>
+                </div>
+              </div>
+
+              <div class="timeline-detail" *ngIf="isExpanded(record)">
+                <div class="detail-grid" *ngIf="record.workingAccount || record.utilityAccount">
+                  <div class="detail-item" *ngIf="record.workingAccount as wa">
+                    <span class="detail-label">{{ wa.name }}</span>
+                    <span class="detail-value">{{ record.currency }} {{ wa.balance | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="record.utilityAccount as ua">
+                    <span class="detail-label">{{ ua.name }}</span>
+                    <span class="detail-value">{{ record.currency }} {{ ua.balance | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="record.merchantAccount as ma">
+                    <span class="detail-label">{{ ma.name }}</span>
+                    <span class="detail-value">{{ record.currency }} {{ ma.balance | number: '1.2-2' }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="record.settlementAccount as sa">
+                    <span class="detail-label">{{ sa.name }}</span>
+                    <span class="detail-value">{{ record.currency }} {{ sa.balance | number: '1.2-2' }}</span>
+                  </div>
+                </div>
+                <div class="detail-meta">
+                  <span *ngIf="record.transactionId">Txn: {{ record.transactionId }}</span>
+                  <span *ngIf="record.resultDesc">{{ record.resultDesc }}</span>
+                  <span *ngIf="record.boCompletedTime">Completed {{ formatRelative(record.boCompletedTime) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #historyEmpty>
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No balance queries yet. Refresh the balance above to start a request.</p>
+          </div>
+        </ng-template>
+      </ng-container>
+
+      <ng-template #historySkeleton>
+        <p-skeleton height="3.5rem" width="100%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="3.5rem" width="100%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="3.5rem" width="80%"></p-skeleton>
+      </ng-template>
+    </div>
+  </ng-container>
+</div>

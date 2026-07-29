@@ -1,0 +1,120 @@
+<!-- pages/wallets/wallet-analytics/wallet-analytics.component.html -->
+<div class="analytics-container">
+  <div class="analytics-header">
+    <div class="header-content">
+      <h1>Wallet Analytics</h1>
+      <p class="text-muted">Balance breakdown, tariffs, and cash flow at a glance</p>
+    </div>
+  </div>
+
+  <!-- ================= HERO: TOTAL BALANCE ================= -->
+  <div class="hero-card">
+    <div class="hero-sheen"></div>
+
+    <div class="hero-top">
+      <span class="hero-eyebrow">Total Wallet Balance</span>
+      <span class="hero-updated" *ngIf="lastUpdated">Updated {{ formatRelative(lastUpdated) }}</span>
+    </div>
+
+    <ng-container *ngIf="balanceLoaded; else heroSkeleton">
+      <div class="hero-amount">
+        <span class="currency">Ksh</span>
+        <span class="value">{{ displayedTotal | number: '1.2-2' }}</span>
+      </div>
+
+      <!-- Segmented breakdown bar -->
+      <div class="segment-bar" *ngIf="balanceItems.length">
+        <div class="segment" *ngFor="let item of balanceItems" [style.width.%]="item.percentage"
+          [style.background]="item.color" [pTooltip]="item.label + ': Ksh ' + (item.totalBalance | number: '1.2-2')"
+          tooltipPosition="top"></div>
+      </div>
+
+      <!-- Category legend -->
+      <div class="category-legend">
+        <div class="legend-row" *ngFor="let item of balanceItems">
+          <div class="legend-label">
+            <span class="dot" [style.background]="item.color"></span>
+            <i class="pi" [class]="item.icon"></i>
+            <span>{{ item.label }}</span>
+          </div>
+          <div class="legend-value">
+            <span class="amount">Ksh {{ item.totalBalance | number: '1.2-2' }}</span>
+            <span class="percent">{{ item.percentage | number: '1.1-1' }}%</span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #heroSkeleton>
+      <p-skeleton height="3rem" width="60%" styleClass="mb-3"></p-skeleton>
+      <p-skeleton height="0.75rem" width="100%" styleClass="mb-4"></p-skeleton>
+      <p-skeleton height="1.25rem" width="100%" styleClass="mb-2"></p-skeleton>
+      <p-skeleton height="1.25rem" width="100%" styleClass="mb-2"></p-skeleton>
+      <p-skeleton height="1.25rem" width="80%"></p-skeleton>
+    </ng-template>
+  </div>
+
+  <!-- ================= SECONDARY STATS ================= -->
+  <div class="stats-grid">
+    <!-- Till Number Tariff -->
+    <p-card styleClass="stat-panel tariff-panel">
+      <div class="panel-header">
+        <div class="panel-icon tariff-icon">
+          <i class="pi pi-percentage"></i>
+        </div>
+        <span class="panel-title">Till Number Tariff</span>
+      </div>
+
+      <ng-container *ngIf="tillLoaded; else tariffSkeleton">
+        <div class="panel-amount">
+          <span class="currency">Ksh</span>
+          <span class="value">{{ tillTariff | number: '1.2-2' }}</span>
+        </div>
+        <p class="panel-caption">Charged per transaction on this till</p>
+      </ng-container>
+      <ng-template #tariffSkeleton>
+        <p-skeleton height="2rem" width="50%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="0.75rem" width="80%"></p-skeleton>
+      </ng-template>
+    </p-card>
+
+    <!-- Withdrawals / Collections -->
+    <p-card styleClass="stat-panel flow-panel">
+      <div class="panel-header">
+        <div class="panel-icon flow-icon">
+          <i class="pi pi-arrow-right-arrow-left"></i>
+        </div>
+        <span class="panel-title">Withdrawals &amp; Collections</span>
+        <span class="preview-badge" *ngIf="isStubData && withdrawalsLoaded"
+          pTooltip="Live data pending — showing placeholder until this endpoint is wired up" tooltipPosition="top">
+          Preview
+        </span>
+      </div>
+
+      <ng-container *ngIf="withdrawalsLoaded; else flowSkeleton">
+        <div class="flow-rows" *ngIf="withdrawalsCollections as wc">
+          <div class="flow-row">
+            <span class="flow-label"><i class="pi pi-arrow-down-left collections"></i> Collections</span>
+            <span class="flow-value collections">Ksh {{ wc.totalCollections | number: '1.2-2' }}</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-label"><i class="pi pi-arrow-up-right withdrawals"></i> Withdrawals</span>
+            <span class="flow-value withdrawals">Ksh {{ wc.totalWithdrawals | number: '1.2-2' }}</span>
+          </div>
+          <div class="flow-row net">
+            <span class="flow-label">Net Flow</span>
+            <span class="flow-value" [class.positive]="wc.netFlow >= 0" [class.negative]="wc.netFlow < 0">
+              Ksh {{ wc.netFlow | number: '1.2-2' }}
+            </span>
+          </div>
+          <p class="panel-caption">{{ wc.period }}</p>
+        </div>
+      </ng-container>
+      <ng-template #flowSkeleton>
+        <p-skeleton height="1.25rem" width="100%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="1.25rem" width="100%" styleClass="mb-2"></p-skeleton>
+        <p-skeleton height="1.25rem" width="70%"></p-skeleton>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

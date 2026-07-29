@@ -28,9 +28,11 @@ import { ActiveDriversComponent } from './pages/drivers/active/drivers';
 import { AllDriversComponent } from './pages/drivers/all/drivers';
 import { InactiveDriversComponent } from './pages/drivers/inactive/drivers';
 import { ObligationsComponent } from './pages/finance/obligations/obligations';
+import { OrganizationBalanceComponent } from './pages/finance/organization-balance/organization-balance';
 import { OrganizationWalletComponent } from './pages/finance/organization-wallet/organization-wallet';
 import { WithdrawalStatementsComponent } from './pages/finance/statements/statements';
 import { UserWallet } from './pages/finance/user-wallet/user-wallet';
+import { WalletAnalyticsComponent } from './pages/finance/wallet-analytics/wallet-analytics';
 import { FleetCollectionsComponent } from './pages/fleet/total-collection/total-collection';
 import { RegisterAdminComponent } from './pages/forms/admin/register-admin/register-admin';
 import { UpdateAdminComponent } from './pages/forms/admin/update-admin/update-admin';
@@ -410,9 +412,24 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] }
       },
+
+      {
+        path: 'organization/balance',
+        component: OrganizationBalanceComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] }
+      },
+
       {
         path: 'wallet/user',
         component: UserWallet,
+        canActivate: [roleGuard],
+        data: { roles: ['CAN_VIEW'] }
+      },
+
+      {
+        path: 'wallet/analytics',
+        component: WalletAnalyticsComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_VIEW'] }
       },

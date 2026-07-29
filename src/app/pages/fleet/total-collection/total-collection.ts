@@ -1,32 +1,32 @@
-import {
-  Component,
-  OnInit,
-  ChangeDetectorRef,
-  ViewChild,
-  ElementRef,
-  AfterViewInit
-} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { DataService } from '../../../../@core/api/data.service';
-import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { LoadingStore } from '../../../../@core/state/loading.store';
-import { AuthService } from '../../../../@core/services/auth.service';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
-import * as XLSX from 'xlsx';
-import { formatDateLocal } from '../../../../@core/utils/date-time.util';
-import { Subject } from 'rxjs';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
 import { PaginatorModule } from 'primeng/paginator';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import { Subject } from 'rxjs';
+import * as XLSX from 'xlsx';
+import { DataService } from '../../../../@core/api/data.service';
+import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { LoadingStore } from '../../../../@core/state/loading.store';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 
 
 Chart.register(...registerables);
@@ -65,7 +65,7 @@ interface SortOption {
     PaginatorModule,
   ],
   templateUrl: './total-collection.html',
-  styleUrls: ['./total-collection.css'],
+  styleUrls: ['./total-collection.css', '../../../../styles/global/_toast.css',],
   providers: [MessageService]
 })
 export class FleetCollectionsComponent implements OnInit, AfterViewInit {

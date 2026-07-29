@@ -51,6 +51,7 @@ import { ThemeService } from '../../../../@core/services/theme.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
 import { formatDateLocal, formatRelativeTime } from '../../../../@core/utils/date-time.util';
 import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget";
+import { WalletAnalyticsComponent } from '../../finance/wallet-analytics/wallet-analytics';
 
 @Component({
   imports: [
@@ -68,7 +69,8 @@ import { ChatWidgetComponent } from "../../../components/chat-widget/chat-widget
     TableModule,
     TooltipModule,
     A11yModule,
-    ChatWidgetComponent
+    ChatWidgetComponent,
+    WalletAnalyticsComponent,
   ],
   standalone: true,
   selector: 'app-dashboard',
@@ -93,6 +95,12 @@ export class DashboardComponent implements OnInit {
   first: number = 0;
   totalRecords: number = 0;
 
+  // True only until the user explicitly changes the date range picker.
+  // While true, Super Metro's Revenue tab (stats/charts/transactions) uses
+  // TODAY only, regardless of the 7-day-default `dateRange` that Fleet and
+  // Parcels keep using unaffected.
+  superMetroDefaultView: boolean = false;
+
   // ── Progressive-load tracking ──────────────────────────────────────────
   // Stats cards + charts are the fastest, cheapest calls and now resolve on
   // their own — they no longer wait on (or block) the transactions fetch.
@@ -116,7 +124,7 @@ export class DashboardComponent implements OnInit {
   parcelDataLoading: boolean = false;
 
   // New State variables for Enhanced Dashboard
-  selectedTab: 'revenue' | 'fleet' | 'parcels' = 'revenue';
+  selectedTab: 'revenue' | 'fleet' | 'parcels' | 'wallet' = 'revenue';
 
   /**
    * Entity flags — only one parcel-capable entity exists (GS000002).
@@ -158,7 +166,7 @@ export class DashboardComponent implements OnInit {
   // Which parcel-tab card is currently driving the trend chart.
   // Vehicle Operations chart intentionally does NOT support this — it stays
   // fixed on "Vehicles Registered" per request.
-  selectedParcelMetric: 'registered' | 'collected' | 'revenue' | 'payment' = 'collected';
+  selectedParcelMetric: 'registered' | 'collected' | 'revenue' | 'payment' = 'payment';
   parcelsTrendTitle: string = 'Parcel Collection Trend';
 
   // Precomputed daily buckets for every parcel metric, built once per data
@@ -172,6 +180,10 @@ export class DashboardComponent implements OnInit {
     cash: number[];
     cashless: number[];
   } | null = null;
+
+  get isRevenueShowingTodayOnly(): boolean {
+    return this.isSuperMetro && this.superMetroDefaultView;
+  }
 
   singleDayLabel: string = '';
 
@@ -214,6 +226,20 @@ export class DashboardComponent implements OnInit {
     return this.loadingStore.loading;
   }
 
+  /**
+ * Resolves (start, end) for Revenue-tab calls (stats, charts, transactions)
+ * only. Fleet/Parcels always read `this.dateRange` directly and are
+ * completely unaffected by this.
+ */
+  private getRevenueDateBounds(): [Date, Date] {
+    if (this.isSuperMetro && this.superMetroDefaultView) {
+      const today = new Date();
+      return [today, today];
+    }
+    const [start, end] = this.dateRange;
+    return [start, end];
+  }
+
   ngOnInit(): void {
     const user = this.authService.currentUser();
 
@@ -227,6 +253,7 @@ export class DashboardComponent implements OnInit {
     // ── Entity flags ────────────────────────────────────────────────────────
     this.isSuperMetro = this.entityId === 'GS000002' || this.entityId === 'GS0000002';
     this.isSalty = this.entityId === 'GS000007';
+    this.superMetroDefaultView = this.isSuperMetro;
     // ────────────────────────────────────────────────────────────────────────
 
     this.themeService.applyTheme(user.entityId);
@@ -253,7 +280,7 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    const [start, end] = this.dateRange;
+    const [start, end] = this.getRevenueDateBounds();
     const event = $event;
     const page = event.first / event.rows;
 
@@ -316,11 +343,10 @@ export class DashboardComponent implements OnInit {
     this.loadingStore.start();
     this.revenueDataLoading = true;
 
-    const [start, end] = this.dateRange;
-    this.singleDayLabel = this.formatDateToReadable(end);
+    const [start, end] = this.getRevenueDateBounds();
 
-    const today = new Date();
-    this.singleDayIsToday = formatDateLocal(end) === formatDateLocal(today);
+    this.singleDayLabel = this.formatDateToReadable(end);
+    this.singleDayIsToday = formatDateLocal(end) === formatDateLocal(new Date());
 
     const baseParams = {
       entityId: this.entityId,
@@ -367,129 +393,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  loadDashboardData(): void {
-    if (!this.dateRange || this.dateRange.length < 2) {
-      return;
-    }
-
-    this.loadingStore.start();
-
-    const [start, end] = this.dateRange;
-    this.singleDayLabel = this.formatDateToReadable(end);
-
-    // FIX #11: determine if the selected end date is actually today, so the
-    // template can say "Today" vs the literal date without implying activity
-    // always happens on the calendar's "today".
-    const today = new Date();
-    this.singleDayIsToday = formatDateLocal(end) === formatDateLocal(today);
-
-    const baseParams = {
-      entityId: this.entityId,
-      startDate: formatDateLocal(start),
-      endDate: formatDateLocal(end),
-    };
-
-    const transactionsPayload = {
-      ...baseParams,
-      page: 0,
-      size: this.rows,
-      paymentStatus: 'PAID',
-      transactionType: 'CREDIT',
-      sort: 'createdAt,DESC',
-    };
-
-    forkJoin({
-      transaction_stats: this.dataService.get<TransactionStats>(
-        API_ENDPOINTS.TRANSACTION_STATS,
-        baseParams,
-        'stats',
-      ),
-      transaction_stats_by_period: this.dataService.get<TransactionStatsByPeriod[]>(
-        API_ENDPOINTS.STATS_BY_PERIOD,
-        { ...baseParams, periodType: 'DAILY' },
-        'daily'
-      ),
-      transaction_stats_per_category: this.dataService.get<TransactionStatsPerCategory[]>(
-        API_ENDPOINTS.STATS_PER_CATEGORY,
-        baseParams,
-        'categories',
-      ),
-      recentTransactions: this.dataService.post<PaymentsApiResponse>(
-        API_ENDPOINTS.ALL_PAYMENTS,
-        transactionsPayload,
-        'transactions',
-      ),
-      // NOTE (FIX #7 / #15): ideally this endpoint accepts startDate/endDate
-      // like ALL_PARCELS does, so we're not pulling the entire historic
-      // fleet just to build a 7-day trend. Left as-is here since we don't
-      // have confirmation the backend supports it yet — flagged for backend
-      // follow-up. size:5000 is a soft cap; see FIX #7 below for how we now
-      // guard against it silently under-reporting totals.
-      vehicles: this.dataService.post<VehicleApiResponse>(
-        API_ENDPOINTS.ALL_VEHICLES,
-        { entityId: this.entityId, page: 0, size: 5000 },
-        'vehicles'
-      ),
-      // Parcels are fetched only for Super Metro (GS000002).
-      // GS000007 (Salty) does not use the parcel logistics tab.
-      parcels: this.isSuperMetro
-        ? this.dataService.post<ParcelsAPiResponse>(
-          API_ENDPOINTS.ALL_PARCELS,
-          {
-            entityId: this.entityId,
-            page: 0,
-            size: 5000,
-            paymentStatus: 'PAID',
-            startDate: formatDateLocal(start),
-            endDate: formatDateLocal(end),
-            sort: 'createdAt,DESC',
-          },
-          'parcels'
-        )
-        : of(null)
-    }).subscribe({
-      next: (data: any) => {
-        // Cards
-        this.statsCards = mapStatsToCards(data.transaction_stats);
-
-        // Line chart
-        this.chartData = buildLineChart(data.transaction_stats_by_period);
-        this.chartOptions = buildLineChartOptions();
-
-        // Pie chart
-        this.pieChartData = buildPieChart(data.transaction_stats_per_category);
-        this.pieChartOptions = buildPieChartOptions();
-
-        // Set transactions
-        const response = data.recentTransactions;
-        this.recentTransactions = response.data.manifest;
-        this.totalRecords = response.data.totalRecords;
-
-        // Vehicle details & trend processing
-        const days = this.getDaysArray(start, end);
-        this.allVehicles = data.vehicles?.data || [];
-        // FIX #7: pass the authoritative totalRecords from the API alongside
-        // the fetched array, so "Total Registered Fleet" reflects the true
-        // count even if the page size (5000) ever falls short of it.
-        this.buildVehiclesTrend(this.allVehicles, days, data.vehicles?.totalRecords);
-
-        // Parcel details & trend processing (GS000002 only)
-        if (this.isSuperMetro && data.parcels) {
-          this.allParcels = data.parcels.parcels || [];
-          this.buildParcelsTrend(this.allParcels, days, data.parcels);
-        } else {
-          this.parcelStats = { total: 0, collected: 0, amount: 0, cash: 0, cashless: 0 };
-        }
-
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Dashboard load failed', err);
-        this.loadingStore.stop();
-      },
-      complete: () => this.loadingStore.stop(),
-    });
-  }
 
   /**
    * Lazy-loaded the first time the user switches to the Fleet Operations
@@ -578,7 +481,7 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  selectTab(tab: 'revenue' | 'fleet' | 'parcels'): void {
+  selectTab(tab: 'revenue' | 'fleet' | 'parcels' | 'wallet'): void {
     this.selectedTab = tab;
 
     if (tab === 'fleet' && !this.fleetDataLoaded && !this.fleetDataLoading) {
@@ -1113,34 +1016,72 @@ export class DashboardComponent implements OnInit {
   }
 
   /** Resets the date range back to the default 7-day window and reloads data. */
+  // resetDateRange(): void {
+  //   if (this.isDateRangeDefault) return;
+  //   this.setDateRange();
+  //   this.onDateRangeChange();
+  // }
+
   resetDateRange(): void {
     if (this.isDateRangeDefault) return;
     this.setDateRange();
-    this.onDateRangeChange();
-  }
-
-  onDateRangeChange() {
+    this.superMetroDefaultView = this.isSuperMetro; // back to today-only default
     const event = { first: 0, rows: this.rows };
     this.loadRevenueData();
     this.loadTransactions(event);
-
-    // Fleet/Parcel only refetch if the user has already visited them —
-    // otherwise they'll pick up the new date range naturally on first visit.
-    if (this.fleetDataLoaded) {
-      this.fleetDataLoaded = false;
-      this.loadFleetData();
-    }
-    if (this.isSuperMetro && this.parcelDataLoaded) {
-      this.parcelDataLoaded = false;
-      this.loadParcelData();
-    }
+    this.refreshFleetAndParcelsIfLoaded();
   }
 
-  onRefresh() {
+  // onDateRangeChange() {
+  //   const event = { first: 0, rows: this.rows };
+  //   this.loadRevenueData();
+  //   this.loadTransactions(event);
+
+  //   // Fleet/Parcel only refetch if the user has already visited them —
+  //   // otherwise they'll pick up the new date range naturally on first visit.
+  //   if (this.fleetDataLoaded) {
+  //     this.fleetDataLoaded = false;
+  //     this.loadFleetData();
+  //   }
+  //   if (this.isSuperMetro && this.parcelDataLoaded) {
+  //     this.parcelDataLoaded = false;
+  //     this.loadParcelData();
+  //   }
+  // }
+
+  onDateRangeChange(): void {
+    // Explicit picker interaction — Super Metro now uses whatever range was
+    // picked for Revenue too, same as every other entity.
+    this.superMetroDefaultView = false;
+    const event = { first: 0, rows: this.rows };
+    this.loadRevenueData();
+    this.loadTransactions(event);
+    this.refreshFleetAndParcelsIfLoaded();
+  }
+
+  // onRefresh() {
+  //   const event = { first: this.first, rows: this.rows };
+  //   this.loadRevenueData();
+  //   this.loadTransactions(event);
+
+  //   if (this.fleetDataLoaded) {
+  //     this.fleetDataLoaded = false;
+  //     this.loadFleetData();
+  //   }
+  //   if (this.isSuperMetro && this.parcelDataLoaded) {
+  //     this.parcelDataLoaded = false;
+  //     this.loadParcelData();
+  //   }
+  // }
+
+  onRefresh(): void {
     const event = { first: this.first, rows: this.rows };
     this.loadRevenueData();
     this.loadTransactions(event);
+    this.refreshFleetAndParcelsIfLoaded();
+  }
 
+  private refreshFleetAndParcelsIfLoaded(): void {
     if (this.fleetDataLoaded) {
       this.fleetDataLoaded = false;
       this.loadFleetData();

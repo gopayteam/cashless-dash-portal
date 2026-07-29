@@ -286,6 +286,16 @@
                 </button>
               </li>
 
+              <li class="menu-item" *hasRole="['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS']">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/wallet/analytics')"
+                  (click)="navigate('/wallet/analytics')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-wallet menu-icon" style="color: rgb(134, 5, 5)"></i>
+                    <span class="menu-text">Wallet Analytics</span>
+                  </span>
+                </button>
+              </li>
+
               <li class="menu-item" *hasRole="['CAN_VIEW_TRANSACTIONS', 'CAN_MANAGE_ORG_WALLETS']">
                 <button class="menu-link" [class.menu-link--active]="isRouteActive('/management-statements')"
                   (click)="navigate('/management-statements')">

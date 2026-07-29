@@ -62,6 +62,11 @@ export const API_ENDPOINTS = {
   ALL_WALLETS: '/api/payment/wallets/all',
   ALL_ORGANIZATION_WALLETS: '/api/payment/wallets/accounts',
 
+  // Wallet Analytics
+  WALLET_BALANCE_SUMMARY: '/api/payment/wallet/analysis/balance/summary',
+  TILL_NUMBER_TARIFFS: '/api/payment/wallet/analysis/till-number-tariffs',
+  WITHDRAWALS_COLLECTIONS: '/api/payment/wallet/analysis/withdrawals-collections',
+
   // #####################  VEHICLE SUB-ENDPOINTS   #######################
   ALL_VEHICLES: '/api/v1/org/vehicles/view-all',
   VEHICLE_DATA: '/api/v1/org/vehicles/view/fleet',
@@ -127,6 +132,13 @@ export const API_ENDPOINTS = {
 
   MARSHAL_PERFORMANCE: '/api/v1/org/approvals/marshal/perfomance',
   MARSHAL_PERFORMANCE_DETAILS: '/api/v1/org/approvals/marshal/perfomance/detail',
+
+  // #####################  ORGANIZATION BALANCE SUB-ENDPOINTS   #######################
+  ORG_BALANCE_QUERY: '/api/payment/balance/query', // POST, body: { partyA, remarks }
+  ORG_BALANCE_QUERY_BY_PARTY: (partyA: string) => `/api/payment/balance/query/${partyA}`, // POST, partyA in path
+  ORG_BALANCE_LATEST: (partyA: string) => `/api/payment/balance/${partyA}/latest`, // GET
+  ORG_BALANCE_HISTORY: (partyA: string) => `/api/payment/balance/${partyA}/history`, // GET
+  ORG_BALANCE_CHECK: (partyA: string) => `/api/payment/balance/${partyA}/check`, // GET, ?amount=
 
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,

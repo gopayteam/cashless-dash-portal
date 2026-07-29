@@ -7,7 +7,7 @@ export const environment = {
   production: false,
   useMockApi: false,
   apiBaseUrl: 'https://api.gopay.ke', //'http://localhost:4200',
-  aiBaseUrl: 'http://localhost:8000',
+  aiBaseUrl: 'http://localhost:3035',
   dashboardBaseUrl: 'http://localhost:4200'
 };
 

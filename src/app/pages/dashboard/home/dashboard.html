@@ -29,6 +29,12 @@
           Reset
         </button>
       </div>
+
+      <span class="today-badge" *ngIf="selectedTab === 'revenue' && isRevenueShowingTodayOnly"
+        pTooltip="Revenue is showing today's data — Fleet and Parcels use the date range below" tooltipPosition="top">
+        <i class="pi pi-calendar"></i> Showing today's data
+      </span>
+
       <mat-form-field appearance="outline" class="date-range-field">
         <mat-date-range-input [rangePicker]="picker">
           <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
@@ -42,6 +48,11 @@
   <!-- ================= SEGMENTED CATEGORY SWITCHER ================= -->
   <div class="segmented-tabs-container">
     <div class="segmented-tabs">
+      <button class="tab-btn" [class.active]="selectedTab === 'wallet'" (click)="selectTab('wallet')">
+        <i class="pi pi-wallet"></i>
+        <span>Wallet Analytics</span>
+      </button>
+
       <button class="tab-btn" [class.active]="selectedTab === 'revenue'" (click)="selectTab('revenue')">
         <i class="pi pi-chart-line"></i>
         <span>Revenue & Sales</span>
@@ -648,6 +659,11 @@
         </div>
       </p-card>
     </div>
+  </div>
+
+  <!-- ================= WALLET ANALYTICS TAB ================= -->
+  <div *ngIf="selectedTab === 'wallet'" class="tab-content fade-in">
+    <app-wallet-analytics />
   </div>
 
   <app-chat-widget />
