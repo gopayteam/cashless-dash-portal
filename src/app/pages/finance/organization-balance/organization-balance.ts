@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -18,6 +19,7 @@ import {
   BalanceSufficiency,
   SubAccount,
 } from '../../../../@core/models/organization/organization-balance.model';
+import { AuthService } from '../../../../@core/services/auth.service';
 import { formatRelativeTime } from '../../../../@core/utils/date-time.util';
 
 /**
@@ -66,6 +68,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
    *  parent component, or be left empty and typed in by the user via the lookup bar. */
   @Input() partyA = '';
 
+  entityId: string | null = null;
+
   /** Bound to the lookup input field — the party number the user is currently typing. */
   partyAInput = '';
 
@@ -98,9 +102,27 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
   checkError: string | null = null;
   checkNotFound = false;
 
-  constructor(private dataService: DataService, private cdr: ChangeDetectorRef) { }
+  bypassCache: boolean = true;
+  useDevApi: boolean = false;
+
+  get isLegacyBrand(): boolean {
+    return this.entityId === 'GS000002';
+  }
+
+  constructor(private dataService: DataService, private cdr: ChangeDetectorRef, private authService: AuthService,
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.entityId = user.entityId;
+    } else {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+
     this.partyAInput = this.partyA;
     if (this.partyA) {
       this.loadLatest();
@@ -168,7 +190,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
         API_ENDPOINTS.ORG_BALANCE_QUERY,
         { partyA: this.partyA, remarks: 'Organization Balance inquiry' },
         'org-balance-query',
-        true
+        this.bypassCache,
+        this.useDevApi,
       )
       .subscribe({
         next: (response) => {
@@ -199,7 +222,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
       .getWithoutParams<BalanceCheckResponse>(
         `${API_ENDPOINTS.ORG_BALANCE_CHECK(this.partyA)}?amount=${this.checkAmount}`,
         'org-balance-check',
-        true
+        this.bypassCache,
+        this.useDevApi,
       )
       .subscribe({
         next: (response) => {
@@ -237,7 +261,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
 
   private loadLatest(silent = true): void {
     this.dataService
-      .getWithoutParams<BalanceLatestResponse>(API_ENDPOINTS.ORG_BALANCE_LATEST(this.partyA), 'org-balance-latest', silent)
+      .getWithoutParams<BalanceLatestResponse>(API_ENDPOINTS.ORG_BALANCE_LATEST(this.partyA), 'org-balance-latest', this.bypassCache,
+        this.useDevApi,)
       .subscribe({
         next: (response) => {
           this.applyLatest(response.data);
@@ -267,7 +292,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
 
   private loadHistory(): void {
     this.dataService
-      .getWithoutParams<BalanceHistoryResponse>(API_ENDPOINTS.ORG_BALANCE_HISTORY(this.partyA), 'org-balance-history', true)
+      .getWithoutParams<BalanceHistoryResponse>(API_ENDPOINTS.ORG_BALANCE_HISTORY(this.partyA), 'org-balance-history', this.bypassCache,
+        this.useDevApi,)
       .subscribe({
         next: (response) => {
           this.history = (response.data ?? [])
@@ -313,7 +339,8 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
     this.pollAttempts++;
 
     this.dataService
-      .getWithoutParams<BalanceLatestResponse>(API_ENDPOINTS.ORG_BALANCE_LATEST(this.partyA), 'org-balance-poll', true)
+      .getWithoutParams<BalanceLatestResponse>(API_ENDPOINTS.ORG_BALANCE_LATEST(this.partyA), 'org-balance-poll', this.bypassCache,
+        this.useDevApi,)
       .subscribe({
         next: (response) => {
           const record = response.data;

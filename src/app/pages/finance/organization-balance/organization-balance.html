@@ -1,5 +1,5 @@
 <!-- pages/wallets/organization-balance/organization-balance.component.html -->
-<div class="org-balance-container">
+<div class="org-balance-container" [class.legacy-brand]="isLegacyBrand">
   <div class="org-header">
     <div class="header-content">
       <h1>Organization Balance</h1>
@@ -39,8 +39,13 @@
 
       <div class="hero-top">
         <span class="hero-eyebrow">Total Balance</span>
-        <!-- <span class="hero-updated" *ngIf="latest?.recordedAt">Synced {{ formatRelative(latest.recordedAt ?? null)
-          }}</span> -->
+        <!-- <span class="hero-updated" *ngIf="latest?.recordedAt">
+          Synced {{ formatRelative(latest.recordedAt ? latest.recordedAt! : null) }}
+        </span> -->
+
+        <span class="hero-updated" *ngIf="latest?.recordedAt">
+          Synced {{ formatRelative(latest?.recordedAt ?? null) }}
+        </span>
       </div>
 
       <ng-container *ngIf="latestLoaded; else heroSkeleton">

@@ -414,7 +414,7 @@ export const routes: Routes = [
       },
 
       {
-        path: 'organization/balance',
+        path: 'wallet/balance',
         component: OrganizationBalanceComponent,
         canActivate: [roleGuard],
         data: { roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] }
