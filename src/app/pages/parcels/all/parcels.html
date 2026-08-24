@@ -389,6 +389,11 @@
     </p-table>
 
     <ng-template pTemplate="footer">
+
+      <button pButton label="Delete" icon="pi pi-trash" iconPos="right" style="gap: 0.5rem; margin-right: 1rem;"
+        class="p-button-danger" *ngIf="selectedParcel" (click)="confirmDeleteParcel(selectedParcel)">
+      </button>
+
       <button pButton label="Close" icon="pi pi-times" style="gap: 0.5rem;" iconPos="right" class="p-button-text"
         (click)="closeBucketParcels()">
       </button>
@@ -770,6 +775,11 @@
 
     <ng-template pTemplate="footer">
       <div class="dialog-footer">
+
+        <button pButton label="Delete" icon="pi pi-trash" iconPos="right" style="gap: 0.5rem; margin-right: 1rem;"
+          class="p-button-danger" *ngIf="selectedParcel" (click)="confirmDeleteParcel(selectedParcel)">
+        </button>
+
         <button pButton label="Simple" icon="pi pi-download" class="p-button-clear" iconPos="right"
           style="gap: 0.5rem; margin-right: 1rem;" severity="secondary" *ngIf="selectedParcel"
           [loading]="isSimpleReceiptDownloading" [disabled]="isSimpleReceiptDownloading"
@@ -840,6 +850,39 @@
           (click)="closeReceiptDialog()">
         </button>
       </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ================= DELETE CONFIRMATION DIALOG ================= -->
+  <p-dialog [(visible)]="displayDeleteConfirmDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '90vw', maxWidth: '450px' }">
+
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <div class="dialog-header-top">
+          <div class="dialog-icon delete-icon"><i class="pi pi-exclamation-triangle"></i></div>
+          <div class="dialog-title-section">
+            <h2>Delete Parcel</h2>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="delete-confirm-content" *ngIf="parcelToDelete">
+      <p>Are you sure you want to delete parcel
+        <span class="receipt-number">{{ parcelToDelete.parcelNumber }}</span>?
+      </p>
+      <p class="text-muted">This action cannot be undone.</p>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" icon="pi pi-times" iconPos="right" style="gap: 0.5rem; margin-right: 1rem;"
+        class="p-button-text" [disabled]="isDeletingParcel" (click)="cancelDeleteParcel()">
+      </button>
+      <button pButton label="Delete" icon="pi pi-trash" iconPos="right" style="gap: 0.5rem" class="p-button-danger"
+        [loading]="isDeletingParcel" [disabled]="isDeletingParcel" (click)="deleteParcel()">
+      </button>
     </ng-template>
   </p-dialog>
 

@@ -62,6 +62,7 @@ import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignmen
 import { MissedTransactionComponent } from './pages/hidden/missed-transactions/missed-transactions';
 import { LocationRoutesComponent } from './pages/locations/routes/routes';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
+import { TransactionLookupComponent } from './pages/lookup/lookup';
 import { BroadcastComponent2 } from './pages/notifications/broadcasts/broadcasts';
 import { SendNotificationsComponent } from './pages/notifications/send-notifications/send-notifications';
 import { SmsBroadcastComponent } from './pages/notifications/sms-broadcast/sms-broadcast';
@@ -838,6 +839,12 @@ export const routes: Routes = [
       {
         path: 'payments/status',
         component: PaymentStatusCheckComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'lookup',
+        component: TransactionLookupComponent,
         canActivate: [AuthGuard],
       },
 

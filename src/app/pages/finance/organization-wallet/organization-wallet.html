@@ -8,7 +8,16 @@
   <!-- ================= HEADER ================= -->
   <div class="wallets-header">
     <div class="header-content">
-      <h1>Organization Wallets</h1>
+      <h1 class="wallet-title">
+        Organization Wallets
+
+        <button type="button" pButton [icon]="getUseDevUrl() ? 'pi pi-code' : 'pi pi-cloud'"
+          class="p-button-text p-button-sm api-toggle-button" [class.dev-active]="getUseDevUrl()"
+          [class.prod-active]="!getUseDevUrl()"
+          [pTooltip]="getUseDevUrl() ? 'Using Dev API — Click to use Production API' : 'Using Production API — Click to use Dev API'"
+          tooltipPosition="right" (click)="toggleApiUrl()">
+        </button>
+      </h1>
       <p class="text-muted">Overview of all organization wallet accounts</p>
     </div>
 

@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "proxy": "ngrok http 4200 --domain capital-obviously-terrier.ngrok-free.app",
     "test": "ng test",
-    "deploy-docker": "docker build --no-cache -t amos876/admin-dashboard:2.4.0 . && docker push amos876/admin-dashboard:2.4.0"
+    "deploy-docker": "docker build --no-cache -t amos876/admin-dashboard:2.5.0 . && docker push amos876/admin-dashboard:2.5.0"
   },
   "prettier": {
     "printWidth": 100,
@@ -28,15 +28,15 @@
   "private": true,
   "packageManager": "npm@11.6.4",
   "dependencies": {
-    "@angular/animations": "~21.0.3",
-    "@angular/cdk": "^21.0.2",
-    "@angular/common": "~21.0.3",
-    "@angular/compiler": "~21.0.3",
-    "@angular/core": "~21.0.3",
-    "@angular/forms": "~21.0.3",
-    "@angular/material": "^21.0.2",
-    "@angular/platform-browser": "~21.0.3",
-    "@angular/router": "~21.0.3",
+    "@angular/animations": "^21.2.20",
+    "@angular/cdk": "^21.2.14",
+    "@angular/common": "^21.2.20",
+    "@angular/compiler": "^21.2.20",
+    "@angular/core": "^21.2.20",
+    "@angular/forms": "^21.2.20",
+    "@angular/material": "^21.2.14",
+    "@angular/platform-browser": "^21.2.20",
+    "@angular/router": "^21.2.20",
     "@primeuix/themes": "^2.0.2",
     "angularx-qrcode": "^21.0.5",
     "chart.js": "^4.5.1",
@@ -45,15 +45,15 @@
     "papaparse": "^5.5.3",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
-    "primeng": "^21.0.1",
+    "primeng": "^21.1.9",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~21.0.2",
-    "@angular/cli": "~21.0.2",
-    "@angular/compiler-cli": "~21.0.3",
+    "@angular-devkit/build-angular": "^21.2.20",
+    "@angular/cli": "^21.2.20",
+    "@angular/compiler-cli": "^21.2.20",
     "@types/papaparse": "^5.5.2",
     "angular-in-memory-web-api": "^0.21.0",
     "autoprefixer": "^10.4.22",
@@ -63,5 +63,14 @@
     "tailwindcss": "^4.1.17",
     "typescript": "~5.9.3",
     "vitest": "^4.0.15"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "esbuild@0.26.0": true,
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true,
+    "core-js@3.50.0": true,
+    "lmdb@3.4.3": true,
+    "msgpackr-extract@3.0.4": true
   }
 }

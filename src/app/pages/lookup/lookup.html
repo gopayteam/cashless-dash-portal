@@ -1,0 +1,367 @@
+<!-- pages/transaction-lookup/transaction-lookup.component.html -->
+<div class="txn-lookup-container">
+  <p-toast position="top-right"></p-toast>
+
+  <!-- ================= HEADER ================= -->
+  <div class="txn-lookup-header">
+    <div class="header-content">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <h1>Transaction Lookup</h1>
+        <p-tag [value]="useDevUrl ? 'DEV URL' : 'NORMAL API'" [severity]="useDevUrl ? 'warn' : 'success'"
+          styleClass="cursor-pointer" pTooltip="Click to toggle between Normal API URL and Dev API URL"
+          tooltipPosition="bottom" (click)="toggleEnvironment(!useDevUrl)"></p-tag>
+      </div>
+      <p class="text-muted">Search, review, and export transaction records</p>
+    </div>
+    <div class="header-actions">
+      <button pButton type="button" [icon]="useDevUrl ? 'pi pi-server' : 'pi pi-globe'"
+        [label]="useDevUrl ? 'Dev URL' : 'Normal API'"
+        [class]="useDevUrl ? 'p-button-warning export-btn' : 'p-button-outlined export-btn'" style="gap: 1.2rem"
+        pTooltip="Toggle DataService between Normal API URL and Dev API URL" tooltipPosition="bottom"
+        (click)="toggleEnvironment(!useDevUrl)"></button>
+      <button pButton type="button" icon="pi pi-file" label="Export CSV" class="p-button-outlined export-btn"
+        style="gap: 1.2rem" [loading]="exportingCsv" pTooltip="Export the current page" tooltipPosition="bottom"
+        (click)="exportCurrentPageCsv()"></button>
+      <button pButton type="button" icon="pi pi-file-excel" label="Export Excel" class="p-button-outlined export-btn"
+        [loading]="exportingExcel" pTooltip="Export the current page" tooltipPosition="bottom" style="gap: 1.2rem"
+        (click)="exportCurrentPageExcel()"></button>
+      <button pButton type="button" icon="pi pi-cloud-download" label="Export All (Filtered)"
+        class="export-btn export-btn-primary" [loading]="exportingAllCsv || exportingAllExcel"
+        (click)="exportAllFilteredExcel()" pTooltip="Fetches every page matching your filters, then exports as Excel"
+        style="gap: 1.2rem" tooltipPosition="bottom"></button>
+    </div>
+  </div>
+
+  <!-- ================= STATS CARDS ================= -->
+  <div class="stats-grid">
+    <p-card *ngFor="let card of statsCards" styleClass="stat-card card-hover">
+      <div class="stat-content">
+        <div class="stat-info">
+          <span class="stat-title">{{ card.title }}</span>
+          <h2 class="stat-value">
+            <span class="amount" *ngIf="!card.isCurrency">{{ card.count | number }}</span>
+            <span class="amount" *ngIf="card.isCurrency">{{ card.count | currency:'KES ':'symbol':'1.0-2' }}</span>
+          </h2>
+        </div>
+        <div class="stat-icon" [style.background-color]="card.color + '20'">
+          <i [class]="'pi ' + card.icon" [style.color]="card.color"></i>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- ================= FILTER PANEL ================= -->
+  <p-card styleClass="stat-card card filter-card">
+    <div class="filter-header">
+      <div class="filter-header-left">
+        <h3>Filters</h3>
+        <span class="filter-count-badge" *ngIf="activeFilterCount > 0">
+          {{ activeFilterCount }} active
+        </span>
+      </div>
+      <button pButton type="button" [label]="showAdvancedFilters ? 'Fewer Filters' : 'More Filters'"
+        [icon]="showAdvancedFilters ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" iconPos="right"
+        class="p-button-text p-button-sm" (click)="toggleAdvancedFilters()"></button>
+    </div>
+
+    <div class="filter-grid">
+      <div class="filter-field">
+        <label>Phone Number</label>
+        <input pInputText type="text" placeholder="2547XXXXXXXX" [(ngModel)]="filters.phoneNumber"
+          (keyup.enter)="onSearch()" />
+      </div>
+
+      <div class="filter-field">
+        <label>M-Pesa Receipt</label>
+        <input pInputText type="text" placeholder="QAB12C3D4E" [(ngModel)]="filters.mpesaReceiptNumber"
+          (keyup.enter)="onSearch()" />
+      </div>
+
+      <div class="filter-field">
+        <label>Fleet Number</label>
+        <input pInputText type="text" placeholder="SM150" [(ngModel)]="filters.fleetNumber"
+          (keyup.enter)="onSearch()" />
+      </div>
+
+      <div class="filter-field">
+        <label>Payment Status</label>
+        <p-select [options]="paymentStatusOptions" optionLabel="label" optionValue="value"
+          [(ngModel)]="filters.paymentStatus" placeholder="All Statuses" styleClass="w-full"></p-select>
+      </div>
+
+      <div class="filter-field">
+        <label>Date From</label>
+        <p-datepicker [(ngModel)]="dateFromValue" [showTime]="true" dateFormat="yy-mm-dd" placeholder="Start date"
+          [showIcon]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+      </div>
+
+      <div class="filter-field">
+        <label>Date To</label>
+        <p-datepicker [(ngModel)]="dateToValue" [showTime]="true" dateFormat="yy-mm-dd" placeholder="End date"
+          [showIcon]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+      </div>
+
+      <!-- ===== Advanced filters ===== -->
+      <ng-container *ngIf="showAdvancedFilters">
+        <div class="filter-field">
+          <label>Entity ID</label>
+          <input pInputText type="text" [(ngModel)]="filters.entityId" (keyup.enter)="onSearch()" />
+        </div>
+
+        <div class="filter-field">
+          <label>Username</label>
+          <input pInputText type="text" [(ngModel)]="filters.username" (keyup.enter)="onSearch()" />
+        </div>
+
+        <div class="filter-field">
+          <label>Transaction Code</label>
+          <input pInputText type="text" [(ngModel)]="filters.transactionCode" (keyup.enter)="onSearch()" />
+        </div>
+
+        <div class="filter-field">
+          <label>Payment Source</label>
+          <p-select [options]="paymentSourceOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="filters.paymentSource" placeholder="All Sources" styleClass="w-full"></p-select>
+        </div>
+
+        <div class="filter-field">
+          <label>Payment Type</label>
+          <p-select [options]="paymentTypeOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="filters.paymentType" placeholder="All Types" styleClass="w-full"></p-select>
+        </div>
+
+        <div class="filter-field">
+          <label>Transaction Type</label>
+          <p-select [options]="transactionTypeOptions" optionLabel="label" optionValue="value"
+            [(ngModel)]="filters.transactionType" placeholder="All" styleClass="w-full"></p-select>
+        </div>
+
+        <div class="filter-field">
+          <label>Amount From (KES)</label>
+          <p-inputNumber [(ngModel)]="filters.amountFrom" mode="decimal" [minFractionDigits]="0"
+            placeholder="0"></p-inputNumber>
+        </div>
+
+        <div class="filter-field">
+          <label>Amount To (KES)</label>
+          <p-inputNumber [(ngModel)]="filters.amountTo" mode="decimal" [minFractionDigits]="0"
+            placeholder="0"></p-inputNumber>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="filter-actions">
+      <button pButton type="button" label="Reset" icon="pi pi-refresh" class="p-button-text" (click)="onResetFilters()"
+        style="gap: 1.2rem"></button>
+      <button pButton type="button" label="Search" icon="pi pi-search" class="search-btn" (click)="onSearch()"
+        style="gap: 1.2rem"></button>
+    </div>
+  </p-card>
+
+  <!-- ================= RESULTS TABLE ================= -->
+  <div>
+    <p-card styleClass="stat-card card">
+      <div class="table-header">
+        <div class="table-header-left">
+          <h3>Transactions</h3>
+          <span class="record-count">{{ totalRecords | number }} total records</span>
+        </div>
+      </div>
+
+      <p-table [value]="transactions" [lazy]="true" [paginator]="true" [rows]="rows" [first]="first"
+        [loading]="loading()" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions"
+        styleClass="data-table" (onLazyLoad)="loadTransactions($event)" [sortField]="sortField" [sortOrder]="sortOrder"
+        [tableStyle]="{ 'min-width': '75rem' }" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="createdAt">Date <p-sortIcon field="createdAt"></p-sortIcon></th>
+            <th>Receipt No.</th>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th pSortableColumn="fleetNumber">Fleet <p-sortIcon field="fleetNumber"></p-sortIcon></th>
+            <th pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+            <th pSortableColumn="paymentStatus">Status <p-sortIcon field="paymentStatus"></p-sortIcon></th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-txn>
+          <tr class="clickable-row" (click)="viewDetails(txn)">
+            <td>
+              <span class="date-value">{{ txn.createdAt | date:'MMM d, y, h:mm a' }}</span>
+            </td>
+            <td>
+              <span class="code-badge">{{ txn.mpesaReceiptNumber || '—' }}</span>
+            </td>
+            <td>{{ txn.customerName || '—' }}</td>
+            <td>{{ txn.phoneNumber || '—' }}</td>
+            <td>{{ txn.fleetNumber || '—' }}</td>
+            <td>
+              <span class="amount-value">{{ txn.amount | currency:'KES ':'symbol':'1.0-2' }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                  'badge-paid': txn.paymentStatus === 'PAID',
+                  'badge-pending': txn.paymentStatus === 'PENDING',
+                  'badge-failed': txn.paymentStatus === 'FAILED' || txn.paymentStatus === 'CANCELLED'
+                }">
+                <i class="pi" [ngClass]="{
+                    'pi-check-circle': txn.paymentStatus === 'PAID',
+                    'pi-clock': txn.paymentStatus === 'PENDING',
+                    'pi-times-circle': txn.paymentStatus === 'FAILED' || txn.paymentStatus === 'CANCELLED'
+                  }"></i>
+                {{ txn.paymentStatus || 'UNKNOWN' }}
+              </span>
+            </td>
+            <td>
+              <span class="type-pill">{{ txn.paymentType || '—' }}</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm"
+                  pTooltip="View Details" tooltipPosition="top"
+                  (click)="viewDetails(txn); $event.stopPropagation()"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="empty-message">
+              <div class="empty-state">
+                <i class="pi pi-search"></i>
+                <h3>No Transactions Found</h3>
+                <p>Try adjusting your search filters</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- ================= DETAILS DIALOG ================= -->
+  <p-dialog [(visible)]="displayDetailsDialog" [modal]="true" [closable]="true" [dismissableMask]="true"
+    [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+    [style]="{ width: '90vw', maxWidth: '760px', backgroundColor: '#f9f9f9' }">
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <h2>Transaction Details</h2>
+        <span class="receipt-number-large">{{ selectedTransaction?.mpesaReceiptNumber }}</span>
+      </div>
+    </ng-template>
+
+    <div class="detail-content" *ngIf="selectedTransaction">
+      <div class="detail-grid">
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Transaction ID</label>
+            <span class="value">{{ selectedTransaction.id }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Customer Name</label>
+            <span class="value">{{ selectedTransaction.customerName || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Phone Number</label>
+            <span class="value">{{ selectedTransaction.phoneNumber || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Fleet Number</label>
+            <span class="value">{{ selectedTransaction.fleetNumber || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Entity ID</label>
+            <span class="value code-value">{{ selectedTransaction.entityId }}</span>
+          </div>
+        </div>
+
+        <div class="detail-column">
+          <div class="detail-item">
+            <label>Amount</label>
+            <span class="value">{{ selectedTransaction.amount | currency:'KES ':'symbol':'1.0-2' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Payment Status</label>
+            <span class="value badge" [ngClass]="{
+                'badge-paid': selectedTransaction.paymentStatus === 'PAID',
+                'badge-pending': selectedTransaction.paymentStatus === 'PENDING',
+                'badge-failed': selectedTransaction.paymentStatus === 'FAILED' || selectedTransaction.paymentStatus === 'CANCELLED'
+              }">
+              {{ selectedTransaction.paymentStatus }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Payment Type / Source</label>
+            <span class="value">{{ selectedTransaction.paymentType }} · {{ selectedTransaction.paymentSource }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Created At</label>
+            <span class="value">{{ selectedTransaction.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Result</label>
+            <span class="value">{{ selectedTransaction.resultDesc || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Reconciliation ===== -->
+      <div class="reconciliation-section">
+        <div class="reconciliation-header">
+          <h4>Reconciliation</h4>
+          <button pButton type="button" label="Check Reconciliation" icon="pi pi-verified"
+            class="p-button-outlined p-button-sm" [loading]="checkingReconciliation"
+            (click)="checkReconciliation()"></button>
+        </div>
+
+        <div class="reconciliation-results" *ngIf="reconciliation">
+          <div class="recon-row">
+            <span class="recon-label">Transaction record</span>
+            <span class="badge" [ngClass]="reconciliation.transactionExists ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.transactionExists ? 'Found' : 'Missing' }}
+            </span>
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">State record</span>
+            <span class="badge" [ngClass]="reconciliation.stateExists ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.stateExists ? 'Found' : 'Missing' }}
+            </span>
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Statement record</span>
+            <span class="badge" [ngClass]="reconciliation.statementExists ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.statementExists ? 'Found' : 'Missing' }}
+            </span>
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Amounts consistent</span>
+            <span class="badge" [ngClass]="reconciliation.amountConsistent ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.amountConsistent ? 'Consistent' : 'Mismatch' }}
+            </span>
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Entity ID consistent</span>
+            <span class="badge" [ngClass]="reconciliation.entityIdConsistent ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.entityIdConsistent ? 'Consistent' : 'Mismatch' }}
+            </span>
+          </div>
+          <div class="recon-row">
+            <span class="recon-label">Receipt number consistent</span>
+            <span class="badge" [ngClass]="reconciliation.mpesaReceiptNumberConsistent ? 'badge-paid' : 'badge-failed'">
+              {{ reconciliation.mpesaReceiptNumberConsistent ? 'Consistent' : 'Mismatch' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" iconPos="right" style="gap: 0.5rem;"
+        (click)="closeDetailsDialog()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

@@ -61,3 +61,4 @@ export type BalanceQueryResponse = ApiEnvelope<BalanceQueryInit>;
 export type BalanceLatestResponse = ApiEnvelope<BalanceRecord>;
 export type BalanceHistoryResponse = ApiEnvelope<BalanceRecord[]>;
 export type BalanceCheckResponse = ApiEnvelope<BalanceSufficiency>;
+// export type BalanceHistoryResponse = BalanceRecord[]; // no envelope for this endpoint

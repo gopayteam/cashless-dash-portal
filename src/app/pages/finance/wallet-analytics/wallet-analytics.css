@@ -7,7 +7,12 @@
 }
 
 .analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 .header-content h1 {
@@ -15,7 +20,7 @@
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
-  letter-spacing: -0.02em;
+  /* letter-spacing: -0.02em; */
 }
 
 .text-muted {
@@ -394,4 +399,34 @@
 
 .analytics-container.legacy-brand .panel-amount .currency {
   color: #a0866b;
+}
+
+
+.wallet-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.api-toggle-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 1.75rem;
+  padding: 0 !important;
+  margin-left: 0.15rem;
+  opacity: 0.35;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.api-toggle-button:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+.api-toggle-button.dev-active {
+  opacity: 0.55;
+}
+
+.api-toggle-button.prod-active {
+  opacity: 0.3;
 }

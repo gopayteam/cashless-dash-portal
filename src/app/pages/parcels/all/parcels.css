@@ -1175,3 +1175,26 @@
   color: var(--text-color-secondary);
   white-space: nowrap;
 }
+
+.delete-btn {
+  color: #e53935 !important;
+}
+
+.delete-btn:hover {
+  background-color: rgba(229, 57, 53, 0.1) !important;
+}
+
+.dialog-icon.delete-icon {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: #e53935;
+}
+
+.delete-confirm-content {
+  padding: 1.5rem 2rem;
+}
+
+.delete-confirm-content p {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}

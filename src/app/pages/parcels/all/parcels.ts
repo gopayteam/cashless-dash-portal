@@ -1,42 +1,42 @@
 // pages/parcels/parcels.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { Paginator } from "primeng/paginator";
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
+import { TooltipModule } from 'primeng/tooltip';
+import * as XLSX from 'xlsx';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { LoadingStore } from '../../../../@core/state/loading.store';
-import { Parcel } from '../../../../@core/models/parcels/parcel.model';
-import { ParcelsAPiResponse, SingleParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
 import { mapParcelStatsToCards } from '../../../../@core/mappers/dashboard.mapper';
-import { AuthService } from '../../../../@core/services/auth.service';
-import { ParcelReceiptService } from '../../../../@core/services/parcel-receipt.service';
-import { Router } from '@angular/router';
-import { MessageModule } from 'primeng/message';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { ParcelReceiptComponent } from "../../../components/parcel-receipt/parcel-receipt";
-import { ParcelReceiptGenerationService } from '../../../../@core/services/parcel-receipts.service';
-import * as XLSX from 'xlsx';
 import { Stage } from '../../../../@core/models/locations/stage.model';
-import { ParcelSelectedStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
-import { SelectModule } from 'primeng/select';
-import { ActionButtonComponent } from "../../../components/action-button/action-button";
-import { formatDateLocal } from '../../../../@core/utils/date-time.util';
-import { Paginator } from "primeng/paginator";
-import { TotalValuePipe, TotalAmountPipe } from '../../../../@core/pipes/total-value.pipe';
+import { Parcel } from '../../../../@core/models/parcels/parcel.model';
 import { ParcelManager } from '../../../../@core/models/parcels/parcel_manager.model';
 import { ParcelManagersApiResponse } from '../../../../@core/models/parcels/parcel_manager_response.model';
+import { ParcelsAPiResponse, SingleParcelsAPiResponse } from '../../../../@core/models/parcels/parcel_response.model';
+import { ParcelSelectedStageApiResponse } from '../../../../@core/models/parcels/parcel_stage_response';
+import { TotalAmountPipe, TotalValuePipe } from '../../../../@core/pipes/total-value.pipe';
+import { AuthService } from '../../../../@core/services/auth.service';
+import { ParcelReceiptService } from '../../../../@core/services/parcel-receipt.service';
+import { ParcelReceiptGenerationService } from '../../../../@core/services/parcel-receipts.service';
+import { LoadingStore } from '../../../../@core/state/loading.store';
+import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { ParcelReceiptComponent } from "../../../components/parcel-receipt/parcel-receipt";
 
 @Component({
   standalone: true,
@@ -163,6 +163,11 @@ export class ParcelsComponent implements OnInit {
   valueBuckets: any[] = [];
   selectedBucket: any = null;
   showBucketParcels = false;
+
+  // Delete confirmation
+  displayDeleteConfirmDialog: boolean = false;
+  parcelToDelete: Parcel | null = null;
+  isDeletingParcel: boolean = false;
 
   constructor(
     private dataService: DataService,
@@ -952,5 +957,70 @@ export class ParcelsComponent implements OnInit {
     } else {
       this.fetchParcels(true, { first: 0, rows: this.rows });
     }
+  }
+
+  /**
+ * Open the delete confirmation dialog for a parcel
+ */
+  confirmDeleteParcel(parcel: Parcel, event?: Event): void {
+    event?.stopPropagation(); // prevent row click (viewParcelDetails) from firing
+    this.parcelToDelete = parcel;
+    this.displayDeleteConfirmDialog = true;
+  }
+
+  /**
+   * Close the delete confirmation dialog without deleting
+   */
+  cancelDeleteParcel(): void {
+    this.displayDeleteConfirmDialog = false;
+    this.parcelToDelete = null;
+  }
+
+  /**
+   * Actually delete the parcel after confirmation
+   */
+  deleteParcel(): void {
+    if (!this.parcelToDelete) return;
+
+    const parcel = this.parcelToDelete;
+    this.isDeletingParcel = true;
+
+    const endpoint = `${API_ENDPOINTS.DELETE_PARCEL}?parcelNumber=${parcel.parcelNumber}`; //&entityId=${this.entityId}
+
+    this.dataService
+      .post<any>(endpoint, {}, 'delete-parcel', true) // bypassCache: true so stale cache isn't reused
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Deleted',
+            detail: `Parcel ${parcel.parcelNumber} deleted successfully`,
+            life: 4000
+          });
+
+          // Close dialogs and refresh
+          this.displayDeleteConfirmDialog = false;
+          this.parcelToDelete = null;
+
+          if (this.displayDetailDialog) {
+            this.closeDetailDialog();
+          }
+
+          this.refreshParcels();
+          this.fetchParcelAggregates();
+        },
+        error: (err) => {
+          console.error('Failed to delete parcel', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to delete parcel',
+            life: 4000
+          });
+        },
+        complete: () => {
+          this.isDeletingParcel = false;
+        }
+      });
   }
 }

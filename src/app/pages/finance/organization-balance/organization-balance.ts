@@ -103,7 +103,7 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
   checkNotFound = false;
 
   bypassCache: boolean = true;
-  useDevApi: boolean = false;
+  useDevApi: boolean = true;
 
   get isLegacyBrand(): boolean {
     return this.entityId === 'GS000002';
@@ -291,6 +291,22 @@ export class OrganizationBalanceComponent implements OnInit, OnChanges, OnDestro
   }
 
   private loadHistory(): void {
+    this.dataService
+      .getWithoutParams<BalanceRecord[]>(API_ENDPOINTS.ORG_BALANCE_HISTORY(this.partyA), 'org-balance-history', this.bypassCache, this.useDevApi)
+      .subscribe({
+        next: (response) => {
+          const records = Array.isArray(response) ? response : (response as any)?.data ?? [];
+          this.history = records
+            .slice()
+            .sort((a: BalanceRecord, b: BalanceRecord) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime());
+          this.historyLoaded = true;
+          this.cdr.detectChanges();
+        },
+        error: (err) => { /* unchanged */ },
+      });
+  }
+
+  private loadHistory_2(): void {
     this.dataService
       .getWithoutParams<BalanceHistoryResponse>(API_ENDPOINTS.ORG_BALANCE_HISTORY(this.partyA), 'org-balance-history', this.bypassCache,
         this.useDevApi,)

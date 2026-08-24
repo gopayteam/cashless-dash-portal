@@ -7,6 +7,8 @@ export const environment = {
   production: false,
   useMockApi: false,
   apiBaseUrl: 'https://api.gopay.ke', //'http://localhost:4200',
+  devApiBaseUrl: 'https://capital-obviously-terrier.ngrok-free.app',
+  useDevApiUrl: false,
   aiBaseUrl: 'https://capital-obviously-terrier.ngrok-free.app',
   dashboardBaseUrl: 'http://localhost:4200'
 };

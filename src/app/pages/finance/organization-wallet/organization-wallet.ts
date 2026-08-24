@@ -1,20 +1,20 @@
 // pages/wallets/organization-wallets.component.ts
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../@core/api/data.service';
 import { API_ENDPOINTS } from '../../../../@core/api/endpoints';
-import { LoadingStore } from '../../../../@core/state/loading.store';
 import { OrganizationWallet } from '../../../../@core/models/wallet/org_wallet.model';
 import { OrganizationWalletApiResponse } from '../../../../@core/models/wallet/org_wallet_response.model';
 import { AuthService } from '../../../../@core/services/auth.service';
-import { Router } from '@angular/router';
+import { LoadingStore } from '../../../../@core/state/loading.store';
 
 @Component({
   selector: 'app-organization-wallets',
@@ -48,13 +48,49 @@ export class OrganizationWalletComponent implements OnInit {
   totalBalance: number = 0;
   activeWallets: number = 0;
 
+  bypassCache: boolean = true;
+  useAi: boolean = true;
+
+  /**
+ * Component-scoped flag: when true, only THIS component's
+ * API calls are routed to the dev API.
+ */
+  private _useDev = false;
+
+  /**
+ * Toggle whether THIS component's API calls use the dev API URL.
+ */
+  public setUseDevUrl(useDev: boolean): void {
+    this._useDev = useDev;
+  }
+
+  /**
+   * Returns whether this component is currently configured
+   * to use the dev API URL.
+   */
+  public getUseDevUrl(): boolean {
+    return this._useDev;
+  }
+
+  /**
+   * Resolves the effective useDev flag for a single call.
+   *
+   * A per-call override wins; otherwise the component-level
+   * setting is used.
+   */
+  private resolveUseDev(perCallOverride?: boolean): boolean {
+    return perCallOverride !== undefined
+      ? perCallOverride
+      : this._useDev;
+  }
+
   constructor(
     private dataService: DataService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   get loading() {
     return this.loadingStore.loading;
@@ -73,7 +109,16 @@ export class OrganizationWalletComponent implements OnInit {
     this.loadWallets();
   }
 
-  loadWallets(): void {
+  toggleApiUrl(): void {
+    const newUseDev = !this.getUseDevUrl();
+
+    this.setUseDevUrl(newUseDev);
+
+    // Reload the wallets using the newly selected API
+    this.loadWallets();
+  }
+
+  loadWallets(useDev?: boolean): void {
     const params = {
       size: 200,
       page: 0,
@@ -86,7 +131,10 @@ export class OrganizationWalletComponent implements OnInit {
       .get<OrganizationWalletApiResponse>(
         API_ENDPOINTS.ALL_ORGANIZATION_WALLETS,
         params,
-        'organization-wallets'
+        'organization-wallets',
+        this.bypassCache,
+        this.useAi,
+        this.resolveUseDev(useDev),
       )
       .subscribe({
         next: (response) => {

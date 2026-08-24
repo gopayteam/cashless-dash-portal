@@ -2,7 +2,25 @@
 <div class="analytics-container" [class.legacy-brand]="entityId === 'GS000002'">
   <div class="analytics-header">
     <div class="header-content">
-      <h1>Wallet Analytics</h1>
+      <h1 class="wallet-title">
+        Wallet Analytics
+
+        <!-- <button type="button" pButton class="p-button-text p-button-sm api-toggle-button"
+
+
+          [class.dev-active]="getUseDevUrl()" [class.prod-active]="!getUseDevUrl()" [pTooltip]="getUseDevUrl()
+      ? 'Using Dev API — Click to use Production API'
+      : 'Using Production API — Click to use Dev API'" tooltipPosition="right" (click)="toggleApiUrl()">
+          <i class="pi" style="size: 2px;" [class.pi-code]="getUseDevUrl()" [class.pi-cloud]="!getUseDevUrl()"></i>
+        </button> -->
+        <button type="button" pButton [icon]="getUseDevUrl() ? 'pi pi-code' : 'pi pi-cloud'"
+          class="p-button-text p-button-sm api-toggle-button" [class.dev-active]="getUseDevUrl()"
+          [class.prod-active]="!getUseDevUrl()"
+          [pTooltip]="getUseDevUrl() ? 'Using Dev API — Click to use Production API' : 'Using Production API — Click to use Dev API'"
+          tooltipPosition="right" (click)="toggleApiUrl()">
+        </button>
+
+      </h1>
       <p class="text-muted">Balance breakdown, tariffs, and cash flow at a glance</p>
     </div>
   </div>

@@ -419,6 +419,7 @@
 }
 
 /* ================= SUB-ACCOUNT GRID ================= */
+/* 
 .subaccount-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -477,6 +478,87 @@
   font-size: 0.72rem;
   color: #a0aec0;
   flex-wrap: wrap;
+} */
+
+/* ================= SUB-ACCOUNT GRID ================= */
+.subaccount-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.subaccount-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #fff;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  padding: 1.1rem;
+  min-height: 132px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.subaccount-card:hover {
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.subaccount-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(var(--secondary-color-rgb, 212, 175, 55), 0.12);
+  color: var(--secondary-color-dark, #b8860b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.subaccount-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.subaccount-name {
+  font-size: 0.72rem;
+  color: #a0aec0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.subaccount-balance {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Zero-balance accounts read as calm placeholders, not equal-weight data */
+.subaccount-card:has(.subaccount-balance[data-zero="true"]) .subaccount-balance {
+  color: #cbd5e0;
+  font-weight: 600;
+}
+
+.subaccount-meta {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  color: #a0aec0;
+  flex-wrap: wrap;
+  min-height: 1em;
+  /* reserves space so cards without it still align */
 }
 
 /* ================= SUFFICIENCY CHECKER ================= */

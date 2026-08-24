@@ -5,19 +5,36 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
+  /** Global toggle determining whether calls use normal apiBaseUrl or devApiBaseUrl */
+  public static useDevUrl: boolean = environment.useDevApiUrl ?? false;
+
   private baseUrl = environment.apiBaseUrl;
-  private aiBaseUrl = environment.aiBaseUrl;   // ← add this to your environment files
+  private devBaseUrl = environment.devApiBaseUrl || 'http://localhost:8080';
+  private aiBaseUrl = environment.aiBaseUrl;
 
   constructor(private http: HttpClient) { }
+
+  public setUseDevUrl(useDev: boolean): void {
+    ApiService.useDevUrl = useDev;
+  }
+
+  public getUseDevUrl(): boolean {
+    return ApiService.useDevUrl;
+  }
 
   // ── Private helpers ──────────────────────────────────────────────────────
 
   /**
    * Resolves which base URL to use.
-   * Pass `true` for any AI service call; omit or pass `false` for standard API.
+   * Priority:
+   * 1. `useAi = true` -> `aiBaseUrl`
+   * 2. `useDev` parameter if provided, otherwise global `ApiService.useDevUrl` -> `devBaseUrl`
+   * 3. Default -> `baseUrl`
    */
-  private resolveBase(useAi?: boolean): string {
-    return useAi ? this.aiBaseUrl : this.baseUrl;
+  private resolveBase(useAi?: boolean, useDev?: boolean): string {
+    if (useAi) return this.aiBaseUrl;
+    const isDev = useDev !== undefined ? useDev : ApiService.useDevUrl;
+    return isDev ? this.devBaseUrl : this.baseUrl;
   }
 
   private buildParams(params?: Record<string, any>): HttpParams {
@@ -32,58 +49,61 @@ export class ApiService {
     return httpParams;
   }
 
-  // ── Methods — all accept an optional `useAi` flag ───────────────────────
+  // ── Methods — all accept optional `useAi` and `useDev` flags ────────────
 
-  get<T>(endpoint: string, params?: Record<string, any>, useAi?: boolean): Observable<T> {
-    return this.http.get<T>(`${this.resolveBase(useAi)}${endpoint}`, {
+  get<T>(endpoint: string, params?: Record<string, any>, useAi?: boolean, useDev?: boolean): Observable<T> {
+    return this.http.get<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, {
       params: this.buildParams(params),
     });
   }
 
-  post<T>(endpoint: string, payload: any, useAi?: boolean): Observable<T> {
-    return this.http.post<T>(`${this.resolveBase(useAi)}${endpoint}`, payload);
+  post<T>(endpoint: string, payload: any, useAi?: boolean, useDev?: boolean): Observable<T> {
+    return this.http.post<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, payload);
   }
 
   postWithParams<T>(
     endpoint: string,
     payload: any,
     params?: Record<string, any>,
-    useAi?: boolean
+    useAi?: boolean,
+    useDev?: boolean
   ): Observable<T> {
-    return this.http.post<T>(`${this.resolveBase(useAi)}${endpoint}`, payload, {
+    return this.http.post<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, payload, {
       params: this.buildParams(params),
     });
   }
 
-  postFormData<T>(endpoint: string, formData: FormData, useAi?: boolean): Observable<T> {
-    return this.http.post<T>(`${this.resolveBase(useAi)}${endpoint}`, formData);
+  postFormData<T>(endpoint: string, formData: FormData, useAi?: boolean, useDev?: boolean): Observable<T> {
+    return this.http.post<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, formData);
   }
 
-  put<T>(endpoint: string, payload: any, useAi?: boolean): Observable<T> {
-    return this.http.put<T>(`${this.resolveBase(useAi)}${endpoint}`, payload);
+  put<T>(endpoint: string, payload: any, useAi?: boolean, useDev?: boolean): Observable<T> {
+    return this.http.put<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, payload);
   }
 
   putWithParams<T>(
     endpoint: string,
     payload: any,
     params?: Record<string, any>,
-    useAi?: boolean
+    useAi?: boolean,
+    useDev?: boolean
   ): Observable<T> {
-    return this.http.put<T>(`${this.resolveBase(useAi)}${endpoint}`, payload, {
+    return this.http.put<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, payload, {
       params: this.buildParams(params),
     });
   }
 
-  delete<T>(endpoint: string, useAi?: boolean): Observable<T> {
-    return this.http.delete<T>(`${this.resolveBase(useAi)}${endpoint}`);
+  delete<T>(endpoint: string, useAi?: boolean, useDev?: boolean): Observable<T> {
+    return this.http.delete<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`);
   }
 
   deleteWithParams<T>(
     endpoint: string,
     params?: Record<string, any>,
-    useAi?: boolean
+    useAi?: boolean,
+    useDev?: boolean
   ): Observable<T> {
-    return this.http.delete<T>(`${this.resolveBase(useAi)}${endpoint}`, {
+    return this.http.delete<T>(`${this.resolveBase(useAi, useDev)}${endpoint}`, {
       params: this.buildParams(params),
     });
   }

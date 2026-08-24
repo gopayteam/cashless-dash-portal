@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   ALL_PARCEL_SOURCES: '/api/parcels/report/summary/source',
   ALL_PARCEL_DESTINATIONS: '/api/parcels/report/summary/destination',
   ALL_PARCEL_STAGES: '/api/route/list/stages',
+  DELETE_PARCEL: '/api/parcels/delete/parcel',
 
   // #####################  PARCEL STAGES CONTACT SUB-ENDPOINTS   #######################
   CREATE_PARCEL_STAGE_CONTACT: '/api/parcels/contacts/create-stage-contact',
@@ -139,6 +140,27 @@ export const API_ENDPOINTS = {
   ORG_BALANCE_LATEST: (partyA: string) => `/api/payment/balance/${partyA}/latest`, // GET
   ORG_BALANCE_HISTORY: (partyA: string) => `/api/payment/balance/${partyA}/history`, // GET
   ORG_BALANCE_CHECK: (partyA: string) => `/api/payment/balance/${partyA}/check`, // GET, ?amount=
+
+  // #####################  TRANSACTION LOOKUP API ENDPOINTS   #######################
+  TRANSACTIONS_SEARCH: '/api/transactions/search',
+  TRANSACTIONS_BY_CODE: (transactionCode: string) => `/api/transactions/code/${transactionCode}`,
+  TRANSACTIONS_BY_RECEIPT: (receiptNumber: string) => `/api/transactions/receipt/${receiptNumber}`,
+  TRANSACTIONS_BY_ENTITY: (entityId: string) => `/api/transactions/entity/${entityId}`,
+  TRANSACTIONS_BY_USER: (phoneNumber: string) => `/api/transactions/user/${phoneNumber}`,
+  TRANSACTIONS_BY_FLEET: (fleetNumber: string) => `/api/transactions/fleet/${fleetNumber}`,
+  TRANSACTION_RECONCILIATION: (transactionCode: string) => `/api/transactions/${transactionCode}/reconciliation`,
+  TRANSACTIONS_ANALYTICS_SUMMARY: '/api/transactions/analytics/summary',
+  TRANSACTIONS_ANALYTICS_DAILY: '/api/transactions/analytics/daily',
+  TRANSACTIONS_ANALYTICS_HOURLY: '/api/transactions/analytics/hourly',
+  USER_TRANSACTIONS: (phoneNumber: string) => `/api/users/${phoneNumber}/transactions`,
+  USER_TRANSACTIONS_SUMMARY: (phoneNumber: string) => `/api/users/${phoneNumber}/transactions/summary`,
+  USER_ANALYTICS: (phoneNumber: string) => `/api/users/${phoneNumber}/analytics`,
+  FLEET_TRANSACTIONS: (fleetNumber: string) => `/api/fleets/${fleetNumber}/transactions`,
+  FLEET_TRANSACTIONS_SUMMARY: (fleetNumber: string) => `/api/fleets/${fleetNumber}/transactions/summary`,
+  FLEET_ANALYTICS: (fleetNumber: string) => `/api/fleets/${fleetNumber}/analytics`,
+  STATEMENTS_SEARCH: '/api/statements/search',
+  STATEMENTS_BY_RECEIPT: (receiptNumber: string) => `/api/statements/receipt/${receiptNumber}`,
+  STATEMENTS_BY_ENTITY: (entityId: string) => `/api/statements/entity/${entityId}`,
 
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,

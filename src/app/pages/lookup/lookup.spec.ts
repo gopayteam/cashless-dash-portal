@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrganizationWalletComponent as OrganizationWallet } from './organization-wallet';
+import { Lookup } from './lookup';
 
-describe('OrganizationWallet', () => {
-  let component: OrganizationWallet;
-  let fixture: ComponentFixture<OrganizationWallet>;
+describe('Lookup', () => {
+  let component: Lookup;
+  let fixture: ComponentFixture<Lookup>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OrganizationWallet]
+      imports: [Lookup]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(OrganizationWallet);
+    fixture = TestBed.createComponent(Lookup);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
