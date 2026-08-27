@@ -30,8 +30,10 @@ import {
   TransactionLookupDto,
   TransactionSearchFilters
 } from '../../../@core/models/lookup/transaction-lookup.model';
+import { OtpLookupDto, OtpSearchFilters } from '../../../@core/models/lookup/otp-lookup.model';
 import { AuthService } from '../../../@core/services/auth.service';
 import { TransactionLookupService } from '../../../@core/services/transaction-lookup.service';
+import { OtpLookupService } from '../../../@core/services/otp-lookup.service';
 import { LoadingStore } from '../../../@core/state/loading.store';
 
 // Adjust these to match your backend's actual enum values.
@@ -73,6 +75,21 @@ const SORT_OPTIONS: { label: string; value: string }[] = [
   { label: 'Payment Status', value: 'paymentStatus' },
 ];
 
+const OTP_STATUS_OPTIONS = [
+  { label: 'All Statuses', value: null },
+  { label: 'Active / Valid', value: 'ACTIVE' },
+  { label: 'Confirmed / Used', value: 'CONFIRMED' },
+  { label: 'Expired', value: 'EXPIRED' },
+];
+
+const OTP_SORT_OPTIONS: { label: string; value: string }[] = [
+  { label: 'Date Created', value: 'createdAt' },
+  { label: 'Expires At', value: 'expiresAt' },
+  { label: 'Confirmed At', value: 'confirmedAt' },
+  { label: 'Phone Number', value: 'phoneNumber' },
+  { label: 'ID', value: 'id' },
+];
+
 const MAX_EXPORT_PAGES = 20; // safety cap: 20 pages * 100 rows = 2,000 records
 const EXPORT_PAGE_SIZE = 100; // API caps collection endpoints at 100/page
 
@@ -101,8 +118,9 @@ const EXPORT_PAGE_SIZE = 100; // API caps collection endpoints at 100/page
 })
 export class TransactionLookupComponent implements OnInit {
   entityId: string | null = null;
+  activeTab: 'transactions' | 'otps' = 'transactions';
 
-  // ============ Filters ============
+  // ============ Transaction Filters ============
   filters: TransactionSearchFilters = {};
   dateFromValue: Date | null = null;
   dateToValue: Date | null = null;
@@ -114,7 +132,7 @@ export class TransactionLookupComponent implements OnInit {
   transactionTypeOptions = TRANSACTION_TYPE_OPTIONS;
   sortOptions = SORT_OPTIONS;
 
-  // ============ Table / Data ============
+  // ============ Transaction Table / Data ============
   transactions: TransactionLookupDto[] = [];
   totalRecords = 0;
   rows = 20;
@@ -122,30 +140,45 @@ export class TransactionLookupComponent implements OnInit {
   sortField: string = 'createdAt';
   sortOrder: number = -1; // PrimeNG: 1 = asc, -1 = desc
   private lastLazyEvent: any = { first: 0, rows: this.rows };
-
-  // ============ Analytics & Statements Lookup ============
-  activeTab: 'transactions' | 'analytics' | 'statements' = 'transactions';
-  analyticsSummary: AnalyticsResponseDto | null = null;
-  statements: StatementDto[] = [];
-
-  // ============ Stats (current page) ============
   statsCards: any[] = [];
 
-  // ============ Details dialog ============
+  // ============ Transaction Details dialog ============
   displayDetailsDialog = false;
   selectedTransaction: TransactionLookupDto | null = null;
   reconciliation: ReconciliationResponse | null = null;
   checkingReconciliation = false;
 
-  // ============ Export ============
+  // ============ Transaction Export ============
   exportingCsv = false;
   exportingExcel = false;
   exportingAllCsv = false;
   exportingAllExcel = false;
 
+  // ============ OTP Lookup State ============
+  otpFilters: OtpSearchFilters = {};
+  otpDateFromValue: Date | null = null;
+  otpDateToValue: Date | null = null;
+  otpStatusOptions = OTP_STATUS_OPTIONS;
+  otpSortOptions = OTP_SORT_OPTIONS;
+
+  otps: OtpLookupDto[] = [];
+  otpTotalRecords = 0;
+  otpRows = 20;
+  otpFirst = 0;
+  otpSortField: string = 'createdAt';
+  otpSortOrder: number = -1;
+  private lastOtpLazyEvent: any = { first: 0, rows: this.otpRows };
+  otpStatsCards: any[] = [];
+
+  displayOtpDialog = false;
+  selectedOtp: OtpLookupDto | null = null;
+  exportingOtpCsv = false;
+  exportingOtpExcel = false;
+
   constructor(
     private dataService: DataService,
     public lookupService: TransactionLookupService,
+    public otpLookupService: OtpLookupService,
     public loadingStore: LoadingStore,
     public authService: AuthService,
     private router: Router,
@@ -157,15 +190,13 @@ export class TransactionLookupComponent implements OnInit {
     return this.loadingStore.loading;
   }
 
-  /**
-   * Global variable property for DataService endpoint URL resolution mode (Normal API vs Dev API)
-   */
   get useDevUrl(): boolean {
     return this.lookupService.getUseDevUrl();
   }
 
   set useDevUrl(val: boolean) {
     this.lookupService.setUseDevUrl(val);
+    this.otpLookupService.setUseDevUrl(val);
   }
 
   toggleEnvironment(useDev: boolean): void {
@@ -175,7 +206,20 @@ export class TransactionLookupComponent implements OnInit {
       summary: 'Endpoint URL Environment Switched',
       detail: `Data service calls now targeting: ${useDev ? 'DEV URL (http://localhost:8080)' : 'NORMAL API URL (https://api.gopay.ke)'}`,
     });
-    this.loadTransactions(this.lastLazyEvent);
+    if (this.activeTab === 'transactions') {
+      this.loadTransactions(this.lastLazyEvent);
+    } else {
+      this.loadOtps(this.lastOtpLazyEvent);
+    }
+  }
+
+  switchTab(tab: 'transactions' | 'otps'): void {
+    this.activeTab = tab;
+    if (tab === 'transactions' && this.transactions.length === 0) {
+      this.loadTransactions({ first: 0, rows: this.rows });
+    } else if (tab === 'otps' && this.otps.length === 0) {
+      this.loadOtps({ first: 0, rows: this.otpRows });
+    }
   }
 
   ngOnInit(): void {
@@ -191,7 +235,7 @@ export class TransactionLookupComponent implements OnInit {
     this.loadTransactions({ first: 0, rows: this.rows });
   }
 
-  // ================= LOADING =================
+  // ================= TRANSACTION LOADING =================
   loadTransactions(event: any): void {
     this.lastLazyEvent = event;
     this.loadingStore.start();
@@ -230,7 +274,45 @@ export class TransactionLookupComponent implements OnInit {
     });
   }
 
-  // Formats a Date as local (Africa/Nairobi wall-clock) ISO-8601, e.g. 2026-08-10T17:00:00
+  // ================= OTP LOADING =================
+  loadOtps(event: any): void {
+    this.lastOtpLazyEvent = event;
+    this.loadingStore.start();
+
+    const page = Math.floor(event.first / event.rows);
+    if (event.sortField) {
+      this.otpSortField = event.sortField;
+      this.otpSortOrder = event.sortOrder ?? this.otpSortOrder;
+    }
+
+    const searchFilters: OtpSearchFilters = {
+      ...this.otpFilters,
+      dateFrom: this.toLocalIso(this.otpDateFromValue),
+      dateTo: this.toLocalIso(this.otpDateToValue),
+      page,
+      size: event.rows,
+      sort: this.otpSortField,
+      direction: this.otpSortOrder === 1 ? 'ASC' : 'DESC',
+    };
+
+    this.otpLookupService.searchOtps(searchFilters).subscribe({
+      next: (response) => {
+        this.otps = response.data;
+        this.otpTotalRecords = response.totalElements;
+        this.otpRows = event.rows;
+        this.otpFirst = event.first;
+
+        this.calculateOtpStats();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.handleApiError(err, 'Failed to load OTPs');
+      },
+      complete: () => this.loadingStore.stop(),
+    });
+  }
+
+  // Formats a Date as local (Africa/Nairobi wall-clock) ISO-8601
   private toLocalIso(date: Date | null): string | null {
     if (!date) return null;
     const pad = (n: number) => n.toString().padStart(2, '0');
@@ -258,6 +340,20 @@ export class TransactionLookupComponent implements OnInit {
     this.onSearch();
   }
 
+  onOtpSearch(): void {
+    this.otpFirst = 0;
+    this.loadOtps({ ...this.lastOtpLazyEvent, first: 0, rows: this.otpRows });
+  }
+
+  onOtpResetFilters(): void {
+    this.otpFilters = {};
+    this.otpDateFromValue = null;
+    this.otpDateToValue = null;
+    this.otpSortField = 'createdAt';
+    this.otpSortOrder = -1;
+    this.onOtpSearch();
+  }
+
   toggleAdvancedFilters(): void {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
@@ -271,7 +367,15 @@ export class TransactionLookupComponent implements OnInit {
     return filterValues.length + dateCount;
   }
 
-  // ================= STATS (current page only) =================
+  get activeOtpFilterCount(): number {
+    const filterValues = Object.values(this.otpFilters).filter(
+      (v) => v !== undefined && v !== null && v !== ''
+    );
+    const dateCount = (this.otpDateFromValue ? 1 : 0) + (this.otpDateToValue ? 1 : 0);
+    return filterValues.length + dateCount;
+  }
+
+  // ================= STATS =================
   calculateStats(): void {
     const pageAmount = this.transactions.reduce(
       (sum, t) => sum + (Number(t.amount) || 0),
@@ -316,7 +420,40 @@ export class TransactionLookupComponent implements OnInit {
     ];
   }
 
-  // ================= DETAILS DIALOG =================
+  calculateOtpStats(): void {
+    const activeCount = this.otps.filter((o) => o.status === 'ACTIVE').length;
+    const confirmedCount = this.otps.filter((o) => o.status === 'CONFIRMED').length;
+    const expiredCount = this.otps.filter((o) => o.status === 'EXPIRED').length;
+
+    this.otpStatsCards = [
+      {
+        title: 'Total Matching OTPs',
+        count: this.otpTotalRecords,
+        icon: 'pi-key',
+        color: '#6366f1',
+      },
+      {
+        title: 'This Page — Active/Valid',
+        count: activeCount,
+        icon: 'pi-shield',
+        color: '#22c55e',
+      },
+      {
+        title: 'This Page — Confirmed/Used',
+        count: confirmedCount,
+        icon: 'pi-check-circle',
+        color: '#3b82f6',
+      },
+      {
+        title: 'This Page — Expired',
+        count: expiredCount,
+        icon: 'pi-clock',
+        color: '#ef4444',
+      },
+    ];
+  }
+
+  // ================= DETAILS DIALOGS =================
   viewDetails(transaction: TransactionLookupDto): void {
     this.selectedTransaction = transaction;
     this.reconciliation = null;
@@ -327,6 +464,33 @@ export class TransactionLookupComponent implements OnInit {
     this.displayDetailsDialog = false;
     this.selectedTransaction = null;
     this.reconciliation = null;
+  }
+
+  viewOtpDetails(otp: OtpLookupDto): void {
+    this.selectedOtp = otp;
+    this.displayOtpDialog = true;
+  }
+
+  closeOtpDialog(): void {
+    this.displayOtpDialog = false;
+    this.selectedOtp = null;
+  }
+
+  copyToClipboard(text: string, label: string): void {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Copied to Clipboard',
+        detail: `${label}: ${text}`,
+      });
+    }).catch(() => {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Copy Value',
+        detail: text,
+      });
+    });
   }
 
   checkReconciliation(): void {
@@ -364,6 +528,30 @@ export class TransactionLookupComponent implements OnInit {
 
   exportAllFilteredExcel(): void {
     this.runExport('excel', true);
+  }
+
+  exportOtpCsv(): void {
+    if (!this.otps.length) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Nothing to export',
+        detail: 'The current page has no OTP results.',
+      });
+      return;
+    }
+    this.writeOtpFile('csv', this.otps);
+  }
+
+  exportOtpExcel(): void {
+    if (!this.otps.length) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Nothing to export',
+        detail: 'The current page has no OTP results.',
+      });
+      return;
+    }
+    this.writeOtpFile('excel', this.otps);
   }
 
   private runExport(format: 'csv' | 'excel', allPages: boolean): void {
@@ -405,7 +593,6 @@ export class TransactionLookupComponent implements OnInit {
       });
   }
 
-  // Loops pages (bounded by MAX_EXPORT_PAGES) collecting all rows matching current filters.
   private async fetchAllFilteredPages(): Promise<TransactionLookupDto[]> {
     const all: TransactionLookupDto[] = [];
     let page = 0;
@@ -483,11 +670,39 @@ export class TransactionLookupComponent implements OnInit {
     });
   }
 
-  // ================= HELPERS =================
-  openInMaps(): void {
-    // placeholder
+  private writeOtpFile(format: 'csv' | 'excel', rows: OtpLookupDto[]): void {
+    const exportRows = rows.map((o) => ({
+      'ID': o.id,
+      'Phone Number': o.phoneNumber,
+      'OTP Code': o.token,
+      'Reference ID': o.tokenRefId,
+      'Status': o.status,
+      'Created At': o.createdAt,
+      'Expires At': o.expiresAt,
+      'Confirmed At': o.confirmedAt || '—',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'OTPs');
+
+    const stamp = this.toLocalIso(new Date())?.replace(/[:T]/g, '-') ?? Date.now();
+    const fileName = `otps_${stamp}`;
+
+    if (format === 'csv') {
+      XLSX.writeFile(workbook, `${fileName}.csv`, { bookType: 'csv' });
+    } else {
+      XLSX.writeFile(workbook, `${fileName}.xlsx`, { bookType: 'xlsx' });
+    }
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Export ready',
+      detail: `${rows.length.toLocaleString()} OTP record(s) exported as ${format.toUpperCase()}.`,
+    });
   }
 
+  // ================= HELPERS =================
   private handleApiError(err: any, fallbackTitle: string): void {
     const body: ApiErrorResponse | undefined = err?.error;
     const detail =

@@ -162,6 +162,13 @@ export const API_ENDPOINTS = {
   STATEMENTS_BY_RECEIPT: (receiptNumber: string) => `/api/statements/receipt/${receiptNumber}`,
   STATEMENTS_BY_ENTITY: (entityId: string) => `/api/statements/entity/${entityId}`,
 
+  // #####################  OTP LOOKUP API ENDPOINTS   #######################
+  OTP_LOOKUP_SEARCH: '/api/lookup/otp/search',
+  OTP_LOOKUP_BY_PHONE: (phoneNumber: string) => `/api/lookup/otp/phone/${phoneNumber}`,
+  OTP_LOOKUP_LATEST_BY_PHONE: (phoneNumber: string) => `/api/lookup/otp/phone/${phoneNumber}/latest`,
+  OTP_LOOKUP_BY_REF: (tokenRefId: string) => `/api/lookup/otp/ref/${tokenRefId}`,
+  OTP_LOOKUP_BY_ID: (id: number | string) => `/api/lookup/otp/${id}`,
+
   ...EDA_ENDPOINTS,
   ...AI_ENDPOINTS,
   ...FORECAST_ENDPOINTS,

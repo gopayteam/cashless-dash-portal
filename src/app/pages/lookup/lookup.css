@@ -440,3 +440,82 @@
   font-size: 0.85rem;
   color: #4b5563;
 }
+/* ================= TAB BAR ================= */
+.lookup-tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.lookup-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lookup-tab-btn:hover {
+  color: #0f172a;
+}
+
+.lookup-tab-btn--active {
+  background: #ffffff;
+  color: #4f46e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.lookup-tab-btn i {
+  font-size: 0.95rem;
+}
+
+/* ================= OTP BADGES ================= */
+.otp-token-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-family: 'SFMono-Regular', ui-monospace, Menlo, monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.otp-token-badge-lg {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  font-family: 'SFMono-Regular', ui-monospace, Menlo, monospace;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+}
+
+.copy-mini-btn {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  color: #64748b !important;
+}
+
+.copy-mini-btn:hover {
+  color: #4f46e5 !important;
+  background: #eef2ff !important;
+}
