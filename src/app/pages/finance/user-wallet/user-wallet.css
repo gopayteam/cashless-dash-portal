@@ -248,3 +248,182 @@
     gap: 1.5rem;
   }
 }
+
+.table-header-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.filter-dropdown {
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-dropdown {
+    min-width: 100%;
+  }
+}
+
+/* ================= MULTISELECT DROPDOWN FIX ================= */
+
+/* The closed/collapsed control itself */
+::ng-deep .filter-dropdown .p-multiselect {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+::ng-deep .filter-dropdown .p-multiselect-label {
+  background: #ffffff;
+  color: #2d3748;
+}
+
+/* The dropdown panel that opens (rendered via CDK overlay, appended to <body>) */
+::ng-deep .p-multiselect-panel {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-items {
+  background: #ffffff;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-item {
+  background: #ffffff;
+  color: #2d3748;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-item:hover {
+  background: #f7fafc;
+}
+
+::ng-deep .p-multiselect-panel .p-multiselect-item.p-highlight {
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+
+/* Search box inside the panel (if filter is enabled) */
+::ng-deep .p-multiselect-panel .p-multiselect-filter-container input {
+  background: #ffffff;
+}
+
+::ng-deep .p-multiselect-header {
+  background: #ffffff;
+}
+
+/* ================= STAT CARDS ================= */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem 1.125rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card-item.combined {
+  border: 1px solid #4299e1;
+  background: #ebf8ff;
+}
+
+.stat-card-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 8px;
+  background: #edf2f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card-icon i {
+  color: #4299e1;
+  font-size: 1.1rem;
+}
+
+.stat-card-icon.combined-icon {
+  background: #bee3f8;
+}
+
+.stat-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.stat-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-card-count {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.stat-card-balance {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2b6cb0;
+}
+
+.stat-card-breakdown {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.breakdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
+.active-pill {
+  background: #c6f6d5;
+  color: #276749;
+}
+
+.dormant-pill {
+  background: #fed7d7;
+  color: #9b2c2c;
+}
+
+@media (max-width: 768px) {
+  .stats-section {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}

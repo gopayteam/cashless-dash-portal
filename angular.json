@@ -62,7 +62,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {"allowedHosts": ["capital-obviously-terrier.ngrok-free.app", "purge-research-spirits.ngrok-free.dev"]},
+          "options": {"allowedHosts": [
+            "capital-obviously-terrier.ngrok-free.app", "purge-research-spirits.ngrok-free.dev"
+          ]},
           "configurations": {
             "production": {
               "buildTarget": "prime:build:production"

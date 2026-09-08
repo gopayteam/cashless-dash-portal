@@ -7,6 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "proxy": "ngrok http 4200 --domain capital-obviously-terrier.ngrok-free.app",
+    "proxy2": "ngrok http 4200 --config ~/.config/ngrok/account2.yml --url https://purge-research-spirits.ngrok-free.dev",
     "test": "ng test",
     "deploy-docker": "docker build --no-cache -t amos876/admin-dashboard:2.6.0 . && docker push amos876/admin-dashboard:2.6.0"
   },
