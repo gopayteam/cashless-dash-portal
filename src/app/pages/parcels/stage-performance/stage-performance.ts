@@ -24,6 +24,7 @@ import { Stage } from '../../../../@core/models/locations/stage.model';
 import { StagePerformance } from '../../../../@core/models/parcels/stage-performance.model';
 import { StagePerformanceService } from '../../../../@core/services/stage-performance.service';
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
 
 type StageOption = { label: string; value: number | 'ALL' };
 
@@ -50,6 +51,7 @@ type StageTotals = Pick<
     MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
+    ActionButtonComponent
   ],
 })
 export class StagePerformanceComponent {
@@ -196,6 +198,7 @@ export class StagePerformanceComponent {
         detail: 'Generate a report before exporting',
         life: 3000,
       });
+      this.cdr.detectChanges();
       return;
     }
 
@@ -216,6 +219,7 @@ export class StagePerformanceComponent {
       const wb: XLSX.WorkBook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Stage Performance');
       XLSX.writeFile(wb, this.buildFilename('xlsx'));
+      this.cdr.detectChanges();
 
       this.messageService.add({
         severity: 'success',
@@ -225,6 +229,7 @@ export class StagePerformanceComponent {
       });
     } catch (error) {
       console.error('Failed to export stage performance to Excel:', error);
+      this.cdr.detectChanges();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -233,11 +238,13 @@ export class StagePerformanceComponent {
       });
     } finally {
       this.isExporting = false;
+      this.cdr.detectChanges();
     }
   }
 
   exportToCSV(): void {
     if (this.rows.length === 0) {
+      this.cdr.detectChanges();
       this.messageService.add({
         severity: 'warn',
         summary: 'No Data',
@@ -259,6 +266,7 @@ export class StagePerformanceComponent {
       link.download = this.buildFilename('csv');
       link.click();
       URL.revokeObjectURL(link.href);
+      this.cdr.detectChanges();
 
       this.messageService.add({
         severity: 'success',
@@ -268,6 +276,7 @@ export class StagePerformanceComponent {
       });
     } catch (error) {
       console.error('Failed to export stage performance to CSV:', error);
+      this.cdr.detectChanges();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -276,6 +285,7 @@ export class StagePerformanceComponent {
       });
     } finally {
       this.isExporting = false;
+      this.cdr.detectChanges();
     }
   }
 }

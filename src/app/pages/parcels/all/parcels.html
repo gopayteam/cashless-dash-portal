@@ -8,9 +8,9 @@
     </div>
 
     <div class="header-actions" style="display:flex; align-items:center; gap:0.75rem;">
-      <button pButton icon="pi pi-chart-line" label="Stage Performance" class="p-button-outlined"
+      <!-- <button pButton icon="pi pi-chart-line" label="Stage Performance" class="p-button-outlined"
         (click)="openStagePerformance()" pTooltip="Generate a per-stage performance report" tooltipPosition="bottom">
-      </button>
+      </button> -->
 
       <div class="filter-item-gradient filter-item-filled">
         <label class="filter-label">Date Range (Server Filter)</label>
@@ -123,6 +123,7 @@
         </div>
 
         <div class="export-buttons-group">
+
           <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
             [disabled]="parcels.length === 0 || isExporting" [loading]="isExporting" (click)="exportToExcel()"
             pTooltip="Export to Excel" tooltipPosition="bottom">
@@ -131,6 +132,12 @@
             [disabled]="parcels.length === 0 || isExporting" [loading]="isExporting" (click)="exportToCSV()"
             pTooltip="Export to CSV" tooltipPosition="bottom">
           </button>
+
+          <app-action-button icon="pi pi-chart-line" label="Stage Performance" variant="warning"
+            [disabled]="parcels.length === 0 || isExporting" [loading]="isExporting" (clicked)="openStagePerformance()"
+            tooltip="Export to PDF" tooltipPosition="bottom">
+          </app-action-button>
+
         </div>
       </div>
     </div>

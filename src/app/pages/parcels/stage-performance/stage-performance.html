@@ -1,7 +1,8 @@
 <!-- pages/parcels/stage-performance/stage-performance.component.html -->
 <p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [closable]="true"
   [dismissableMask]="true" [draggable]="false" [resizable]="false" styleClass="custom-dialog"
-  [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '95vw', maxWidth: '1100px' }" (onHide)="close()">
+  [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '95vw', maxWidth: '1100px', minHeight: '65vh' }"
+  (onHide)="close()">
 
   <ng-template pTemplate="header">
     <div class="dialog-header">
@@ -26,22 +27,28 @@
       </div>
 
       <div class="control-item control-item-filled">
-        <label class="filter-label">Date Range</label>
-        <mat-form-field appearance="outline" class="date-range-field">
-          <mat-date-range-input [rangePicker]="reportPicker">
-            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
-            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matSuffix [for]="reportPicker"></mat-datepicker-toggle>
-          <mat-date-range-picker #reportPicker></mat-date-range-picker>
-        </mat-form-field>
+        <div class="filter-item-gradient filter-item">
+          <label class="filter-label">Date Range</label>
+          <mat-form-field appearance="outline" class="date-range-field">
+            <mat-date-range-input [rangePicker]="reportPicker">
+              <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+              <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="reportPicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #reportPicker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
       </div>
 
-      <div class="control-item control-actions">
-        <button pButton icon="pi pi-chart-bar" label="Generate Report" class="p-button-primary" [loading]="isLoading"
-          [disabled]="isLoading" (click)="generateReport()">
-        </button>
-      </div>
+      <!-- <div class="control-item control-actions"> -->
+      <!-- <button pButton icon="pi pi-chart-bar" label="Generate Report" class="p-button-primary" [loading]="isLoading"
+          style="gap: 0.5rem; justify-content: center; align-items: center;" [disabled]="isLoading" (click)="generateReport()">
+        </button> -->
+
+      <!-- <app-action-button icon="pi pi-chart-bar" label="Generate Report" variant="success" [disabled]="isExporting"
+          [loading]="isExporting" (clicked)="generateReport()" tooltip="Generate Report" tooltipPosition="bottom">
+        </app-action-button> -->
+      <!-- </div> -->
     </div>
 
     <!-- Loading -->
@@ -62,10 +69,11 @@
       <div class="report-export-actions">
         <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
           [disabled]="isExporting" [loading]="isExporting" (click)="exportToExcel()" pTooltip="Export to Excel"
-          tooltipPosition="bottom">
+          style="gap: 0.5rem" tooltipPosition="bottom">
         </button>
         <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn" [disabled]="isExporting"
-          [loading]="isExporting" (click)="exportToCSV()" pTooltip="Export to CSV" tooltipPosition="bottom">
+          style="gap: 0.5rem" [loading]="isExporting" (click)="exportToCSV()" pTooltip="Export to CSV"
+          tooltipPosition="bottom">
         </button>
       </div>
 
@@ -117,6 +125,12 @@
   </div>
 
   <ng-template pTemplate="footer">
+
+    <app-action-button icon="pi pi-chart-bar" label="Generate Report" variant="success"
+      [disabled]="isLoading || isExporting" [loading]="isExporting" (clicked)="generateReport()"
+      tooltip="Generate Report" tooltipPosition="bottom">
+    </app-action-button>
+
     <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"
       (click)="close()">
     </button>
