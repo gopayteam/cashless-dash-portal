@@ -23,6 +23,35 @@
           [panelStyle]="{ background: '#ffffff' }">
         </p-select>
 
+        <!-- Export current page -->
+        <div class="export-buttons-group">
+          <span class="export-group-label">This page</span>
+          <button pButton icon="pi pi-file-excel" label="Excel" [style]="{ gap: '0.5rem' }"
+            class="p-button-success export-action-btn" [disabled]="items.length === 0 || isExporting"
+            [loading]="isExporting" (click)="exportCurrentPageExcel()"
+            pTooltip="Export visible page to Excel" tooltipPosition="bottom">
+          </button>
+          <button pButton icon="pi pi-file" label="CSV" [style]="{ gap: '0.5rem' }"
+            class="p-button-help export-action-btn" [disabled]="items.length === 0 || isExporting"
+            [loading]="isExporting" (click)="exportCurrentPageCSV()"
+            pTooltip="Export visible page to CSV" tooltipPosition="bottom">
+          </button>
+        </div>
+
+        <!-- Export all pages -->
+        <div class="export-buttons-group">
+          <span class="export-group-label">All accounts</span>
+          <button pButton icon="pi pi-file-excel" label="Excel" [style]="{ gap: '0.5rem' }"
+            class="p-button-success export-action-btn" [disabled]="totalRecords === 0 || isExporting"
+            [loading]="isExporting" (click)="exportAllExcel()"
+            pTooltip="Fetch and export all accounts to Excel" tooltipPosition="bottom">
+          </button>
+          <button pButton icon="pi pi-file" label="CSV" [style]="{ gap: '0.5rem' }"
+            class="p-button-help export-action-btn" [disabled]="totalRecords === 0 || isExporting"
+            [loading]="isExporting" (click)="exportAllCSV()"
+            pTooltip="Fetch and export all accounts to CSV" tooltipPosition="bottom">
+          </button>
+        </div>
 
       </div>
 

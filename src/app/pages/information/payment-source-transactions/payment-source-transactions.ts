@@ -348,9 +348,9 @@ export class PaymentSourceTransactionsComponent implements OnInit {
       this.selectedPaymentSources.length > 0
         ? this.selectedPaymentSources
         : [
-            ...orderedSources.filter((s) => presentSources.includes(s)),
-            ...presentSources.filter((s) => !orderedSources.includes(s)),
-          ];
+          ...orderedSources.filter((s) => presentSources.includes(s)),
+          ...presentSources.filter((s) => !orderedSources.includes(s)),
+        ];
 
     this.sourceStats = sourcesToShow.map((src) => {
       const list = base.filter((t) => t.paymentSource === src);

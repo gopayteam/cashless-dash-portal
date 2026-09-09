@@ -31,8 +31,6 @@ import { ObligationsComponent } from './pages/finance/obligations/obligations';
 import { OrganizationBalanceComponent } from './pages/finance/organization-balance/organization-balance';
 import { OrganizationWalletComponent } from './pages/finance/organization-wallet/organization-wallet';
 import { WithdrawalStatementsComponent } from './pages/finance/statements/statements';
-import { UserWallet } from './pages/finance/user-wallet/user-wallet';
-import { WalletAnalyticsComponent } from './pages/finance/wallet-analytics/wallet-analytics';
 import { FleetCollectionsComponent } from './pages/fleet/total-collection/total-collection';
 import { RegisterAdminComponent } from './pages/forms/admin/register-admin/register-admin';
 import { UpdateAdminComponent } from './pages/forms/admin/update-admin/update-admin';
@@ -60,6 +58,7 @@ import { AddVehicleComponent } from './pages/forms/vehicle/add-vehicle/add-vehic
 import { UpdateVehicleComponent } from './pages/forms/vehicle/update-vehicle/update-vehicle';
 import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignment/fund-reassignment';
 import { MissedTransactionComponent } from './pages/hidden/missed-transactions/missed-transactions';
+import { PaymentsOverviewWidgetComponent } from './pages/information/collection/collection';
 import { PaymentSourceBreakdownWidgetComponent } from './pages/information/payment-source-breakdown-widget/payment-source-breakdown-widget';
 import { PaymentSourceTransactionsComponent } from './pages/information/payment-source-transactions/payment-source-transactions';
 import { UserWalletsAnalysisComponent } from './pages/information/user-wallets-analysis/user-wallets-analysis';
@@ -109,7 +108,6 @@ import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
-import { PaymentsOverviewWidgetComponent } from './pages/information/collection/collection';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -426,19 +424,19 @@ export const routes: Routes = [
         data: { roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] }
       },
 
-      {
-        path: 'wallet/user',
-        component: UserWallet,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW'] }
-      },
+      // {
+      //   path: 'wallet/user',
+      //   component: UserWallet,
+      //   canActivate: [roleGuard],
+      //   data: { roles: ['CAN_VIEW'] }
+      // },
 
-      {
-        path: 'wallet/analytics',
-        component: WalletAnalyticsComponent,
-        canActivate: [roleGuard],
-        data: { roles: ['CAN_VIEW'] }
-      },
+      // {
+      //   path: 'wallet/analytics',
+      //   component: WalletAnalyticsComponent,
+      //   canActivate: [roleGuard],
+      //   data: { roles: ['CAN_VIEW'] }
+      // },
       {
         path: 'management-statements',
         component: WithdrawalStatementsComponent,

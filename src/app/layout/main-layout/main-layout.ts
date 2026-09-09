@@ -157,9 +157,9 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     ],
     '/wallet': [
       { label: 'Organization', icon: 'pi pi-building', route: '/wallet/organization', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
-      { label: 'Analytics', icon: 'pi pi-trend', route: '/wallet/analytics', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
+      // { label: 'Analytics', icon: 'pi pi-trend', route: '/wallet/analytics', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
       { label: 'Balance', icon: 'pi pi-wallet', route: '/wallet/balance', roles: ['CAN_MANAGE_ORGANIZATION_WALLETS', 'CAN_MANAGE_ORG_WALLETS'] },
-      { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] },
+      // { label: 'User Wallets', icon: 'pi pi-users', route: '/wallet/user', roles: ['CAN_VIEW'] },
     ],
     '/users': [
       { label: 'All Users', icon: 'pi pi-users', route: '/users/all', roles: ['CAN_VIEW_USERS', 'CAN_VIEW_USER'] },
