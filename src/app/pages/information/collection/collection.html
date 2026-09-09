@@ -2,7 +2,7 @@
   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
     <div class="dashboard-header">
       <div class="header-content">
-        <h1 class="dashboard-title">Collections</h1>
+        <h1 class="dashboard-title">Collections Breakdown</h1>
         <span class="dashboard-subtitle">Overview of collections, withdrawals and source mix for the selected day</span>
       </div>
     </div>
@@ -10,7 +10,7 @@
     <div class="filter-item-gradient filter-item">
       <label class="filter-label">Date</label>
       <mat-form-field appearance="outline" class="date-range-field">
-        <input matInput [matDatepicker]="picker" placeholder="Select date" [(ngModel)]="selectedDate"
+        <input matInput [matDatepicker]="picker" placeholder="Select date" [(ngModel)]="selectedDate" [max]="today"
           (dateChange)="onDateChange()" />
 
         <mat-datepicker-toggle matSuffix [for]="picker">
@@ -65,7 +65,7 @@
         </div>
         <div class="po-ledger-divider" aria-hidden="true"></div>
         <div class="po-ledger-item">
-          <span class="po-ledger-label">Net</span>
+          <span class="po-ledger-label">Net Balance</span>
           <span class="po-ledger-value" [class.po-value--in]="netDifference >= 0"
             [class.po-value--out]="netDifference < 0">{{ netDifference >= 0 ? '+' : '' }}Ksh {{ netDifference | number :
             '1.2-2' }}</span>
@@ -80,8 +80,8 @@
           <div class="po-flow-fill po-flow-fill--in" [style.width.%]="collectedBarPct"></div>
         </div>
         <div class="po-flow-legend">
-          <span><i class="po-dot po-dot--out"></i>Withdrawn</span>
-          <span><i class="po-dot po-dot--in"></i>Collected</span>
+          <span><i class="po-dot po-dot--out"></i>Withdrawn ({{ withdrawnSharePct | number: '1.0-0' }}%)</span>
+          <span><i class="po-dot po-dot--in"></i>Collected ({{ collectedSharePct | number: '1.0-0' }}%)</span>
         </div>
       </div>
 
@@ -100,6 +100,12 @@
         </div>
       </div>
 
+      <!-- Zero-data notice if totalSourceAmount is 0 -->
+      <div class="po-empty-source" *ngIf="totalSourceAmount === 0 && totalCollected === 0">
+        <i class="pi pi-info-circle"></i>
+        <span>No collection transactions recorded for this date.</span>
+      </div>
+
       <!-- BARS view -->
       <div class="po-bars" *ngIf="viewMode === 'bars'">
         <div class="po-bar-row" *ngFor="let slice of slices">
@@ -115,13 +121,22 @@
 
       <!-- CARDS view -->
       <div class="po-cards" *ngIf="viewMode === 'cards'">
-        <div class="po-source-card" *ngFor="let slice of slices" [style.borderTopColor]="slice.color">
+        <div class="po-source-card" *ngFor="let slice of slices" [style.--card-accent]="slice.color">
           <div class="po-source-card-head">
-            <i class="pi {{ slice.icon }}" [style.color]="slice.color"></i>
-            <span class="po-source-card-title">{{ slice.displayName }}</span>
+            <div class="po-source-icon-wrap" [style.background]="slice.color + '15'">
+              <i class="pi {{ slice.icon }}" [style.color]="slice.color"></i>
+            </div>
+            <div class="po-source-head-info">
+              <span class="po-source-card-title">{{ slice.displayName }}</span>
+              <span class="po-source-card-pct">{{ slice.pct | number : '1.1-1' }}% of total</span>
+            </div>
           </div>
-          <span class="po-source-card-amount">Ksh {{ slice.amount | number : '1.2-2' }}</span>
-          <span class="po-source-card-pct">{{ slice.pct | number : '1.1-1' }}% of total</span>
+          <div class="po-source-card-body">
+            <span class="po-source-card-amount">Ksh {{ slice.amount | number : '1.2-2' }}</span>
+            <div class="po-card-progress">
+              <div class="po-card-fill" [style.width.%]="slice.pct" [style.background]="slice.color"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -137,6 +152,7 @@
           <div class="po-legend-item" *ngFor="let slice of slices">
             <span class="po-legend-swatch" [style.background]="slice.color"></span>
             <span class="po-legend-label">{{ slice.displayName }}</span>
+            <span class="po-legend-amount">Ksh {{ slice.amount | number : '1.0-0' }}</span>
             <span class="po-legend-value">{{ slice.pct | number : '1.1-1' }}%</span>
           </div>
         </div>

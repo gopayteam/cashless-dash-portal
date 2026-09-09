@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { Collection } from './collection';
+import { PaymentsOverviewWidgetComponent as Collection } from './collection';
 
 describe('Collection', () => {
   let component: Collection;

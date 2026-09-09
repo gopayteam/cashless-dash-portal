@@ -3,20 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from "@angular/material/datepicker";
-import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
-import { DatePickerModule } from 'primeng/datepicker';
-import { InputTextModule } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { SkeletonModule } from 'primeng/skeleton';
-import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
 
@@ -59,11 +51,11 @@ const ALL_SOURCES: PaymentSource[] = [
 // A muted, coherent palette in place of default saturated primaries — each
 // hue reads distinctly at a glance without competing for attention.
 const SOURCE_COLORS: Record<PaymentSource, string> = {
-  USSD: '#3C6E71',
-  PASSENGER_APP_MPESA_PROMPT: '#146356',
-  PASSENGER_APP_WALLET: '#5B4B8A',
-  DRIVER_MPESA_PROMPT: '#A6491F',
-  SCAN_TO_PAY: '#C98A2C',
+  USSD: '#0284c7',
+  PASSENGER_APP_MPESA_PROMPT: '#059669',
+  PASSENGER_APP_WALLET: '#7c3aed',
+  DRIVER_MPESA_PROMPT: '#ea580c',
+  SCAN_TO_PAY: '#d97706',
 };
 
 const SOURCE_DISPLAY_NAMES: Record<PaymentSource, string> = {
@@ -90,42 +82,20 @@ const SOURCE_ICONS: Record<PaymentSource, string> = {
     FormsModule,
     CardModule,
     ButtonModule,
-    DatePickerModule,
-    SelectButtonModule,
     SkeletonModule,
     TooltipModule,
     MatFormFieldModule,
     MatDatepickerModule,
-    CommonModule,
-    FormsModule,
-    CardModule,
-    TableModule,
-    ButtonModule,
-    TooltipModule,
-    ProgressSpinnerModule,
-    InputTextModule,
-    MultiSelectModule,
-    DatePickerModule,
-    MatFormFieldModule,
-    MatDatepickerModule,
-    ActionButtonComponent,
-    MatFormFieldModule,
-    MatDatepickerModule,
     MatInputModule,
     MatNativeDateModule,
-    MatProgressSpinnerModule,
-    ProgressSpinnerModule,
-    CommonModule,
-    FormsModule,
-    CardModule,
-    ChartModule,
-    ButtonModule,
-    TableModule,
-    TooltipModule,
+    ActionButtonComponent,
     A11yModule,
   ],
   templateUrl: './collection.html',
-  styleUrls: ['./collection.css'],
+  styleUrls: [
+    './collection.css',
+    '../../../../styles/modules/_filter_actions.css',
+  ],
 })
 export class PaymentsOverviewWidgetComponent implements OnInit {
   entityId: string | null = null;
@@ -180,8 +150,23 @@ export class PaymentsOverviewWidgetComponent implements OnInit {
     return (this.totalWithdrawn / max) * 50;
   }
 
+  get grossVolume(): number {
+    return this.totalCollected + this.totalWithdrawn;
+  }
+
+  get collectedSharePct(): number {
+    return this.grossVolume > 0 ? (this.totalCollected / this.grossVolume) * 100 : 0;
+  }
+
+  get withdrawnSharePct(): number {
+    return this.grossVolume > 0 ? (this.totalWithdrawn / this.grossVolume) * 100 : 0;
+  }
+
   // Builds the conic-gradient background string for the donut view
   get donutGradient(): string {
+    if (this.totalSourceAmount <= 0) {
+      return 'conic-gradient(#e2e8f0 0% 100%)';
+    }
     let cumulative = 0;
     const stops = this.slices.map((s) => {
       const start = cumulative;
