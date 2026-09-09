@@ -1,0 +1,72 @@
+<p-card styleClass="widget-card">
+  <div class="widget-header">
+    <div class="widget-title">
+      <h3>Payment Source Breakdown</h3>
+      <span class="text-muted">Credit amount by source</span>
+    </div>
+    <div class="widget-controls">
+      <p-datepicker [(ngModel)]="selectedDate" (onSelect)="onDateChange()" dateFormat="dd M yy" [showIcon]="true"
+        [maxDate]="today" styleClass="date-picker"></p-datepicker>
+      <button pButton icon="pi pi-refresh" class="p-button-outlined p-button-sm" [disabled]="loading()"
+        (click)="refresh()" pTooltip="Refresh"></button>
+    </div>
+  </div>
+
+  <div class="view-toggle-row" *ngIf="hasLoaded">
+    <p-selectButton [options]="viewOptions" [(ngModel)]="viewMode" optionLabel="label" optionValue="value">
+    </p-selectButton>
+    <span class="total-amount-label">Total: Ksh {{ totalAmount | number : '1.2-2' }}</span>
+  </div>
+
+  <div class="widget-body" *ngIf="hasLoaded; else spinnerTpl">
+    <!-- BARS VIEW -->
+    <div class="bar-chart" *ngIf="viewMode === 'bars'">
+      <div class="bar-row" *ngFor="let slice of slices">
+        <span class="bar-label">
+          <i [class]="'pi ' + slice.icon"></i> {{ slice.displayName }}
+        </span>
+        <div class="bar-track">
+          <div class="bar-fill" [style.width.%]="slice.pct" [style.background]="slice.color"></div>
+        </div>
+        <span class="bar-amount">Ksh {{ slice.amount | number : '1.0-0' }}</span>
+      </div>
+    </div>
+
+    <!-- CARDS VIEW -->
+    <div class="cards-grid" *ngIf="viewMode === 'cards'">
+      <div class="source-card" *ngFor="let slice of slices">
+        <div class="source-card-icon" [style.background]="slice.color + '22'">
+          <i [class]="'pi ' + slice.icon" [style.color]="slice.color"></i>
+        </div>
+        <div class="source-card-body">
+          <span class="source-card-title">{{ slice.displayName }}</span>
+          <span class="source-card-amount">Ksh {{ slice.amount | number : '1.2-2' }}</span>
+          <span class="source-card-pct">{{ slice.pct | number : '1.1-1' }}% of total</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONUT VIEW -->
+    <div class="donut-wrapper" *ngIf="viewMode === 'donut'">
+      <div class="donut-chart" [style.background]="donutGradient">
+        <div class="donut-hole">
+          <span class="donut-total-label">Total</span>
+          <span class="donut-total-value">Ksh {{ totalAmount | number : '1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="donut-legend">
+        <div class="legend-item" *ngFor="let slice of slices">
+          <span class="legend-swatch" [style.background]="slice.color"></span>
+          <span class="legend-label">{{ slice.displayName }}</span>
+          <span class="legend-value">{{ slice.pct | number : '1.1-1' }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #spinnerTpl>
+    <div class="widget-loading">
+      <p-progressSpinner styleClass="small-spinner"></p-progressSpinner>
+    </div>
+  </ng-template>
+</p-card>

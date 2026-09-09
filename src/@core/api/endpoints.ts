@@ -30,6 +30,9 @@ export const API_ENDPOINTS = {
   PUBLISH_STK_TRANSACTIONS: '/api/route/publish/stk/transactions/no-fleet-number',
   SEARCH_TRANSACTION: '/api/route/search/transaction-id',
   CHECK_PAYMENT_STATUS: '/api/payment/check/status',
+  PAYMENT_SOURCE_TRANSACTIONS: '/api/payment/wallet/analysis/payment-source-transaction-list',
+  WITHDRAWALS_COLLECTIONS: '/api/payment/wallet/analysis/withdrwals-collections',
+  PAYMENT_SOURCE_AMOUNT: '/api/payment/wallet/analysis/payment-source',
 
   // #####################  PARCELS SUB-ENDPOINTS   #######################
   ALL_PARCELS: '/api/parcels/filter/user/sales',
@@ -66,7 +69,8 @@ export const API_ENDPOINTS = {
   // Wallet Analytics
   WALLET_BALANCE_SUMMARY: '/api/payment/wallet/analysis/balance/summary',
   TILL_NUMBER_TARIFFS: '/api/payment/wallet/analysis/till-number-tariffs',
-  WITHDRAWALS_COLLECTIONS: '/api/payment/wallet/analysis/withdrawals-collections',
+  // WITHDRAWALS_COLLECTIONS: '/api/payment/wallet/analysis/withdrawals-collections',
+  USER_WALLETS_ANALYSIS: '/api/payment/wallet/analysis/user-wallets',
 
   // #####################  VEHICLE SUB-ENDPOINTS   #######################
   ALL_VEHICLES: '/api/v1/org/vehicles/view-all',

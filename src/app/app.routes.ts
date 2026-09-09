@@ -60,6 +60,10 @@ import { AddVehicleComponent } from './pages/forms/vehicle/add-vehicle/add-vehic
 import { UpdateVehicleComponent } from './pages/forms/vehicle/update-vehicle/update-vehicle';
 import { HiddenFundReassignmentComponent } from './pages/hidden/fund-reassignment/fund-reassignment';
 import { MissedTransactionComponent } from './pages/hidden/missed-transactions/missed-transactions';
+import { PaymentSourceBreakdownWidgetComponent } from './pages/information/payment-source-breakdown-widget/payment-source-breakdown-widget';
+import { PaymentSourceTransactionsComponent } from './pages/information/payment-source-transactions/payment-source-transactions';
+import { UserWalletsAnalysisComponent } from './pages/information/user-wallets-analysis/user-wallets-analysis';
+import { WithdrawalsCollectionsWidgetComponent } from './pages/information/withdrawals-collections-widget/withdrawals-collections-widget';
 import { LocationRoutesComponent } from './pages/locations/routes/routes';
 import { LocationStagesComponent } from './pages/locations/stages/stages';
 import { TransactionLookupComponent } from './pages/lookup/lookup';
@@ -105,6 +109,7 @@ import { ActiveVehiclesComponent } from './pages/vehicles/active/active';
 import { AllVehiclesComponent } from './pages/vehicles/all/all';
 import { InactiveVehiclesComponent } from './pages/vehicles/inactive/inactive';
 import { MaintenanceVehiclesComponent } from './pages/vehicles/maintenance/maintenance';
+import { PaymentsOverviewWidgetComponent } from './pages/information/collection/collection';
 
 /* =====================================================
    ROUTES WITH ROLE-BASED ACCESS CONTROL
@@ -845,6 +850,37 @@ export const routes: Routes = [
       {
         path: 'lookup',
         component: TransactionLookupComponent,
+        canActivate: [AuthGuard],
+      },
+
+      // ##########################################################################
+      {
+        path: 'payment-source-breakdown',
+        component: PaymentSourceBreakdownWidgetComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'payment-source-transactions',
+        component: PaymentSourceTransactionsComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'user-wallet-analytics',
+        component: UserWalletsAnalysisComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'withdrawal-collections-widget',
+        component: WithdrawalsCollectionsWidgetComponent,
+        canActivate: [AuthGuard],
+      },
+
+      {
+        path: 'app-collection-stats',
+        component: PaymentsOverviewWidgetComponent,
         canActivate: [AuthGuard],
       },
 

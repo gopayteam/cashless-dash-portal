@@ -430,3 +430,25 @@
 .api-toggle-button.prod-active {
   opacity: 0.3;
 }
+
+.tariff-date-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.tariff-date-selector label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #718096;
+}
+
+.tariff-date-picker {
+  width: 100%;
+}
+
+.tariff-date-picker :deep(.p-datepicker-input) {
+  width: 100%;
+  font-size: 0.85rem;
+}

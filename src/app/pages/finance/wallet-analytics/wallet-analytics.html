@@ -80,19 +80,52 @@
         <div class="panel-icon tariff-icon">
           <i class="pi pi-percentage"></i>
         </div>
+
         <span class="panel-title">Till Number Tariff</span>
       </div>
 
+      <!-- Date range selector -->
+      <div class="tariff-date-selector">
+        <label>Tariff period</label>
+
+        <div class="filter-item-gradient filter-item">
+          <mat-form-field appearance="outline" class="date-range-field">
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate placeholder="Start date" [(ngModel)]="tariffDateRange[0]" />
+
+              <input matEndDate placeholder="End date" [(ngModel)]="tariffDateRange[1]"
+                (dateChange)="onTariffDateRangeChange()" />
+            </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix [for]="picker">
+            </mat-datepicker-toggle>
+
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+        </div>
+      </div>
+
       <ng-container *ngIf="tillLoaded; else tariffSkeleton">
+
         <div class="panel-amount">
           <span class="currency">Ksh</span>
-          <span class="value">{{ tillTariff | number: '1.2-2' }}</span>
+          <span class="value">
+            {{ tillTariff | number: '1.2-2' }}
+          </span>
         </div>
-        <p class="panel-caption">Charged per transaction on this till</p>
+
+        <p class="panel-caption">
+          {{ getTariffPeriodLabel() }}
+        </p>
+
       </ng-container>
+
       <ng-template #tariffSkeleton>
-        <p-skeleton height="2rem" width="50%" styleClass="mb-2"></p-skeleton>
-        <p-skeleton height="0.75rem" width="80%"></p-skeleton>
+        <p-skeleton height="2rem" width="50%" styleClass="mb-2">
+        </p-skeleton>
+
+        <p-skeleton height="0.75rem" width="80%">
+        </p-skeleton>
       </ng-template>
     </p-card>
 
@@ -103,10 +136,12 @@
           <i class="pi pi-arrow-right-arrow-left"></i>
         </div>
         <span class="panel-title">Withdrawals &amp; Collections</span>
-        <span class="preview-badge" *ngIf="isStubData && withdrawalsLoaded"
+        <!-- <span class="preview-badge" *ngIf="isStubData && withdrawalsLoaded"
           pTooltip="Live data pending — showing placeholder until this endpoint is wired up" tooltipPosition="top">
           Preview
-        </span>
+        </span> -->
+        <span class="preview-badge"> <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+            (clicked)="toggleRefresh()"></app-action-button></span>
       </div>
 
       <ng-container *ngIf="withdrawalsLoaded; else flowSkeleton">

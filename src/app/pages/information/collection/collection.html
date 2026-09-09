@@ -1,0 +1,146 @@
+<div class="dashboard-container">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+    <div class="dashboard-header">
+      <div class="header-content">
+        <h1 class="dashboard-title">Collections</h1>
+        <span class="dashboard-subtitle">Overview of collections, withdrawals and source mix for the selected day</span>
+      </div>
+    </div>
+
+    <div class="filter-item-gradient filter-item">
+      <label class="filter-label">Date</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <input matInput [matDatepicker]="picker" placeholder="Select date" [(ngModel)]="selectedDate"
+          (dateChange)="onDateChange()" />
+
+        <mat-datepicker-toggle matSuffix [for]="picker">
+        </mat-datepicker-toggle>
+
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <p-card styleClass="po-card">
+    <div class="po-header">
+      <div class="po-heading">
+        <h3 class="po-title">Payments overview</h3>
+        <span class="po-subtitle">Collections, withdrawals &amp; source mix for the selected day</span>
+      </div>
+      <div class="po-controls">
+
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary" (clicked)="refresh()"
+          [disabled]="loading()"></app-action-button>
+      </div>
+    </div>
+
+    <!-- Initial load: skeleton shaped like the real layout -->
+    <div class="po-body" *ngIf="!hasLoaded">
+      <div class="po-ledger">
+        <div class="po-ledger-item" *ngFor="let i of [0, 1, 2]">
+          <p-skeleton width="4.5rem" height="0.65rem" styleClass="po-skel-label"></p-skeleton>
+          <p-skeleton width="7rem" height="1.35rem" styleClass="po-skel-value"></p-skeleton>
+        </div>
+      </div>
+      <p-skeleton width="100%" height="0.5rem" styleClass="po-skel-bar"></p-skeleton>
+      <div class="po-divider"></div>
+      <div class="po-source-skel">
+        <p-skeleton width="100%" height="1.6rem" *ngFor="let i of [0, 1, 2, 3, 4]"
+          styleClass="po-skel-row"></p-skeleton>
+      </div>
+    </div>
+
+    <!-- Loaded content -->
+    <div class="po-body" *ngIf="hasLoaded" [class.po-body--refreshing]="loading()">
+      <!-- Ledger strip -->
+      <div class="po-ledger">
+        <div class="po-ledger-item">
+          <span class="po-ledger-label">Collected</span>
+          <span class="po-ledger-value po-value--in">Ksh {{ totalCollected | number : '1.2-2' }}</span>
+        </div>
+        <div class="po-ledger-divider" aria-hidden="true"></div>
+        <div class="po-ledger-item">
+          <span class="po-ledger-label">Withdrawn</span>
+          <span class="po-ledger-value po-value--out">Ksh {{ totalWithdrawn | number : '1.2-2' }}</span>
+        </div>
+        <div class="po-ledger-divider" aria-hidden="true"></div>
+        <div class="po-ledger-item">
+          <span class="po-ledger-label">Net</span>
+          <span class="po-ledger-value" [class.po-value--in]="netDifference >= 0"
+            [class.po-value--out]="netDifference < 0">{{ netDifference >= 0 ? '+' : '' }}Ksh {{ netDifference | number :
+            '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Diverging in / out bar -->
+      <div class="po-flow" role="img" aria-label="Collected versus withdrawn, relative to each other">
+        <div class="po-flow-track">
+          <div class="po-flow-fill po-flow-fill--out" [style.width.%]="withdrawnBarPct"></div>
+          <div class="po-flow-centre"></div>
+          <div class="po-flow-fill po-flow-fill--in" [style.width.%]="collectedBarPct"></div>
+        </div>
+        <div class="po-flow-legend">
+          <span><i class="po-dot po-dot--out"></i>Withdrawn</span>
+          <span><i class="po-dot po-dot--in"></i>Collected</span>
+        </div>
+      </div>
+
+      <div class="po-divider"></div>
+
+      <!-- Source breakdown -->
+      <div class="po-source-header">
+        <div class="po-source-heading">
+          <h4 class="po-source-title">Source breakdown</h4>
+          <span class="po-source-total">Total Ksh {{ totalSourceAmount | number : '1.2-2' }}</span>
+        </div>
+        <div class="po-view-toggle" role="tablist" aria-label="Breakdown view">
+          <button type="button" role="tab" *ngFor="let opt of viewOptions" class="po-view-tab"
+            [class.po-view-tab--active]="viewMode === opt.value" [attr.aria-selected]="viewMode === opt.value"
+            (click)="viewMode = opt.value">{{ opt.label }}</button>
+        </div>
+      </div>
+
+      <!-- BARS view -->
+      <div class="po-bars" *ngIf="viewMode === 'bars'">
+        <div class="po-bar-row" *ngFor="let slice of slices">
+          <span class="po-bar-label">
+            <i class="pi {{ slice.icon }}" [style.color]="slice.color"></i>{{ slice.displayName }}
+          </span>
+          <div class="po-bar-track">
+            <div class="po-bar-fill" [style.width.%]="slice.pct" [style.background]="slice.color"></div>
+          </div>
+          <span class="po-bar-amount">Ksh {{ slice.amount | number : '1.0-0' }}</span>
+        </div>
+      </div>
+
+      <!-- CARDS view -->
+      <div class="po-cards" *ngIf="viewMode === 'cards'">
+        <div class="po-source-card" *ngFor="let slice of slices" [style.borderTopColor]="slice.color">
+          <div class="po-source-card-head">
+            <i class="pi {{ slice.icon }}" [style.color]="slice.color"></i>
+            <span class="po-source-card-title">{{ slice.displayName }}</span>
+          </div>
+          <span class="po-source-card-amount">Ksh {{ slice.amount | number : '1.2-2' }}</span>
+          <span class="po-source-card-pct">{{ slice.pct | number : '1.1-1' }}% of total</span>
+        </div>
+      </div>
+
+      <!-- DONUT view -->
+      <div class="po-donut-wrap" *ngIf="viewMode === 'donut'">
+        <div class="po-donut" [style.background]="donutGradient">
+          <div class="po-donut-hole">
+            <span class="po-donut-label">Total</span>
+            <span class="po-donut-value">Ksh {{ totalSourceAmount | number : '1.0-0' }}</span>
+          </div>
+        </div>
+        <div class="po-legend">
+          <div class="po-legend-item" *ngFor="let slice of slices">
+            <span class="po-legend-swatch" [style.background]="slice.color"></span>
+            <span class="po-legend-label">{{ slice.displayName }}</span>
+            <span class="po-legend-value">{{ slice.pct | number : '1.1-1' }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-card>
+</div>

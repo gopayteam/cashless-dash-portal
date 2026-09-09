@@ -1,0 +1,119 @@
+.analysis-container {
+  padding: 1.5rem;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.analysis-header {
+  margin-bottom: 2rem;
+}
+
+.header-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.text-muted {
+  color: #718096;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.table-header-left h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.record-count {
+  padding: 0.25rem 0.75rem;
+  background: #edf2f7;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+  margin-left: 0.75rem;
+}
+
+.table-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.category-dropdown {
+  min-width: 180px;
+}
+
+.wallet-id {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.category-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-cell i {
+  color: #4299e1;
+}
+
+.amount-cell .amount {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+::ng-deep .category-dropdown .p-dropdown {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+::ng-deep .p-dropdown-panel {
+  background: #ffffff !important;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+  background: #ffffff;
+}
+
+::ng-deep .p-dropdown-panel .p-dropdown-items .p-dropdown-item:hover {
+  background: #f7fafc;
+}
+
+@media (max-width: 768px) {
+  .analysis-container {
+    padding: 1rem;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-header-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

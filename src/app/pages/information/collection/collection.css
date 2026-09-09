@@ -1,0 +1,534 @@
+/*
+  Optional — for the intended type pairing, add to index.html:
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  Everything below falls back gracefully to system fonts without it.
+*/
+
+/* Dashboard Container */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+
+:host {
+  --po-ink: #16211c;
+  --po-ink-soft: #5c6b63;
+  --po-ink-faint: #8b968f;
+  --po-hairline: #e3e6e0;
+  --po-surface-tint: #f4f6f3;
+
+  --po-in: #146356;
+  --po-in-tint: #e7efec;
+  --po-out: #a6491f;
+  --po-out-tint: #f4e9e2;
+
+  --po-font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --po-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --po-font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  font-family: var(--po-font-body);
+  color: var(--po-ink);
+}
+
+::ng-deep .po-card .p-card-body,
+::ng-deep .po-card .p-card-content {
+  padding: 0;
+}
+
+/* ---------- Header ---------- */
+
+.po-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--po-hairline);
+  flex-wrap: wrap;
+}
+
+.po-title {
+  margin: 0 0 0.2rem;
+  font-family: var(--po-font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: var(--po-ink);
+}
+
+.po-subtitle {
+  font-size: 0.82rem;
+  color: var(--po-ink-soft);
+}
+
+.po-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+::ng-deep .po-date-picker .p-inputtext {
+  font-family: var(--po-font-body);
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+.po-refresh-btn {
+  border-radius: 6px !important;
+}
+
+/* ---------- Body / loading states ---------- */
+
+.po-body {
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: opacity 0.15s ease;
+}
+
+.po-body--refreshing {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .po-body {
+    transition: none;
+  }
+}
+
+.po-divider {
+  height: 1px;
+  background: var(--po-hairline);
+  border: none;
+  margin: 0;
+}
+
+/* ---------- Ledger strip ---------- */
+
+.po-ledger {
+  display: flex;
+  align-items: stretch;
+}
+
+.po-ledger-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0 1.25rem;
+}
+
+.po-ledger-item:first-child {
+  padding-left: 0;
+}
+
+.po-ledger-divider {
+  width: 1px;
+  background: var(--po-hairline);
+}
+
+.po-ledger-label {
+  font-size: 0.78rem;
+  color: var(--po-ink-soft);
+}
+
+.po-ledger-value {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--po-ink);
+}
+
+.po-value--in {
+  color: var(--po-in);
+}
+
+.po-value--out {
+  color: var(--po-out);
+}
+
+/* ---------- Diverging flow bar ---------- */
+
+.po-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.po-flow-track {
+  position: relative;
+  height: 8px;
+  background: var(--po-surface-tint);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.po-flow-fill {
+  height: 100%;
+}
+
+.po-flow-fill--out {
+  width: 0;
+  margin-left: auto;
+  background: var(--po-out);
+  border-radius: 4px 0 0 4px;
+  transition: width 0.4s ease;
+}
+
+.po-flow-fill--in {
+  width: 0;
+  background: var(--po-in);
+  border-radius: 0 4px 4px 0;
+  transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .po-flow-fill--out,
+  .po-flow-fill--in {
+    transition: none;
+  }
+}
+
+.po-flow-centre {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: #fff;
+}
+
+.po-flow-legend {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.78rem;
+  color: var(--po-ink-soft);
+}
+
+.po-flow-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.po-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.po-dot--in {
+  background: var(--po-in);
+}
+
+.po-dot--out {
+  background: var(--po-out);
+}
+
+/* ---------- Source breakdown header ---------- */
+
+.po-source-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.po-source-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.po-source-title {
+  margin: 0;
+  font-family: var(--po-font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--po-ink);
+}
+
+.po-source-total {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: var(--po-ink-soft);
+}
+
+.po-view-toggle {
+  display: flex;
+  gap: 1.1rem;
+  border-bottom: 1px solid var(--po-hairline);
+}
+
+.po-view-tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0 0 0.45rem;
+  font-family: var(--po-font-body);
+  font-size: 0.82rem;
+  color: var(--po-ink-faint);
+  cursor: pointer;
+}
+
+.po-view-tab:hover {
+  color: var(--po-ink);
+}
+
+.po-view-tab:focus-visible {
+  outline: 2px solid var(--po-in);
+  outline-offset: 2px;
+}
+
+.po-view-tab--active {
+  color: var(--po-ink);
+  border-bottom-color: var(--po-in);
+}
+
+/* ---------- Bars view ---------- */
+
+.po-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.po-bar-row {
+  display: grid;
+  grid-template-columns: 12rem 1fr auto;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.po-bar-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--po-ink);
+}
+
+.po-bar-label i {
+  font-size: 0.8rem;
+}
+
+.po-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--po-surface-tint);
+  overflow: hidden;
+}
+
+.po-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .po-bar-fill {
+    transition: none;
+  }
+}
+
+.po-bar-amount {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+  color: var(--po-ink-soft);
+  text-align: right;
+  min-width: 5.5rem;
+}
+
+/* ---------- Cards view ---------- */
+
+.po-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  gap: 0.85rem;
+}
+
+.po-source-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--po-hairline);
+  border-top: 2px solid;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.po-source-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
+}
+
+.po-source-card-title {
+  font-size: 0.82rem;
+  color: var(--po-ink-soft);
+}
+
+.po-source-card-amount {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--po-ink);
+}
+
+.po-source-card-pct {
+  font-size: 0.75rem;
+  color: var(--po-ink-faint);
+}
+
+/* ---------- Donut view ---------- */
+
+.po-donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.po-donut {
+  position: relative;
+  width: 9.5rem;
+  height: 9.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.po-donut-hole {
+  position: absolute;
+  inset: 1.6rem;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.po-donut-label {
+  font-size: 0.7rem;
+  color: var(--po-ink-faint);
+}
+
+.po-donut-value {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--po-ink);
+}
+
+.po-legend {
+  flex: 1;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.po-legend-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.82rem;
+}
+
+.po-legend-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.po-legend-label {
+  color: var(--po-ink);
+}
+
+.po-legend-value {
+  font-family: var(--po-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--po-ink-soft);
+}
+
+/* ---------- Skeleton loading ---------- */
+
+.po-source-skel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+::ng-deep .po-skel-label,
+::ng-deep .po-skel-value,
+::ng-deep .po-skel-bar,
+::ng-deep .po-skel-row {
+  background: var(--po-surface-tint) !important;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .po-ledger {
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .po-ledger-item {
+    padding: 0;
+  }
+
+  .po-ledger-divider {
+    width: auto;
+    height: 1px;
+  }
+
+  .po-bar-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .po-bar-amount {
+    text-align: left;
+  }
+
+  .po-donut-wrap {
+    justify-content: center;
+    text-align: center;
+  }
+}

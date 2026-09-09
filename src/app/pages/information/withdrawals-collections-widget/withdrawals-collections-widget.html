@@ -1,0 +1,54 @@
+<p-card styleClass="widget-card">
+  <div class="widget-header">
+    <div class="widget-title">
+      <h3>Withdrawals vs Collections</h3>
+      <span class="text-muted">Daily totals</span>
+    </div>
+    <div class="widget-controls">
+      <p-datePicker [(ngModel)]="selectedDate" (onSelect)="onDateChange()" dateFormat="dd M yy" [showIcon]="true"
+        [maxDate]="today" styleClass="date-picker"></p-datePicker>
+      <button pButton icon="pi pi-refresh" class="p-button-outlined p-button-sm" [disabled]="loading()"
+        (click)="refresh()" pTooltip="Refresh"></button>
+    </div>
+  </div>
+
+  <div class="widget-body" *ngIf="hasLoaded; else spinnerTpl">
+    <!-- Number cards -->
+    <div class="totals-row">
+      <div class="total-box collected">
+        <span class="total-label">Collected</span>
+        <span class="total-value">Ksh {{ totalCollected | number : '1.2-2' }}</span>
+      </div>
+      <div class="total-box withdrawn">
+        <span class="total-label">Withdrawn</span>
+        <span class="total-value">Ksh {{ totalWithdrawn | number : '1.2-2' }}</span>
+      </div>
+      <div class="total-box net" [class.negative]="netDifference < 0">
+        <span class="total-label">Net</span>
+        <span class="total-value">Ksh {{ netDifference | number : '1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Simple SVG bar comparison -->
+    <div class="bar-chart">
+      <div class="bar-row">
+        <span class="bar-label">Collected</span>
+        <div class="bar-track">
+          <div class="bar-fill collected-fill" [style.width.%]="collectedBarPct"></div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Withdrawn</span>
+        <div class="bar-track">
+          <div class="bar-fill withdrawn-fill" [style.width.%]="withdrawnBarPct"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #spinnerTpl>
+    <div class="widget-loading">
+      <p-progressSpinner styleClass="small-spinner"></p-progressSpinner>
+    </div>
+  </ng-template>
+</p-card>

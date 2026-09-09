@@ -1,9 +1,11 @@
 // pages/wallets/wallet-analytics/wallet-analytics.component.ts
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { DatePickerModule } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { DataService } from '../../../../@core/api/data.service';
@@ -13,6 +15,7 @@ import {
   WalletBalanceItem,
   WalletBalanceSummaryResponse,
   WithdrawalsCollectionsResponse,
+  WithdrawalsCollectionsView
 } from '../../../../@core/models/wallet/wallet-analytics.model';
 import { AuthService } from '../../../../@core/services/auth.service';
 import { LoadingStore } from '../../../../@core/state/loading.store';
@@ -20,6 +23,9 @@ import {
   formatDateLocal,
   formatRelativeTime,
 } from '../../../../@core/utils/date-time.util';
+import { ActionButtonComponent } from "../../../components/action-button/action-button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatDatepickerModule } from "@angular/material/datepicker";
 
 interface CategoryVisual {
   color: string;
@@ -47,7 +53,7 @@ type BalanceRow = WalletBalanceItem & CategoryVisual & { percentage: number };
 @Component({
   selector: 'app-wallet-analytics',
   standalone: true,
-  imports: [CommonModule, CardModule, TooltipModule, SkeletonModule, ButtonModule],
+  imports: [CommonModule, CardModule, TooltipModule, SkeletonModule, ButtonModule, ActionButtonComponent, DatePickerModule, FormsModule, MatFormFieldModule, MatDatepickerModule],
   templateUrl: './wallet-analytics.html',
   styleUrls: ['./wallet-analytics.css'],
 })
@@ -89,6 +95,11 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
       : this._useDev;
   }
 
+  // ---- Till tariff date range ----
+  tariffDateRange: [Date | null, Date | null] = [new Date(), new Date()];
+
+  today: Date = new Date();
+
   // ---- Balance summary ----
   totalBalance = 0;
   displayedTotal = 0;
@@ -101,9 +112,8 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
   tillLoaded = false;
 
   // ---- Withdrawals / collections ----
-  withdrawalsCollections: WithdrawalsCollectionsResponse['data'] | null = null;
+  withdrawalsCollections: WithdrawalsCollectionsView | null = null;
   withdrawalsLoaded = false;
-  isStubData = true;
 
   private countUpFrame: number | null = null;
 
@@ -156,13 +166,19 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
     this.loadWithdrawalsCollections();
   }
 
+  public toggleRefresh(): void {
+    this.loadBalanceSummary();
+    this.loadTillTariff();
+    this.loadWithdrawalsCollections();
+  }
+
   formatRelative(iso: string): string {
     return formatRelativeTime(iso);
   }
 
   private loadBalanceSummary(useDev?: boolean): void {
     this.dataService
-      .post<WalletBalanceSummaryResponse>(
+      .get<WalletBalanceSummaryResponse>(
         API_ENDPOINTS.WALLET_BALANCE_SUMMARY,
         { entityId: this.entityId },
         'wallet-analytics',
@@ -214,10 +230,22 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
   }
 
   private loadTillTariff(useDev?: boolean): void {
+    const [startDate, endDate] = this.tariffDateRange;
+
+    if (!startDate || !endDate) {
+      return;
+    }
+
+    this.tillLoaded = false;
+
     this.dataService
-      .post<TillNumberTariffResponse>(
+      .get<TillNumberTariffResponse>(
         API_ENDPOINTS.TILL_NUMBER_TARIFFS,
-        { entityId: this.entityId },
+        {
+          entityId: this.entityId,
+          startDate: formatDateLocal(startDate),
+          endDate: formatDateLocal(endDate),
+        },
         'wallet-analytics',
         true,
         false,
@@ -236,6 +264,7 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
             err
           );
 
+          this.tillTariff = null;
           this.tillLoaded = true;
           this.cdr.detectChanges();
         },
@@ -244,14 +273,15 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
 
   private loadWithdrawalsCollections(useDev?: boolean): void {
     this.dataService
-      .post<WithdrawalsCollectionsResponse>(
+      .get<WithdrawalsCollectionsResponse>(
         API_ENDPOINTS.WITHDRAWALS_COLLECTIONS,
         {
           entityId: this.entityId,
-          from: formatDateLocal(
-            new Date(new Date().setDate(1))
-          ),
-          to: formatDateLocal(new Date()),
+          date: formatDateLocal(new Date())
+          // from: formatDateLocal(
+          //   new Date(new Date().setDate(1))
+          // ),
+          // to: formatDateLocal(new Date()),
         },
         'wallet-analytics',
         true,
@@ -260,30 +290,43 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response) => {
-          this.withdrawalsCollections = response.data;
-          this.isStubData = false;
+          const { totalAmountCollected, totalAmountWithdrawn } =
+            response.data;
+
+          this.withdrawalsCollections = {
+            totalCollections: totalAmountCollected,
+            totalWithdrawals: totalAmountWithdrawn,
+            netFlow: totalAmountCollected - totalAmountWithdrawn,
+            period: 'Today',
+          };
+
+
           this.withdrawalsLoaded = true;
           this.cdr.detectChanges();
         },
 
         error: (err) => {
-          console.warn(
-            'Withdrawals/collections endpoint not wired yet — showing placeholder data',
+          console.error(
+            'Failed to load withdrawals and collections',
             err
           );
 
-          this.withdrawalsCollections = {
-            totalWithdrawals: 0,
-            totalCollections: 0,
-            netFlow: 0,
-            period: 'This month',
-          };
-
-          this.isStubData = true;
+          this.withdrawalsCollections = null;
           this.withdrawalsLoaded = true;
           this.cdr.detectChanges();
         },
       });
+  }
+
+  public onTariffDateRangeChange(): void {
+    const [startDate, endDate] = this.tariffDateRange;
+
+    // PrimeNG emits the first date before the second date is selected.
+    if (!startDate || !endDate) {
+      return;
+    }
+
+    this.loadTillTariff();
   }
 
   private animateTotal(target: number): void {
@@ -309,5 +352,30 @@ export class WalletAnalyticsComponent implements OnInit, OnDestroy {
     };
 
     this.countUpFrame = requestAnimationFrame(step);
+  }
+
+  public getTariffPeriodLabel(): string {
+    const [startDate, endDate] = this.tariffDateRange;
+
+    if (!startDate || !endDate) {
+      return 'Select a period';
+    }
+
+    const start = formatDateLocal(startDate);
+    const end = formatDateLocal(endDate);
+
+    if (start === end) {
+      return `For ${this.formatDisplayDate(startDate)}`;
+    }
+
+    return `${this.formatDisplayDate(startDate)} – ${this.formatDisplayDate(endDate)}`;
+  }
+
+  private formatDisplayDate(date: Date): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
   }
 }

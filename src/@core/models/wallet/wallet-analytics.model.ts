@@ -22,19 +22,18 @@ export interface TillNumberTariffResponse {
   code: number;
 }
 
-/**
- * STUB — the real withdrawals-collections response has not been shared yet.
- * This is a best-guess shape so the UI has something to bind to.
- * Once you share the actual payload, update this interface (and the
- * handler in wallet-analytics.component.ts) to match it exactly.
- */
 export interface WithdrawalsCollectionsResponse {
   data: {
-    totalWithdrawals: number;
-    totalCollections: number;
-    netFlow: number;
-    period: string;
+    totalAmountCollected: number;
+    totalAmountWithdrawn: number;
   };
   message: string;
   code: number;
+}
+
+export interface WithdrawalsCollectionsView {
+  totalCollections: number;
+  totalWithdrawals: number;
+  netFlow: number;
+  period: string;
 }

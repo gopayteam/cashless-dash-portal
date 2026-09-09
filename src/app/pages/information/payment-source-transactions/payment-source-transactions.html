@@ -1,0 +1,252 @@
+<div class="txn-container">
+  <!-- ================= HEADER ================= -->
+  <div class="txn-header"
+    style="display: flex; flex-direction: row; gap: 1rem; align-items: center; justify-content: space-between;">
+    <div class="header-content">
+      <h1>Transactions by Source</h1>
+      <p class="text-muted">Transactions categorized by method of payment (USSD, Mpesa,Passenger Wallet,
+        Driver Prompt, Scan to Pay)</p>
+    </div>
+
+    <div class="filter-item-gradient filter-item">
+      <label class="filter-label">Date</label>
+      <mat-form-field appearance="outline" class="date-range-field">
+        <input matInput [matDatepicker]="picker" placeholder="Select date" [(ngModel)]="selectedDate"
+          (dateChange)="onDateChange()" />
+
+        <mat-datepicker-toggle matSuffix [for]="picker">
+        </mat-datepicker-toggle>
+
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- ================= STAT CARDS ================= -->
+  <!-- Skeleton Loading State -->
+  <div class="stats-section" *ngIf="loading() && allTransactions.length === 0">
+    <div class="stat-card-item stat-skeleton-card" *ngFor="let i of [1, 2, 3, 4]">
+      <div class="stat-card-header">
+        <div class="stat-card-title-group">
+          <p-skeleton shape="circle" size="42px"></p-skeleton>
+          <div class="stat-header-text">
+            <p-skeleton width="6.5rem" height="0.95rem"></p-skeleton>
+            <p-skeleton width="4.5rem" height="0.75rem"></p-skeleton>
+          </div>
+        </div>
+        <p-skeleton width="3rem" height="1.4rem" borderRadius="16px"></p-skeleton>
+      </div>
+
+      <div class="stat-card-body">
+        <p-skeleton width="4.5rem" height="0.75rem"></p-skeleton>
+        <p-skeleton width="9.5rem" height="1.85rem"></p-skeleton>
+        <p-skeleton width="100%" height="4px" borderRadius="4px"></p-skeleton>
+      </div>
+
+      <div class="stat-card-footer">
+        <p-skeleton width="4rem" height="0.85rem"></p-skeleton>
+        <p-skeleton width="4rem" height="0.85rem"></p-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loaded Stat Cards -->
+  <div class="stats-section" *ngIf="sourceStats.length > 0">
+
+    <!-- Combined / Overall Total Card -->
+    <div class="stat-card-item stat-card-highlight" *ngIf="combinedStat">
+      <div class="stat-card-header">
+        <div class="stat-card-title-group">
+          <div class="stat-icon-wrapper" [style.background]="combinedStat.colors.gradient">
+            <i [class]="'pi ' + combinedStat.icon"></i>
+          </div>
+          <div class="stat-header-text">
+            <span class="stat-card-title">{{ combinedStat.displayName }}</span>
+            <span class="stat-card-subtitle">
+              {{ combinedStat.source === 'TOTAL' ? 'All Channels Summary' : 'Selected Sources' }}
+            </span>
+          </div>
+        </div>
+
+        <span class="stat-badge stat-badge-highlight">
+          {{ combinedStat.source === 'TOTAL' ? 'Total' : (combinedStat.percentage | number : '1.0-0') + '%' }}
+        </span>
+      </div>
+
+      <div class="stat-card-body">
+        <span class="stat-amount-label">Gross Collections</span>
+        <div class="stat-amount-row">
+          <span class="stat-currency">Ksh</span>
+          <span class="stat-amount-value">{{ combinedStat.totalAmount | number : '1.2-2' }}</span>
+        </div>
+
+        <div class="stat-progress-track">
+          <div class="stat-progress-bar" [style.width.%]="combinedStat.percentage"
+            [style.background]="combinedStat.colors.gradient"></div>
+        </div>
+      </div>
+
+      <div class="stat-card-footer">
+        <div class="stat-meta-item" pTooltip="Total count of transactions" tooltipPosition="top">
+          <i class="pi pi-receipt"></i>
+          <span><strong>{{ combinedStat.count | number }}</strong> txns</span>
+        </div>
+        <span class="stat-meta-divider"></span>
+        <div class="stat-meta-item" pTooltip="Unique fleets with transactions" tooltipPosition="top">
+          <i class="pi pi-car"></i>
+          <span><strong>{{ combinedStat.uniqueFleets | number }}</strong> fleets</span>
+        </div>
+        <ng-container *ngIf="combinedStat.avgTicket > 0">
+          <span class="stat-meta-divider"></span>
+          <div class="stat-meta-item" pTooltip="Average transaction amount" tooltipPosition="top">
+            <i class="pi pi-chart-bar"></i>
+            <span>Avg <strong>Ksh {{ combinedStat.avgTicket | number: '1.0-0' }}</strong></span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Individual Payment Sources -->
+    <div class="stat-card-item" *ngFor="let stat of sourceStats"
+      [style.--source-color]="stat.colors.primary"
+      [style.--source-light]="stat.colors.light"
+      [style.--source-border]="stat.colors.border">
+      <div class="stat-card-header">
+        <div class="stat-card-title-group">
+          <div class="stat-icon-wrapper" [style.background]="stat.colors.gradient">
+            <i [class]="'pi ' + stat.icon"></i>
+          </div>
+          <div class="stat-header-text">
+            <span class="stat-card-title">{{ stat.displayName }}</span>
+            <span class="stat-card-subtitle">Channel Total</span>
+          </div>
+        </div>
+
+        <span class="stat-badge" [style.background]="stat.colors.light" [style.color]="stat.colors.primary"
+          [style.borderColor]="stat.colors.border">
+          {{ stat.percentage | number : '1.1-1' }}%
+        </span>
+      </div>
+
+      <div class="stat-card-body">
+        <span class="stat-amount-label">Total Amount</span>
+        <div class="stat-amount-row">
+          <span class="stat-currency">Ksh</span>
+          <span class="stat-amount-value">{{ stat.totalAmount | number : '1.2-2' }}</span>
+        </div>
+
+        <div class="stat-progress-track">
+          <div class="stat-progress-bar" [style.width.%]="stat.percentage"
+            [style.background]="stat.colors.gradient"></div>
+        </div>
+      </div>
+
+      <div class="stat-card-footer">
+        <div class="stat-meta-item" pTooltip="Successful transactions on this channel" tooltipPosition="top">
+          <i class="pi pi-receipt"></i>
+          <span><strong>{{ stat.count | number }}</strong> txns</span>
+        </div>
+        <span class="stat-meta-divider"></span>
+        <div class="stat-meta-item" pTooltip="Fleets served through this channel" tooltipPosition="top">
+          <i class="pi pi-car"></i>
+          <span><strong>{{ stat.uniqueFleets | number }}</strong> fleets</span>
+        </div>
+        <ng-container *ngIf="stat.avgTicket > 0">
+          <span class="stat-meta-divider"></span>
+          <div class="stat-meta-item" pTooltip="Average transaction ticket size" tooltipPosition="top">
+            <i class="pi pi-chart-bar"></i>
+            <span>Avg <strong>Ksh {{ stat.avgTicket | number: '1.0-0' }}</strong></span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= TABLE ================= -->
+  <p-card styleClass="stat-card card">
+    <div class="table-header">
+      <div class="table-header-left">
+        <h3>Transactions</h3>
+        <span class="record-count">{{ totalRecords }} of {{ allTransactions.length }} transactions</span>
+      </div>
+
+      <div class="export-buttons-group">
+        <app-action-button icon="pi-refresh" tooltip="Refresh" variant="primary"
+          (clicked)="toggleRefresh()"></app-action-button>
+
+        <button pButton icon="pi pi-file-excel" label="Excel" [style]="{ gap: '0.5rem' }"
+          class="p-button-success export-action-btn" [disabled]="allTransactions.length === 0 || isExporting"
+          [loading]="isExporting" (click)="exportExcel()" pTooltip="Export to Excel" tooltipPosition="bottom">
+        </button>
+        <button pButton icon="pi pi-file" label="CSV" [style]="{ gap: '0.5rem' }"
+          class="p-button-help export-action-btn" [disabled]="allTransactions.length === 0 || isExporting"
+          [loading]="isExporting" (click)="exportCSV()" pTooltip="Export to CSV" tooltipPosition="bottom">
+        </button>
+      </div>
+    </div>
+
+    <!-- ============ FILTER ROW ============ -->
+    <div class="filter-row">
+      <div class="search-container">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" placeholder="Search fleet or transaction ID..." [(ngModel)]="searchTerm"
+            (input)="onSearchChange()" class="search-input" />
+        </span>
+        <button *ngIf="searchTerm" pButton icon="pi pi-times" class="p-button-text p-button-sm clear-button"
+          (click)="clearSearch()" pTooltip="Clear search"></button>
+      </div>
+
+      <p-multiSelect [options]="paymentSourceOptions" [(ngModel)]="selectedPaymentSources"
+        (onChange)="onPaymentSourceFilterChange()" placeholder="Filter by payment source" display="chip"
+        styleClass="filter-dropdown" [style]="{ background: '#ffffff' }" [panelStyle]="{ background: '#ffffff' }">
+      </p-multiSelect>
+
+      <button *ngIf="searchTerm || selectedPaymentSources.length" pButton label="Clear all" icon="pi pi-filter-slash"
+        class="p-button-text p-button-sm" (click)="clearAllFilters()"></button>
+    </div>
+
+    <p-table [value]="transactions" [paginator]="true" [rows]="rows" [first]="first" [loading]="loading()"
+      [totalRecords]="totalRecords" [rowsPerPageOptions]="[10, 20, 30, 50, 100, 500]" [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} transactions" styleClass="data-table"
+      [tableStyle]="{ 'min-width': '55rem' }" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="transactionId">Transaction ID <p-sortIcon field="transactionId"></p-sortIcon></th>
+          <th pSortableColumn="fleetNumber">Fleet Number <p-sortIcon field="fleetNumber"></p-sortIcon></th>
+          <th pSortableColumn="paymentSource">Payment Source <p-sortIcon field="paymentSource"></p-sortIcon></th>
+          <th pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-txn>
+        <tr>
+          <td><span class="wallet-id">{{ txn.transactionId }}</span></td>
+          <td>{{ txn.fleetNumber }}</td>
+          <td>
+            <div class="category-cell">
+              <i [class]="'pi ' + getSourceIcon(txn.paymentSource)"></i>
+              <span>{{ getSourceDisplayName(txn.paymentSource) }}</span>
+            </div>
+          </td>
+          <td class="amount-cell">
+            <span class="amount">Ksh {{ txn.amount | number : '1.2-2' }}</span>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <h3>No Transactions Found</h3>
+              <p>No transactions match your filters for this date</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

@@ -37,6 +37,8 @@ import { LoadingStore } from '../../../../@core/state/loading.store';
 import { formatDateLocal } from '../../../../@core/utils/date-time.util';
 import { ActionButtonComponent } from "../../../components/action-button/action-button";
 import { ParcelReceiptComponent } from "../../../components/parcel-receipt/parcel-receipt";
+import { StagePerformanceComponent } from '../stage-performance/stage-performance';
+
 
 @Component({
   standalone: true,
@@ -71,6 +73,7 @@ import { ParcelReceiptComponent } from "../../../components/parcel-receipt/parce
     Paginator,
     TotalValuePipe,
     TotalAmountPipe,
+    StagePerformanceComponent,
   ],
 })
 export class ParcelsComponent implements OnInit {
@@ -119,6 +122,9 @@ export class ParcelsComponent implements OnInit {
   displayDetailDialog = false;
   displayReceiptDialog = false;
   selectedParcel: Parcel | null = null;
+
+  // Stage performance report dialog
+  displayStagePerformanceDialog = false;
 
   // Download state
   isDownloading = false;
@@ -270,7 +276,7 @@ export class ParcelsComponent implements OnInit {
    */
   loadParcels($event: any): void {
     this.lastEvent = $event;
-    this.fetchParcels(false, $event);
+    this.fetchParcels(true, $event); //false
   }
 
   fetchParcels(bypassCache: boolean, $event: any): void {
@@ -376,7 +382,7 @@ export class ParcelsComponent implements OnInit {
     const payload: any = {
       entityId: this.entityId,
       page: 0,
-      size: 6000,
+      size: 10000,
       paymentStatus: 'PAID',
       startDate: formatDateLocal(start),
       endDate: formatDateLocal(end),
@@ -629,6 +635,13 @@ export class ParcelsComponent implements OnInit {
   closeReceiptDialog(): void {
     this.displayReceiptDialog = false;
     this.selectedParcel = null;
+  }
+
+  /**
+   * Open the stage performance report dialog
+   */
+  openStagePerformance(): void {
+    this.displayStagePerformanceDialog = true;
   }
 
   /**

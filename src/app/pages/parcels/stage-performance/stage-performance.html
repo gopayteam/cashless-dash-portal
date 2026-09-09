@@ -1,0 +1,124 @@
+<!-- pages/parcels/stage-performance/stage-performance.component.html -->
+<p-dialog [(visible)]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [closable]="true"
+  [dismissableMask]="true" [draggable]="false" [resizable]="false" styleClass="custom-dialog"
+  [breakpoints]="{'960px': '90vw', '640px': '95vw'}" [style]="{ width: '95vw', maxWidth: '1100px' }" (onHide)="close()">
+
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div class="dialog-header-top">
+        <div class="dialog-icon"><i class="pi pi-chart-line"></i></div>
+        <div class="dialog-title-section">
+          <h2>Stage Performance Report</h2>
+          <span class="receipt-number-large">Parcels processed by source stage</span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="stage-performance-content">
+    <!-- Controls -->
+    <div class="report-controls">
+      <div class="control-item">
+        <label class="filter-label">Source Stage</label>
+        <p-select [options]="stageOptions" [(ngModel)]="selectedStageId" optionLabel="label" optionValue="value"
+          styleClass="filter-dropdown" [style]="{ width: '100%' }">
+        </p-select>
+      </div>
+
+      <div class="control-item control-item-filled">
+        <label class="filter-label">Date Range</label>
+        <mat-form-field appearance="outline" class="date-range-field">
+          <mat-date-range-input [rangePicker]="reportPicker">
+            <input matStartDate placeholder="Start date" [(ngModel)]="dateRange[0]" />
+            <input matEndDate placeholder="End date" [(ngModel)]="dateRange[1]" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matSuffix [for]="reportPicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #reportPicker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="control-item control-actions">
+        <button pButton icon="pi pi-chart-bar" label="Generate Report" class="p-button-primary" [loading]="isLoading"
+          [disabled]="isLoading" (click)="generateReport()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="report-loading" *ngIf="isLoading">
+      <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4"></p-progressSpinner>
+      <p class="text-muted">Crunching parcel data for the selected range…</p>
+    </div>
+
+    <!-- Empty state -->
+    <div class="report-empty" *ngIf="!isLoading && hasGenerated && rows.length === 0">
+      <i class="pi pi-inbox"></i>
+      <h3>No Parcels Found</h3>
+      <p>No parcels matched the selected stage and date range</p>
+    </div>
+
+    <!-- Results -->
+    <div class="report-results" *ngIf="!isLoading && rows.length > 0">
+      <div class="report-export-actions">
+        <button pButton icon="pi pi-file-excel" label="Excel" class="p-button-success export-action-btn"
+          [disabled]="isExporting" [loading]="isExporting" (click)="exportToExcel()" pTooltip="Export to Excel"
+          tooltipPosition="bottom">
+        </button>
+        <button pButton icon="pi pi-file" label="CSV" class="p-button-help export-action-btn" [disabled]="isExporting"
+          [loading]="isExporting" (click)="exportToCSV()" pTooltip="Export to CSV" tooltipPosition="bottom">
+        </button>
+      </div>
+
+      <p-table [value]="rows" styleClass="data-table" [tableStyle]="{ 'min-width': '55rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Stage</th>
+            <th>Parcels Processed</th>
+            <th>Total Amount</th>
+            <th>Cash</th>
+            <th>Cashless</th>
+            <th>Expenses</th>
+            <th>Net Revenue</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td><span class="bucket-label">{{ row.stageName }}</span></td>
+            <td>{{ row.parcelsProcessed | number }}</td>
+            <td class="amount-cell"><span class="amount">Ksh {{ row.totalAmount | number: '1.2-2' }}</span></td>
+            <td class="amount-cell"><span class="amount">Ksh {{ row.cashAmount | number: '1.2-2' }}</span></td>
+            <td class="amount-cell"><span class="amount">Ksh {{ row.cashlessAmount | number: '1.2-2' }}</span></td>
+            <td class="amount-cell"><span class="amount amount-danger">Ksh {{ row.totalExpenses | number: '1.2-2'
+                }}</span></td>
+            <td class="amount-cell"><span class="amount amount-highlight">Ksh {{ row.netRevenue | number: '1.2-2'
+                }}</span></td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="footer">
+          <tr>
+            <td><strong>Total</strong></td>
+            <td><strong>{{ grandTotals.parcelsProcessed | number }}</strong></td>
+            <td class="amount-cell"><strong class="amount">Ksh {{ grandTotals.totalAmount | number: '1.2-2' }}</strong>
+            </td>
+            <td class="amount-cell"><strong class="amount">Ksh {{ grandTotals.cashAmount | number: '1.2-2' }}</strong>
+            </td>
+            <td class="amount-cell"><strong class="amount">Ksh {{ grandTotals.cashlessAmount | number: '1.2-2'
+                }}</strong></td>
+            <td class="amount-cell"><strong class="amount">Ksh {{ grandTotals.totalExpenses | number: '1.2-2'
+                }}</strong></td>
+            <td class="amount-cell"><strong class="amount">Ksh {{ grandTotals.netRevenue | number: '1.2-2' }}</strong>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Close" icon="pi pi-times" iconPos="right" style="gap: 0.5rem" class="p-button-text"
+      (click)="close()">
+    </button>
+  </ng-template>
+</p-dialog>

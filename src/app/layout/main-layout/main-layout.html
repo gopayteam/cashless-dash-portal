@@ -46,6 +46,45 @@
             </ul>
           </li>
 
+          <!-- Information Category -->
+          <li>
+            <div class="menu-category">Information</div>
+            <ul class="menu-items">
+
+              <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/payment-source-transactions')"
+                  (click)="navigate('/payment-source-transactions')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
+                    <span class="menu-text">Transactions by Source</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/user-wallet-analytics')"
+                  (click)="navigate('/user-wallet-analytics')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
+                    <span class="menu-text">User Wallets</span>
+                  </span>
+                </button>
+              </li>
+
+              <li class="menu-item" *hasRole="'CAN_VIEW_DASHBOARD'">
+                <button class="menu-link" [class.menu-link--active]="isRouteActive('/app-collection-stats')"
+                  (click)="navigate('/app-collection-stats')">
+                  <span class="menu-link-content">
+                    <i class="pi pi-home menu-icon" style="color: rgb(131, 4, 4)"></i>
+                    <span class="menu-text">Collection Statistics</span>
+                  </span>
+                </button>
+              </li>
+
+
+            </ul>
+          </li>
+
           <!-- Transactions Category -->
           <li *ngIf="hasTransactionAccess()">
             <div class="menu-category">Transactions</div>

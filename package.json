@@ -22,7 +22,10 @@
         }
       },
       {
-        "vite": "5.4.11"
+        "files": "*.scss",
+        "options": {
+          "parser": "scss"
+        }
       }
     ]
   },
