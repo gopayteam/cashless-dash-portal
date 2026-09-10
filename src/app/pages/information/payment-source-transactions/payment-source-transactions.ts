@@ -100,6 +100,17 @@ export class PaymentSourceTransactionsComponent implements OnInit {
   // Fixed: this endpoint only ever deals in CREDIT transactions
   readonly transactionType = 'CREDIT';
 
+  // Vehicle visibility configuration
+  // false = hide SE00, SE01, SE02
+  // true  = show them
+  private readonly SHOW_SPECIAL_VEHICLES = false;
+  private readonly HIDDEN_VEHICLE_PREFIX = 'SE';
+  private readonly HIDDEN_VEHICLE_PREFIXES = [
+    'SE00',
+    'SE01',
+    'SE02',
+  ];
+
   // Master dataset for the selected date, and the derived/displayed dataset
   allTransactions: PaymentSourceTransaction[] = [];
   transactions: PaymentSourceTransaction[] = [];
@@ -181,7 +192,17 @@ export class PaymentSourceTransactionsComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-          this.allTransactions = response.data ?? [];
+          const fetchedTransactions = response.data ?? [];
+
+          this.allTransactions = this.SHOW_SPECIAL_VEHICLES
+            ? fetchedTransactions
+            : fetchedTransactions.filter((transaction) => {
+              const fleetNumber =
+                transaction.fleetNumber?.trim().toUpperCase() ?? '';
+
+              return !fleetNumber.startsWith(this.HIDDEN_VEHICLE_PREFIX);
+            });
+
           this.applyFilters();
           this.loadingStore.stop();
         },
